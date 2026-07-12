@@ -1,0 +1,55 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Kiriha.App">
+    <!-- RequestedThemeVariant 未指定 = Windows のダーク / ライト設定に自動追従 -->
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <!-- Chrome ライト配色 -->
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="TabStripBg" Color="#DEE1E6" />
+                    <SolidColorBrush x:Key="TabHoverBg" Color="#EDEFF2" />
+                    <SolidColorBrush x:Key="ContentBg" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="OmniboxBg" Color="#F1F3F4" />
+                    <SolidColorBrush x:Key="SidebarBg" Color="#F8F9FA" />
+                    <SolidColorBrush x:Key="StatusBg" Color="#F8F9FA" />
+                    <SolidColorBrush x:Key="TextPrimary" Color="#202124" />
+                    <SolidColorBrush x:Key="TextSecondary" Color="#5F6368" />
+                    <SolidColorBrush x:Key="TextTertiary" Color="#80868B" />
+                    <SolidColorBrush x:Key="Divider" Color="#E8EAED" />
+                    <SolidColorBrush x:Key="HoverBg" Color="#E8EAED" />
+                    <SolidColorBrush x:Key="CrumbHoverBg" Color="#E1E3E6" />
+                    <SolidColorBrush x:Key="CaptionHoverBg" Color="#CDD0D5" />
+                    <SolidColorBrush x:Key="TabCloseHoverBg" Color="#D0D3D9" />
+                    <SolidColorBrush x:Key="StatusDivider" Color="#D0D3D9" />
+                    <Color x:Key="AcrylicTintColor">#DEE1E6</Color>
+                </ResourceDictionary>
+                <!-- Chrome ダーク配色 -->
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="TabStripBg" Color="#202124" />
+                    <SolidColorBrush x:Key="TabHoverBg" Color="#292A2D" />
+                    <SolidColorBrush x:Key="ContentBg" Color="#35363A" />
+                    <SolidColorBrush x:Key="OmniboxBg" Color="#202124" />
+                    <SolidColorBrush x:Key="SidebarBg" Color="#2B2C2F" />
+                    <SolidColorBrush x:Key="StatusBg" Color="#2B2C2F" />
+                    <SolidColorBrush x:Key="TextPrimary" Color="#E8EAED" />
+                    <SolidColorBrush x:Key="TextSecondary" Color="#9AA0A6" />
+                    <SolidColorBrush x:Key="TextTertiary" Color="#9AA0A6" />
+                    <SolidColorBrush x:Key="Divider" Color="#4A4B4F" />
+                    <SolidColorBrush x:Key="HoverBg" Color="#4A4B4F" />
+                    <SolidColorBrush x:Key="CrumbHoverBg" Color="#45474B" />
+                    <SolidColorBrush x:Key="CaptionHoverBg" Color="#5F6368" />
+                    <SolidColorBrush x:Key="TabCloseHoverBg" Color="#5F6368" />
+                    <SolidColorBrush x:Key="StatusDivider" Color="#5F6368" />
+                    <Color x:Key="AcrylicTintColor">#202124</Color>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+
+    <Application.Styles>
+        <FluentTheme />
+    </Application.Styles>
+
+</Application>

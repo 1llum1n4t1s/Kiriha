@@ -1,0 +1,19 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PlatformTarget Condition="'$(PlatformTarget)' == ''">x64</PlatformTarget>
+    <Platforms>x64;ARM64</Platforms>
+    <SupportedOSPlatformVersion>8.0</SupportedOSPlatformVersion>
+    <Version>1.0.0</Version>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AssemblyTitle>Kiriha</AssemblyTitle>
+    <AssemblyDescription>Chrome ライクなタブ型ファイラー</AssemblyDescription>
+    <AssemblyCompany>1llum1n4t1s</AssemblyCompany>
+    <AssemblyProduct>Kiriha</AssemblyProduct>
+    <AssemblyCopyright>Copyright © 2026 ゆろち</AssemblyCopyright>
+    <Title>Kiriha</Title>
+    <Authors>ゆろち</Authors>
+  </PropertyGroup>
+</Project>

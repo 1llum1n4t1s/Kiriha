@@ -1,0 +1,14 @@
+# Kiriha ランディングページ配信 Worker。
+# kiriha.nephilim.jp は R2 バケットのカスタムドメインでもあるため、
+# Worker はトップページだけを返し、それ以外を R2 へ委譲する。
+name = "kiriha-landing"
+main = "worker.js"
+compatibility_date = "2026-05-01"
+
+routes = [
+  { pattern = "kiriha.nephilim.jp/*", zone_name = "nephilim.jp" },
+]
+
+[[rules]]
+type = "Text"
+globs = ["**/*.html"]

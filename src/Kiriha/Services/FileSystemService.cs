@@ -1,0 +1,110 @@
+using Kiriha.Models;
+
+namespace Kiriha.Services;
+
+/// <summary>ディレクトリ / ドライブの列挙を担当するサービス。</summary>
+public static class FileSystemService
+{
+    /// <summary>PC（ドライブ一覧）を表す仮想パス。</summary>
+    public const string ComputerPath = "";
+
+    /// <summary>サイドバー / パンくずに表示するドライブラベル（例: "Windows (C:)"）。</summary>
+    public static string GetDriveLabel(DriveInfo drive)
+        => string.IsNullOrEmpty(drive.VolumeLabel)
+            ? drive.Name.TrimEnd('\\')
+            : $"{drive.VolumeLabel} ({drive.Name.TrimEnd('\\')})";
+
+    private static string? TryGetDriveFormat(DriveInfo drive)
+    {
+        try
+        {
+            return drive.DriveFormat;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    /// <summary>指定パスのエントリ一覧を返す（フォルダー優先・名前順）。ComputerPath はドライブ一覧。</summary>
+    public static List<FileSystemEntry> GetEntries(string path, ShellOptions options)
+    {
+        if (path == ComputerPath)
+        {
+            return DriveInfo.GetDrives()
+                .Where(d => d.IsReady)
+                .Select(d => new FileSystemEntry
+                {
+                    Name = GetDriveLabel(d),
+                    DisplayName = GetDriveLabel(d),
+                    FullPath = d.RootDirectory.FullName,
+                    IsDirectory = true,
+                    IsDrive = true,
+                    MaterialIconKey = "", // MaterialIcon は IsDrive で常に null になるため未使用
+                    SizeTextOverride = $"空き {FileSystemEntry.FormatSize(d.AvailableFreeSpace)} / {FileSystemEntry.FormatSize(d.TotalSize)}",
+                    DriveFormat = TryGetDriveFormat(d),
+                    DriveUsedPercent = d.TotalSize > 0
+                        ? (d.TotalSize - d.AvailableFreeSpace) * 100.0 / d.TotalSize
+                        : 0,
+                })
+                .ToList();
+        }
+
+        // テーマ判定は列挙全体で 1 回だけ（行ごとに問い合わせない）
+        var preferLight = options.UseMaterialIcons && MaterialIconService.IsLightTheme();
+
+        var info = new DirectoryInfo(path);
+        var entries = new List<FileSystemEntry>();
+
+        foreach (var dir in info.EnumerateDirectories().OrderBy(d => d.Name, StringComparer.OrdinalIgnoreCase))
+        {
+            var hidden = (dir.Attributes & FileAttributes.Hidden) != 0;
+            if (!options.ShowHidden && hidden)
+            {
+                continue;
+            }
+
+            entries.Add(new FileSystemEntry
+            {
+                Name = dir.Name,
+                DisplayName = dir.Name,
+                FullPath = dir.FullName,
+                IsDirectory = true,
+                Modified = dir.LastWriteTime,
+                Created = dir.CreationTime,
+                IsHidden = hidden,
+                IsCut = ClipboardFileService.IsCutPath(dir.FullName),
+                MaterialIconKey = MaterialIconService.ResolveIconKey(dir.Name, isDirectory: true, preferLight),
+            });
+        }
+
+        foreach (var file in info.EnumerateFiles().OrderBy(f => f.Name, StringComparer.OrdinalIgnoreCase))
+        {
+            var hidden = (file.Attributes & FileAttributes.Hidden) != 0;
+            if (!options.ShowHidden && hidden)
+            {
+                continue;
+            }
+
+            var display = !options.ShowExtensions && Path.GetFileNameWithoutExtension(file.Name) is { Length: > 0 } stem
+                ? stem
+                : file.Name;
+
+            entries.Add(new FileSystemEntry
+            {
+                Name = file.Name,
+                DisplayName = display,
+                FullPath = file.FullName,
+                IsDirectory = false,
+                Size = file.Length,
+                Modified = file.LastWriteTime,
+                Created = file.CreationTime,
+                IsHidden = hidden,
+                IsCut = ClipboardFileService.IsCutPath(file.FullName),
+                MaterialIconKey = MaterialIconService.ResolveIconKey(file.Name, isDirectory: false, preferLight),
+            });
+        }
+
+        return entries;
+    }
+}

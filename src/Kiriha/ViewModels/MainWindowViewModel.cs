@@ -1,0 +1,964 @@
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Kiriha.Models;
+using Kiriha.Services;
+
+namespace Kiriha.ViewModels;
+
+/// <summary>タブの集合・固定タブの永続化・共有表示オプションを管理するメインウィンドウの ViewModel。</summary>
+public partial class MainWindowViewModel : ObservableObject
+{
+    private readonly AppSettings _settings;
+
+    /// <summary>共有アプリ設定（UpdateService が IgnoreUpdateTag を読み書きする）。</summary>
+    public AppSettings Settings => _settings;
+
+    public ObservableCollection<TabViewModel> Tabs { get; } = new();
+
+    /// <summary>左ペイン項目（SidebarHeader / SidebarLink の混在リスト）。</summary>
+    public ObservableCollection<object> SidebarItems { get; } = new();
+
+    /// <summary>全タブ共通の表示オプション（隠しファイル / 拡張子 / チェックボックス）。</summary>
+    public ShellOptions Options { get; }
+
+    /// <summary>お気に入りバーの内容（settings.json に永続化）。</summary>
+    public ObservableCollection<BookmarkNode> BookmarkItems { get; } = new();
+
+    [ObservableProperty]
+    private TabViewModel? _selectedTab;
+
+    /// <summary>ウィンドウタイトル（現在のフォルダー名 - Kiriha、タスクバー表示用）。</summary>
+    public string WindowTitle
+        => SelectedTab is { } tab && tab.Title.Length > 0 ? $"{tab.Title} - Kiriha" : "Kiriha";
+
+    partial void OnSelectedTabChanged(TabViewModel? value) => OnPropertyChanged(nameof(WindowTitle));
+
+    /// <summary>ステータスバーの表示状態（表示メニューで切替）。</summary>
+    [ObservableProperty]
+    private bool _showStatusBar = true;
+
+    [RelayCommand]
+    private void ToggleStatusBar() => ShowStatusBar = !ShowStatusBar;
+
+    /// <summary>プレビューペインの幅（Thumb ドラッグで変更）。</summary>
+    [ObservableProperty]
+    private double _previewWidth = 280;
+
+    /// <summary>お気に入りバーの表示状態（Ctrl+Shift+B で切替、永続化）。</summary>
+    [ObservableProperty]
+    private bool _showBookmarksBar;
+
+    /// <summary>閉じたタブのパス履歴（Ctrl+Shift+T で開き直す）。</summary>
+    private readonly Stack<string> _closedTabPaths = new();
+
+    /// <summary>左ペインの表示状態。</summary>
+    [ObservableProperty]
+    private bool _showSidebar = true;
+
+    /// <summary>左ペインの幅（Thumb ドラッグで変更、永続化）。</summary>
+    [ObservableProperty]
+    private double _sidebarWidth = 230;
+
+    /// <summary>プレビューペインの表示状態（Alt+P）。</summary>
+    [ObservableProperty]
+    private bool _showPreviewPane;
+
+    partial void OnShowBookmarksBarChanged(bool value)
+    {
+        _settings.ShowBookmarksBar = value;
+        SettingsService.Save(_settings);
+    }
+
+    partial void OnShowSidebarChanged(bool value)
+    {
+        _settings.ShowSidebar = value;
+        SettingsService.Save(_settings);
+    }
+
+    partial void OnSidebarWidthChanged(double value)
+    {
+        _settings.SidebarWidth = value; // 保存自体は終了時の SaveWindowBounds でまとめて行う
+    }
+
+    partial void OnShowPreviewPaneChanged(bool value)
+    {
+        _settings.ShowPreviewPane = value;
+        SettingsService.Save(_settings);
+        foreach (var tab in Tabs)
+        {
+            tab.SetPreviewEnabled(value);
+        }
+    }
+
+    [RelayCommand]
+    private void ToggleSidebar() => ShowSidebar = !ShowSidebar;
+
+    [RelayCommand]
+    private void TogglePreviewPane() => ShowPreviewPane = !ShowPreviewPane;
+
+    /// <summary>テーマ設定（System / Light / Dark）。設定タブの ComboBox から変更。</summary>
+    public string OptTheme
+    {
+        get => _settings.ThemePreference;
+        set
+        {
+            _settings.ThemePreference = value;
+            SettingsService.Save(_settings);
+            ApplyTheme(value);
+            OnPropertyChanged();
+        }
+    }
+
+    private void ApplyTheme(string preference)
+    {
+        if (Avalonia.Application.Current is { } app)
+        {
+            app.RequestedThemeVariant = preference switch
+            {
+                "Light" => Avalonia.Styling.ThemeVariant.Light,
+                "Dark" => Avalonia.Styling.ThemeVariant.Dark,
+                _ => Avalonia.Styling.ThemeVariant.Default,
+            };
+
+            // テーマ（明暗）が変わると背景の基準色も変わるため、アクリル半透明色を現在の設定で再計算する
+            Services.ThemeService.SetAcrylicEnabled(app, _settings.UseAcrylicBackground);
+        }
+    }
+
+    /// <summary>設定タブ: ウィンドウのアクリル（半透明ぼかし）効果（Lhamiel / RealTimeTranslator 同等）。</summary>
+    public bool OptUseAcrylicBackground
+    {
+        get => _settings.UseAcrylicBackground;
+        set
+        {
+            _settings.UseAcrylicBackground = value;
+            SettingsService.Save(_settings);
+            if (Avalonia.Application.Current is { } app)
+            {
+                Services.ThemeService.SetAcrylicEnabled(app, value);
+            }
+
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>設定タブ: 起動フォルダー。</summary>
+    public string OptStartupPath
+    {
+        get => _settings.StartupPath;
+        set
+        {
+            _settings.StartupPath = value;
+            SettingsService.Save(_settings);
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>設定タブ: 前回のタブを復元。</summary>
+    public bool OptRestoreAllTabs
+    {
+        get => _settings.RestoreAllTabs;
+        set
+        {
+            _settings.RestoreAllTabs = value;
+            SettingsService.Save(_settings);
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>設定タブ: ウィンドウのサイズと位置を保存して次回復元する。</summary>
+    public bool OptRememberWindowBounds
+    {
+        get => _settings.RememberWindowBounds;
+        set
+        {
+            _settings.RememberWindowBounds = value;
+            SettingsService.Save(_settings);
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>設定タブ: 最小化時にタスクバーではなくタスクトレイに格納する（Discord 相当）。</summary>
+    public bool OptMinimizeToTray
+    {
+        get => _settings.MinimizeToTray;
+        set
+        {
+            _settings.MinimizeToTray = value;
+            SettingsService.Save(_settings);
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>設定タブ: 起動時にウィンドウを表示せずタスクトレイに格納した状態で開始する（Discord 相当）。</summary>
+    public bool OptStartMinimizedToTray
+    {
+        get => _settings.StartMinimizedToTray;
+        set
+        {
+            _settings.StartMinimizedToTray = value;
+            SettingsService.Save(_settings);
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>設定タブ: Windows のスタートアップに登録する（真実の源は HKCU Run キー）。</summary>
+    public bool OptRunAtStartup
+    {
+        get => WindowsIntegrationService.IsStartupEnabled();
+        set
+        {
+            WindowsIntegrationService.SetStartupEnabled(value);
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>設定タブ: エクスプローラーの右クリックメニューに「Kiriha で開く」を追加する（真実の源は HKCU レジストリ）。</summary>
+    public bool OptExplorerContextMenu
+    {
+        get => WindowsIntegrationService.IsExplorerMenuEnabled();
+        set
+        {
+            WindowsIntegrationService.SetExplorerMenuEnabled(value);
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>設定タブ: 設定を既定値に戻す（固定タブとお気に入りは保持）。</summary>
+    [RelayCommand]
+    private void ResetSettings()
+    {
+        OptShowHidden = false;
+        OptShowExtensions = false;
+        OptShowCheckBoxes = false;
+        OptUseMaterialIcons = false;
+        OptCheckUpdatesOnStartup = true;
+        OptRestoreAllTabs = false;
+        OptStartupPath = "";
+        OptTheme = "System";
+        OptUseAcrylicBackground = true;
+        OptRememberWindowBounds = true;
+        OptRunAtStartup = false;
+        OptExplorerContextMenu = false;
+        OptMinimizeToTray = false;
+        OptStartMinimizedToTray = false;
+        ShowBookmarksBar = false;
+        ShowSidebar = true;
+        SidebarWidth = 230;
+        ShowPreviewPane = false;
+    }
+
+    /// <summary>設定タブ: ログフォルダーを開く。</summary>
+    [RelayCommand]
+    private void OpenLogFolder()
+    {
+        var dir = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Kiriha", "logs");
+        try
+        {
+            Directory.CreateDirectory(dir);
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("explorer.exe", $"\"{dir}\"") { UseShellExecute = true });
+        }
+        catch
+        {
+            // 開けなくても致命的ではない
+        }
+    }
+
+    /// <summary>設定タブ: クイックアクセスを再読み込み。</summary>
+    [RelayCommand]
+    private void ReloadSidebar() => RefreshSidebar();
+
+    // ===== オプションパネル用のバインディングプロパティ =====
+
+    public bool OptShowHidden
+    {
+        get => Options.ShowHidden;
+        set { Options.ShowHidden = value; OnPropertyChanged(); }
+    }
+
+    public bool OptShowExtensions
+    {
+        get => Options.ShowExtensions;
+        set { Options.ShowExtensions = value; OnPropertyChanged(); }
+    }
+
+    public bool OptShowCheckBoxes
+    {
+        get => Options.ShowCheckBoxes;
+        set { Options.ShowCheckBoxes = value; OnPropertyChanged(); }
+    }
+
+    /// <summary>設定タブ: アイコンセット（絵文字 / Material Icon Theme）。</summary>
+    public bool OptUseMaterialIcons
+    {
+        get => Options.UseMaterialIcons;
+        set { Options.UseMaterialIcons = value; OnPropertyChanged(); }
+    }
+
+    public bool OptCheckUpdatesOnStartup
+    {
+        get => _settings.CheckUpdatesOnStartup;
+        set
+        {
+            _settings.CheckUpdatesOnStartup = value;
+            SettingsService.Save(_settings);
+            OnPropertyChanged();
+        }
+    }
+
+    public string VersionText => $"Kiriha {typeof(MainWindowViewModel).Assembly.GetName().Version?.ToString(3) ?? "?"}";
+
+    /// <summary>Chrome の chrome://settings と同じく、設定を専用タブとして開く（既存があれば選択）。</summary>
+    [RelayCommand]
+    private void OpenSettings()
+    {
+        var existing = Tabs.FirstOrDefault(t => t.IsSettingsTab);
+        if (existing is not null)
+        {
+            SelectedTab = existing;
+            return;
+        }
+
+        var tab = new TabViewModel(FileSystemService.ComputerPath, Options, isSettingsTab: true);
+        Tabs.Add(tab);
+        tab.CloseRequested += (_, _) => CloseTab(tab);
+        SelectedTab = tab;
+    }
+
+    /// <summary>Ctrl+Shift+T: 最後に閉じたタブを開き直す（Chrome 互換）。</summary>
+    [RelayCommand]
+    private void ReopenClosedTab()
+    {
+        while (_closedTabPaths.Count > 0)
+        {
+            var path = _closedTabPaths.Pop();
+            if (path == FileSystemService.ComputerPath || Directory.Exists(path))
+            {
+                OpenInNewTab(path);
+                return;
+            }
+        }
+    }
+
+    [RelayCommand]
+    private void ToggleBookmarksBar() => ShowBookmarksBar = !ShowBookmarksBar;
+
+    public MainWindowViewModel()
+    {
+        _settings = SettingsService.Load();
+        Options = new ShellOptions
+        {
+            ShowHidden = _settings.ShowHidden,
+            ShowExtensions = _settings.ShowExtensions,
+        };
+        Options.ShowCheckBoxes = _settings.ShowCheckBoxes;
+        Options.UseMaterialIcons = _settings.UseMaterialIcons;
+        Options.Changed += (_, _) =>
+        {
+            _settings.ShowHidden = Options.ShowHidden;
+            _settings.ShowExtensions = Options.ShowExtensions;
+            _settings.ShowCheckBoxes = Options.ShowCheckBoxes;
+            _settings.UseMaterialIcons = Options.UseMaterialIcons;
+            SettingsService.Save(_settings);
+        };
+
+        _showBookmarksBar = _settings.ShowBookmarksBar;
+        _showSidebar = _settings.ShowSidebar;
+        _sidebarWidth = _settings.SidebarWidth is > 120 and < 600 ? _settings.SidebarWidth : 230;
+        _showPreviewPane = _settings.ShowPreviewPane;
+        ApplyTheme(_settings.ThemePreference);
+        RefreshBookmarks();
+        BuildSidebar();
+
+        // 前回の固定タブを復元してから通常タブを開く
+        foreach (var path in _settings.PinnedPaths)
+        {
+            if (path == FileSystemService.ComputerPath || Directory.Exists(path))
+            {
+                AddTab(path, pinned: true);
+            }
+        }
+
+        // 「前回開いていたタブを復元」設定（Chrome 互換）
+        var restored = false;
+        if (_settings.RestoreAllTabs)
+        {
+            foreach (var path in _settings.OpenTabPaths)
+            {
+                if (path == FileSystemService.ComputerPath || Directory.Exists(path))
+                {
+                    SelectedTab = AddTab(path, pinned: false);
+                    restored = true;
+                }
+            }
+        }
+
+        // コマンドライン引数のフォルダーを開く（kiriha.exe C:\path）
+        foreach (var arg in Program.StartupArgs)
+        {
+            if (Directory.Exists(arg))
+            {
+                SelectedTab = AddTab(Path.GetFullPath(arg), pinned: false);
+                restored = true;
+            }
+        }
+
+        if (!restored)
+        {
+            NewTab();
+        }
+    }
+
+    /// <summary>新しいタブの既定フォルダー（設定 > 起動フォルダー、無効ならユーザーフォルダー）。</summary>
+    private string NewTabPath
+        => _settings.StartupPath is { Length: > 0 } p && Directory.Exists(p)
+            ? p
+            : Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+    [RelayCommand]
+    private void NewTab()
+    {
+        var tab = AddTab(NewTabPath, pinned: false);
+        SelectedTab = tab;
+    }
+
+    private TabViewModel AddTab(string path, bool pinned)
+    {
+        var tab = new TabViewModel(path, Options);
+        if (Enum.TryParse<ViewMode>(_settings.DefaultViewMode, out var mode))
+        {
+            tab.ViewMode = mode;
+        }
+
+        Tabs.Add(tab);
+        tab.CloseRequested += (_, _) => CloseTab(tab);
+        tab.PropertyChanged += Tab_PropertyChanged;
+        tab.IsPinned = pinned;
+        tab.SetPreviewEnabled(ShowPreviewPane);
+        return tab;
+    }
+
+    private void Tab_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (sender is not TabViewModel tab)
+        {
+            return;
+        }
+
+        if (e.PropertyName == nameof(TabViewModel.IsPinned))
+        {
+            ReorderPinned(tab);
+            SavePinned();
+        }
+        else if (e.PropertyName == nameof(TabViewModel.PathText) && tab.IsPinned)
+        {
+            // 固定タブの移動先も保存し、次回同じ場所で復元する
+            SavePinned();
+        }
+        else if (e.PropertyName == nameof(TabViewModel.Title) && ReferenceEquals(tab, SelectedTab))
+        {
+            OnPropertyChanged(nameof(WindowTitle));
+        }
+        else if (e.PropertyName == nameof(TabViewModel.ViewMode))
+        {
+            // 最後に使った表示モードを新規タブの既定にする
+            _settings.DefaultViewMode = tab.ViewMode.ToString();
+            SettingsService.Save(_settings);
+        }
+    }
+
+    /// <summary>Chrome と同じく、固定タブは左端の固定ブロックへ移動する。</summary>
+    private void ReorderPinned(TabViewModel tab)
+    {
+        var index = Tabs.IndexOf(tab);
+        if (index < 0)
+        {
+            return;
+        }
+
+        var target = Tabs.Count(t => t != tab && t.IsPinned);
+        if (index != target)
+        {
+            Tabs.Move(index, target);
+        }
+    }
+
+    private void SavePinned()
+    {
+        _settings.PinnedPaths = Tabs.Where(t => t.IsPinned && !t.IsSettingsTab).Select(t => t.CurrentPath).ToList();
+        SettingsService.Save(_settings);
+    }
+
+    [RelayCommand]
+    private void CloseTab(TabViewModel tab)
+    {
+        var index = Tabs.IndexOf(tab);
+        if (index < 0)
+        {
+            return;
+        }
+
+        tab.Detach();
+        tab.PropertyChanged -= Tab_PropertyChanged;
+        if (!tab.IsSettingsTab)
+        {
+            _closedTabPaths.Push(tab.CurrentPath);
+        }
+
+        Tabs.RemoveAt(index);
+        if (tab.IsPinned)
+        {
+            SavePinned();
+        }
+
+        // Chrome と同じく最後の 1 タブを閉じたら新しいタブで維持する（ウィンドウは残す）
+        if (Tabs.Count == 0)
+        {
+            NewTab();
+            return;
+        }
+
+        if (SelectedTab is null || !Tabs.Contains(SelectedTab))
+        {
+            SelectedTab = Tabs[Math.Min(index, Tabs.Count - 1)];
+        }
+    }
+
+    // ===== お気に入りバー =====
+
+    public bool HasNoBookmarks => BookmarkItems.Count == 0;
+
+    /// <summary>settings の Bookmarks から表示用コレクションを再構築する。</summary>
+    public void RefreshBookmarks()
+    {
+        BookmarkItems.Clear();
+        foreach (var node in _settings.Bookmarks)
+        {
+            BookmarkItems.Add(node);
+        }
+
+        OnPropertyChanged(nameof(HasNoBookmarks));
+    }
+
+    public void SaveBookmarks()
+    {
+        SettingsService.Save(_settings);
+        RefreshBookmarks();
+    }
+
+    /// <summary>お気に入りバーへ追加（parent が null ならルート）。</summary>
+    public void AddBookmark(string path, BookmarkNode? parent = null)
+    {
+        var name = path == FileSystemService.ComputerPath
+            ? "PC"
+            : Path.GetFileName(path.TrimEnd(Path.DirectorySeparatorChar)) is { Length: > 0 } n ? n : path;
+        var target = parent?.Children ?? _settings.Bookmarks;
+        if (target.Any(b => string.Equals(b.Path, path, StringComparison.OrdinalIgnoreCase)))
+        {
+            return;
+        }
+
+        target.Add(new BookmarkNode { Name = name, Path = path });
+        SaveBookmarks();
+    }
+
+    public void AddBookmarkFolder(string name, BookmarkNode? parent = null)
+    {
+        var target = parent?.Children ?? _settings.Bookmarks;
+        target.Add(new BookmarkNode { Name = name, Children = new List<BookmarkNode>() });
+        SaveBookmarks();
+    }
+
+    public void RemoveBookmark(BookmarkNode node)
+    {
+        RemoveBookmarkRecursive(_settings.Bookmarks, node);
+        SaveBookmarks();
+    }
+
+    private static bool RemoveBookmarkRecursive(List<BookmarkNode> list, BookmarkNode node)
+    {
+        if (list.Remove(node))
+        {
+            return true;
+        }
+
+        return list.Any(child => child.Children is not null && RemoveBookmarkRecursive(child.Children, node));
+    }
+
+    public void RenameBookmark(BookmarkNode node, string newName)
+    {
+        if (!string.IsNullOrWhiteSpace(newName))
+        {
+            node.Name = newName;
+            SaveBookmarks();
+        }
+    }
+
+    /// <summary>Chrome の「名前順で並べ替え / パス名順で並べ替え」（フォルダー優先、ネスト内も再帰的に）。</summary>
+    public void SortBookmarks(bool byPath)
+    {
+        _settings.Bookmarks = SortBookmarkList(_settings.Bookmarks, byPath);
+        SaveBookmarks();
+    }
+
+    private static List<BookmarkNode> SortBookmarkList(List<BookmarkNode> list, bool byPath)
+    {
+        foreach (var folder in list.Where(b => b.Children is not null))
+        {
+            folder.Children = SortBookmarkList(folder.Children!, byPath);
+        }
+
+        return list
+            .OrderByDescending(b => b.IsFolder)
+            .ThenBy(b => byPath ? b.Path ?? "" : b.Name, StringComparer.CurrentCultureIgnoreCase)
+            .ToList();
+    }
+
+    /// <summary>ウィンドウの位置・サイズ・最大化状態・開いていたタブの保存（終了時に呼ばれる）。</summary>
+    public void SaveWindowBounds(double width, double height, int x, int y, bool maximized)
+    {
+        // 「ウィンドウのサイズと位置を保存する」が OFF のときはウィンドウ枠の情報は書き換えず、
+        // 開いていたタブなどセッション情報だけを保存する。
+        if (_settings.RememberWindowBounds)
+        {
+            if (!maximized)
+            {
+                _settings.WindowWidth = width;
+                _settings.WindowHeight = height;
+                _settings.WindowX = x;
+                _settings.WindowY = y;
+            }
+
+            _settings.WindowMaximized = maximized;
+        }
+
+        SaveOpenTabsAndSettings();
+    }
+
+    /// <summary>最小化中に閉じられた場合の保存（Win32 は最小化中の座標をセンチネル値 (-32000,-32000)
+    /// で返すため、位置・サイズは前回保存済みの値を維持し最大化フラグだけ更新する）。</summary>
+    public void SaveWindowMaximizedFlag(bool maximized)
+    {
+        if (_settings.RememberWindowBounds)
+        {
+            _settings.WindowMaximized = maximized;
+        }
+
+        SaveOpenTabsAndSettings();
+    }
+
+    private void SaveOpenTabsAndSettings()
+    {
+        _settings.OpenTabPaths = Tabs
+            .Where(t => !t.IsSettingsTab && !t.IsPinned)
+            .Select(t => t.CurrentPath)
+            .ToList();
+        SettingsService.Save(_settings);
+    }
+
+    /// <summary>前回のウィンドウサイズ（未保存なら null）。</summary>
+    public (double Width, double Height)? SavedWindowSize
+        => _settings.WindowWidth > 200 && _settings.WindowHeight > 200
+            ? (_settings.WindowWidth, _settings.WindowHeight)
+            : null;
+
+    /// <summary>前回のウィンドウ位置（未保存なら null）。</summary>
+    public (int X, int Y)? SavedWindowPosition
+        => _settings.WindowX != int.MinValue && _settings.WindowY != int.MinValue
+            ? (_settings.WindowX, _settings.WindowY)
+            : null;
+
+    public bool SavedWindowMaximized => _settings.WindowMaximized;
+
+    // ===== タブ操作（Chrome 互換） =====
+
+    /// <summary>指定パスを新しいタブで開く（サイドバー / お気に入りの中クリックなど）。</summary>
+    public void OpenInNewTab(string path)
+    {
+        var tab = AddTab(path, pinned: false);
+        SelectedTab = tab;
+    }
+
+    /// <summary>バックグラウンドの新しいタブで開く（Chrome の中クリックと同じく選択を移さない）。</summary>
+    public void OpenInNewTabBackground(string path) => AddTab(path, pinned: false);
+
+    /// <summary>最近閉じたタブの一覧（新しい順、最大 10 件）。</summary>
+    public IReadOnlyList<string> ClosedTabPaths => _closedTabPaths.Take(10).ToList();
+
+    /// <summary>「最近閉じたタブ」メニューから特定のパスを開き直す。</summary>
+    public void ReopenClosedPath(string path)
+    {
+        var list = _closedTabPaths.ToList();
+        if (list.Remove(path))
+        {
+            _closedTabPaths.Clear();
+            for (var i = list.Count - 1; i >= 0; i--)
+            {
+                _closedTabPaths.Push(list[i]);
+            }
+        }
+
+        if (path == FileSystemService.ComputerPath || Directory.Exists(path))
+        {
+            OpenInNewTab(path);
+        }
+    }
+
+    /// <summary>タブを左右に 1 つ移動する（Ctrl+Shift+PgUp/PgDn）。</summary>
+    public void MoveSelectedTab(int direction)
+    {
+        if (SelectedTab is { } tab)
+        {
+            MoveTab(tab, Tabs.IndexOf(tab) + direction);
+        }
+    }
+
+    /// <summary>ウィンドウのアクティブ化で全タブの貼り付け活性を再評価する。</summary>
+    public void NotifyClipboardChanged()
+    {
+        foreach (var tab in Tabs)
+        {
+            tab.NotifyClipboardChanged();
+        }
+    }
+
+    /// <summary>「新しいタブを右に開く」。</summary>
+    public void NewTabToRight(TabViewModel anchor)
+    {
+        var tab = AddTab(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), pinned: false);
+        var index = Tabs.IndexOf(anchor);
+        Tabs.Move(Tabs.IndexOf(tab), Math.Min(Math.Max(index + 1, Tabs.Count(t => t.IsPinned)), Tabs.Count - 1));
+        SelectedTab = tab;
+    }
+
+    /// <summary>次 / 前のタブへ切り替える（Ctrl+Tab / Ctrl+Shift+Tab）。</summary>
+    public void SelectAdjacentTab(int direction)
+    {
+        if (Tabs.Count == 0 || SelectedTab is null)
+        {
+            return;
+        }
+
+        var index = (Tabs.IndexOf(SelectedTab) + direction + Tabs.Count) % Tabs.Count;
+        SelectedTab = Tabs[index];
+    }
+
+    /// <summary>タブを複製する。</summary>
+    public void DuplicateTab(TabViewModel source)
+    {
+        if (source.IsSettingsTab)
+        {
+            return;
+        }
+
+        var tab = AddTab(source.CurrentPath, pinned: false);
+        var index = Tabs.IndexOf(source);
+        Tabs.Move(Tabs.IndexOf(tab), Math.Min(index + 1, Tabs.Count - 1));
+        SelectedTab = tab;
+    }
+
+    /// <summary>右側のタブを閉じる（固定タブは残す）。</summary>
+    public void CloseTabsToRight(TabViewModel anchor)
+    {
+        var index = Tabs.IndexOf(anchor);
+        foreach (var tab in Tabs.Skip(index + 1).Where(t => !t.IsPinned).ToList())
+        {
+            CloseTab(tab);
+        }
+    }
+
+    /// <summary>他のタブを閉じる（固定タブは残す）。</summary>
+    public void CloseOtherTabs(TabViewModel keep)
+    {
+        foreach (var tab in Tabs.Where(t => t != keep && !t.IsPinned).ToList())
+        {
+            CloseTab(tab);
+        }
+
+        SelectedTab = keep;
+    }
+
+    /// <summary>タブのドラッグ並べ替え（固定 / 非固定の境界を越えない）。</summary>
+    public void MoveTab(TabViewModel tab, int targetIndex)
+    {
+        var from = Tabs.IndexOf(tab);
+        if (from < 0 || targetIndex < 0 || targetIndex >= Tabs.Count || from == targetIndex)
+        {
+            return;
+        }
+
+        var pinnedCount = Tabs.Count(t => t.IsPinned);
+        if (tab.IsPinned && targetIndex >= pinnedCount)
+        {
+            targetIndex = pinnedCount - 1;
+        }
+        else if (!tab.IsPinned && targetIndex < pinnedCount)
+        {
+            targetIndex = pinnedCount;
+        }
+
+        if (from != targetIndex)
+        {
+            // ObservableCollection.Move の通知を ListBox の SelectedItem 双方向バインディングが
+            // 正しく維持しないことがあり、並べ替え中に選択が外れることがあるため明示的に復元する。
+            var previousSelection = SelectedTab;
+            Tabs.Move(from, targetIndex);
+            if (!ReferenceEquals(SelectedTab, previousSelection))
+            {
+                SelectedTab = previousSelection;
+            }
+
+            if (tab.IsPinned)
+            {
+                SavePinned();
+            }
+        }
+    }
+
+    /// <summary>タブ右クリックに追加した一括管理操作を実行する。</summary>
+    public void ExecuteTabManagement(string actionId, TabViewModel anchor)
+    {
+        if (!Tabs.Contains(anchor)) return;
+        var index = Tabs.IndexOf(anchor);
+        var normal = Tabs.Where(t => !t.IsSettingsTab).ToList();
+        switch (actionId)
+        {
+            case "tab.close-left":
+                foreach (var tab in Tabs.Take(index).Where(t => !t.IsPinned).ToList()) CloseTab(tab);
+                break;
+            case "tab.close-duplicates":
+                foreach (var group in normal.GroupBy(t => t.CurrentPath, StringComparer.OrdinalIgnoreCase))
+                    foreach (var tab in group.Skip(1).Where(t => !t.IsPinned).ToList()) CloseTab(tab);
+                break;
+            case "tab.close-unpinned":
+                foreach (var tab in normal.Where(t => !t.IsPinned).ToList()) CloseTab(tab);
+                break;
+            case "tab.pin-all": SetPinned(normal, true); break;
+            case "tab.unpin-all": SetPinned(normal, false); break;
+            case "tab.pin-left": SetPinned(Tabs.Take(index).Where(t => !t.IsSettingsTab).ToList(), true); break;
+            case "tab.pin-right": SetPinned(Tabs.Skip(index + 1).Where(t => !t.IsSettingsTab).ToList(), true); break;
+            case "tab.reload-all": RefreshTabs(normal); break;
+            case "tab.reload-left": RefreshTabs(Tabs.Take(index)); break;
+            case "tab.reload-right": RefreshTabs(Tabs.Skip(index + 1)); break;
+            case "tab.move-first": MoveTab(anchor, anchor.IsPinned ? 0 : Tabs.Count(t => t.IsPinned)); break;
+            case "tab.move-last": MoveTab(anchor, anchor.IsPinned ? Math.Max(0, Tabs.Count(t => t.IsPinned) - 1) : Tabs.Count - 1); break;
+            case "tab.sort-title": ReorderTabs(normal.OrderBy(t => t.Title, StringComparer.CurrentCultureIgnoreCase)); break;
+            case "tab.sort-path": ReorderTabs(normal.OrderBy(t => t.CurrentPath, StringComparer.OrdinalIgnoreCase)); break;
+            case "tab.reverse": ReorderTabs(normal.AsEnumerable().Reverse()); break;
+            case "tab.open-parent":
+                if (anchor.CurrentPath != FileSystemService.ComputerPath && Directory.GetParent(anchor.CurrentPath) is { } parent)
+                    OpenInNewTab(parent.FullName);
+                break;
+        }
+    }
+
+    private static void RefreshTabs(IEnumerable<TabViewModel> tabs)
+    {
+        foreach (var tab in tabs.Where(t => !t.IsSettingsTab).ToList()) tab.RefreshCommand.Execute(null);
+    }
+
+    private static void SetPinned(IEnumerable<TabViewModel> tabs, bool pinned)
+    {
+        foreach (var tab in tabs.ToList()) tab.IsPinned = pinned;
+    }
+
+    private void ReorderTabs(IEnumerable<TabViewModel> ordered)
+    {
+        var pinned = ordered.Where(t => t.IsPinned).ToList();
+        var unpinned = ordered.Where(t => !t.IsPinned).ToList();
+        var settings = Tabs.Where(t => t.IsSettingsTab).ToList();
+        var target = pinned.Concat(unpinned).Concat(settings).ToList();
+        for (var i = 0; i < target.Count; i++)
+        {
+            var current = Tabs.IndexOf(target[i]);
+            if (current != i) Tabs.Move(current, i);
+        }
+        SavePinned();
+    }
+
+    // ===== サイドバー =====
+
+    /// <summary>クイックアクセスのピン留め変更後などに左ペインを再構築する。</summary>
+    public void RefreshSidebar()
+    {
+        SidebarItems.Clear();
+        BuildSidebar();
+    }
+
+    private void BuildSidebar()
+    {
+        SidebarItems.Add(new SidebarHeader { Title = "クイックアクセス" });
+        foreach (var (name, path) in QuickAccessService.GetFolders())
+        {
+            SidebarItems.Add(new SidebarLink
+            {
+                Name = name,
+                Path = path,
+                Icon = IconFor(path),
+                IsQuickAccess = true,
+                Tooltip = path,
+            });
+        }
+
+        SidebarItems.Add(new SidebarHeader { Title = "PC" });
+        SidebarItems.Add(new SidebarLink { Name = "PC", Path = FileSystemService.ComputerPath, Icon = "🖥", Tooltip = "ドライブ一覧" });
+        foreach (var drive in DriveInfo.GetDrives().Where(d => d.IsReady))
+        {
+            SidebarItems.Add(new SidebarLink
+            {
+                Name = FileSystemService.GetDriveLabel(drive),
+                Path = drive.RootDirectory.FullName,
+                Icon = "💾",
+                Tooltip = $"空き {Models.FileSystemEntry.FormatSize(drive.AvailableFreeSpace)} / {Models.FileSystemEntry.FormatSize(drive.TotalSize)}",
+            });
+        }
+
+        SidebarItems.Add(new SidebarLink
+        {
+            Name = "ごみ箱",
+            Path = "shell:RecycleBinFolder",
+            Icon = "🗑",
+            IsShellCommand = true,
+            Tooltip = "ごみ箱をエクスプローラーで開く",
+        });
+
+        // 最近使用したファイル（クイックアクセスの列挙から。エクスプローラーのホーム相当）
+        var recent = QuickAccessService.GetRecentFiles();
+        if (recent.Count > 0)
+        {
+            SidebarItems.Add(new SidebarHeader { Title = "最近使用したファイル" });
+            foreach (var (name, path) in recent)
+            {
+                SidebarItems.Add(new SidebarLink
+                {
+                    Name = name,
+                    Path = path,
+                    Icon = "🕒",
+                    IsFile = true,
+                    Tooltip = path,
+                });
+            }
+        }
+    }
+
+    private static string IconFor(string path)
+    {
+        var profile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        if (PathEquals(path, Environment.GetFolderPath(Environment.SpecialFolder.Desktop))) return "🖥";
+        if (PathEquals(path, Path.Combine(profile, "Downloads"))) return "⬇";
+        if (PathEquals(path, Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments))) return "📄";
+        if (PathEquals(path, Environment.GetFolderPath(Environment.SpecialFolder.MyPictures))) return "🖼";
+        if (PathEquals(path, Environment.GetFolderPath(Environment.SpecialFolder.MyMusic))) return "🎵";
+        if (PathEquals(path, Environment.GetFolderPath(Environment.SpecialFolder.MyVideos))) return "🎬";
+        return "📁";
+    }
+
+    private static bool PathEquals(string a, string b)
+        => string.Equals(
+            a.TrimEnd(Path.DirectorySeparatorChar),
+            b.TrimEnd(Path.DirectorySeparatorChar),
+            StringComparison.OrdinalIgnoreCase);
+}

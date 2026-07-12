@@ -1,0 +1,53 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <ApplicationIcon>icon\app.ico</ApplicationIcon>
+    <UseWPF>false</UseWPF>
+    <UseWindowsForms>false</UseWindowsForms>
+    <Optimize>true</Optimize>
+    <DebugType>portable</DebugType>
+    <!-- ネイティブAOT -->
+    <PublishAot>true</PublishAot>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <!--
+      IL3053 = "Assembly produced AOT analysis warnings"。Velopack 内部の
+      Velopack.Windows.ShellLink+CShellLink (COM interop) を ILC が「Invalid IL or CLR
+      metadata」と判定し、Directory.Build.props の TreatWarningsAsErrors=true でビルドエラー化される。
+      該当 COM ctor は本アプリのコードパスでは呼ばれないため警告を抑制する (Lhamiel と同対応)。
+    -->
+    <NoWarn>$(NoWarn);IL3053</NoWarn>
+    <!-- CLIから -p:RuntimeIdentifier=win-arm64 で切り替え可能 -->
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">win-x64</RuntimeIdentifier>
+    <!-- source-generated COM (クイックアクセス取得) が unsafe コードを生成するため -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <SatelliteResourceLanguages>ja</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- ウィンドウタイトルバー / タスクバー用アイコン (exe アイコンとは別系統) -->
+    <AvaloniaResource Include="icon\app_icon.png" />
+    <!-- Material Icon Theme (MIT) から取得したファイル種別アイコン一式 (resvg でビルド時に PNG 化済み)。Assets/MaterialIcons/NOTICE.md 参照 -->
+    <AvaloniaResource Include="Assets\MaterialIcons\icons\*.png" />
+    <AvaloniaResource Include="Assets\MaterialIcons\manifest.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="12.1.0" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.1.0" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.0" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.0" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="SuperLightLogger" Version="1.0.9" />
+    <PackageReference Include="VelopackUpdateDialog.Avalonia" Version="1.0.10" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- VelopackUpdateDialog: ViewModel / DefaultStrings / DefaultIcons などが XAML compiled binding 経由でしか参照されないため、AOT trim で削られないよう root 化する -->
+    <TrimmerRootAssembly Include="VelopackUpdateDialog" />
+    <TrimmerRootAssembly Include="Velopack" />
+  </ItemGroup>
+
+</Project>

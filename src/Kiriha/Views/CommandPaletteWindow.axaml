@@ -1,0 +1,130 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Kiriha.Views.CommandPaletteWindow"
+        x:CompileBindings="False"
+        Title="コマンドパレット"
+        Width="620" Height="620" MinWidth="440" MinHeight="380"
+        WindowStartupLocation="CenterOwner"
+        WindowDecorations="BorderOnly"
+        Background="{DynamicResource TabStripBg}">
+    <Window.Styles>
+        <Style Selector="Button.caption">
+            <Setter Property="Width" Value="46" />
+            <Setter Property="Height" Value="34" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="CornerRadius" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="FontSize" Value="10" />
+            <Setter Property="FontFamily" Value="Segoe Fluent Icons,Segoe MDL2 Assets" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style Selector="Button.caption:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource CaptionHoverBg}" />
+        </Style>
+        <Style Selector="Button.caption.close:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#E81123" />
+        </Style>
+        <Style Selector="Button.caption.close:pointerover">
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="TextBox.paletteSearch">
+            <Setter Property="Height" Value="40" />
+            <Setter Property="Padding" Value="42,8,16,8" />
+            <Setter Property="CornerRadius" Value="20" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Divider}" />
+            <Setter Property="Background" Value="{DynamicResource OmniboxBg}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+        <Style Selector="TextBox.paletteSearch:focus">
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
+        </Style>
+        <Style Selector="ListBox.paletteList">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+        <Style Selector="ListBox.paletteList ListBoxItem">
+            <Setter Property="Padding" Value="12,9" />
+            <Setter Property="Margin" Value="0,2" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+        </Style>
+        <Style Selector="ListBox.paletteList ListBoxItem:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource HoverBg}" />
+        </Style>
+        <Style Selector="ListBox.paletteList ListBoxItem:selected /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource AccentSelectionBrush}" />
+        </Style>
+    </Window.Styles>
+
+    <Panel>
+        <ExperimentalAcrylicBorder IsHitTestVisible="False">
+            <ExperimentalAcrylicBorder.Material>
+                <ExperimentalAcrylicMaterial BackgroundSource="Digger" MaterialOpacity="0.85"
+                                             TintColor="{DynamicResource AcrylicTintColor}" TintOpacity="0.9" />
+            </ExperimentalAcrylicBorder.Material>
+        </ExperimentalAcrylicBorder>
+
+        <Grid RowDefinitions="34,*">
+            <!-- メイン画面のタブストリップと同じカスタムタイトルバー -->
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Background="{DynamicResource TabStripBg}"
+                  PointerPressed="TitleBar_PointerPressed">
+                <StackPanel Orientation="Horizontal" Margin="16,0,0,0" Spacing="9" VerticalAlignment="Center">
+                    <TextBlock Text="⌘" FontSize="17" Foreground="{DynamicResource TextSecondary}"
+                               VerticalAlignment="Center" />
+                    <TextBlock Text="コマンドパレット" FontSize="13" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center" />
+                </StackPanel>
+                <Button Grid.Column="1" Classes="caption close" Content="&#xE8BB;"
+                        Click="Close_Click" ToolTip.Tip="閉じる (Esc)" />
+            </Grid>
+
+            <Border Grid.Row="1" Background="{DynamicResource ContentBg}" CornerRadius="12,12,0,0"
+                    BorderBrush="{DynamicResource Divider}" BorderThickness="0,1,0,0">
+                <Grid RowDefinitions="Auto,*,32" Margin="16,16,16,0">
+                    <Grid Grid.Row="0" Margin="0,0,0,12">
+                        <TextBox x:Name="SearchBox" Classes="paletteSearch" PlaceholderText="機能を検索..."
+                                 TextChanged="SearchBox_TextChanged" KeyDown="SearchBox_KeyDown" />
+                        <TextBlock Text="&#xE721;" FontFamily="Segoe Fluent Icons" FontSize="15"
+                                   Foreground="{DynamicResource TextSecondary}" Margin="16,0,0,0"
+                                   HorizontalAlignment="Left" VerticalAlignment="Center"
+                                   IsHitTestVisible="False" />
+                    </Grid>
+
+                    <ListBox x:Name="CommandsList" Grid.Row="1" Classes="paletteList"
+                             ItemsSource="{Binding Commands}" DoubleTapped="CommandsList_DoubleTapped"
+                             KeyDown="CommandsList_KeyDown">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnDefinitions="110,*" Height="28">
+                                    <Border Grid.Column="0" Background="{DynamicResource OmniboxBg}"
+                                            CornerRadius="8" Padding="8,3" Margin="0,0,10,0">
+                                        <TextBlock Text="{Binding Category}" FontSize="11"
+                                                   Foreground="{DynamicResource TextSecondary}"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Border>
+                                    <TextBlock Grid.Column="1" Text="{Binding Title}" FontSize="13"
+                                               Foreground="{DynamicResource TextPrimary}"
+                                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <Border Grid.Row="2" BorderBrush="{DynamicResource Divider}" BorderThickness="0,1,0,0">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Text="↑↓ 選択   Enter 実行   Esc 閉じる" FontSize="10.5"
+                                       Foreground="{DynamicResource TextTertiary}" VerticalAlignment="Center" />
+                        <TextBlock x:Name="CountText" Grid.Column="1" FontSize="10.5"
+                                   Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" />
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+    </Panel>
+</Window>

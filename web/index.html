@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kiriha — タブで軽やかに使える Windows ファイルマネージャー</title>
+  <meta name="description" content="Kiriha（キリハ）は Chrome のようなタブ操作と Windows Explorer の使い勝手を組み合わせた、無料・オープンソースの Windows ファイルマネージャーです。Native AOT で軽快に起動し、標準シェルメニューや Explorer 互換のコピー＆ペースト、ドラッグ＆ドロップに対応します。" />
+  <meta name="keywords" content="Kiriha, キリハ, ファイルマネージャー, ファイラー, Windows, タブ, Explorer, Avalonia, Native AOT, オープンソース" />
+  <meta name="author" content="1llum1n4t1s" />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0b111b" />
+  <link rel="canonical" href="https://kiriha.nephilim.jp/" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Kiriha" />
+  <meta property="og:title" content="Kiriha — タブで軽やかに使える Windows ファイルマネージャー" />
+  <meta property="og:description" content="Chrome のようなタブ操作と Windows Explorer の使い勝手をひとつに。無料・オープンソースの Windows ファイルマネージャー。" />
+  <meta property="og:url" content="https://kiriha.nephilim.jp/" />
+  <meta property="og:locale" content="ja_JP" />
+  <meta property="og:locale:alternate" content="en_US" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Kiriha — Tabbed file manager for Windows" />
+  <meta name="twitter:description" content="Chrome-like tabs meet Windows Explorer familiarity. Free and open source." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700;900&amp;display=swap" rel="stylesheet" />
+  <script>document.documentElement.classList.add('js');</script>
+
+  <style>
+    :root {
+      --bg: #080d14;
+      --bg-2: #0b111b;
+      --panel: #111925;
+      --panel-2: #172230;
+      --panel-3: #1d2a39;
+      --blue: #3f9df5;
+      --blue-2: #72bdff;
+      --cyan: #67e8f9;
+      --text: #f4f8fc;
+      --muted: #9eacba;
+      --muted-2: #6f8193;
+      --line: #263648;
+      --line-soft: #1c2937;
+      --success: #75e6aa;
+      --shadow: 0 36px 90px rgba(0, 0, 0, .45);
+      --radius: 18px;
+      --max: 1180px;
+      --font: "Inter", "Zen Kaku Gothic New", system-ui, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 74% 2%, rgba(63, 157, 245, .14), transparent 32rem),
+        radial-gradient(circle at 5% 38%, rgba(103, 232, 249, .07), transparent 28rem),
+        var(--bg);
+      font: 400 clamp(15px, 1vw, 17px)/1.7 var(--font);
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    .wrap { width: min(calc(100% - 40px), var(--max)); margin-inline: auto; }
+    .en { display: block; color: var(--muted-2); font-size: .79em; line-height: 1.5; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+    .top-glow {
+      position: fixed;
+      inset: 0 0 auto;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--cyan), var(--blue), transparent);
+      opacity: .7;
+      z-index: 20;
+    }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 15;
+      border-bottom: 1px solid rgba(255,255,255,.07);
+      background: rgba(8, 13, 20, .78);
+      backdrop-filter: blur(18px) saturate(1.35);
+    }
+    .nav-inner { min-height: 70px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .brand { display: inline-flex; align-items: center; gap: 11px; font-weight: 800; letter-spacing: -.02em; }
+    .brand-mark {
+      position: relative;
+      width: 37px;
+      height: 37px;
+      flex: 0 0 auto;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 11px;
+      background: linear-gradient(150deg, #1d6fe0, #48b5fb);
+      box-shadow: 0 9px 26px rgba(33, 131, 235, .28), inset 0 1px rgba(255,255,255,.22);
+    }
+    .brand-mark::before {
+      content: "";
+      position: absolute;
+      left: 8px;
+      top: 10px;
+      width: 12px;
+      height: 7px;
+      border-radius: 3px 3px 0 0;
+      background: white;
+    }
+    .brand-mark::after {
+      content: "";
+      position: absolute;
+      left: 8px;
+      right: 7px;
+      top: 15px;
+      bottom: 8px;
+      border-radius: 3px 5px 5px 5px;
+      background: linear-gradient(#fff, #dcecff);
+    }
+    .brand-copy { display: flex; flex-direction: column; line-height: 1.05; }
+    .brand-copy b { font-size: 1.02rem; }
+    .brand-copy span { margin-top: 5px; color: var(--muted-2); font-size: .64rem; font-weight: 600; letter-spacing: .14em; }
+    .nav-links { display: flex; align-items: center; gap: 7px; }
+    .nav-links a { padding: 8px 12px; border-radius: 9px; color: var(--muted); font-size: .86rem; font-weight: 600; transition: .2s ease; }
+    .nav-links a:hover, .nav-links a:focus-visible { color: var(--text); background: rgba(255,255,255,.06); outline: none; }
+    .nav-links .github { margin-left: 3px; border: 1px solid var(--line); color: var(--text); }
+
+    .hero { position: relative; padding: clamp(70px, 10vw, 132px) 0 clamp(72px, 9vw, 116px); }
+    .hero::before {
+      content: "";
+      position: absolute;
+      width: 680px;
+      height: 680px;
+      right: -260px;
+      top: -180px;
+      border: 1px solid rgba(102, 185, 255, .09);
+      border-radius: 50%;
+      box-shadow: 0 0 0 85px rgba(72, 164, 250, .025), 0 0 0 170px rgba(72, 164, 250, .018);
+      pointer-events: none;
+    }
+    .hero-grid { display: grid; grid-template-columns: minmax(0, .86fr) minmax(500px, 1.14fr); align-items: center; gap: clamp(44px, 7vw, 86px); }
+    .badges { display: flex; flex-wrap: wrap; gap: 9px; margin-bottom: 27px; }
+    .badge { display: inline-flex; align-items: center; gap: 7px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 999px; background: rgba(17,25,37,.65); color: var(--muted); font-size: .72rem; font-weight: 700; }
+    .badge .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 4px rgba(117,230,170,.1); }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { margin-bottom: 17px; font-size: clamp(4rem, 8.5vw, 7.3rem); line-height: .9; letter-spacing: -.075em; }
+    .gradient-text { background: linear-gradient(110deg, #fff 8%, #aadaff 48%, #4c9ff4 86%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .reading { margin-bottom: 24px; color: var(--blue-2); font-size: .78rem; font-weight: 800; letter-spacing: .28em; }
+    .tagline { max-width: 630px; margin-bottom: 8px; font-size: clamp(1.3rem, 2.6vw, 2.08rem); line-height: 1.42; font-weight: 700; letter-spacing: -.035em; }
+    .tagline-en { max-width: 610px; margin-bottom: 31px; color: var(--muted); font-size: .94rem; line-height: 1.62; }
+    .cta { display: flex; flex-wrap: wrap; gap: 12px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 11px; min-height: 54px; padding: 10px 20px; border: 1px solid var(--line); border-radius: 12px; font-size: .9rem; font-weight: 800; transition: transform .2s ease, border-color .2s ease, background .2s ease; }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary { border-color: transparent; color: #06101b; background: linear-gradient(135deg, #8fd2ff, #3c96ed); box-shadow: 0 18px 35px -18px rgba(63,157,245,.8); }
+    .btn-ghost { background: rgba(255,255,255,.035); }
+    .btn-ghost:hover { border-color: #46617c; background: rgba(255,255,255,.065); }
+    .btn .arrow { font-size: 1.3rem; line-height: 1; }
+    .btn small { display: block; opacity: .68; font-size: .66rem; font-weight: 700; }
+    .hero-meta { display: flex; flex-wrap: wrap; gap: 17px 26px; margin-top: 25px; color: var(--muted); font-size: .77rem; }
+    .hero-meta b { display: block; color: var(--text); font-size: .8rem; }
+
+    .window {
+      position: relative;
+      width: 100%;
+      border: 1px solid #35485d;
+      border-radius: 15px;
+      overflow: hidden;
+      background: #111a25;
+      box-shadow: var(--shadow), 0 0 0 1px rgba(255,255,255,.025) inset;
+      transform: perspective(1200px) rotateY(-3deg) rotateX(1deg);
+      transform-origin: center;
+    }
+    .window::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(118deg, rgba(255,255,255,.07), transparent 28%); }
+    .tabbar { height: 43px; display: flex; align-items: end; gap: 5px; padding: 0 12px; background: #0b1119; }
+    .tab { height: 34px; min-width: 148px; padding: 0 13px; display: flex; align-items: center; gap: 8px; border-radius: 10px 10px 0 0; background: #182433; color: #dbe7f3; font-size: .68rem; }
+    .tab .mini-folder { width: 13px; height: 10px; border-radius: 2px; background: #4ea7f4; }
+    .tab .close { margin-left: auto; color: #7e8fa1; }
+    .new-tab { align-self: center; color: #8192a4; font-size: 1.1rem; }
+    .caption { margin-left: auto; align-self: center; display: flex; gap: 18px; padding: 0 4px 2px; color: #8798a9; font-size: .75rem; }
+    .toolbar { display: grid; grid-template-columns: auto minmax(0,1fr) 124px; align-items: center; gap: 10px; height: 53px; padding: 0 14px; border-bottom: 1px solid #202f3f; background: #121c28; }
+    .nav-actions { display: flex; gap: 8px; color: #8194a8; font-size: .8rem; }
+    .omnibox, .searchbox { height: 32px; display: flex; align-items: center; padding: 0 12px; border: 1px solid #26394c; border-radius: 8px; background: #0d1620; color: #aab8c6; font-size: .64rem; }
+    .crumb { color: #eef6ff; font-weight: 600; }
+    .sep { padding: 0 8px; color: #52677a; }
+    .searchbox { color: #65798d; }
+    .commandbar { height: 43px; display: flex; align-items: center; gap: 7px; padding: 0 14px; border-bottom: 1px solid #202f3f; color: #a9b8c6; font-size: .61rem; }
+    .commandbar span { padding: 5px 8px; border-radius: 5px; }
+    .commandbar .primary { color: #dcecff; background: #21364b; }
+    .file-body { display: grid; grid-template-columns: 118px minmax(0,1fr); min-height: 300px; }
+    .side { padding: 13px 8px; border-right: 1px solid #202f3f; background: #0f1823; }
+    .side-title { margin: 4px 8px 8px; color: #667c90; font-size: .55rem; font-weight: 700; text-transform: uppercase; }
+    .side-item { display: flex; align-items: center; gap: 7px; height: 28px; padding: 0 8px; border-radius: 6px; color: #9eafbf; font-size: .59rem; }
+    .side-item.active { color: #eaf5ff; background: #1d3043; }
+    .side-dot { width: 8px; height: 7px; border-radius: 2px; background: #4c9ce7; opacity: .85; }
+    .files { display: grid; grid-template-columns: repeat(4, 1fr); align-content: start; gap: 8px; padding: 20px 18px 26px; }
+    .file { min-width: 0; padding: 12px 4px 9px; border: 1px solid transparent; border-radius: 9px; text-align: center; color: #adbdcc; font-size: .57rem; }
+    .file.selected { border-color: #31577b; background: rgba(47, 111, 170, .18); }
+    .folder-icon { position: relative; width: 48px; height: 34px; margin: 5px auto 10px; border-radius: 4px 7px 7px 7px; background: linear-gradient(145deg, #4294e5, #75c5ff); box-shadow: inset 0 1px rgba(255,255,255,.22); }
+    .folder-icon::before { content: ""; position: absolute; left: 0; top: -5px; width: 22px; height: 9px; border-radius: 4px 4px 0 0; background: #5cb0f5; }
+    .folder-icon.code::after { content: "‹/›"; position: absolute; inset: 5px 0 0; display: grid; place-items: center; color: white; font-size: .75rem; font-weight: 800; }
+    .file-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .status { height: 26px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; border-top: 1px solid #202f3f; color: #6d8194; font-size: .55rem; }
+
+    .strip { border-block: 1px solid var(--line-soft); background: rgba(15, 24, 35, .72); }
+    .strip-inner { min-height: 76px; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 9px 13px; }
+    .strip-label { color: var(--muted-2); font-size: .7rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+    .chip { padding: 6px 10px; border: 1px solid var(--line); border-radius: 7px; color: #c2d0dc; background: rgba(255,255,255,.025); font-size: .7rem; font-weight: 700; }
+
+    .section { padding: clamp(78px, 10vw, 128px) 0; }
+    .section.compact { padding-top: 0; }
+    .section-head { max-width: 720px; margin-bottom: 44px; }
+    .eyebrow { display: inline-block; margin-bottom: 12px; color: var(--blue-2); font-size: .69rem; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; }
+    h2 { margin-bottom: 10px; font-size: clamp(2rem, 4.6vw, 3.55rem); line-height: 1.18; letter-spacing: -.055em; }
+    .heading-en { margin-bottom: 16px; color: var(--muted-2); font-size: .86rem; font-weight: 600; }
+    .section-head > p:last-child { color: var(--muted); }
+
+    .feature-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+    .card { position: relative; min-height: 238px; padding: 25px; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: linear-gradient(145deg, rgba(25,37,51,.9), rgba(12,19,28,.86)); transition: transform .24s ease, border-color .24s ease; }
+    .card::after { content: ""; position: absolute; width: 180px; height: 180px; left: calc(var(--mx, 50%) - 90px); top: calc(var(--my, 50%) - 90px); border-radius: 50%; background: radial-gradient(circle, rgba(74,166,250,.12), transparent 68%); pointer-events: none; }
+    .card:hover { transform: translateY(-4px); border-color: #395673; }
+    .card.wide { grid-column: span 2; }
+    .card-icon { width: 39px; height: 39px; margin-bottom: 23px; display: grid; place-items: center; border: 1px solid rgba(105,190,255,.2); border-radius: 10px; color: var(--blue-2); background: rgba(63,157,245,.1); font-size: 1.1rem; font-weight: 800; }
+    .card-kicker { display: block; margin-bottom: 6px; color: var(--muted-2); font-size: .68rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    h3 { margin-bottom: 11px; font-size: 1.1rem; letter-spacing: -.02em; }
+    .card p { margin: 0; color: var(--muted); font-size: .85rem; }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 17px; }
+    .tags span { padding: 4px 7px; border: 1px solid var(--line); border-radius: 6px; color: var(--muted-2); font-size: .6rem; font-weight: 700; }
+
+    .philosophy { display: grid; grid-template-columns: .82fr 1.18fr; gap: 54px; align-items: center; }
+    .compare { padding: 8px; border: 1px solid var(--line); border-radius: 20px; background: #0d151f; box-shadow: var(--shadow); }
+    .compare-row { display: grid; grid-template-columns: 118px 1fr; gap: 18px; padding: 18px; border-radius: 13px; }
+    .compare-row + .compare-row { border-top: 1px solid var(--line-soft); }
+    .compare-row.highlight { background: linear-gradient(90deg, rgba(63,157,245,.12), transparent); }
+    .compare-label { color: var(--blue-2); font-size: .69rem; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; }
+    .compare-copy b { display: block; margin-bottom: 3px; font-size: .92rem; }
+    .compare-copy span { color: var(--muted); font-size: .78rem; }
+    .principles { display: grid; gap: 22px; }
+    .principle { display: grid; grid-template-columns: 39px 1fr; gap: 15px; }
+    .number { width: 39px; height: 39px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 10px; color: var(--blue-2); background: var(--panel); font-size: .75rem; font-weight: 800; }
+    .principle b { display: block; margin-bottom: 3px; }
+    .principle p { margin: 0; color: var(--muted); font-size: .84rem; }
+
+    .req-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+    .req { min-height: 130px; padding: 22px; background: rgba(17,25,37,.72); }
+    .req + .req { border-left: 1px solid var(--line); }
+    .req .key { margin-bottom: 14px; color: var(--muted-2); font-size: .66rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    .req .value { font-size: .98rem; font-weight: 700; }
+    .req small { display: block; margin-top: 5px; color: var(--muted); font-size: .69rem; font-weight: 500; }
+
+    .download-panel { position: relative; padding: clamp(26px, 5vw, 54px); overflow: hidden; border: 1px solid #31506d; border-radius: 24px; background: linear-gradient(135deg, #172638, #0d151f 68%); box-shadow: var(--shadow); }
+    .download-panel::before { content: ""; position: absolute; width: 400px; height: 400px; right: -150px; top: -220px; border-radius: 50%; background: rgba(64,159,246,.12); filter: blur(10px); }
+    .download-head { position: relative; display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 30px; }
+    .download-head h2 { margin-bottom: 4px; }
+    .free { padding: 7px 11px; border: 1px solid rgba(117,230,170,.27); border-radius: 999px; color: var(--success); background: rgba(117,230,170,.07); font-size: .69rem; font-weight: 800; }
+    .download-grid { position: relative; display: grid; grid-template-columns: 1.35fr .65fr; gap: 12px; }
+    .download-card { min-height: 89px; padding: 16px 18px; display: flex; align-items: center; gap: 16px; border: 1px solid var(--line); border-radius: 14px; background: rgba(6,12,18,.42); transition: .22s ease; }
+    .download-card:hover { transform: translateY(-3px); border-color: #4d7397; background: rgba(25,45,64,.65); }
+    .download-card.primary { border-color: #3a76a9; background: linear-gradient(135deg, rgba(45,129,204,.25), rgba(6,12,18,.42)); }
+    .download-icon { width: 46px; height: 46px; display: grid; place-items: center; border-radius: 12px; color: var(--blue-2); background: rgba(63,157,245,.13); font-size: 1.45rem; }
+    .download-card b { display: block; font-size: .88rem; }
+    .download-card small { display: block; margin-top: 4px; color: var(--muted); font-size: .66rem; }
+    .download-card .go { margin-left: auto; color: var(--blue-2); font-size: 1.35rem; }
+    .notes { position: relative; display: flex; flex-wrap: wrap; gap: 13px 24px; margin-top: 20px; color: var(--muted); font-size: .7rem; }
+    .notes span::before { content: "✓"; margin-right: 6px; color: var(--success); font-weight: 800; }
+
+    footer { padding: 55px 0 28px; border-top: 1px solid var(--line-soft); background: #060a10; }
+    .footer-grid { display: grid; grid-template-columns: 1.5fr .75fr .9fr; gap: 52px; }
+    .footer-brand p { max-width: 430px; margin-top: 18px; color: var(--muted); font-size: .8rem; }
+    .footer-col { display: flex; flex-direction: column; align-items: start; gap: 9px; }
+    .footer-col h4 { margin: 0 0 5px; color: var(--muted-2); font-size: .67rem; letter-spacing: .13em; text-transform: uppercase; }
+    .footer-col a, .footer-col span { color: var(--muted); font-size: .75rem; }
+    .footer-col a:hover { color: var(--text); }
+    .footer-bottom { margin-top: 42px; padding-top: 22px; display: flex; justify-content: space-between; gap: 20px; border-top: 1px solid var(--line-soft); color: var(--muted-2); font-size: .68rem; }
+
+    .js .reveal { opacity: 0; transform: translateY(16px); transition: opacity .62s ease var(--delay, 0ms), transform .62s ease var(--delay, 0ms); }
+    .js .is-in .reveal, .js .reveal.is-in { opacity: 1; transform: none; }
+
+    @media (max-width: 980px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .hero-copy { max-width: 740px; }
+      .window { max-width: 720px; transform: none; }
+      .feature-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .card.wide { grid-column: span 2; }
+      .philosophy { grid-template-columns: 1fr; }
+      .req-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .req + .req { border-left: 0; }
+      .req:nth-child(even) { border-left: 1px solid var(--line); }
+      .req:nth-child(n+3) { border-top: 1px solid var(--line); }
+    }
+    @media (max-width: 700px) {
+      .wrap { width: min(calc(100% - 26px), var(--max)); }
+      .nav-inner { min-height: 62px; }
+      .nav-anchor { display: none; }
+      .nav-links a { padding: 7px 10px; }
+      .hero { padding-top: 62px; }
+      h1 { font-size: clamp(3.65rem, 20vw, 5.5rem); }
+      .toolbar { grid-template-columns: auto minmax(0,1fr); }
+      .searchbox { display: none; }
+      .commandbar span:nth-child(n+5) { display: none; }
+      .file-body { grid-template-columns: 88px minmax(0,1fr); min-height: 250px; }
+      .side-item { padding-inline: 5px; }
+      .files { grid-template-columns: repeat(3,1fr); padding: 17px 9px; }
+      .folder-icon { width: 39px; height: 28px; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .card.wide { grid-column: auto; }
+      .compare-row { grid-template-columns: 1fr; gap: 6px; }
+      .req-grid { grid-template-columns: 1fr; }
+      .req:nth-child(even) { border-left: 0; }
+      .req + .req { border-top: 1px solid var(--line); }
+      .download-head { align-items: start; flex-direction: column; }
+      .download-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .footer-brand { grid-column: 1 / -1; }
+      .footer-bottom { flex-direction: column; }
+    }
+    @media (max-width: 430px) {
+      .brand-copy span { display: none; }
+      .files { grid-template-columns: repeat(2,1fr); }
+      .file:nth-child(n+7) { display: none; }
+      .caption { gap: 11px; }
+      .tab { min-width: 124px; }
+      .cta .btn { width: 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      .js .reveal { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="top-glow" aria-hidden="true"></div>
+
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="#top" aria-label="Kiriha ホーム">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-copy"><b>Kiriha</b><span>FILE MANAGER</span></span>
+      </a>
+      <nav class="nav-links" aria-label="メインナビゲーション">
+        <a class="nav-anchor" href="#features">機能</a>
+        <a class="nav-anchor" href="#design">設計</a>
+        <a class="nav-anchor" href="#requirements">動作環境</a>
+        <a class="nav-anchor" href="#download">ダウンロード</a>
+        <a class="github" href="https://github.com/1llum1n4t1s/Kiriha" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <div class="badges reveal" style="--delay: 40ms">
+            <span class="badge"><span class="dot"></span>無料・オープンソース</span>
+            <span class="badge">Windows 10 / 11</span>
+            <span class="badge">Native AOT · .NET 10</span>
+          </div>
+          <h1 id="hero-title" class="reveal" style="--delay: 100ms"><span class="gradient-text">Kiriha</span></h1>
+          <p class="reading reveal" style="--delay: 150ms">キリハ</p>
+          <p class="tagline reveal" style="--delay: 200ms">タブは Chrome のように。<br />ファイル操作は Explorer のまま。</p>
+          <p class="tagline-en reveal" lang="en" style="--delay: 250ms">Chrome-like tabs meet the familiar power of Windows Explorer. A fast, native file manager built for the way you already work.</p>
+          <div class="cta reveal" style="--delay: 300ms">
+            <a class="btn btn-primary" href="https://kiriha.nephilim.jp/Kiriha-win-Setup.exe" download>
+              <span class="arrow" aria-hidden="true">↓</span>
+              <span>無料でダウンロード<small>Windows x64 · Setup.exe</small></span>
+            </a>
+            <a class="btn btn-ghost" href="https://github.com/1llum1n4t1s/Kiriha" target="_blank" rel="noopener noreferrer">
+              <span>ソースコード<small>View on GitHub</small></span><span aria-hidden="true">↗</span>
+            </a>
+          </div>
+          <div class="hero-meta reveal" style="--delay: 350ms">
+            <div><b>ランタイム不要</b>No runtime needed</div>
+            <div><b>標準シェル互換</b>Windows Shell compatible</div>
+            <div><b>広告・追跡なし</b>No ads or tracking</div>
+          </div>
+        </div>
+
+        <div class="window reveal" style="--delay: 180ms" role="img" aria-label="Kiriha のファイルマネージャー画面イメージ">
+          <div class="tabbar">
+            <div class="tab"><span class="mini-folder"></span><span>IMT</span><span class="close">×</span></div>
+            <div class="tab"><span class="mini-folder"></span><span>dev</span><span class="close">×</span></div>
+            <span class="new-tab">＋</span>
+            <span class="caption"><span>—</span><span>□</span><span>×</span></span>
+          </div>
+          <div class="toolbar">
+            <div class="nav-actions"><span>←</span><span>→</span><span>↻</span><span>↑</span></div>
+            <div class="omnibox"><span class="crumb">PC</span><span class="sep">›</span><span class="crumb">Windows (C:)</span><span class="sep">›</span><span class="crumb">Users</span><span class="sep">›</span><span class="crumb">IMT</span></div>
+            <div class="searchbox">⌕&nbsp; IMT の検索</div>
+          </div>
+          <div class="commandbar"><span class="primary">＋ 新規作成</span><span>切り取り</span><span>コピー</span><span>貼り付け</span><span>並べ替え⌄</span><span>表示⌄</span><span>場所⌄</span><span>種類⌄</span></div>
+          <div class="file-body">
+            <aside class="side" aria-hidden="true">
+              <div class="side-title">クイックアクセス</div>
+              <div class="side-item active"><span class="side-dot"></span>IMT</div>
+              <div class="side-item"><span class="side-dot"></span>デスクトップ</div>
+              <div class="side-item"><span class="side-dot"></span>dev</div>
+              <div class="side-item"><span class="side-dot"></span>ドキュメント</div>
+              <div class="side-title" style="margin-top:12px">PC</div>
+              <div class="side-item"><span class="side-dot"></span>Windows (C:)</div>
+            </aside>
+            <div class="files" aria-hidden="true">
+              <div class="file"><div class="folder-icon"></div><div class="file-name">Desktop</div></div>
+              <div class="file selected"><div class="folder-icon code"></div><div class="file-name">dev</div></div>
+              <div class="file"><div class="folder-icon"></div><div class="file-name">Documents</div></div>
+              <div class="file"><div class="folder-icon"></div><div class="file-name">Downloads</div></div>
+              <div class="file"><div class="folder-icon"></div><div class="file-name">Pictures</div></div>
+              <div class="file"><div class="folder-icon"></div><div class="file-name">Projects</div></div>
+              <div class="file"><div class="folder-icon"></div><div class="file-name">Saved Games</div></div>
+              <div class="file"><div class="folder-icon"></div><div class="file-name">Videos</div></div>
+            </div>
+          </div>
+          <div class="status"><span>70 個の項目</span><span>空き領域: 203 GB　 ●━━━━━━</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="strip" aria-label="主要機能">
+      <div class="wrap strip-inner">
+        <span class="strip-label">Built for Windows</span>
+        <span class="chip">Tabbed browsing</span>
+        <span class="chip">Shell context menu</span>
+        <span class="chip">Quick Access</span>
+        <span class="chip">Clipboard &amp; DnD</span>
+        <span class="chip">Live accent color</span>
+        <span class="chip">Auto update</span>
+      </div>
+    </section>
+
+    <section class="section" id="features" aria-labelledby="features-title">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <span class="eyebrow">Features</span>
+          <h2 id="features-title">慣れた操作に、<br />タブの自由を。</h2>
+          <p class="heading-en" lang="en">Everything familiar. Now with better flow.</p>
+          <p>Windows の作法を置き換えず、複数フォルダーを行き来する日常だけをもっと軽やかにします。</p>
+        </div>
+
+        <div class="feature-grid">
+          <article class="card wide reveal" style="--delay: 30ms">
+            <div class="card-icon" aria-hidden="true">＋</div>
+            <span class="card-kicker">Chrome-like Tabs</span>
+            <h3>迷わず使えるタブ操作</h3>
+            <p>新規タブ、固定、復元、ドラッグ並べ替え、中クリックで閉じる。Chrome と同じ感覚でフォルダーを整理できます。</p>
+            <div class="tags"><span>Ctrl+T</span><span>Ctrl+W</span><span>Ctrl+Tab</span><span>Pin</span><span>Restore</span></div>
+          </article>
+
+          <article class="card reveal" style="--delay: 80ms">
+            <div class="card-icon" aria-hidden="true">⋯</div>
+            <span class="card-kicker">Real Windows Shell</span>
+            <h3>本物のシェルメニュー</h3>
+            <p>コピー、削除、プロパティ、Open with、拡張機能が追加した項目まで、Windows 標準の右クリックメニューがそのまま動きます。</p>
+          </article>
+
+          <article class="card reveal" style="--delay: 30ms">
+            <div class="card-icon" aria-hidden="true">↔</div>
+            <span class="card-kicker">Explorer Compatible</span>
+            <h3>コピーも DnD も相互互換</h3>
+            <p>Explorer と Kiriha の間で切り取り・コピー・貼り付け、ドラッグ＆ドロップが自然につながります。</p>
+          </article>
+
+          <article class="card reveal" style="--delay: 80ms">
+            <div class="card-icon" aria-hidden="true">⌕</div>
+            <span class="card-kicker">Search &amp; Filter</span>
+            <h3>探す操作をすぐ近くに</h3>
+            <p>インクリメンタル検索、サブフォルダーを含む再帰検索、メディア・文書・開発ファイルなどの種別フィルターを搭載。</p>
+          </article>
+
+          <article class="card reveal" style="--delay: 130ms">
+            <div class="card-icon" aria-hidden="true">⌘</div>
+            <span class="card-kicker">Command Palette</span>
+            <h3>機能を横断検索</h3>
+            <p><strong>Ctrl+Shift+P</strong> でコマンドパレットを開き、タブ、表示、選択、ファイル操作を名前から実行できます。</p>
+          </article>
+
+          <article class="card reveal" style="--delay: 30ms">
+            <div class="card-icon" aria-hidden="true">◫</div>
+            <span class="card-kicker">Views &amp; Preview</span>
+            <h3>用途に合わせた表示</h3>
+            <p>詳細・一覧・連続ズーム可能なアイコン表示、画像サムネイル、Alt+P のプレビューペイン、列のカスタマイズに対応。</p>
+          </article>
+
+          <article class="card reveal" style="--delay: 80ms">
+            <div class="card-icon" aria-hidden="true">◐</div>
+            <span class="card-kicker">Windows Theme</span>
+            <h3>テーマとアクセントに追従</h3>
+            <p>Windows のダーク / ライトテーマとアクセントカラーを即時反映。Material Icon Theme のカラーアイコンにも切り替えられます。</p>
+          </article>
+
+          <article class="card reveal" style="--delay: 130ms">
+            <div class="card-icon" aria-hidden="true">⚡</div>
+            <span class="card-kicker">Native AOT</span>
+            <h3>軽快なネイティブ起動</h3>
+            <p>.NET 10 Native AOT の自己完結型アプリ。別途ランタイムをインストールする必要はありません。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section compact" id="design" aria-labelledby="design-title">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <span class="eyebrow">Design Principle</span>
+          <h2 id="design-title">新しく覚えなくていい、<br />新しいファイラー。</h2>
+          <p class="heading-en" lang="en">A new file manager you already know how to use.</p>
+        </div>
+        <div class="philosophy">
+          <div class="compare reveal">
+            <div class="compare-row highlight">
+              <div class="compare-label">Browser-shaped</div>
+              <div class="compare-copy"><b>タブ、アドレス入力、お気に入りバー</b><span>Chrome の操作語彙を採用</span></div>
+            </div>
+            <div class="compare-row">
+              <div class="compare-label">Explorer-shaped</div>
+              <div class="compare-copy"><b>パンくず、クイックアクセス、ファイル操作</b><span>Windows Explorer の作法を維持</span></div>
+            </div>
+            <div class="compare-row">
+              <div class="compare-label">Kiriha</div>
+              <div class="compare-copy"><b>二つの「いつもの」を、一つの流れに</b><span>慣れたまま、移動だけが速くなる</span></div>
+            </div>
+          </div>
+
+          <div class="principles reveal" style="--delay: 100ms">
+            <div class="principle"><span class="number">01</span><div><b>Windows と共存する</b><p>標準 API とシェル機能を使い、Explorer との行き来を分断しません。</p></div></div>
+            <div class="principle"><span class="number">02</span><div><b>状態はタブごとに保つ</b><p>履歴、検索、並べ替え、表示モードは開いている場所ごとに独立します。</p></div></div>
+            <div class="principle"><span class="number">03</span><div><b>作業は次回へつなぐ</b><p>ウィンドウ位置、タブ、固定タブ、起動フォルダーを復元できます。</p></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section compact" id="requirements" aria-labelledby="requirements-title">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <span class="eyebrow">System Requirements</span>
+          <h2 id="requirements-title">動作環境</h2>
+          <p class="heading-en" lang="en">Built natively for modern Windows.</p>
+        </div>
+        <div class="req-grid reveal">
+          <div class="req"><div class="key">OS</div><div class="value">Windows 10 / 11<small>64-bit エディション</small></div></div>
+          <div class="req"><div class="key">Architecture</div><div class="value">x64<small>Intel / AMD 64-bit</small></div></div>
+          <div class="req"><div class="key">Runtime</div><div class="value">不要 / None<small>.NET 10 Native AOT</small></div></div>
+          <div class="req"><div class="key">License</div><div class="value">MIT<small>Free &amp; open source</small></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section compact" id="download" aria-labelledby="download-title">
+      <div class="wrap">
+        <div class="download-panel reveal">
+          <div class="download-head">
+            <div><span class="eyebrow">Download</span><h2 id="download-title">Kiriha を始める</h2><p class="heading-en" lang="en">Get Kiriha for Windows.</p></div>
+            <span class="free">¥0 · 完全無料</span>
+          </div>
+          <div class="download-grid">
+            <a class="download-card primary" href="https://kiriha.nephilim.jp/Kiriha-win-Setup.exe" download>
+              <span class="download-icon" aria-hidden="true">⊞</span>
+              <span><b>Windows x64 インストーラー</b><small>Intel / AMD 64-bit · Setup.exe</small></span>
+              <span class="go" aria-hidden="true">↓</span>
+            </a>
+            <a class="download-card" href="https://github.com/1llum1n4t1s/Kiriha" target="_blank" rel="noopener noreferrer">
+              <span class="download-icon" aria-hidden="true">&lt;/&gt;</span>
+              <span><b>ソースコード</b><small>GitHub repository</small></span>
+              <span class="go" aria-hidden="true">↗</span>
+            </a>
+          </div>
+          <div class="notes"><span>Velopack による自動更新</span><span>広告・課金・トラッキングなし</span><span>GitHub で全ソースを公開</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer aria-labelledby="footer-title">
+    <h2 id="footer-title" class="sr-only">フッター</h2>
+    <div class="wrap">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a class="brand" href="#top" aria-label="Kiriha ホーム"><span class="brand-mark" aria-hidden="true"></span><span class="brand-copy"><b>Kiriha</b><span>FILE MANAGER</span></span></a>
+          <p>Chrome のようなタブ操作と Windows Explorer の使い勝手を組み合わせた、無料・オープンソースのファイルマネージャー。</p>
+        </div>
+        <nav class="footer-col" aria-label="製品リンク"><h4>Product</h4><a href="#features">機能 / Features</a><a href="#design">設計 / Design</a><a href="#requirements">動作環境 / Requirements</a><a href="#download">ダウンロード / Download</a></nav>
+        <nav class="footer-col" aria-label="プロジェクトリンク"><h4>Project</h4><a href="https://github.com/1llum1n4t1s/Kiriha" target="_blank" rel="noopener noreferrer">GitHub リポジトリ ↗</a><a href="https://github.com/1llum1n4t1s/Kiriha/issues" target="_blank" rel="noopener noreferrer">不具合報告 / Issues ↗</a><a href="https://github.com/1llum1n4t1s/Kiriha/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">MIT ライセンス ↗</a><span>自動更新 / Velopack</span></nav>
+      </div>
+      <div class="footer-bottom"><span>© 2026 1llum1n4t1s. Kiriha is free and open-source software.</span><span>Made for Windows · Built with Avalonia</span></div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var sections = document.querySelectorAll('section, footer');
+      if (reduce || !('IntersectionObserver' in window)) {
+        sections.forEach(function (section) { section.classList.add('is-in'); });
+      } else {
+        var observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-in');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { rootMargin: '0px 0px -7% 0px', threshold: .07 });
+        sections.forEach(function (section) { observer.observe(section); });
+        document.querySelector('.hero').classList.add('is-in');
+      }
+
+      if (!reduce) {
+        document.querySelectorAll('.card').forEach(function (card) {
+          card.addEventListener('pointermove', function (event) {
+            var rect = card.getBoundingClientRect();
+            card.style.setProperty('--mx', (event.clientX - rect.left) + 'px');
+            card.style.setProperty('--my', (event.clientY - rect.top) + 'px');
+          });
+        });
+      }
+    }());
+  </script>
+</body>
+</html>
