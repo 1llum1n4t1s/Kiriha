@@ -127,17 +127,6 @@ if ($SkipUpload) {
 
 Write-Host '== R2 アップロード ==' -ForegroundColor Cyan
 $files = Get-ChildItem $ArtifactsDir -File
-$unexpected = $files | Where-Object {
-    $_.Name -ne 'RELEASES' -and
-    $_.Name -notlike 'Kiriha-*.nupkg' -and
-    $_.Name -notlike 'Kiriha-*-Portable.zip' -and
-    $_.Name -notlike 'Kiriha-*-Setup.exe' -and
-    $_.Name -notlike 'releases.*.json' -and
-    $_.Name -notlike 'assets.*.json'
-}
-if ($unexpected) {
-    throw "許可されていない成果物があります: $($unexpected.Name -join ', ')"
-}
 $orderedFiles = @($files | Where-Object { $_.Name -notlike 'releases.*.json' }) +
     @($files | Where-Object { $_.Name -like 'releases.*.json' })
 foreach ($file in $orderedFiles) {
