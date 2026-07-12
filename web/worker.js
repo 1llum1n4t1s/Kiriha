@@ -1,8 +1,6 @@
 // kiriha.nephilim.jp のランディングページ配信 Worker。
 //
-// 同じホスト名の R2 カスタムドメインは Velopack の更新ファイルを配信する。
-// トップページだけを Worker から返し、Setup.exe や nupkg、リリース情報は
-// R2 へそのまま委譲して Range / キャッシュなどの配信挙動を維持する。
+// トップページを Worker から返す。
 import landingHtml from "./index.html";
 
 export default {
@@ -18,7 +16,14 @@ export default {
       });
     }
 
-    // 更新配信パスには手を加えず R2 のレスポンスを返す。
-    return fetch(request);
+    // Custom Domain 上の同じ URL を fetch すると自分自身を再呼び出しするため、
+    // 配置されていないパスは明示的に 404 にする。
+    return new Response("ページが見つかりません。", {
+      status: 404,
+      headers: {
+        "content-type": "text/plain; charset=utf-8",
+        "cache-control": "no-store",
+      },
+    });
   },
 };
