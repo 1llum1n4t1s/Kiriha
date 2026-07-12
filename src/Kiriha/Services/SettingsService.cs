@@ -9,6 +9,9 @@ public sealed class AppSettings
     /// <summary>固定タブのパス（並び順どおり）。次回起動時に復元する。</summary>
     public List<string> PinnedPaths { get; set; } = new();
 
+    /// <summary>設定タブを固定タブとして次回起動時も復元する。</summary>
+    public bool PinnedSettingsTab { get; set; }
+
     public bool ShowHidden { get; set; }
 
     public bool ShowExtensions { get; set; }
@@ -91,6 +94,7 @@ public static class SettingsService
     private static readonly string SettingsPath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "Kiriha", "settings.json");
+    private static readonly string BackupPath = SettingsPath + ".bak";
 
     public static AppSettings Load()
     {
@@ -102,9 +106,24 @@ public static class SettingsService
                        ?? new AppSettings();
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // 壊れた設定ファイルは既定値で継続する
+            Logger.LogException("設定ファイルを読み込めませんでした", ex);
+            PreserveCorruptSettings();
+            try
+            {
+                if (File.Exists(BackupPath))
+                {
+                    return JsonSerializer.Deserialize(
+                               File.ReadAllText(BackupPath),
+                               SettingsJsonContext.Default.AppSettings)
+                           ?? new AppSettings();
+                }
+            }
+            catch (Exception backupEx)
+            {
+                Logger.LogException("設定バックアップも読み込めませんでした", backupEx);
+            }
         }
 
         return new AppSettings();
@@ -114,12 +133,57 @@ public static class SettingsService
     {
         try
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(SettingsPath)!);
-            File.WriteAllText(SettingsPath, JsonSerializer.Serialize(settings, SettingsJsonContext.Default.AppSettings));
+            var directory = Path.GetDirectoryName(SettingsPath)!;
+            Directory.CreateDirectory(directory);
+            var temporary = Path.Combine(directory, $"settings-{Guid.NewGuid():N}.tmp");
+            try
+            {
+                var json = JsonSerializer.Serialize(settings, SettingsJsonContext.Default.AppSettings);
+                using (var stream = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+                using (var writer = new StreamWriter(stream, new System.Text.UTF8Encoding(false)))
+                {
+                    writer.Write(json);
+                    writer.Flush();
+                    stream.Flush(flushToDisk: true);
+                }
+
+                if (File.Exists(SettingsPath))
+                {
+                    File.Replace(temporary, SettingsPath, BackupPath, ignoreMetadataErrors: true);
+                }
+                else
+                {
+                    File.Move(temporary, SettingsPath);
+                }
+            }
+            finally
+            {
+                File.Delete(temporary);
+            }
         }
-        catch
+        catch (Exception ex)
         {
-            // 保存失敗は致命的でないため無視する（次回保存で再試行）
+            Logger.LogException("設定ファイルを保存できませんでした", ex);
+        }
+    }
+
+    private static void PreserveCorruptSettings()
+    {
+        try
+        {
+            if (!File.Exists(SettingsPath))
+            {
+                return;
+            }
+
+            var corruptPath = Path.Combine(
+                Path.GetDirectoryName(SettingsPath)!,
+                $"settings-{DateTime.UtcNow:yyyyMMdd-HHmmssfff}.corrupt.json");
+            File.Copy(SettingsPath, corruptPath, overwrite: false);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException("壊れた設定ファイルを退避できませんでした", ex);
         }
     }
 }

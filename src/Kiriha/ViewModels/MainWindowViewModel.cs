@@ -226,6 +226,22 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
+    /// <summary>設定タブ: フォルダーとドライブを開く既定アプリを Kiriha にする。</summary>
+    public bool OptDefaultFolderApp
+    {
+        get => WindowsIntegrationService.IsDefaultFolderAppEnabled();
+        set
+        {
+            _ = WindowsIntegrationService.SetDefaultFolderAppEnabled(value);
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(OptDefaultFolderAppStatus));
+        }
+    }
+
+    public string OptDefaultFolderAppStatus => OptDefaultFolderApp
+        ? "現在、フォルダーとドライブは Kiriha で開きます。解除すると変更前の動作へ戻します。"
+        : "有効にすると、エクスプローラーでフォルダーやドライブを開いたときに Kiriha が起動します。";
+
     /// <summary>設定タブ: 設定を既定値に戻す（固定タブとお気に入りは保持）。</summary>
     [RelayCommand]
     private void ResetSettings()
@@ -242,6 +258,7 @@ public partial class MainWindowViewModel : ObservableObject
         OptRememberWindowBounds = true;
         OptRunAtStartup = false;
         OptExplorerContextMenu = false;
+        OptDefaultFolderApp = false;
         OptMinimizeToTray = false;
         OptStartMinimizedToTray = false;
         ShowBookmarksBar = false;
@@ -259,7 +276,7 @@ public partial class MainWindowViewModel : ObservableObject
         try
         {
             Directory.CreateDirectory(dir);
-            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("explorer.exe", $"\"{dir}\"") { UseShellExecute = true });
+            TrustedProcessLauncher.Start("explorer.exe", [dir], Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
         }
         catch
         {
@@ -322,9 +339,7 @@ public partial class MainWindowViewModel : ObservableObject
             return;
         }
 
-        var tab = new TabViewModel(FileSystemService.ComputerPath, Options, isSettingsTab: true);
-        Tabs.Add(tab);
-        tab.CloseRequested += (_, _) => CloseTab(tab);
+        var tab = AddSettingsTab(pinned: false);
         SelectedTab = tab;
     }
 
@@ -371,7 +386,12 @@ public partial class MainWindowViewModel : ObservableObject
         _showPreviewPane = _settings.ShowPreviewPane;
         ApplyTheme(_settings.ThemePreference);
         RefreshBookmarks();
-        BuildSidebar();
+        BuildSidebar(QuickAccessService.GetFallbackSnapshot());
+
+        if (_settings.PinnedSettingsTab)
+        {
+            AddSettingsTab(pinned: true);
+        }
 
         // 前回の固定タブを復元してから通常タブを開く
         foreach (var path in _settings.PinnedPaths)
@@ -397,14 +417,7 @@ public partial class MainWindowViewModel : ObservableObject
         }
 
         // コマンドライン引数のフォルダーを開く（kiriha.exe C:\path）
-        foreach (var arg in Program.StartupArgs)
-        {
-            if (Directory.Exists(arg))
-            {
-                SelectedTab = AddTab(Path.GetFullPath(arg), pinned: false);
-                restored = true;
-            }
-        }
+        restored |= OpenShellPaths(Program.StartupArgs);
 
         if (!restored)
         {
@@ -438,6 +451,19 @@ public partial class MainWindowViewModel : ObservableObject
         tab.PropertyChanged += Tab_PropertyChanged;
         tab.IsPinned = pinned;
         tab.SetPreviewEnabled(ShowPreviewPane);
+        return tab;
+    }
+
+    private TabViewModel AddSettingsTab(bool pinned)
+    {
+        var tab = new TabViewModel(FileSystemService.ComputerPath, Options, isSettingsTab: true)
+        {
+            IsPinned = pinned,
+        };
+        Tabs.Add(tab);
+        tab.CloseRequested += (_, _) => CloseTab(tab);
+        tab.PropertyChanged += Tab_PropertyChanged;
+        tab.SetPreviewEnabled(false);
         return tab;
     }
 
@@ -489,6 +515,7 @@ public partial class MainWindowViewModel : ObservableObject
     private void SavePinned()
     {
         _settings.PinnedPaths = Tabs.Where(t => t.IsPinned && !t.IsSettingsTab).Select(t => t.CurrentPath).ToList();
+        _settings.PinnedSettingsTab = Tabs.Any(t => t.IsSettingsTab && t.IsPinned);
         SettingsService.Save(_settings);
     }
 
@@ -556,7 +583,7 @@ public partial class MainWindowViewModel : ObservableObject
             ? "PC"
             : Path.GetFileName(path.TrimEnd(Path.DirectorySeparatorChar)) is { Length: > 0 } n ? n : path;
         var target = parent?.Children ?? _settings.Bookmarks;
-        if (target.Any(b => string.Equals(b.Path, path, StringComparison.OrdinalIgnoreCase)))
+        if (target.Any(b => b.Path is not null && WindowsPathIdentity.Instance.Equals(b.Path, path)))
         {
             return;
         }
@@ -818,6 +845,19 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
+    /// <summary>Explorer または二重起動から渡されたフォルダーを新しいタブで開く。</summary>
+    public bool OpenShellPaths(IEnumerable<string> paths)
+    {
+        var opened = false;
+        foreach (var path in paths.Where(Directory.Exists))
+        {
+            SelectedTab = AddTab(Path.GetFullPath(path), pinned: false);
+            opened = true;
+        }
+
+        return opened;
+    }
+
     /// <summary>タブ右クリックに追加した一括管理操作を実行する。</summary>
     public void ExecuteTabManagement(string actionId, TabViewModel anchor)
     {
@@ -830,7 +870,7 @@ public partial class MainWindowViewModel : ObservableObject
                 foreach (var tab in Tabs.Take(index).Where(t => !t.IsPinned).ToList()) CloseTab(tab);
                 break;
             case "tab.close-duplicates":
-                foreach (var group in normal.GroupBy(t => t.CurrentPath, StringComparer.OrdinalIgnoreCase))
+                foreach (var group in normal.GroupBy(t => t.CurrentPath, WindowsPathIdentity.Instance))
                     foreach (var tab in group.Skip(1).Where(t => !t.IsPinned).ToList()) CloseTab(tab);
                 break;
             case "tab.close-unpinned":
@@ -883,15 +923,19 @@ public partial class MainWindowViewModel : ObservableObject
 
     /// <summary>クイックアクセスのピン留め変更後などに左ペインを再構築する。</summary>
     public void RefreshSidebar()
+        => _ = RefreshSidebarAsync();
+
+    public async Task RefreshSidebarAsync()
     {
+        var snapshot = await Task.Run(QuickAccessService.GetSnapshot);
         SidebarItems.Clear();
-        BuildSidebar();
+        BuildSidebar(snapshot);
     }
 
-    private void BuildSidebar()
+    private void BuildSidebar(QuickAccessService.Snapshot quickAccess)
     {
         SidebarItems.Add(new SidebarHeader { Title = "クイックアクセス" });
-        foreach (var (name, path) in QuickAccessService.GetFolders())
+        foreach (var (name, path) in quickAccess.Folders)
         {
             SidebarItems.Add(new SidebarLink
             {
@@ -926,7 +970,7 @@ public partial class MainWindowViewModel : ObservableObject
         });
 
         // 最近使用したファイル（クイックアクセスの列挙から。エクスプローラーのホーム相当）
-        var recent = QuickAccessService.GetRecentFiles();
+        var recent = quickAccess.RecentFiles;
         if (recent.Count > 0)
         {
             SidebarItems.Add(new SidebarHeader { Title = "最近使用したファイル" });
@@ -947,18 +991,12 @@ public partial class MainWindowViewModel : ObservableObject
     private static string IconFor(string path)
     {
         var profile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        if (PathEquals(path, Environment.GetFolderPath(Environment.SpecialFolder.Desktop))) return "🖥";
-        if (PathEquals(path, Path.Combine(profile, "Downloads"))) return "⬇";
-        if (PathEquals(path, Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments))) return "📄";
-        if (PathEquals(path, Environment.GetFolderPath(Environment.SpecialFolder.MyPictures))) return "🖼";
-        if (PathEquals(path, Environment.GetFolderPath(Environment.SpecialFolder.MyMusic))) return "🎵";
-        if (PathEquals(path, Environment.GetFolderPath(Environment.SpecialFolder.MyVideos))) return "🎬";
+        if (WindowsPathIdentity.Instance.Equals(path, Environment.GetFolderPath(Environment.SpecialFolder.Desktop))) return "🖥";
+        if (WindowsPathIdentity.Instance.Equals(path, Path.Combine(profile, "Downloads"))) return "⬇";
+        if (WindowsPathIdentity.Instance.Equals(path, Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments))) return "📄";
+        if (WindowsPathIdentity.Instance.Equals(path, Environment.GetFolderPath(Environment.SpecialFolder.MyPictures))) return "🖼";
+        if (WindowsPathIdentity.Instance.Equals(path, Environment.GetFolderPath(Environment.SpecialFolder.MyMusic))) return "🎵";
+        if (WindowsPathIdentity.Instance.Equals(path, Environment.GetFolderPath(Environment.SpecialFolder.MyVideos))) return "🎬";
         return "📁";
     }
-
-    private static bool PathEquals(string a, string b)
-        => string.Equals(
-            a.TrimEnd(Path.DirectorySeparatorChar),
-            b.TrimEnd(Path.DirectorySeparatorChar),
-            StringComparison.OrdinalIgnoreCase);
 }

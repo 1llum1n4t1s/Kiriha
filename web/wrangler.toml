@@ -8,6 +8,10 @@ compatibility_date = "2026-05-01"
 pattern = "kiriha.nephilim.jp"
 custom_domain = true
 
+[[r2_buckets]]
+binding = "UPDATES"
+bucket_name = "kiriha-updates"
+
 [[rules]]
 type = "Text"
 globs = ["**/*.html"]

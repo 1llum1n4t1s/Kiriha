@@ -9,6 +9,9 @@ namespace Kiriha.Services;
 /// </summary>
 internal static partial class QuickAccessService
 {
+    internal sealed record Snapshot(
+        List<(string Name, string Path)> Folders,
+        List<(string Name, string Path)> RecentFiles);
     /// <summary>クイックアクセスの Shell 仮想フォルダー CLSID。</summary>
     private const string QuickAccessParsingName = "shell:::{679f85cb-0220-4080-b29b-5540cc05aab6}";
 
@@ -24,42 +27,44 @@ internal static partial class QuickAccessService
     /// COM 取得に失敗した場合は標準ユーザーフォルダーへフォールバックする。
     /// </summary>
     public static List<(string Name, string Path)> GetFolders()
+        => GetSnapshot().Folders;
+
+    /// <summary>フォルダーと最近使ったファイルを1回のShell列挙で取得する。</summary>
+    public static Snapshot GetSnapshot()
     {
-        var result = new List<(string Name, string Path)>();
+        var folders = new List<(string Name, string Path)>();
+        var recent = new List<(string Name, string Path)>();
         try
         {
-            EnumerateQuickAccess(result, wantFolders: true);
+            EnumerateQuickAccess(folders, recent);
         }
         catch
         {
             // COM 初期化不備などで失敗した場合はフォールバックに任せる
         }
 
-        if (result.Count == 0)
+        if (folders.Count == 0)
         {
-            AddFallbackFolders(result);
+            AddFallbackFolders(folders);
         }
 
-        return result;
+        return new Snapshot(folders, recent.Take(10).ToList());
+    }
+
+    public static Snapshot GetFallbackSnapshot()
+    {
+        var folders = new List<(string Name, string Path)>();
+        AddFallbackFolders(folders);
+        return new Snapshot(folders, []);
     }
 
     /// <summary>クイックアクセスの「最近使用したファイル」一覧（最大 10 件）。</summary>
     public static List<(string Name, string Path)> GetRecentFiles()
-    {
-        var result = new List<(string Name, string Path)>();
-        try
-        {
-            EnumerateQuickAccess(result, wantFolders: false);
-        }
-        catch
-        {
-            // 取得できなければ空のまま（セクション自体を出さない）
-        }
+        => GetSnapshot().RecentFiles;
 
-        return result.Take(10).ToList();
-    }
-
-    private static void EnumerateQuickAccess(List<(string Name, string Path)> result, bool wantFolders)
+    private static void EnumerateQuickAccess(
+        List<(string Name, string Path)> folders,
+        List<(string Name, string Path)> recent)
     {
         if (SHCreateItemFromParsingName(QuickAccessParsingName, 0, IidIShellItem, out var rootPtr) < 0 || rootPtr == 0)
         {
@@ -85,18 +90,21 @@ internal static partial class QuickAccessService
 
             // クイックアクセスの列挙にはフォルダーと「最近使用したファイル」が混ざる
             var path = GetDisplayName(item, SigdnFilesysPath);
-            if (path is null || (wantFolders ? !Directory.Exists(path) : !File.Exists(path)))
+            if (path is null)
             {
                 continue;
             }
 
-            if (result.Any(r => string.Equals(r.Path, path, StringComparison.OrdinalIgnoreCase)))
+            var target = Directory.Exists(path)
+                ? folders
+                : File.Exists(path) ? recent : null;
+            if (target is null || target.Any(r => WindowsPathIdentity.Instance.Equals(r.Path, path)))
             {
                 continue;
             }
 
             var name = GetDisplayName(item, SigdnNormalDisplay) ?? Path.GetFileName(path);
-            result.Add((name, path));
+            target.Add((name, path));
         }
     }
 

@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
+using Avalonia.Threading;
 using Kiriha.ViewModels;
 using Kiriha.Views;
 
@@ -23,6 +24,11 @@ public partial class App : Application
             Services.ThemeService.Initialize(this, viewModel.OptUseAcrylicBackground);
             var mainWindow = new MainWindow { DataContext = viewModel };
             desktop.MainWindow = mainWindow;
+            Program.RegisterActivationHandler(args => Dispatcher.UIThread.Post(() =>
+            {
+                viewModel.OpenShellPaths(args);
+                mainWindow.RestoreFromTray();
+            }));
 
             SetupTrayIcon(mainWindow, viewModel, desktop);
 
@@ -39,7 +45,7 @@ public partial class App : Application
                 }
 
                 // 「起動時にタスクトレイに格納する」ON: 開いた直後に隠す（Discord 相当）。
-                if (viewModel.OptStartMinimizedToTray)
+                if (viewModel.OptStartMinimizedToTray && !Program.StartupArgs.Any(Directory.Exists))
                 {
                     mainWindow.Hide();
                 }

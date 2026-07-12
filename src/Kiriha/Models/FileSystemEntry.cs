@@ -45,6 +45,13 @@ public partial class FileSystemEntry : ObservableObject
 
     public bool HasNoThumbnail => Thumbnail is null;
 
+    /// <summary>この項目が所有するサムネイルを解放する。</summary>
+    public void DisposeThumbnail()
+    {
+        Thumbnail?.Dispose();
+        Thumbnail = null;
+    }
+
     /// <summary>Material Icon Theme のアイコンキー（拡張子/ファイル名/フォルダー名から解決済み）。</summary>
     public required string MaterialIconKey { get; init; }
 

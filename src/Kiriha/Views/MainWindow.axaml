@@ -30,10 +30,40 @@
             <Setter Property="Background" Value="{DynamicResource TabHoverBg}" />
         </Style>
         <Style Selector="ListBox.tabs ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource ContentBg}" />
+            <Setter Property="Background" Value="{DynamicResource TabActiveBg}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource TabActiveBorder}" />
+            <Setter Property="BorderThickness" Value="1,1,1,0" />
         </Style>
         <Style Selector="ListBox.tabs ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource ContentBg}" />
+            <Setter Property="Background" Value="{DynamicResource TabActiveBg}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource TabActiveBorder}" />
+            <Setter Property="BorderThickness" Value="1,1,1,0" />
+        </Style>
+        <Style Selector="ListBox.tabs ListBoxItem.dragging">
+            <Setter Property="Opacity" Value="0.62" />
+            <Setter Property="RenderTransform" Value="scale(1.04)" />
+            <Setter Property="RenderTransformOrigin" Value="50%,50%" />
+            <Setter Property="ZIndex" Value="20" />
+        </Style>
+        <Style Selector="ListBox.tabs ListBoxItem.droptarget /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
+            <Setter Property="BorderThickness" Value="3,1,1,0" />
+        </Style>
+        <Style Selector="Border.tabicon">
+            <Setter Property="Width" Value="30" />
+            <Setter Property="Height" Value="26" />
+            <Setter Property="Margin" Value="6,0,0,0" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+        <Style Selector="Border.tabicon.pinned">
+            <Setter Property="Background" Value="{DynamicResource PinnedTabBg}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource PinnedTabBorder}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        <Style Selector="Border.tabicon.pinned:pointerover">
+            <Setter Property="Background" Value="{DynamicResource PinnedTabHoverBg}" />
         </Style>
 
         <!-- Fluent アイコン共通 -->
@@ -170,6 +200,13 @@
                 </ControlTemplate>
             </Setter>
         </Style>
+        <Style Selector="Border.detailcolumn.dragging">
+            <Setter Property="Opacity" Value="0.55" />
+        </Style>
+        <Style Selector="Border.detailcolumn.droptarget">
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
+            <Setter Property="BorderThickness" Value="3,0,0,0" />
+        </Style>
 
         <!-- お気に入りバーのボタン -->
         <Style Selector="Button.bookmark">
@@ -204,6 +241,10 @@
             <Setter Property="CornerRadius" Value="6" />
             <Setter Property="Margin" Value="4,0" />
         </Style>
+        <Style Selector="ListBox.files.details ListBoxItem">
+            <Setter Property="Padding" Value="0,2" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        </Style>
 
         <!-- ファイル一覧（アイコン表示）のセル -->
         <Style Selector="ListBox.icons ListBoxItem">
@@ -218,23 +259,25 @@
              見出し 20/13/12 の数値規則は3アプリとも同一だったためそのまま採用し、色のみ Kiriha 側のテーマトークンに差し替えている。 -->
         <Style Selector="TabControl.settingsnav">
             <Setter Property="TabStripPlacement" Value="Left" />
+            <Setter Property="Background" Value="Transparent" />
             <Setter Property="Template">
                 <ControlTemplate>
-                    <Grid ColumnDefinitions="180,*">
-                        <Border Grid.Column="0" Margin="0,0,12,12" Padding="6"
-                                Background="{DynamicResource SidebarBg}"
-                                BorderBrush="{DynamicResource Divider}" BorderThickness="1"
-                                BoxShadow="0 8 24 0 #18000000, 0 2 6 0 #10000000, inset 0 1 0 0 #30FFFFFF"
-                                CornerRadius="14">
+                    <Grid ColumnDefinitions="204,*">
+                        <Border Grid.Column="0" Margin="0,0,18,0" Padding="10"
+                                Background="{DynamicResource SettingsNavBg}"
+                                BorderBrush="{DynamicResource SettingsCardBorder}" BorderThickness="1"
+                                BoxShadow="0 14 34 0 #26000000, 0 3 10 0 #18000000, inset 0 1 0 0 #26FFFFFF"
+                                CornerRadius="18">
                             <ItemsPresenter Name="PART_ItemsPresenter">
                                 <ItemsPresenter.ItemsPanel>
                                     <ItemsPanelTemplate>
-                                        <StackPanel Spacing="2" />
+                                        <StackPanel Spacing="4" />
                                     </ItemsPanelTemplate>
                                 </ItemsPresenter.ItemsPanel>
                             </ItemsPresenter>
                         </Border>
                         <ContentPresenter Name="PART_SelectedContentHost" Grid.Column="1"
+                                          Margin="4,0,0,0"
                                           Content="{TemplateBinding SelectedContent}"
                                           ContentTemplate="{TemplateBinding SelectedContentTemplate}" />
                     </Grid>
@@ -242,12 +285,17 @@
             </Setter>
         </Style>
         <Style Selector="TabControl.settingsnav TabItem">
-            <Setter Property="Padding" Value="10,6" />
-            <Setter Property="CornerRadius" Value="6" />
-            <Setter Property="FontSize" Value="13" />
-            <Setter Property="FontWeight" Value="Medium" />
-            <Setter Property="MinHeight" Value="28" />
+            <Setter Property="Padding" Value="14,10" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="FontSize" Value="13.5" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="MinHeight" Value="42" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
             <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+        </Style>
+        <Style Selector="TabControl.settingsnav TabItem /template/ Border#PART_LayoutRoot">
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="BorderThickness" Value="0" />
         </Style>
         <Style Selector="TabControl.settingsnav TabItem /template/ Border#PART_SelectedPipe">
             <Setter Property="IsVisible" Value="False" />
@@ -256,35 +304,60 @@
             <Setter Property="Background" Value="{DynamicResource HoverBg}" />
         </Style>
         <Style Selector="TabControl.settingsnav TabItem:selected /template/ Border#PART_LayoutRoot">
-            <Setter Property="Background" Value="{DynamicResource AccentSelectionBrush}" />
+            <Setter Property="Background" Value="{DynamicResource SettingsNavSelected}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
+            <Setter Property="BorderThickness" Value="3,0,0,0" />
         </Style>
 
         <!-- 見出し・カード・補足文のスタイルクラス -->
         <Style Selector="TextBlock.settingsh1">
-            <Setter Property="FontSize" Value="20" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Margin" Value="4,0,0,12" />
+            <Setter Property="FontSize" Value="24" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Margin" Value="0" />
             <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+        </Style>
+        <Style Selector="Border.settingshero">
+            <Setter Property="Background" Value="{DynamicResource SettingsHeroBg}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SettingsCardBorder}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="18" />
+            <Setter Property="Padding" Value="18" />
+            <Setter Property="Margin" Value="0,0,0,16" />
+            <Setter Property="BoxShadow" Value="0 8 22 0 #16000000, inset 0 1 0 0 #24FFFFFF" />
+        </Style>
+        <Style Selector="Border.settingsheroicon">
+            <Setter Property="Width" Value="48" />
+            <Setter Property="Height" Value="48" />
+            <Setter Property="Background" Value="{DynamicResource SettingsIconBg}" />
+            <Setter Property="CornerRadius" Value="14" />
+            <Setter Property="Margin" Value="0,0,16,0" />
+        </Style>
+        <Style Selector="TextBlock.settingsherosubtitle">
+            <Setter Property="FontSize" Value="12.5" />
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondary}" />
+            <Setter Property="Margin" Value="0,4,0,0" />
         </Style>
         <!-- 見出し行を持たない単純パネル（ショートカット一覧・バージョン情報）用のガラスカード -->
         <Style Selector="Border.settingscard">
-            <Setter Property="Background" Value="{DynamicResource ContentBg}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource Divider}" />
+            <Setter Property="Background" Value="{DynamicResource SettingsCardBg}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SettingsCardBorder}" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="14" />
-            <Setter Property="Padding" Value="16" />
-            <Setter Property="Margin" Value="0,0,0,12" />
+            <Setter Property="CornerRadius" Value="16" />
+            <Setter Property="Padding" Value="18" />
+            <Setter Property="Margin" Value="0,0,0,14" />
+            <Setter Property="BoxShadow" Value="0 5 16 0 #12000000, inset 0 1 0 0 #20FFFFFF" />
         </Style>
         <!-- 小見出し付きガラスカード。3アプリとも HeaderedContentControl を使い回しているのに合わせて実コントロールをテンプレート化 -->
         <Style Selector="HeaderedContentControl.settingscard">
             <Setter Property="Template">
                 <ControlTemplate>
-                    <Border Margin="0,0,0,12" Padding="16"
-                            Background="{DynamicResource ContentBg}"
-                            BorderBrush="{DynamicResource Divider}" BorderThickness="1" CornerRadius="14">
+                    <Border Margin="0,0,0,14" Padding="18"
+                            Background="{DynamicResource SettingsCardBg}"
+                            BorderBrush="{DynamicResource SettingsCardBorder}" BorderThickness="1" CornerRadius="16"
+                            BoxShadow="0 5 16 0 #12000000, inset 0 1 0 0 #20FFFFFF">
                         <StackPanel>
-                            <TextBlock Margin="0,0,0,10" FontSize="13" FontWeight="SemiBold"
-                                       Foreground="{DynamicResource TextSecondary}"
+                            <TextBlock Margin="0,0,0,12" FontSize="14" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextPrimary}"
                                        Text="{TemplateBinding Header}" />
                             <ContentPresenter Name="PART_ContentPresenter" Content="{TemplateBinding Content}" />
                         </StackPanel>
@@ -302,6 +375,13 @@
         </Style>
         <Style Selector="TextBox.settingsfield, ComboBox.settingsfield">
             <Setter Property="CornerRadius" Value="10" />
+        </Style>
+        <Style Selector="TabControl.settingsnav Button.cmd">
+            <Setter Property="Background" Value="{DynamicResource SettingsButtonBg}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SettingsCardBorder}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Padding" Value="14,8" />
         </Style>
     </Window.Styles>
 
@@ -325,6 +405,9 @@
               DoubleTapped="TitleBar_DoubleTapped">
 
             <ListBox x:Name="TabsListBox" Grid.Column="0" Classes="tabs" Margin="10,0,0,0"
+                     Height="42" ClipToBounds="True"
+                     ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                     ScrollViewer.HorizontalScrollBarVisibility="Hidden"
                      ItemsSource="{Binding Tabs}"
                      SelectedItem="{Binding SelectedTab}"
                      DragDrop.AllowDrop="True"
@@ -367,12 +450,16 @@
                                               Command="{Binding OpenInExplorerCommand}" />
                                 </ContextMenu>
                             </StackPanel.ContextMenu>
-                            <TextBlock Text="📁" FontSize="12" Margin="12,0,0,0"
-                                       IsVisible="{Binding IsNormalTab}"
-                                       VerticalAlignment="Center" />
-                            <TextBlock Text="⚙" FontSize="12" Margin="12,0,0,0"
-                                       IsVisible="{Binding IsSettingsTab}"
-                                       VerticalAlignment="Center" />
+                            <Border Classes="tabicon" Classes.pinned="{Binding IsPinned}">
+                                <Grid>
+                                    <TextBlock Text="📁" FontSize="12"
+                                               IsVisible="{Binding IsNormalTab}"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    <TextBlock Text="⚙" FontSize="12"
+                                               IsVisible="{Binding IsSettingsTab}"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Grid>
+                            </Border>
                             <TextBlock Text="{Binding Title}"
                                        IsVisible="{Binding !IsPinned}"
                                        Width="128" Margin="8,0,4,0" FontSize="12.5"
@@ -412,7 +499,8 @@
 
                     <!-- 設定タブの中身。Lhamiel / Shisui / RealTimeTranslator の実装を直接調査し、
                          浮遊カード状サイドバー TabControl + HeaderedContentControl 積みの数値を実測値どおりに再現。 -->
-                    <Grid IsVisible="{Binding IsSettingsTab}" Margin="24">
+                    <Border IsVisible="{Binding IsSettingsTab}" Background="{DynamicResource SettingsPageBg}">
+                        <Grid Margin="24">
                         <TabControl Classes="settingsnav">
 
                             <!-- ===== 表示 ===== -->
@@ -424,8 +512,19 @@
                                     </StackPanel>
                                 </TabItem.Header>
                                 <ScrollViewer>
-                                    <StackPanel MaxWidth="640" HorizontalAlignment="Left">
-                                        <TextBlock Classes="settingsh1" Text="表示" />
+                                    <StackPanel MaxWidth="860" HorizontalAlignment="Stretch" Margin="0,0,12,0">
+                                        <Border Classes="settingshero">
+                                            <Grid ColumnDefinitions="Auto,*">
+                                                <Border Classes="settingsheroicon">
+                                                    <TextBlock Classes="fico" Text="&#xE890;" FontSize="21"
+                                                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Border>
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                    <TextBlock Classes="settingsh1" Text="表示" />
+                                                    <TextBlock Classes="settingsherosubtitle" Text="ファイル一覧の見え方とKirihaの外観を調整します" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
 
                                         <HeaderedContentControl Classes="settingscard" Header="エクスプローラー表示">
                                             <StackPanel Classes="settingsfields">
@@ -476,8 +575,19 @@
                                     </StackPanel>
                                 </TabItem.Header>
                                 <ScrollViewer>
-                                    <StackPanel MaxWidth="640" HorizontalAlignment="Left">
-                                        <TextBlock Classes="settingsh1" Text="起動" />
+                                    <StackPanel MaxWidth="860" HorizontalAlignment="Stretch" Margin="0,0,12,0">
+                                        <Border Classes="settingshero">
+                                            <Grid ColumnDefinitions="Auto,*">
+                                                <Border Classes="settingsheroicon">
+                                                    <TextBlock Classes="fico" Text="&#xE7E8;" FontSize="21"
+                                                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Border>
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                    <TextBlock Classes="settingsh1" Text="起動" />
+                                                    <TextBlock Classes="settingsherosubtitle" Text="起動方法、Windows統合、タスクトレイを管理します" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
                                         <HeaderedContentControl Classes="settingscard" Header="起動時の動作">
                                             <StackPanel Spacing="8">
                                                 <TextBlock Classes="settingscaption" Margin="0"
@@ -509,6 +619,10 @@
                                                           IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptExplorerContextMenu}" />
                                                 <TextBlock Classes="settingscaption"
                                                            Text="フォルダーやフォルダー内の背景を右クリックしたときに、そのフォルダーを Kiriha で開けます。" />
+                                                <CheckBox Content="フォルダーとドライブを開く既定のアプリを Kiriha にする" Margin="0,8,0,0"
+                                                          IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptDefaultFolderApp}" />
+                                                <TextBlock Classes="settingscaption" TextWrapping="Wrap"
+                                                           Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptDefaultFolderAppStatus}" />
                                             </StackPanel>
                                         </HeaderedContentControl>
 
@@ -537,8 +651,19 @@
                                     </StackPanel>
                                 </TabItem.Header>
                                 <ScrollViewer>
-                                    <StackPanel MaxWidth="640" HorizontalAlignment="Left">
-                                        <TextBlock Classes="settingsh1" Text="更新" />
+                                    <StackPanel MaxWidth="860" HorizontalAlignment="Stretch" Margin="0,0,12,0">
+                                        <Border Classes="settingshero">
+                                            <Grid ColumnDefinitions="Auto,*">
+                                                <Border Classes="settingsheroicon">
+                                                    <TextBlock Classes="fico" Text="&#xE895;" FontSize="21"
+                                                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Border>
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                    <TextBlock Classes="settingsh1" Text="更新" />
+                                                    <TextBlock Classes="settingsherosubtitle" Text="Kirihaを最新の状態に保ちます" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
                                         <HeaderedContentControl Classes="settingscard" Header="自動更新">
                                             <StackPanel Spacing="10">
                                                 <CheckBox Content="起動時に更新を確認する"
@@ -561,8 +686,19 @@
                                     </StackPanel>
                                 </TabItem.Header>
                                 <ScrollViewer>
-                                    <StackPanel MaxWidth="640" HorizontalAlignment="Left">
-                                        <TextBlock Classes="settingsh1" Text="メンテナンス" />
+                                    <StackPanel MaxWidth="860" HorizontalAlignment="Stretch" Margin="0,0,12,0">
+                                        <Border Classes="settingshero">
+                                            <Grid ColumnDefinitions="Auto,*">
+                                                <Border Classes="settingsheroicon">
+                                                    <TextBlock Classes="fico" Text="&#xE90F;" FontSize="21"
+                                                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Border>
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                    <TextBlock Classes="settingsh1" Text="メンテナンス" />
+                                                    <TextBlock Classes="settingsherosubtitle" Text="キャッシュ、ログ、設定データを管理します" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
                                         <HeaderedContentControl Classes="settingscard" Header="データとキャッシュ">
                                             <StackPanel Spacing="10">
                                                 <StackPanel Orientation="Horizontal" Spacing="8">
@@ -592,12 +728,33 @@
                                     </StackPanel>
                                 </TabItem.Header>
                                 <ScrollViewer>
-                                    <StackPanel MaxWidth="640" HorizontalAlignment="Left">
-                                        <TextBlock Classes="settingsh1" Text="キーボードショートカット" />
-                                        <Border Classes="settingscard">
-                                            <TextBlock FontSize="13" Foreground="{DynamicResource TextPrimary}" LineHeight="24"
-                                                       Text="Ctrl+T 新しいタブ / Ctrl+W タブを閉じる / Ctrl+Shift+T 閉じたタブを開く&#x0a;Ctrl+Tab・Ctrl+PgDn タブ切替 / Ctrl+1..9 タブ選択 / Ctrl+Shift+PgUp/PgDn タブ移動&#x0a;Ctrl+L・F4 アドレス入力 / Ctrl+F・F3 検索 / Ctrl+Shift+B お気に入りバー / Ctrl+D お気に入り追加&#x0a;Alt+←/→ 戻る・進む / Alt+↑ 上へ / Alt+Home ホーム / F5 更新 / F11 全画面&#x0a;Ctrl+X/C/V 切り取り・コピー・貼り付け / Ctrl+Shift+C パスのコピー / Delete 削除 / Shift+Delete 完全削除&#x0a;F2 名前の変更 / Alt+Enter プロパティ / Ctrl+Shift+N 新しいフォルダー / Alt+P プレビュー / Ctrl+ホイール 表示ズーム" />
+                                    <StackPanel MaxWidth="860" HorizontalAlignment="Stretch" Margin="0,0,12,0">
+                                        <Border Classes="settingshero">
+                                            <Grid ColumnDefinitions="Auto,*">
+                                                <Border Classes="settingsheroicon">
+                                                    <TextBlock Classes="fico" Text="&#xE765;" FontSize="21"
+                                                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Border>
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                    <TextBlock Classes="settingsh1" Text="ショートカット" />
+                                                    <TextBlock Classes="settingsherosubtitle" Text="キーボードで素早く操作するための一覧です" />
+                                                </StackPanel>
+                                            </Grid>
                                         </Border>
+                                        <Grid ColumnDefinitions="*,14,*" RowDefinitions="Auto,Auto">
+                                            <HeaderedContentControl Grid.Row="0" Grid.Column="0" Classes="settingscard" Header="タブ">
+                                                <TextBlock FontSize="12.5" Foreground="{DynamicResource TextSecondary}" LineHeight="24"
+                                                           Text="Ctrl+T　新しいタブ&#x0a;Ctrl+W　タブを閉じる&#x0a;Ctrl+Shift+T　閉じたタブを開く&#x0a;Ctrl+Tab　タブを切り替える&#x0a;Ctrl+1..9　指定タブを選択" />
+                                            </HeaderedContentControl>
+                                            <HeaderedContentControl Grid.Row="0" Grid.Column="2" Classes="settingscard" Header="移動と表示">
+                                                <TextBlock FontSize="12.5" Foreground="{DynamicResource TextSecondary}" LineHeight="24"
+                                                           Text="Ctrl+L / F4　アドレス入力&#x0a;Ctrl+F / F3　検索&#x0a;Alt+← / →　戻る・進む&#x0a;Alt+↑　1つ上へ&#x0a;F5　更新 / F11　全画面" />
+                                            </HeaderedContentControl>
+                                            <HeaderedContentControl Grid.Row="1" Grid.ColumnSpan="3" Classes="settingscard" Header="ファイル操作">
+                                                <TextBlock FontSize="12.5" Foreground="{DynamicResource TextSecondary}" LineHeight="24"
+                                                           Text="Ctrl+X / C / V　切り取り・コピー・貼り付け　　Delete / Shift+Delete　削除・完全削除&#x0a;F2　名前の変更　　Alt+Enter　プロパティ　　Ctrl+Shift+N　新しいフォルダー　　Alt+P　プレビュー" />
+                                            </HeaderedContentControl>
+                                        </Grid>
                                     </StackPanel>
                                 </ScrollViewer>
                             </TabItem>
@@ -611,22 +768,55 @@
                                     </StackPanel>
                                 </TabItem.Header>
                                 <ScrollViewer>
-                                    <StackPanel MaxWidth="640" HorizontalAlignment="Left">
-                                        <TextBlock Classes="settingsh1" Text="バージョン情報" />
-                                        <Border Classes="settingscard">
-                                            <StackPanel Spacing="6">
-                                                <TextBlock Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).VersionText}"
-                                                           FontSize="14" FontWeight="SemiBold"
+                                    <StackPanel MaxWidth="860" HorizontalAlignment="Stretch" Margin="0,0,12,0">
+                                        <StackPanel Margin="4,0,0,22" Orientation="Horizontal">
+                                            <Border Width="76" Height="76" Margin="0,0,18,0"
+                                                    Background="{DynamicResource SettingsHeroBg}"
+                                                    BorderBrush="{DynamicResource SettingsCardBorder}" BorderThickness="1"
+                                                    CornerRadius="18" BoxShadow="0 8 20 0 #22000000">
+                                                <Image Width="64" Height="64" Source="avares://Kiriha/icon/app_icon.png"
+                                                       RenderOptions.BitmapInterpolationMode="HighQuality"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                            <StackPanel VerticalAlignment="Center">
+                                                <TextBlock Text="Kiriha" FontSize="30" FontWeight="Bold"
                                                            Foreground="{DynamicResource TextPrimary}" />
-                                                <TextBlock FontSize="12" Foreground="{DynamicResource TextSecondary}"
-                                                           Text="Avalonia UI 製 Chrome ライクなタブ型ファイラー。" />
+                                                <TextBlock Text="Chromeの操作感とExplorerの機能を融合したファイルマネージャー"
+                                                           FontSize="13" Foreground="{DynamicResource TextSecondary}" />
                                             </StackPanel>
+                                        </StackPanel>
+
+                                        <Border Classes="settingscard">
+                                            <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="バージョン"
+                                                           Margin="0,0,22,0" VerticalAlignment="Center"
+                                                           FontSize="13" Foreground="{DynamicResource TextSecondary}" />
+                                                <TextBlock Grid.Row="0" Grid.Column="1"
+                                                           Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).VersionText}"
+                                                           FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center"
+                                                           Foreground="{DynamicResource TextPrimary}" />
+                                                <Button Grid.RowSpan="2" Grid.Column="2" Classes="cmd"
+                                                        Content="アップデートを確認" Click="CheckUpdate_Click" />
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="実行環境"
+                                                           Margin="0,10,22,0" FontSize="13"
+                                                           Foreground="{DynamicResource TextSecondary}" />
+                                                <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,10,0,0"
+                                                           Text=".NET 10 / Avalonia UI / Native AOT"
+                                                           FontSize="13" Foreground="{DynamicResource TextPrimary}" />
+                                            </Grid>
                                         </Border>
+
+                                        <HeaderedContentControl Classes="settingscard" Header="Kiriha について">
+                                            <TextBlock FontSize="13" LineHeight="22" TextWrapping="Wrap"
+                                                       Foreground="{DynamicResource TextSecondary}"
+                                                       Text="Windows Explorerのファイル操作と、Chromeのタブ・アドレスバー・お気に入り操作を一つの画面にまとめています。設定は現在のユーザーに保存されます。" />
+                                        </HeaderedContentControl>
                                     </StackPanel>
                                 </ScrollViewer>
                             </TabItem>
                         </TabControl>
-                    </Grid>
+                        </Grid>
+                    </Border>
 
                     <Grid RowDefinitions="48,Auto,40,*,28" Background="{DynamicResource ContentBg}"
                           IsVisible="{Binding IsNormalTab}">
@@ -659,9 +849,9 @@
                                     PointerPressed="BreadcrumbBar_PointerPressed"
                                     PointerReleased="BreadcrumbBar_PointerReleased">
 
-                                <Grid>
+                                <Grid ColumnDefinitions="*,40">
                                     <!-- パンくずリスト（Windows 11 相当） -->
-                                    <ScrollViewer IsVisible="{Binding !IsEditingPath}"
+                                    <ScrollViewer Grid.Column="0" IsVisible="{Binding !IsEditingPath}"
                                                   HorizontalScrollBarVisibility="Hidden"
                                                   VerticalScrollBarVisibility="Disabled"
                                                   VerticalAlignment="Center"
@@ -691,8 +881,13 @@
                                         </ItemsControl>
                                     </ScrollViewer>
 
+                                    <!-- 長いパスでも直接入力へ切り替えられる固定クリック領域 -->
+                                    <Border Grid.Column="1" Background="Transparent"
+                                            IsVisible="{Binding !IsEditingPath}"
+                                            ToolTip.Tip="クリックしてパスを編集" />
+
                                     <!-- 直接入力モード -->
-                                    <TextBox IsVisible="{Binding IsEditingPath}"
+                                    <TextBox Grid.ColumnSpan="2" IsVisible="{Binding IsEditingPath}"
                                              Text="{Binding PathText}"
                                              KeyDown="PathBox_KeyDown"
                                              LostFocus="PathBox_LostFocus"
@@ -1015,70 +1210,42 @@
 
                             <Grid Grid.Column="2" RowDefinitions="Auto,*">
                                 <!-- 詳細表示のカラムヘッダー（クリックでソート / Thumb で幅変更） -->
-                                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="12,2,0,2"
-                                            Background="Transparent"
-                                            PointerReleased="ColumnHeader_PointerReleased"
-                                            IsVisible="{Binding IsDetailsView}">
-                                    <Button Classes="colhead" Width="{Binding ColNameWidth}"
-                                            Command="{Binding SortByColumnCommand}" CommandParameter="Name">
-                                        <StackPanel Orientation="Horizontal" Spacing="6">
-                                            <TextBlock Text="名前" FontSize="12" />
-                                            <TextBlock Classes="fico" Text="{Binding NameSortGlyph}" FontSize="9"
-                                                       VerticalAlignment="Center" />
-                                        </StackPanel>
-                                    </Button>
-                                    <Thumb Classes="colsplit" Tag="Name" DragDelta="ColumnThumb_DragDelta" />
-                                    <Button Classes="colhead" Width="{Binding ColModifiedWidth}"
-                                            IsVisible="{Binding ShowColModified}"
-                                            Command="{Binding SortByColumnCommand}" CommandParameter="Modified">
-                                        <StackPanel Orientation="Horizontal" Spacing="6">
-                                            <TextBlock Text="更新日時" FontSize="12" />
-                                            <TextBlock Classes="fico" Text="{Binding ModifiedSortGlyph}" FontSize="9"
-                                                       VerticalAlignment="Center" />
-                                        </StackPanel>
-                                    </Button>
-                                    <Thumb Classes="colsplit" Tag="Modified" DragDelta="ColumnThumb_DragDelta"
-                                           IsVisible="{Binding ShowColModified}" />
-                                    <Button Classes="colhead" Width="{Binding ColCreatedWidth}"
-                                            IsVisible="{Binding ShowColCreated}"
-                                            Command="{Binding SortByColumnCommand}" CommandParameter="Created">
-                                        <StackPanel Orientation="Horizontal" Spacing="6">
-                                            <TextBlock Text="作成日時" FontSize="12" />
-                                            <TextBlock Classes="fico" Text="{Binding CreatedSortGlyph}" FontSize="9"
-                                                       VerticalAlignment="Center" />
-                                        </StackPanel>
-                                    </Button>
-                                    <Thumb Classes="colsplit" Tag="Created" DragDelta="ColumnThumb_DragDelta"
-                                           IsVisible="{Binding ShowColCreated}" />
-                                    <Button Classes="colhead" Width="{Binding ColTypeWidth}"
-                                            IsVisible="{Binding ShowColType}"
-                                            Command="{Binding SortByColumnCommand}" CommandParameter="Type">
-                                        <StackPanel Orientation="Horizontal" Spacing="6">
-                                            <TextBlock Text="種類" FontSize="12" />
-                                            <TextBlock Classes="fico" Text="{Binding TypeSortGlyph}" FontSize="9"
-                                                       VerticalAlignment="Center" />
-                                        </StackPanel>
-                                    </Button>
-                                    <Thumb Classes="colsplit" Tag="Type" DragDelta="ColumnThumb_DragDelta"
-                                           IsVisible="{Binding ShowColType}" />
-                                    <Button Classes="colhead" Width="{Binding ColSizeWidth}"
-                                            IsVisible="{Binding ShowColSize}"
-                                            Command="{Binding SortByColumnCommand}" CommandParameter="Size">
-                                        <StackPanel Orientation="Horizontal" Spacing="6">
-                                            <TextBlock Text="サイズ" FontSize="12" />
-                                            <TextBlock Classes="fico" Text="{Binding SizeSortGlyph}" FontSize="9"
-                                                       VerticalAlignment="Center" />
-                                        </StackPanel>
-                                    </Button>
-                                    <Thumb Classes="colsplit" Tag="Size" DragDelta="ColumnThumb_DragDelta"
-                                           IsVisible="{Binding ShowColSize}" />
-                                </StackPanel>
+                                <ItemsControl Grid.Row="0" ItemsSource="{Binding DetailColumns}"
+                                              Margin="12,2,0,2" Background="Transparent"
+                                              PointerReleased="ColumnHeader_PointerReleased"
+                                              IsVisible="{Binding IsDetailsView}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="vm:DetailColumnViewModel">
+                                            <Border Classes="detailcolumn" Width="{Binding Width}"
+                                                    Classes.dragging="{Binding IsDragging}"
+                                                    Classes.droptarget="{Binding IsDropTarget}"
+                                                    IsVisible="{Binding IsVisible}">
+                                                <Grid ColumnDefinitions="*,6">
+                                                    <Button Grid.Column="0" Classes="colhead"
+                                                            Command="{Binding Owner.SortByColumnCommand}"
+                                                            CommandParameter="{Binding Key}">
+                                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                                            <TextBlock Text="{Binding Title}" FontSize="12" />
+                                                            <TextBlock Classes="fico" Text="{Binding SortGlyph}" FontSize="9"
+                                                                       VerticalAlignment="Center" />
+                                                        </StackPanel>
+                                                    </Button>
+                                                    <Thumb Grid.Column="1" Classes="colsplit" DragDelta="ColumnThumb_DragDelta" />
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
                                 <Border Grid.Row="0" Height="1" Background="{DynamicResource Divider}" VerticalAlignment="Bottom"
                                         IsVisible="{Binding IsDetailsView}" />
 
                                 <Panel Grid.Row="1">
                                     <!-- 詳細表示 -->
-                                    <ListBox Classes="files"
+                                    <ListBox Classes="files details"
+                                             Margin="0,0,30,0"
                                              IsVisible="{Binding IsDetailsView}"
                                              ItemsSource="{Binding Entries}"
                                              SelectedItem="{Binding SelectedEntry}"
@@ -1093,56 +1260,63 @@
                                              KeyDown="FileList_KeyDown">
                                         <ListBox.ItemTemplate>
                                             <DataTemplate x:DataType="m:FileSystemEntry">
-                                                <StackPanel Orientation="Horizontal" Margin="8,0,0,0"
+                                                <ItemsControl Margin="8,0,0,0"
+                                                            ItemsSource="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).DetailColumns}"
                                                             Background="Transparent"
                                                             Height="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).RowHeight}"
                                                             Opacity="{Binding RowOpacity}"
                                                             ToolTip.Tip="{Binding RowTooltip}">
-                                                    <Grid ColumnDefinitions="Auto,Auto,*"
-                                                          Width="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).ColNameWidth}">
-                                                        <CheckBox Grid.Column="0" MinWidth="0" Padding="0" Margin="0,0,6,0"
-                                                                  IsVisible="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).ShowCheckBoxes}"
-                                                                  IsChecked="{Binding $parent[ListBoxItem].IsSelected, Mode=TwoWay}" />
-                                                        <Image Grid.Column="1" Source="{Binding MaterialIcon}"
-                                                               IsVisible="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).ShowMaterialIcons}"
-                                                               Width="16" Height="16" Margin="0,0,10,0" VerticalAlignment="Center" />
-                                                        <TextBlock Grid.Column="1" Text="{Binding Icon}" FontSize="14"
-                                                                   IsVisible="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).UseEmojiIcons}"
-                                                                   Margin="0,0,10,0" VerticalAlignment="Center" />
-                                                        <TextBlock Grid.Column="2" Text="{Binding DisplayName}" FontSize="13"
-                                                                   Foreground="{DynamicResource TextPrimary}"
-                                                                   VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
-                                                    </Grid>
-                                                    <Panel Width="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).ColModifiedWidth}"
-                                                           IsVisible="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).ShowColModified}">
-                                                        <TextBlock Text="{Binding ModifiedText}" FontSize="12.5" Padding="6,0,0,0"
-                                                                   IsVisible="{Binding !IsDrive}"
-                                                                   Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" />
-                                                        <!-- ドライブは更新日時の代わりに使用率バー -->
-                                                        <ProgressBar IsVisible="{Binding IsDrive}"
-                                                                     Minimum="0" Maximum="100"
-                                                                     Value="{Binding DriveUsedPercent}"
-                                                                     Height="10" Margin="6,0,12,0"
-                                                                     VerticalAlignment="Center" />
-                                                    </Panel>
-                                                    <TextBlock Width="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).ColCreatedWidth}"
-                                                               IsVisible="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).ShowColCreated}"
-                                                               Text="{Binding CreatedText}" FontSize="12.5" Padding="6,0,0,0"
-                                                               Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" />
-                                                    <TextBlock Width="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).ColTypeWidth}"
-                                                               IsVisible="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).ShowColType}"
-                                                               Text="{Binding TypeText}" FontSize="12.5" Padding="6,0,0,0"
-                                                               Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center"
-                                                               TextTrimming="CharacterEllipsis" />
-                                                    <TextBlock Width="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).ColSizeWidth}"
-                                                               IsVisible="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).ShowColSize}"
-                                                               Text="{Binding SizeText}" FontSize="12.5" Padding="6,0,6,0"
-                                                               Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center"
-                                                               TextAlignment="Right" />
-                                                </StackPanel>
+                                                    <ItemsControl.ItemsPanel>
+                                                        <ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate>
+                                                    </ItemsControl.ItemsPanel>
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate x:DataType="vm:DetailColumnViewModel">
+                                                            <Panel Width="{Binding Width}" IsVisible="{Binding IsVisible}">
+                                                                <Grid IsVisible="{Binding IsName}" ColumnDefinitions="Auto,Auto,*">
+                                                                    <CheckBox Grid.Column="0" MinWidth="0" Padding="0" Margin="0,0,6,0"
+                                                                              IsVisible="{Binding Owner.ShowCheckBoxes}"
+                                                                              IsChecked="{Binding $parent[ListBoxItem].IsSelected, Mode=TwoWay}" />
+                                                                    <Image Grid.Column="1" Source="{Binding $parent[ItemsControl].((m:FileSystemEntry)DataContext).MaterialIcon}"
+                                                                           IsVisible="{Binding Owner.ShowMaterialIcons}"
+                                                                           Width="16" Height="16" Margin="0,0,10,0" VerticalAlignment="Center" />
+                                                                    <TextBlock Grid.Column="1" Text="{Binding $parent[ItemsControl].((m:FileSystemEntry)DataContext).Icon}" FontSize="14"
+                                                                               IsVisible="{Binding Owner.UseEmojiIcons}"
+                                                                               Margin="0,0,10,0" VerticalAlignment="Center" />
+                                                                    <TextBlock Grid.Column="2" Text="{Binding $parent[ItemsControl].((m:FileSystemEntry)DataContext).DisplayName}" FontSize="13"
+                                                                               Foreground="{DynamicResource TextPrimary}"
+                                                                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                                                </Grid>
+                                                                <Grid IsVisible="{Binding IsModified}" ClipToBounds="True">
+                                                                    <TextBlock Text="{Binding $parent[ItemsControl].((m:FileSystemEntry)DataContext).ModifiedText}" FontSize="12.5" Padding="6,0,0,0"
+                                                                               IsVisible="{Binding !$parent[ItemsControl].((m:FileSystemEntry)DataContext).IsDrive}"
+                                                                               Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" />
+                                                                    <ProgressBar IsVisible="{Binding $parent[ItemsControl].((m:FileSystemEntry)DataContext).IsDrive}"
+                                                                                 Minimum="0" Maximum="100"
+                                                                                 Value="{Binding $parent[ItemsControl].((m:FileSystemEntry)DataContext).DriveUsedPercent}"
+                                                                                 MinWidth="0" HorizontalAlignment="Stretch"
+                                                                                 Height="10" Margin="6,0,12,0" VerticalAlignment="Center" />
+                                                                </Grid>
+                                                                <TextBlock IsVisible="{Binding IsCreated}"
+                                                                           Text="{Binding $parent[ItemsControl].((m:FileSystemEntry)DataContext).CreatedText}" FontSize="12.5" Padding="6,0,0,0"
+                                                                           Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" />
+                                                                <TextBlock IsVisible="{Binding IsType}"
+                                                                           Text="{Binding $parent[ItemsControl].((m:FileSystemEntry)DataContext).TypeText}" FontSize="12.5" Padding="6,0,0,0"
+                                                                           Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                                                <TextBlock IsVisible="{Binding IsSize}"
+                                                                           Text="{Binding $parent[ItemsControl].((m:FileSystemEntry)DataContext).SizeText}" FontSize="12.5" Padding="6,0,6,0"
+                                                                           Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center"
+                                                                           TextAlignment="Right" TextTrimming="CharacterEllipsis" />
+                                                            </Panel>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>
                                     </ListBox>
+                                    <Border Width="30" HorizontalAlignment="Right" Background="Transparent"
+                                            IsVisible="{Binding IsDetailsView}"
+                                            PointerPressed="FileListClearArea_PointerPressed"
+                                            ToolTip.Tip="クリックして選択を解除" />
 
                                     <!-- 一覧 / 小アイコン表示 -->
                                     <ListBox Classes="files"
@@ -1202,6 +1376,7 @@
                                         <ListBox.ItemTemplate>
                                             <DataTemplate x:DataType="m:FileSystemEntry">
                                                 <StackPanel Width="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).IconItemWidth}"
+                                                            EffectiveViewportChanged="IconItem_EffectiveViewportChanged"
                                                             Background="Transparent"
                                                             Opacity="{Binding RowOpacity}"
                                                             ToolTip.Tip="{Binding RowTooltip}">

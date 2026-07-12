@@ -56,7 +56,7 @@ public static class FileSystemService
         var info = new DirectoryInfo(path);
         var entries = new List<FileSystemEntry>();
 
-        foreach (var dir in info.EnumerateDirectories().OrderBy(d => d.Name, StringComparer.OrdinalIgnoreCase))
+        foreach (var dir in info.EnumerateDirectories())
         {
             var hidden = (dir.Attributes & FileAttributes.Hidden) != 0;
             if (!options.ShowHidden && hidden)
@@ -78,7 +78,7 @@ public static class FileSystemService
             });
         }
 
-        foreach (var file in info.EnumerateFiles().OrderBy(f => f.Name, StringComparer.OrdinalIgnoreCase))
+        foreach (var file in info.EnumerateFiles())
         {
             var hidden = (file.Attributes & FileAttributes.Hidden) != 0;
             if (!options.ShowHidden && hidden)

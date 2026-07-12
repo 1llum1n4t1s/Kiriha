@@ -1,5 +1,11 @@
 namespace Kiriha.Services;
 
+public enum ShellOptionKind { ShowHidden, ShowExtensions, ShowCheckBoxes, UseMaterialIcons }
+public sealed class ShellOptionChangedEventArgs(ShellOptionKind kind) : EventArgs
+{
+    public ShellOptionKind Kind { get; } = kind;
+}
+
 /// <summary>全タブ共通の表示オプション（隠しファイル / 拡張子）。変更時に Changed を発火する。</summary>
 public sealed class ShellOptions
 {
@@ -8,7 +14,7 @@ public sealed class ShellOptions
     private bool _showCheckBoxes;
     private bool _useMaterialIcons;
 
-    public event EventHandler? Changed;
+    public event EventHandler<ShellOptionChangedEventArgs>? Changed;
 
     public bool ShowHidden
     {
@@ -17,7 +23,7 @@ public sealed class ShellOptions
         {
             if (_showHidden == value) return;
             _showHidden = value;
-            Changed?.Invoke(this, EventArgs.Empty);
+            Changed?.Invoke(this, new ShellOptionChangedEventArgs(ShellOptionKind.ShowHidden));
         }
     }
 
@@ -28,7 +34,7 @@ public sealed class ShellOptions
         {
             if (_showExtensions == value) return;
             _showExtensions = value;
-            Changed?.Invoke(this, EventArgs.Empty);
+            Changed?.Invoke(this, new ShellOptionChangedEventArgs(ShellOptionKind.ShowExtensions));
         }
     }
 
@@ -40,7 +46,7 @@ public sealed class ShellOptions
         {
             if (_showCheckBoxes == value) return;
             _showCheckBoxes = value;
-            Changed?.Invoke(this, EventArgs.Empty);
+            Changed?.Invoke(this, new ShellOptionChangedEventArgs(ShellOptionKind.ShowCheckBoxes));
         }
     }
 
@@ -52,7 +58,7 @@ public sealed class ShellOptions
         {
             if (_useMaterialIcons == value) return;
             _useMaterialIcons = value;
-            Changed?.Invoke(this, EventArgs.Empty);
+            Changed?.Invoke(this, new ShellOptionChangedEventArgs(ShellOptionKind.UseMaterialIcons));
         }
     }
 }

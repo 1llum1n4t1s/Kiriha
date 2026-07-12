@@ -24,6 +24,8 @@ public static class MaterialIconService
 
     private static MaterialIconManifest? _manifest;
     private static readonly ConcurrentDictionary<string, IImage?> ImageCache = new();
+    private static readonly ConcurrentQueue<string> ImageCacheOrder = new();
+    private const int ImageCacheLimit = 256;
 
     private static MaterialIconManifest Manifest => _manifest ??= Load();
 
@@ -96,8 +98,24 @@ public static class MaterialIconService
 
     /// <summary>アイコンキーに対応する PNG を（キャッシュ済みなら再利用して）返す。</summary>
     public static IImage? GetImage(string iconKey)
-        => ImageCache.GetOrAdd(iconKey, key =>
+    {
+        if (ImageCache.TryGetValue(iconKey, out var cached))
         {
+            return cached;
+        }
+
+        var image = ImageCache.GetOrAdd(iconKey, LoadImage);
+        ImageCacheOrder.Enqueue(iconKey);
+        while (ImageCache.Count > ImageCacheLimit && ImageCacheOrder.TryDequeue(out var oldest))
+        {
+            // 表示中のImageを破棄しないため、強参照だけを外してGCへ所有権を戻す。
+            ImageCache.TryRemove(oldest, out _);
+        }
+        return image;
+    }
+
+    private static IImage? LoadImage(string key)
+    {
             // 上流アイコンセット内で同名 SVG が重複していたものは、ラスタライズ時に
             // 「.clone」付きで保存されている。マニフェストは元のキーを指すため、
             // 通常名が無い場合だけ clone 版を試す。
@@ -113,7 +131,7 @@ public static class MaterialIconService
                 ? Manifest.DefaultFolder
                 : Manifest.DefaultFile;
             return TryLoadImage(fallbackKey);
-        });
+    }
 
     private static IImage? TryLoadImage(string iconKey)
     {

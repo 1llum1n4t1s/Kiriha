@@ -2,6 +2,19 @@ using System.Runtime.InteropServices;
 
 namespace Kiriha.Services;
 
+internal enum FileOperationOutcome
+{
+    Success,
+    Cancelled,
+    Failed,
+}
+
+internal readonly record struct FileOperationResult(FileOperationOutcome Outcome, int NativeErrorCode)
+{
+    public bool IsSuccess => Outcome == FileOperationOutcome.Success;
+    public bool IsCancelled => Outcome == FileOperationOutcome.Cancelled;
+}
+
 /// <summary>
 /// SHFileOperationW によるファイル操作。ごみ箱への削除・進捗ダイアログ・
 /// 名前競合ダイアログなど Windows 標準（エクスプローラー同等）の UI/挙動になる。
@@ -17,12 +30,12 @@ internal static partial class FileOperationService
     private const ushort FofRenameOnCollision = 0x0008;
 
     /// <summary>コピーまたは移動。競合時はエクスプローラー標準のダイアログが出る。</summary>
-    public static bool CopyOrMove(IReadOnlyList<string> sources, string destDir, bool move, bool renameOnCollision = false)
+    public static FileOperationResult CopyOrMove(IReadOnlyList<string> sources, string destDir, bool move, bool renameOnCollision = false)
         => Execute(move ? FoMove : FoCopy, JoinPaths(sources), destDir + "\0\0",
             (ushort)(FofAllowUndo | (renameOnCollision ? FofRenameOnCollision : 0)));
 
     /// <summary>ごみ箱へ削除（Explorer 同様 Undo 可能）。permanent = true で完全削除（システム確認あり）。</summary>
-    public static bool DeleteToRecycleBin(IReadOnlyList<string> sources, bool permanent = false)
+    public static FileOperationResult DeleteToRecycleBin(IReadOnlyList<string> sources, bool permanent = false)
         => Execute(FoDelete, JoinPaths(sources), null, permanent ? (ushort)0 : FofAllowUndo);
 
     /// <summary>ごみ箱を空にする（システム確認ダイアログあり）。</summary>
@@ -33,7 +46,7 @@ internal static partial class FileOperationService
     private static partial int SHEmptyRecycleBinW(nint hwnd, nint pszRootPath, uint flags);
 
     /// <summary>名前の変更。</summary>
-    public static bool Rename(string source, string newPath)
+    public static FileOperationResult Rename(string source, string newPath)
         => Execute(FoRename, source + "\0\0", newPath + "\0\0", FofAllowUndo);
 
     /// <summary>エクスプローラーの「プロパティ」ダイアログを表示する。</summary>
@@ -61,7 +74,7 @@ internal static partial class FileOperationService
     private static string JoinPaths(IReadOnlyList<string> paths)
         => string.Join('\0', paths) + "\0\0";
 
-    private static bool Execute(uint func, string from, string? to, ushort flags)
+    private static FileOperationResult Execute(uint func, string from, string? to, ushort flags)
     {
         var pFrom = Marshal.StringToHGlobalUni(from);
         var pTo = to is null ? 0 : Marshal.StringToHGlobalUni(to);
@@ -74,7 +87,15 @@ internal static partial class FileOperationService
                 To = pTo,
                 Flags = flags,
             };
-            return SHFileOperationW(ref op) == 0 && op.AnyOperationsAborted == 0;
+            var error = SHFileOperationW(ref op);
+            if (error != 0)
+            {
+                return new FileOperationResult(FileOperationOutcome.Failed, error);
+            }
+
+            return op.AnyOperationsAborted != 0
+                ? new FileOperationResult(FileOperationOutcome.Cancelled, 0)
+                : new FileOperationResult(FileOperationOutcome.Success, 0);
         }
         finally
         {

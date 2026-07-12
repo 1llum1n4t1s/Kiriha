@@ -1,7 +1,10 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:m="using:Kiriha.Models"
+        xmlns:views="using:Kiriha.Views"
         x:Class="Kiriha.Views.CommandPaletteWindow"
-        x:CompileBindings="False"
+        x:DataType="views:CommandPaletteWindow"
+        x:CompileBindings="True"
         Title="コマンドパレット"
         Width="620" Height="620" MinWidth="440" MinHeight="380"
         WindowStartupLocation="CenterOwner"
@@ -99,7 +102,7 @@
                              ItemsSource="{Binding Commands}" DoubleTapped="CommandsList_DoubleTapped"
                              KeyDown="CommandsList_KeyDown">
                         <ListBox.ItemTemplate>
-                            <DataTemplate>
+                            <DataTemplate x:DataType="m:FeatureCommand">
                                 <Grid ColumnDefinitions="110,*" Height="28">
                                     <Border Grid.Column="0" Background="{DynamicResource OmniboxBg}"
                                             CornerRadius="8" Padding="8,3" Margin="0,0,10,0">

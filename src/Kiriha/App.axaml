@@ -9,7 +9,12 @@
                 <!-- Chrome ライト配色 -->
                 <ResourceDictionary x:Key="Light">
                     <SolidColorBrush x:Key="TabStripBg" Color="#DEE1E6" />
-                    <SolidColorBrush x:Key="TabHoverBg" Color="#EDEFF2" />
+                    <SolidColorBrush x:Key="TabHoverBg" Color="#F1F3F5" />
+                    <SolidColorBrush x:Key="TabActiveBg" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="TabActiveBorder" Color="#B8BEC7" />
+                    <SolidColorBrush x:Key="PinnedTabBg" Color="#C9CED6" />
+                    <SolidColorBrush x:Key="PinnedTabHoverBg" Color="#B9C0CA" />
+                    <SolidColorBrush x:Key="PinnedTabBorder" Color="#A5ACB6" />
                     <SolidColorBrush x:Key="ContentBg" Color="#FFFFFF" />
                     <SolidColorBrush x:Key="OmniboxBg" Color="#F1F3F4" />
                     <SolidColorBrush x:Key="SidebarBg" Color="#F8F9FA" />
@@ -23,12 +28,25 @@
                     <SolidColorBrush x:Key="CaptionHoverBg" Color="#CDD0D5" />
                     <SolidColorBrush x:Key="TabCloseHoverBg" Color="#D0D3D9" />
                     <SolidColorBrush x:Key="StatusDivider" Color="#D0D3D9" />
+                    <SolidColorBrush x:Key="SettingsPageBg" Color="#F3F6FA" />
+                    <SolidColorBrush x:Key="SettingsNavBg" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="SettingsCardBg" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="SettingsCardBorder" Color="#D9E0E8" />
+                    <SolidColorBrush x:Key="SettingsNavSelected" Color="#E4EDF9" />
+                    <SolidColorBrush x:Key="SettingsHeroBg" Color="#EAF2FC" />
+                    <SolidColorBrush x:Key="SettingsIconBg" Color="#D7E7FA" />
+                    <SolidColorBrush x:Key="SettingsButtonBg" Color="#E8EDF3" />
                     <Color x:Key="AcrylicTintColor">#DEE1E6</Color>
                 </ResourceDictionary>
                 <!-- Chrome ダーク配色 -->
                 <ResourceDictionary x:Key="Dark">
                     <SolidColorBrush x:Key="TabStripBg" Color="#202124" />
-                    <SolidColorBrush x:Key="TabHoverBg" Color="#292A2D" />
+                    <SolidColorBrush x:Key="TabHoverBg" Color="#34363B" />
+                    <SolidColorBrush x:Key="TabActiveBg" Color="#45474D" />
+                    <SolidColorBrush x:Key="TabActiveBorder" Color="#686C74" />
+                    <SolidColorBrush x:Key="PinnedTabBg" Color="#34373D" />
+                    <SolidColorBrush x:Key="PinnedTabHoverBg" Color="#454950" />
+                    <SolidColorBrush x:Key="PinnedTabBorder" Color="#5B6069" />
                     <SolidColorBrush x:Key="ContentBg" Color="#35363A" />
                     <SolidColorBrush x:Key="OmniboxBg" Color="#202124" />
                     <SolidColorBrush x:Key="SidebarBg" Color="#2B2C2F" />
@@ -42,6 +60,14 @@
                     <SolidColorBrush x:Key="CaptionHoverBg" Color="#5F6368" />
                     <SolidColorBrush x:Key="TabCloseHoverBg" Color="#5F6368" />
                     <SolidColorBrush x:Key="StatusDivider" Color="#5F6368" />
+                    <SolidColorBrush x:Key="SettingsPageBg" Color="#25282E" />
+                    <SolidColorBrush x:Key="SettingsNavBg" Color="#2C3037" />
+                    <SolidColorBrush x:Key="SettingsCardBg" Color="#30343B" />
+                    <SolidColorBrush x:Key="SettingsCardBorder" Color="#464C56" />
+                    <SolidColorBrush x:Key="SettingsNavSelected" Color="#484E58" />
+                    <SolidColorBrush x:Key="SettingsHeroBg" Color="#293746" />
+                    <SolidColorBrush x:Key="SettingsIconBg" Color="#344C65" />
+                    <SolidColorBrush x:Key="SettingsButtonBg" Color="#50555F" />
                     <Color x:Key="AcrylicTintColor">#202124</Color>
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>

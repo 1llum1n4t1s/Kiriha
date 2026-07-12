@@ -18,6 +18,23 @@ public static class FeatureCatalog
             throw new InvalidOperationException($"アプリ機能の定義数が不正です（現在 {result.Count} 件）");
         }
 
+        var validKinds = new HashSet<string>(["location", "filter", "action"], StringComparer.Ordinal);
+        if (result.Any(x => !validKinds.Contains(x.Kind) || string.IsNullOrWhiteSpace(x.Value)))
+        {
+            throw new InvalidOperationException("アプリ機能に未定義の種類または空の値があります");
+        }
+
+        var actionValues = new HashSet<string>(
+        [
+            "clear-filter", "select-all", "select-none", "select-invert", "select-folders", "select-files",
+            "sort-name-asc", "sort-name-desc", "sort-modified-desc", "sort-size-desc", "view-Details", "view-List",
+            "view-SmallIcons", "view-LargeIcons", "view-ExtraLargeIcons",
+        ], StringComparer.Ordinal);
+        if (result.Where(x => x.Kind == "action").Any(x => !actionValues.Contains(x.Value)))
+        {
+            throw new InvalidOperationException("アプリ機能に実行先のない操作があります");
+        }
+
         return result;
     }
 

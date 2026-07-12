@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
@@ -15,6 +16,13 @@ public partial class TabViewModel : ObservableObject
     private readonly Stack<string> _back = new();
     private readonly Stack<string> _forward = new();
     private readonly ShellOptions _options;
+    private readonly CancellationTokenSource _lifetimeCts = new();
+    private CancellationTokenSource? _filterDebounceCts;
+    private bool _isDetached;
+    private bool _suppressSearchFilter;
+    private long _searchGeneration;
+    private long _navigationGeneration;
+    private readonly SemaphoreSlim _fileOperationGate = new(1, 1);
 
     [ObservableProperty]
     private string _title = "PC";
@@ -57,6 +65,8 @@ public partial class TabViewModel : ObservableObject
 
     private List<FileSystemEntry> _selection = new();
 
+    public ObservableCollection<DetailColumnViewModel> DetailColumns { get; }
+
     /// <summary>現在の複数選択（切り取り / コピー / 削除の対象）。</summary>
     public IReadOnlyList<FileSystemEntry> Selection => _selection;
 
@@ -78,16 +88,16 @@ public partial class TabViewModel : ObservableObject
 
     /// <summary>詳細表示のカラム幅（ヘッダーの Thumb ドラッグで変更）。</summary>
     [ObservableProperty]
-    private double _colNameWidth = 320;
+    private double _colNameWidth = 300;
 
     [ObservableProperty]
-    private double _colModifiedWidth = 170;
+    private double _colModifiedWidth = 160;
 
     [ObservableProperty]
-    private double _colTypeWidth = 150;
+    private double _colTypeWidth = 140;
 
     [ObservableProperty]
-    private double _colSizeWidth = 110;
+    private double _colSizeWidth = 180;
 
     [ObservableProperty]
     private double _colCreatedWidth = 170;
@@ -222,6 +232,10 @@ public partial class TabViewModel : ObservableObject
                     // 画像は寸法も表示する
                     PreviewInfo = $"{entry.Name}\n{entry.TypeText}  {entry.SizeText}  {bmp.PixelSize.Width}×{bmp.PixelSize.Height}\n更新日時: {entry.ModifiedText}";
                 }
+                else
+                {
+                    bmp.Dispose();
+                }
 
                 return;
             }
@@ -290,54 +304,29 @@ public partial class TabViewModel : ObservableObject
 
     // ===== フォルダー変更の自動検知（エクスプローラーと同じ自動更新） =====
 
-    private FileSystemWatcher? _watcher;
-    private int _watcherRefreshQueued;
+    private IDisposable? _watcherSubscription;
 
     private void SetupWatcher(string path)
     {
-        _watcher?.Dispose();
-        _watcher = null;
-        if (path == FileSystemService.ComputerPath)
+        _watcherSubscription?.Dispose();
+        _watcherSubscription = null;
+        if (_isDetached || path == FileSystemService.ComputerPath)
         {
             return;
         }
 
-        try
-        {
-            _watcher = new FileSystemWatcher(path)
-            {
-                NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName
-                               | NotifyFilters.LastWrite | NotifyFilters.Size,
-                EnableRaisingEvents = true,
-            };
-            _watcher.Created += OnWatcherEvent;
-            _watcher.Deleted += OnWatcherEvent;
-            _watcher.Renamed += OnWatcherEvent;
-            _watcher.Changed += OnWatcherEvent;
-        }
-        catch
-        {
-            // ネットワークドライブなど監視不可の場所は手動更新のみ
-        }
+        _watcherSubscription = DirectoryObservationService.Subscribe(path, OnObservedDirectoryChanged);
     }
 
-    private void OnWatcherEvent(object sender, FileSystemEventArgs e)
+    private void OnObservedDirectoryChanged()
     {
-        // 連続イベントを 600ms でまとめて 1 回の更新にする
-        if (Interlocked.CompareExchange(ref _watcherRefreshQueued, 1, 0) != 0)
+        Dispatcher.UIThread.Post(() =>
         {
-            return;
-        }
-
-        Task.Delay(600).ContinueWith(_ => Dispatcher.UIThread.Post(() =>
-        {
-            Interlocked.Exchange(ref _watcherRefreshQueued, 0);
-            // 検索中は結果が消えないよう自動更新しない
-            if (SearchText.Length == 0)
+            if (!_isDetached && SearchText.Length == 0)
             {
                 NavigateTo(CurrentPath, record: false);
             }
-        }));
+        });
     }
 
     // ===== 再帰検索（検索ボックスで Enter） =====
@@ -354,8 +343,9 @@ public partial class TabViewModel : ObservableObject
         }
 
         _searchCts?.Cancel();
-        var cts = new CancellationTokenSource();
+        var cts = CancellationTokenSource.CreateLinkedTokenSource(_lifetimeCts.Token);
         _searchCts = cts;
+        var generation = Interlocked.Increment(ref _searchGeneration);
         StatusText = "検索中... (サブフォルダーを含む)";
 
         var root = CurrentPath;
@@ -419,7 +409,9 @@ public partial class TabViewModel : ObservableObject
             return list;
         }, cts.Token);
 
-        if (cts.IsCancellationRequested)
+        if (cts.IsCancellationRequested || _isDetached || generation != _searchGeneration
+            || !string.Equals(root, CurrentPath, StringComparison.OrdinalIgnoreCase)
+            || !string.Equals(query, SearchText.Trim(), StringComparison.Ordinal))
         {
             return;
         }
@@ -437,6 +429,8 @@ public partial class TabViewModel : ObservableObject
     // ===== アイコンビューの画像サムネイル =====
 
     private CancellationTokenSource? _thumbnailCts;
+    private readonly SemaphoreSlim _thumbnailGate = new(4, 4);
+    private readonly ConcurrentDictionary<string, byte> _loadingThumbnails = new(StringComparer.OrdinalIgnoreCase);
 
     partial void OnViewModeChanged(ViewMode value)
     {
@@ -451,46 +445,58 @@ public partial class TabViewModel : ObservableObject
 
         if (IsIconsView)
         {
-            _ = LoadThumbnailsAsync();
+            _thumbnailCts?.Cancel();
+            _thumbnailCts = CancellationTokenSource.CreateLinkedTokenSource(_lifetimeCts.Token);
+        }
+        else
+        {
+            _thumbnailCts?.Cancel();
         }
     }
 
-    private async Task LoadThumbnailsAsync()
+    public async Task EnsureThumbnailAsync(FileSystemEntry entry)
     {
-        _thumbnailCts?.Cancel();
-        var cts = new CancellationTokenSource();
-        _thumbnailCts = cts;
-
-        foreach (var entry in Entries.ToList())
+        if (!IsIconsView || _isDetached || entry.IsDirectory || entry.Thumbnail is not null
+            || !ImageExtensions.Contains(Path.GetExtension(entry.Name).ToLowerInvariant())
+            || entry.Size is null or > 32 * 1024 * 1024
+            || !_loadingThumbnails.TryAdd(entry.FullPath, 0))
         {
-            if (cts.IsCancellationRequested)
-            {
-                return;
-            }
+            return;
+        }
 
-            if (entry.IsDirectory || entry.Thumbnail is not null
-                || !ImageExtensions.Contains(Path.GetExtension(entry.Name).ToLowerInvariant())
-                || entry.Size is null or > 32 * 1024 * 1024)
-            {
-                continue;
-            }
-
+        var token = _thumbnailCts?.Token ?? _lifetimeCts.Token;
+        try
+        {
+            await _thumbnailGate.WaitAsync(token);
             try
             {
                 var bmp = await Task.Run(() =>
                 {
                     using var stream = File.OpenRead(entry.FullPath);
                     return Bitmap.DecodeToWidth(stream, 128);
-                }, cts.Token);
-                if (!cts.IsCancellationRequested)
+                }, token);
+                if (!token.IsCancellationRequested && IsIconsView && _allEntries.Contains(entry))
                 {
                     entry.Thumbnail = bmp;
                 }
+                else
+                {
+                    bmp.Dispose();
+                }
             }
-            catch
+            finally
             {
-                // 壊れた画像などはアイコンのまま
+                _thumbnailGate.Release();
             }
+        }
+        catch (OperationCanceledException) { }
+        catch (Exception ex)
+        {
+            Logger.LogException($"サムネイルを読み込めませんでした: {entry.FullPath}", ex);
+        }
+        finally
+        {
+            _loadingThumbnails.TryRemove(entry.FullPath, out _);
         }
     }
 
@@ -584,6 +590,14 @@ public partial class TabViewModel : ObservableObject
     public TabViewModel(string initialPath, ShellOptions options, bool isSettingsTab = false)
     {
         _options = options;
+        DetailColumns =
+        [
+            new(this, "Name", "名前"),
+            new(this, "Modified", "更新日時"),
+            new(this, "Created", "作成日時"),
+            new(this, "Type", "種類"),
+            new(this, "Size", "サイズ"),
+        ];
         IsSettingsTab = isSettingsTab;
         _options.Changed += OnOptionsChanged;
         ClipboardFileService.CutStateChanged += OnCutStateChanged;
@@ -602,23 +616,32 @@ public partial class TabViewModel : ObservableObject
     /// <summary>タブを閉じるときに共有イベントの購読・リソースを解放する。</summary>
     public void Detach()
     {
+        if (_isDetached) return;
+        _isDetached = true;
+        _lifetimeCts.Cancel();
         _options.Changed -= OnOptionsChanged;
         ClipboardFileService.CutStateChanged -= OnCutStateChanged;
-        _watcher?.Dispose();
-        _watcher = null;
+        _watcherSubscription?.Dispose();
+        _watcherSubscription = null;
+        _filterDebounceCts?.Cancel();
         _searchCts?.Cancel();
         _thumbnailCts?.Cancel();
+        foreach (var column in DetailColumns) column.Detach();
+        DisposeEntryThumbnails(_allEntries);
         ClearPreview();
     }
 
-    private void OnOptionsChanged(object? sender, EventArgs e)
+    private void OnOptionsChanged(object? sender, ShellOptionChangedEventArgs e)
     {
         OnPropertyChanged(nameof(ShowHidden));
         OnPropertyChanged(nameof(ShowExtensions));
         OnPropertyChanged(nameof(ShowCheckBoxes));
         OnPropertyChanged(nameof(ShowMaterialIcons));
         OnPropertyChanged(nameof(UseEmojiIcons));
-        Refresh();
+        if (e.Kind != ShellOptionKind.ShowCheckBoxes)
+        {
+            Refresh();
+        }
     }
 
     /// <summary>切り取り状態の変化を全エントリの半透明表示へ反映する（エクスプローラーと同じ見た目）。</summary>
@@ -640,23 +663,36 @@ public partial class TabViewModel : ObservableObject
 
     /// <summary>指定パスへ移動する。失敗時は現状維持でステータスにエラーを出す。</summary>
     public void NavigateTo(string path, bool record = true)
+        => _ = NavigateToAsync(path, record);
+
+    public async Task NavigateToAsync(string path, bool record = true)
     {
+        if (_isDetached) return;
+        var generation = Interlocked.Increment(ref _navigationGeneration);
         // 同一パスの再読み込み（更新）ではスクロール / 選択を維持する
-        var preserveSelection = path == CurrentPath ? SelectedEntry?.FullPath : null;
+        var preserveSelection = WindowsPathIdentity.Instance.Equals(path, CurrentPath) ? SelectedEntry?.FullPath : null;
 
         List<FileSystemEntry> entries;
         try
         {
-            entries = FileSystemService.GetEntries(path, _options);
+            entries = await Task.Run(() => FileSystemService.GetEntries(path, _options), _lifetimeCts.Token);
         }
+        catch (OperationCanceledException) { return; }
         catch (Exception ex)
         {
+            Logger.LogException($"フォルダーを開けませんでした: {path}", ex);
             StatusText = $"開けませんでした: {ex.Message}";
             PathText = CurrentPath;
             return;
         }
 
-        if (record && CurrentPath != path)
+        if (_isDetached || generation != _navigationGeneration)
+        {
+            DisposeEntryThumbnails(entries);
+            return;
+        }
+
+        if (record && !WindowsPathIdentity.Instance.Equals(CurrentPath, path))
         {
             _back.Push(CurrentPath);
             _forward.Clear();
@@ -671,12 +707,15 @@ public partial class TabViewModel : ObservableObject
                 ? name
                 : path;
 
+        DisposeEntryThumbnails(_allEntries);
         _allEntries = ApplySort(entries).ToList();
         // 移動で検索と種別フィルターをリセット（エクスプローラーと同じ）。プロパティ経由だと OnSearchTextChanged
         // → ApplyFilter が二重に走るだけで害はないため素直にプロパティへ代入する。
         _extensionFilter = null;
         _extensionFilterName = "";
+        _suppressSearchFilter = true;
         SearchText = "";
+        _suppressSearchFilter = false;
         ApplyFilter();
 
         BuildBreadcrumbs(path);
@@ -695,13 +734,45 @@ public partial class TabViewModel : ObservableObject
                 string.Equals(e.FullPath, preserveSelection, StringComparison.OrdinalIgnoreCase));
         }
 
-        if (IsIconsView)
+        if (IsIconsView && _thumbnailCts is null)
+            _thumbnailCts = CancellationTokenSource.CreateLinkedTokenSource(_lifetimeCts.Token);
+    }
+
+    partial void OnSearchTextChanged(string value)
+    {
+        _searchCts?.Cancel();
+        Interlocked.Increment(ref _searchGeneration);
+        if (_suppressSearchFilter || _isDetached) return;
+
+        _filterDebounceCts?.Cancel();
+        var cts = CancellationTokenSource.CreateLinkedTokenSource(_lifetimeCts.Token);
+        _filterDebounceCts = cts;
+        _ = ApplyFilterDebouncedAsync(cts.Token);
+    }
+
+    private async Task ApplyFilterDebouncedAsync(CancellationToken token)
+    {
+        try
         {
-            _ = LoadThumbnailsAsync();
+            await Task.Delay(180, token);
+            if (!token.IsCancellationRequested && !_isDetached)
+            {
+                ApplyFilter();
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // 次の入力が来た場合は最後の検索語だけを反映する。
         }
     }
 
-    partial void OnSearchTextChanged(string value) => ApplyFilter();
+    private static void DisposeEntryThumbnails(IEnumerable<FileSystemEntry> entries)
+    {
+        foreach (var entry in entries)
+        {
+            entry.DisposeThumbnail();
+        }
+    }
 
     private HashSet<string>? _extensionFilter;
     private string _extensionFilterName = "";
@@ -965,6 +1036,14 @@ public partial class TabViewModel : ObservableObject
         }
     }
 
+    public void MoveDetailColumn(DetailColumnViewModel source, DetailColumnViewModel target)
+    {
+        var sourceIndex = DetailColumns.IndexOf(source);
+        var targetIndex = DetailColumns.IndexOf(target);
+        if (sourceIndex >= 0 && targetIndex >= 0 && sourceIndex != targetIndex)
+            DetailColumns.Move(sourceIndex, targetIndex);
+    }
+
     private bool HasSelection => _selection.Count > 0;
 
     /// <summary>ドライブは切り取り / 削除 / 名前変更の対象にしない（誤操作防止、エクスプローラー互換）。</summary>
@@ -978,17 +1057,29 @@ public partial class TabViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(HasModifiableSelection))]
     private void Cut()
     {
-        ClipboardFileService.SetFiles(_selection.Select(e => e.FullPath).ToList(), cut: true);
-        StatusText = $"{_selection.Count} 個の項目を切り取りました";
-        PasteCommand.NotifyCanExecuteChanged();
+        if (ClipboardFileService.SetFiles(_selection.Select(e => e.FullPath).ToList(), cut: true))
+        {
+            StatusText = $"{_selection.Count} 個の項目を切り取りました";
+            PasteCommand.NotifyCanExecuteChanged();
+        }
+        else
+        {
+            StatusText = "クリップボードへ書き込めませんでした";
+        }
     }
 
     [RelayCommand(CanExecute = nameof(HasSelection))]
     private void Copy()
     {
-        ClipboardFileService.SetFiles(_selection.Select(e => e.FullPath).ToList(), cut: false);
-        StatusText = $"{_selection.Count} 個の項目をコピーしました";
-        PasteCommand.NotifyCanExecuteChanged();
+        if (ClipboardFileService.SetFiles(_selection.Select(e => e.FullPath).ToList(), cut: false))
+        {
+            StatusText = $"{_selection.Count} 個の項目をコピーしました";
+            PasteCommand.NotifyCanExecuteChanged();
+        }
+        else
+        {
+            StatusText = "クリップボードへ書き込めませんでした";
+        }
     }
 
     private bool CanPaste => CurrentPath != FileSystemService.ComputerPath && ClipboardFileService.HasFiles();
@@ -1010,20 +1101,29 @@ public partial class TabViewModel : ObservableObject
             return;
         }
 
-        var dest = CurrentPath;
-        // 同一フォルダーへのコピー貼り付けはエクスプローラーと同じく自動リネーム（"- コピー"）
-        var sameDir = !isCut && files.Any(f => string.Equals(
-            Path.GetDirectoryName(f)?.TrimEnd(Path.DirectorySeparatorChar),
-            dest.TrimEnd(Path.DirectorySeparatorChar), StringComparison.OrdinalIgnoreCase));
-
-        // SHFileOperation は同期ブロッキングだが独自の進捗ダイアログを出すため背景スレッドで実行
-        var ok = await Task.Run(() => FileOperationService.CopyOrMove(files, dest, move: isCut, renameOnCollision: sameDir));
-        if (ok && isCut)
+        if (!await _fileOperationGate.WaitAsync(0))
         {
-            ClipboardFileService.Clear();
+            StatusText = "別のファイル操作が完了するまでお待ちください";
+            return;
         }
 
-        Refresh();
+        try
+        {
+            var dest = CurrentPath;
+            // 同一フォルダーへのコピー貼り付けはエクスプローラーと同じく自動リネーム（"- コピー"）
+            var sameDir = !isCut && files.Any(f => WindowsPathIdentity.Instance.Equals(
+                Path.GetDirectoryName(f), dest));
+
+            // SHFileOperation は同期ブロッキングだが独自の進捗ダイアログを出すため背景スレッドで実行
+            var result = await Task.Run(() => FileOperationService.CopyOrMove(files, dest, move: isCut, renameOnCollision: sameDir));
+            if (result.IsSuccess && isCut) ClipboardFileService.Clear();
+            if (result.IsSuccess) Refresh();
+            else if (!result.IsCancelled) StatusText = $"貼り付けに失敗しました（エラー {result.NativeErrorCode}）";
+        }
+        finally
+        {
+            _fileOperationGate.Release();
+        }
     }
 
     [RelayCommand(CanExecute = nameof(HasSelection))]
@@ -1035,16 +1135,36 @@ public partial class TabViewModel : ObservableObject
 
     private async Task DeleteCoreAsync(bool permanent)
     {
+        if (!await _fileOperationGate.WaitAsync(0))
+        {
+            StatusText = "別のファイル操作が完了するまでお待ちください";
+            return;
+        }
+        try
+        {
         var targets = _selection.Select(e => e.FullPath).ToList();
         // 削除後はエクスプローラーと同じく隣接項目を選択する
         var anchorIndex = _selection.Count > 0 ? Entries.IndexOf(_selection[0]) : -1;
 
-        await Task.Run(() => FileOperationService.DeleteToRecycleBin(targets, permanent));
-        Refresh();
+        var result = await Task.Run(() => FileOperationService.DeleteToRecycleBin(targets, permanent));
+        if (!result.IsSuccess)
+        {
+            if (!result.IsCancelled)
+            {
+                StatusText = $"削除に失敗しました（エラー {result.NativeErrorCode}）";
+            }
+            return;
+        }
+        await NavigateToAsync(CurrentPath, record: false);
 
         if (anchorIndex >= 0 && Entries.Count > 0)
         {
             SelectedEntry = Entries[Math.Min(anchorIndex, Entries.Count - 1)];
+        }
+        }
+        finally
+        {
+            _fileOperationGate.Release();
         }
     }
 
@@ -1058,7 +1178,7 @@ public partial class TabViewModel : ObservableObject
     }
 
     /// <summary>名前の変更を確定する（View のダイアログから呼ばれる）。バリデーション付き。</summary>
-    public void CommitRename(FileSystemEntry entry, string newName)
+    public async Task CommitRenameAsync(FileSystemEntry entry, string newName)
     {
         newName = newName.Trim();
         if (newName.Length == 0 || newName == entry.Name)
@@ -1090,14 +1210,34 @@ public partial class TabViewModel : ObservableObject
         {
             // Windows の大文字・小文字だけの変更は同一パス扱いになるため、一時名を経由する。
             var temporary = Path.Combine(dir, $".kiriha-rename-{Guid.NewGuid():N}");
-            if (FileOperationService.Rename(entry.FullPath, temporary))
-                FileOperationService.Rename(temporary, newPath);
+            var first = FileOperationService.Rename(entry.FullPath, temporary);
+            if (!first.IsSuccess)
+            {
+                if (!first.IsCancelled) StatusText = $"名前を変更できませんでした（エラー {first.NativeErrorCode}）";
+                return;
+            }
+
+            var second = FileOperationService.Rename(temporary, newPath);
+            if (!second.IsSuccess)
+            {
+                var rollback = FileOperationService.Rename(temporary, entry.FullPath);
+                StatusText = rollback.IsSuccess
+                    ? "名前を変更できなかったため、元の名前へ戻しました"
+                    : $"名前を変更できませんでした。一時名のまま残っています: {Path.GetFileName(temporary)}";
+                await NavigateToAsync(CurrentPath, record: false);
+                return;
+            }
         }
         else
         {
-            FileOperationService.Rename(entry.FullPath, newPath);
+            var result = FileOperationService.Rename(entry.FullPath, newPath);
+            if (!result.IsSuccess)
+            {
+                if (!result.IsCancelled) StatusText = $"名前を変更できませんでした（エラー {result.NativeErrorCode}）";
+                return;
+            }
         }
-        Refresh();
+        await NavigateToAsync(CurrentPath, record: false);
 
         // 変更後の項目を選択し直す
         var renamed = Entries.FirstOrDefault(e => string.Equals(e.FullPath, newPath, StringComparison.OrdinalIgnoreCase));
@@ -1156,13 +1296,36 @@ public partial class TabViewModel : ObservableObject
             return;
         }
 
-        await Task.Run(() => FileOperationService.CopyOrMove(effective, destDir, move));
-        Refresh();
-        StatusText = $"{effective.Count} 個の項目を{(move ? "移動" : "コピー")}しました";
+        if (!await _fileOperationGate.WaitAsync(0))
+        {
+            StatusText = "別のファイル操作が完了するまでお待ちください";
+            return;
+        }
+
+        try
+        {
+            var result = await Task.Run(() => FileOperationService.CopyOrMove(effective, destDir, move));
+            if (result.IsSuccess)
+            {
+                Refresh();
+                StatusText = $"{effective.Count} 個の項目を{(move ? "移動" : "コピー")}しました";
+            }
+            else if (!result.IsCancelled)
+            {
+                StatusText = $"ファイル操作に失敗しました（エラー {result.NativeErrorCode}）";
+            }
+        }
+        finally
+        {
+            _fileOperationGate.Release();
+        }
     }
 
     /// <summary>「新規作成 > フォルダー」。作成後は選択して即リネーム入力へ（エクスプローラーと同じ）。</summary>
     public void CreateNewFolder()
+        => _ = CreateNewFolderAsync();
+
+    private async Task CreateNewFolderAsync()
     {
         if (CurrentPath == FileSystemService.ComputerPath)
         {
@@ -1173,7 +1336,7 @@ public partial class TabViewModel : ObservableObject
         {
             var path = GetUniquePath("新しいフォルダー", "");
             Directory.CreateDirectory(path);
-            Refresh();
+            await NavigateToAsync(CurrentPath, record: false);
 
             var created = Entries.FirstOrDefault(e => string.Equals(e.FullPath, path, StringComparison.OrdinalIgnoreCase));
             if (created is not null)
@@ -1199,17 +1362,13 @@ public partial class TabViewModel : ObservableObject
 
         try
         {
-            Process.Start(new ProcessStartInfo("wt.exe", $"-d \"{CurrentPath}\"") { UseShellExecute = true });
+            TrustedProcessLauncher.Start("wt.exe", ["-d", CurrentPath], CurrentPath);
         }
         catch
         {
             try
             {
-                Process.Start(new ProcessStartInfo("cmd.exe")
-                {
-                    WorkingDirectory = CurrentPath,
-                    UseShellExecute = true,
-                });
+                TrustedProcessLauncher.Start("cmd.exe", [], CurrentPath);
             }
             catch (Exception ex)
             {
@@ -1224,9 +1383,10 @@ public partial class TabViewModel : ObservableObject
     {
         try
         {
-            Process.Start(new ProcessStartInfo("explorer.exe",
-                CurrentPath == FileSystemService.ComputerPath ? "" : $"\"{CurrentPath}\"")
-            { UseShellExecute = true });
+            TrustedProcessLauncher.Start(
+                "explorer.exe",
+                CurrentPath == FileSystemService.ComputerPath ? [] : [CurrentPath],
+                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
         }
         catch (Exception ex)
         {
@@ -1236,6 +1396,9 @@ public partial class TabViewModel : ObservableObject
 
     /// <summary>「新規作成」メニューの ShellNew テンプレートからファイルを作成する。</summary>
     public void CreateFromTemplate(NewItemTemplate template)
+        => _ = CreateFromTemplateAsync(template);
+
+    private async Task CreateFromTemplateAsync(NewItemTemplate template)
     {
         if (CurrentPath == FileSystemService.ComputerPath)
         {
@@ -1258,7 +1421,7 @@ public partial class TabViewModel : ObservableObject
                     break;
             }
 
-            Refresh();
+            await NavigateToAsync(CurrentPath, record: false);
         }
         catch (Exception ex)
         {

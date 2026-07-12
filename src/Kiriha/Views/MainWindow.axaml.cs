@@ -21,9 +21,29 @@ public partial class MainWindow : Window
     private ListBox? _dragListBox;
     private Point _dragStartPoint;
     private bool _dragInProgress;
+    private readonly HashSet<ListBox> _bulkSelectionLists = [];
+    private static readonly IReadOnlyDictionary<string, HashSet<string>> SelectionExtensionSets =
+        new Dictionary<string, HashSet<string>>(StringComparer.Ordinal)
+        {
+            ["select.images"] = ExtSet(".jpg;.jpeg;.png;.gif;.bmp;.webp;.tif;.tiff;.heic;.avif"),
+            ["select.videos"] = ExtSet(".mp4;.mkv;.avi;.mov;.wmv;.webm;.m4v"),
+            ["select.audio"] = ExtSet(".mp3;.wav;.flac;.aac;.ogg;.m4a;.wma"),
+            ["select.documents"] = ExtSet(".txt;.md;.pdf;.doc;.docx;.xls;.xlsx;.ppt;.pptx;.odt;.ods"),
+            ["select.archives"] = ExtSet(".zip;.7z;.rar;.tar;.gz;.bz2;.xz"),
+            ["select.code"] = ExtSet(".cs;.cpp;.c;.h;.js;.ts;.py;.rs;.go;.java;.kt;.swift;.php;.rb;.vue;.svelte;.axaml"),
+            ["select.executable"] = ExtSet(".exe;.com;.bat;.cmd;.ps1;.msi"),
+        };
 
     private TabViewModel? _tabDragTab;
     private Point _tabDragStart;
+    private bool _tabDragActive;
+    private ListBoxItem? _tabDragContainer;
+    private ListBoxItem? _tabDropContainer;
+    private TabViewModel? _tabDropTab;
+    private DetailColumnViewModel? _columnDrag;
+    private DetailColumnViewModel? _columnDropTarget;
+    private Point _columnDragStart;
+    private bool _columnDragActive;
 
     /// <summary>最小化される直前の最大化状態（最小化中は Position がセンチネル値になるため、
     /// 閉じたときにこの値で最大化フラグを復元する）。</summary>
@@ -41,6 +61,9 @@ public partial class MainWindow : Window
         // 通常のバブル購読（XAML の PointerPressed="..."）ではタブの並べ替え開始を検知できない。
         // handledEventsToo: true で Handled 後も確実に拾う。
         TabsListBox.AddHandler(PointerPressedEvent, Tabs_PointerPressed, handledEventsToo: true);
+        AddHandler(PointerPressedEvent, DetailColumn_PointerPressed, handledEventsToo: true);
+        AddHandler(PointerMovedEvent, DetailColumn_PointerMoved, handledEventsToo: true);
+        AddHandler(PointerReleasedEvent, DetailColumn_PointerReleased, handledEventsToo: true);
 
         DataContextChanged += (_, _) =>
         {
@@ -64,6 +87,7 @@ public partial class MainWindow : Window
         {
             Opened -= onFirstOpened;
             ApplySavedWindowSize();
+            if (ViewModel is { } vm) _ = vm.RefreshSidebarAsync();
         };
         Opened += onFirstOpened;
 
@@ -182,8 +206,8 @@ public partial class MainWindow : Window
     /// <summary>タスクトレイに格納された状態から、最小化前の状態（通常 / 最大化）に復元して最前面に出す。</summary>
     public void RestoreFromTray()
     {
-        WindowState = _lastKnownMaximized ? WindowState.Maximized : WindowState.Normal;
         Show();
+        WindowState = _lastKnownMaximized ? WindowState.Maximized : WindowState.Normal;
         Activate();
     }
 
@@ -500,8 +524,8 @@ public partial class MainWindow : Window
         switch (action)
         {
             case "clear-filter": tab.SearchText = ""; tab.ClearExtensionFilter(); break;
-            case "select-all": list?.SelectAll(); break;
-            case "select-none": list?.UnselectAll(); break;
+            case "select-all": ApplyBulkSelection(list, list?.Items.OfType<FileSystemEntry>() ?? []); break;
+            case "select-none": ApplyBulkSelection(list, []); break;
             case "select-invert": SelectInvert_Click(null, new RoutedEventArgs()); break;
             case "select-folders": SelectMatching(list, e => e.IsDirectory); break;
             case "select-files": SelectMatching(list, e => !e.IsDirectory); break;
@@ -511,16 +535,13 @@ public partial class MainWindow : Window
             case "sort-size-desc": tab.SortKey = "Size"; tab.SortAscendingFlag = false; tab.RefreshCommand.Execute(null); break;
             default:
                 if (action.StartsWith("view-") && Enum.TryParse<ViewMode>(action[5..], out var mode)) tab.ViewMode = mode;
+                else tab.StatusText = $"未定義の操作です: {action}";
                 break;
         }
     }
 
-    private static void SelectMatching(ListBox? list, Func<FileSystemEntry, bool> predicate)
-    {
-        if (list?.SelectedItems is not { } selected) return;
-        selected.Clear();
-        foreach (var entry in list.Items.OfType<FileSystemEntry>().Where(predicate)) selected.Add(entry);
-    }
+    private void SelectMatching(ListBox? list, Func<FileSystemEntry, bool> predicate)
+        => ApplyBulkSelection(list, list?.Items.OfType<FileSystemEntry>().Where(predicate) ?? []);
 
     private void SelectFolders_Click(object? sender, RoutedEventArgs e)
         => SelectMatching(FindActiveFileList(), entry => entry.IsDirectory);
@@ -732,7 +753,7 @@ public partial class MainWindow : Window
         var newName = await PromptTextAsync("名前の変更", entry.Name, selectionLength);
         if (newName is not null)
         {
-            tab.CommitRename(entry, newName);
+            await tab.CommitRenameAsync(entry, newName);
         }
     }
 
@@ -922,21 +943,32 @@ public partial class MainWindow : Window
 
     private void Tabs_PointerMoved(object? sender, PointerEventArgs e)
     {
-        if (_tabDragTab is null || ViewModel is not { } vm
-            || !e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        if (_tabDragTab is null || !e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
         {
             return;
         }
 
         var position = e.GetPosition(this);
-        if (Math.Abs(position.X - _tabDragStart.X) < 8)
+        if (!_tabDragActive && Math.Abs(position.X - _tabDragStart.X) < 8
+            && Math.Abs(position.Y - _tabDragStart.Y) < 8)
         {
             return;
         }
 
+        if (!_tabDragActive)
+        {
+            _tabDragActive = true;
+            _tabDragContainer = TabContainer(_tabDragTab);
+            _tabDragContainer?.Classes.Add("dragging");
+        }
+
         if (TabUnderPoint(position) is { } target && target != _tabDragTab)
         {
-            vm.MoveTab(_tabDragTab, vm.Tabs.IndexOf(target));
+            if (_tabDropContainer is not null) _tabDropContainer.Classes.Remove("droptarget");
+            _tabDropTab = target;
+            _tabDropContainer = TabContainer(target);
+            _tabDropContainer?.Classes.Add("droptarget");
+            e.Handled = true;
         }
     }
 
@@ -974,7 +1006,24 @@ public partial class MainWindow : Window
             e.Handled = true;
         }
 
+        if (_tabDragActive && _tabDragTab is not null && _tabDropTab is not null && ViewModel is { } vm)
+            vm.MoveTab(_tabDragTab, vm.Tabs.IndexOf(_tabDropTab));
+        EndTabDrag();
+    }
+
+    private ListBoxItem? TabContainer(TabViewModel tab)
+        => TabsListBox.GetVisualDescendants().OfType<ListBoxItem>()
+            .FirstOrDefault(item => ReferenceEquals(item.DataContext, tab));
+
+    private void EndTabDrag()
+    {
+        _tabDragContainer?.Classes.Remove("dragging");
+        _tabDropContainer?.Classes.Remove("droptarget");
+        _tabDragContainer = null;
+        _tabDropContainer = null;
+        _tabDropTab = null;
         _tabDragTab = null;
+        _tabDragActive = false;
     }
 
     private void TabNewRight_Click(object? sender, RoutedEventArgs e)
@@ -1183,11 +1232,7 @@ public partial class MainWindow : Window
         }
 
         var current = selected.OfType<FileSystemEntry>().ToHashSet();
-        listBox.UnselectAll();
-        foreach (var entry in tab.Entries.Where(entry => !current.Contains(entry)))
-        {
-            selected.Add(entry);
-        }
+        ApplyBulkSelection(listBox, tab.Entries.Where(entry => !current.Contains(entry)));
     }
 
     private void PinToQuickAccess_Click(object? sender, RoutedEventArgs e)
@@ -1309,8 +1354,8 @@ public partial class MainWindow : Window
         {
             try
             {
-                System.Diagnostics.Process.Start(
-                    new System.Diagnostics.ProcessStartInfo("explorer.exe", link.Path) { UseShellExecute = true });
+                TrustedProcessLauncher.Start("explorer.exe", [link.Path],
+                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
             }
             catch
             {
@@ -1351,8 +1396,8 @@ public partial class MainWindow : Window
         {
             // ごみ箱: 開く / 空にする
             var openBin = new MenuItem { Header = "開く" };
-            openBin.Click += (_, _) => System.Diagnostics.Process.Start(
-                new System.Diagnostics.ProcessStartInfo("explorer.exe", link.Path) { UseShellExecute = true });
+            openBin.Click += (_, _) => TrustedProcessLauncher.Start("explorer.exe", [link.Path],
+                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
             flyout.Items.Add(openBin);
 
             var empty = new MenuItem { Header = "ごみ箱を空にする" };
@@ -1583,26 +1628,49 @@ public partial class MainWindow : Window
 
     private void ColumnThumb_DragDelta(object? sender, VectorEventArgs e)
     {
-        if (sender is not Thumb { DataContext: TabViewModel tab } thumb)
+        if (sender is not Thumb { DataContext: DetailColumnViewModel column })
         {
             return;
         }
+        column.Width += e.Vector.X;
+    }
 
-        switch (thumb.Tag as string)
-        {
-            case "Name":
-                tab.ColNameWidth = Math.Max(100, tab.ColNameWidth + e.Vector.X);
-                break;
-            case "Modified":
-                tab.ColModifiedWidth = Math.Max(60, tab.ColModifiedWidth + e.Vector.X);
-                break;
-            case "Type":
-                tab.ColTypeWidth = Math.Max(60, tab.ColTypeWidth + e.Vector.X);
-                break;
-            case "Size":
-                tab.ColSizeWidth = Math.Max(60, tab.ColSizeWidth + e.Vector.X);
-                break;
-        }
+    private void DetailColumn_PointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed
+            || (e.Source as Visual)?.FindAncestorOfType<Button>()?.DataContext is not DetailColumnViewModel column)
+            return;
+
+        _columnDrag = column;
+        _columnDragStart = e.GetPosition(this);
+    }
+
+    private void DetailColumn_PointerMoved(object? sender, PointerEventArgs e)
+    {
+        if (_columnDrag is null || !e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
+        var point = e.GetPosition(this);
+        if (!_columnDragActive && Math.Abs(point.X - _columnDragStart.X) < 8) return;
+        _columnDragActive = true;
+        _columnDrag.IsDragging = true;
+
+        var target = (this.InputHitTest(point) as Visual)?.FindAncestorOfType<Button>()?.DataContext as DetailColumnViewModel;
+        if (target is null || target == _columnDrag) return;
+        if (_columnDropTarget is not null) _columnDropTarget.IsDropTarget = false;
+        _columnDropTarget = target;
+        target.IsDropTarget = true;
+        e.Handled = true;
+    }
+
+    private void DetailColumn_PointerReleased(object? sender, PointerReleasedEventArgs e)
+    {
+        if (_columnDragActive) e.Handled = true;
+        if (_columnDrag is not null && _columnDropTarget is not null)
+            _columnDrag.Owner.MoveDetailColumn(_columnDrag, _columnDropTarget);
+        if (_columnDrag is not null) _columnDrag.IsDragging = false;
+        if (_columnDropTarget is not null) _columnDropTarget.IsDropTarget = false;
+        _columnDrag = null;
+        _columnDropTarget = null;
+        _columnDragActive = false;
     }
 
     // ===== ファイル一覧 =====
@@ -1617,7 +1685,8 @@ public partial class MainWindow : Window
 
     private void FileList_SelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        if (sender is ListBox { DataContext: TabViewModel tab } listBox && listBox.IsVisible)
+        if (sender is ListBox { DataContext: TabViewModel tab } listBox && listBox.IsVisible
+            && !_bulkSelectionLists.Contains(listBox))
         {
             tab.SetSelection(listBox.SelectedItems?.OfType<FileSystemEntry>().ToList() ?? []);
         }
@@ -1968,6 +2037,24 @@ public partial class MainWindow : Window
         e.Handled = true;
     }
 
+    private void FileListClearArea_PointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        FindActiveFileList()?.UnselectAll();
+        e.Handled = true;
+    }
+
+    private async void IconItem_EffectiveViewportChanged(object? sender, EffectiveViewportChangedEventArgs e)
+    {
+        if (e.EffectiveViewport.Width <= 0 || e.EffectiveViewport.Height <= 0
+            || sender is not Control { DataContext: FileSystemEntry entry } control
+            || control.FindAncestorOfType<ListBox>()?.DataContext is not TabViewModel tab)
+        {
+            return;
+        }
+
+        await tab.EnsureThumbnailAsync(entry);
+    }
+
     /// <summary>追加機能はWindows標準コンテキストメニューを置き換えず、コマンドバーから提供する。</summary>
     private void AdvancedToolsButton_Click(object? sender, RoutedEventArgs e)
     {
@@ -1975,21 +2062,21 @@ public partial class MainWindow : Window
         var flyout = new MenuFlyout { Placement = PlacementMode.BottomEdgeAlignedLeft };
         if (tab.Selection.FirstOrDefault() is { } entry)
         {
-            AddActionGroup(flyout, "選択項目: パス変換", ContextActionCatalog.For(ActionScope.File).Take(15),
+            AddActionGroup(flyout, "選択項目: パス変換", ContextActionCatalog.For(ActionScope.File).Where(x => x.Group == "path"),
                 action => ExecuteFileContextActionAsync(action, tab, entry));
-            AddActionGroup(flyout, "選択項目: 情報・ハッシュ", ContextActionCatalog.For(ActionScope.File).Skip(15).Take(10),
+            AddActionGroup(flyout, "選択項目: 情報・ハッシュ", ContextActionCatalog.For(ActionScope.File).Where(x => x.Group == "info"),
                 action => ExecuteFileContextActionAsync(action, tab, entry));
-            AddActionGroup(flyout, "選択項目: 開く", ContextActionCatalog.For(ActionScope.File).Skip(25).Take(8),
+            AddActionGroup(flyout, "選択項目: 開く", ContextActionCatalog.For(ActionScope.File).Where(x => x.Group == "open"),
                 action => ExecuteFileContextActionAsync(action, tab, entry));
-            AddActionGroup(flyout, "選択項目: 整理", ContextActionCatalog.For(ActionScope.File).Skip(33),
+            AddActionGroup(flyout, "選択項目: 整理", ContextActionCatalog.For(ActionScope.File).Where(x => x.Group == "organize"),
                 action => ExecuteFileContextActionAsync(action, tab, entry));
             flyout.Items.Add(new Separator());
         }
-        AddActionGroup(flyout, "テンプレートから作成", ContextActionCatalog.For(ActionScope.Background).Take(10),
+        AddActionGroup(flyout, "テンプレートから作成", ContextActionCatalog.For(ActionScope.Background).Where(x => x.Group == "create"),
             action => ExecuteBackgroundActionAsync(action, tab));
-        AddActionGroup(flyout, "現在の場所をコピー", ContextActionCatalog.For(ActionScope.Background).Skip(10).Take(5),
+        AddActionGroup(flyout, "現在の場所をコピー", ContextActionCatalog.For(ActionScope.Background).Where(x => x.Group == "copy"),
             action => ExecuteBackgroundActionAsync(action, tab));
-        AddActionGroup(flyout, "この場所で開く", ContextActionCatalog.For(ActionScope.Background).Skip(15),
+        AddActionGroup(flyout, "この場所で開く", ContextActionCatalog.For(ActionScope.Background).Where(x => x.Group == "open"),
             action => ExecuteBackgroundActionAsync(action, tab));
         AddActionGroup(flyout, "条件を指定して選択", ContextActionCatalog.For(ActionScope.Selection),
             action => ExecuteSelectionAction(action, FindActiveFileList()));
@@ -2055,7 +2142,7 @@ public partial class MainWindow : Window
                 var hash = await Task.Run(() => ComputeHash(path, action.Id));
                 await SetClipboardTextAsync(hash, tab);
             }
-            catch (Exception ex) { tab.StatusText = $"ハッシュを計算できませんでした: {ex.Message}"; }
+            catch (Exception ex) { Logger.LogException($"ハッシュ計算に失敗しました: {path}", ex); tab.StatusText = $"ハッシュを計算できませんでした: {ex.Message}"; }
             return;
         }
 
@@ -2072,22 +2159,30 @@ public partial class MainWindow : Window
                 case "file.cmd-here": StartProcess("cmd.exe", ["/K", "cd", "/d", entry.IsDirectory ? path : parent], parent); break;
                 case "file.vscode": StartProcess("code.cmd", [path], parent); break;
                 case "file.duplicate":
-                    if (entry.IsDirectory) FileOperationService.CopyOrMove([path], parent, move: false, renameOnCollision: true);
+                    if (entry.IsDirectory)
+                    {
+                        var result = FileOperationService.CopyOrMove([path], parent, move: false, renameOnCollision: true);
+                        if (!result.IsSuccess)
+                        {
+                            if (!result.IsCancelled) tab.StatusText = $"複製に失敗しました（エラー {result.NativeErrorCode}）";
+                            break;
+                        }
+                    }
                     else File.Copy(path, UniqueSiblingPath(path, " - コピー"));
                     tab.RefreshCommand.Execute(null); break;
                 case "file.backup":
                     var backup = UniqueSiblingPath(path, $" - バックアップ {DateTime.Now:yyyyMMdd-HHmmss}");
                     if (entry.IsDirectory) DirectoryCopy(path, backup); else File.Copy(path, backup);
                     tab.RefreshCommand.Execute(null); break;
-                case "file.rename-lower": tab.CommitRename(entry, entry.Name.ToLowerInvariant()); break;
-                case "file.rename-upper": tab.CommitRename(entry, entry.Name.ToUpperInvariant()); break;
-                case "file.rename-underscores": tab.CommitRename(entry, entry.Name.Replace(' ', '_')); break;
+                case "file.rename-lower": await tab.CommitRenameAsync(entry, entry.Name.ToLowerInvariant()); break;
+                case "file.rename-upper": await tab.CommitRenameAsync(entry, entry.Name.ToUpperInvariant()); break;
+                case "file.rename-underscores": await tab.CommitRenameAsync(entry, entry.Name.Replace(' ', '_')); break;
                 case "file.touch":
                     if (entry.IsDirectory) Directory.SetLastWriteTime(path, DateTime.Now); else File.SetLastWriteTime(path, DateTime.Now);
                     tab.RefreshCommand.Execute(null); break;
             }
         }
-        catch (Exception ex) { tab.StatusText = $"操作を完了できませんでした: {ex.Message}"; }
+        catch (Exception ex) { Logger.LogException($"ファイル操作に失敗しました: {action.Id} / {path}", ex); tab.StatusText = $"操作を完了できませんでした: {ex.Message}"; }
     }
 
     private async Task ExecuteBackgroundActionAsync(ContextAction action, TabViewModel tab)
@@ -2120,40 +2215,38 @@ public partial class MainWindow : Window
                 case "bg.open-notepad": StartProcess("notepad.exe", [], path); break;
             }
         }
-        catch (Exception ex) { tab.StatusText = $"操作を完了できませんでした: {ex.Message}"; }
+        catch (Exception ex) { Logger.LogException($"背景操作に失敗しました: {action.Id} / {path}", ex); tab.StatusText = $"操作を完了できませんでした: {ex.Message}"; }
     }
 
     private Task ExecuteSelectionAction(ContextAction action, ListBox? list)
     {
         if (list is null) return Task.CompletedTask;
         var now = DateTime.Now;
-        var extSets = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal)
-        {
-            ["select.images"] = ExtSet(".jpg;.jpeg;.png;.gif;.bmp;.webp;.tif;.tiff;.heic;.avif"),
-            ["select.videos"] = ExtSet(".mp4;.mkv;.avi;.mov;.wmv;.webm;.m4v"),
-            ["select.audio"] = ExtSet(".mp3;.wav;.flac;.aac;.ogg;.m4a;.wma"),
-            ["select.documents"] = ExtSet(".txt;.md;.pdf;.doc;.docx;.xls;.xlsx;.ppt;.pptx;.odt;.ods"),
-            ["select.archives"] = ExtSet(".zip;.7z;.rar;.tar;.gz;.bz2;.xz"),
-            ["select.code"] = ExtSet(".cs;.cpp;.c;.h;.js;.ts;.py;.rs;.go;.java;.kt;.swift;.php;.rb;.vue;.svelte;.axaml"),
-        };
         if (action.Id is "select.largest" or "select.smallest")
         {
-            var ordered = list.Items.OfType<FileSystemEntry>().Where(x => x.Size is not null)
-                .OrderBy(x => x.Size).ToList();
-            if (action.Id == "select.largest") ordered.Reverse();
-            SelectEntries(list, ordered.Take(10));
+            var largest = action.Id == "select.largest";
+            var queue = new PriorityQueue<FileSystemEntry, long>();
+            foreach (var entry in list.Items.OfType<FileSystemEntry>().Where(x => x.Size is not null))
+            {
+                queue.Enqueue(entry, largest ? entry.Size!.Value : -entry.Size!.Value);
+                if (queue.Count > 10) queue.Dequeue();
+            }
+            var selected = queue.UnorderedItems.Select(x => x.Element);
+            selected = largest
+                ? selected.OrderByDescending(x => x.Size)
+                : selected.OrderBy(x => x.Size);
+            SelectEntries(list, selected);
             return Task.CompletedTask;
         }
         SelectMatching(list, entry => action.Id switch
         {
-            var id when extSets.TryGetValue(id, out var set) => !entry.IsDirectory && set.Contains(Path.GetExtension(entry.Name)),
+            var id when SelectionExtensionSets.TryGetValue(id, out var set) => !entry.IsDirectory && set.Contains(Path.GetExtension(entry.Name)),
             "select.hidden" => entry.IsHidden, "select.visible" => !entry.IsHidden,
             "select.empty" => entry.Size == 0, "select.nonempty" => entry.Size > 0,
             "select.today" => entry.Modified?.Date == now.Date,
             "select.week" => entry.Modified >= now.AddDays(-7), "select.old" => entry.Modified < now.AddDays(-30),
             "select.dotfiles" => entry.Name.StartsWith('.'), "select.spaces" => entry.Name.Contains(' '),
             "select.digits" => entry.Name.Any(char.IsDigit),
-            "select.executable" => ExtSet(".exe;.com;.bat;.cmd;.ps1;.msi").Contains(Path.GetExtension(entry.Name)),
             "select.readonly" => SafeAttributes(entry.FullPath).HasFlag(FileAttributes.ReadOnly), _ => false,
         });
         return Task.CompletedTask;
@@ -2192,11 +2285,7 @@ public partial class MainWindow : Window
     }
 
     private static void StartProcess(string fileName, IEnumerable<string> args, string workingDirectory)
-    {
-        var info = new System.Diagnostics.ProcessStartInfo(fileName) { UseShellExecute = true, WorkingDirectory = workingDirectory };
-        foreach (var arg in args) info.ArgumentList.Add(arg);
-        System.Diagnostics.Process.Start(info);
-    }
+        => TrustedProcessLauncher.Start(fileName, args, workingDirectory);
 
     private static string UniqueSiblingPath(string source, string suffix)
     {
@@ -2239,11 +2328,28 @@ public partial class MainWindow : Window
         _ => throw new ArgumentOutOfRangeException(nameof(id), id, "未定義のテンプレートです"),
     };
 
-    private static void SelectEntries(ListBox list, IEnumerable<FileSystemEntry> entries)
+    private void SelectEntries(ListBox list, IEnumerable<FileSystemEntry> entries)
+        => ApplyBulkSelection(list, entries);
+
+    private void ApplyBulkSelection(ListBox? list, IEnumerable<FileSystemEntry> entries)
     {
-        if (list.SelectedItems is not { } selected) return;
-        selected.Clear();
-        foreach (var entry in entries) selected.Add(entry);
+        if (list?.SelectedItems is not { } selected) return;
+        var materialized = entries.ToList();
+        _bulkSelectionLists.Add(list);
+        try
+        {
+            selected.Clear();
+            foreach (var entry in materialized) selected.Add(entry);
+        }
+        finally
+        {
+            _bulkSelectionLists.Remove(list);
+        }
+
+        if (list.IsVisible && list.DataContext is TabViewModel tab)
+        {
+            tab.SetSelection(materialized);
+        }
     }
 
     /// <summary>指定パスに対する Windows 標準のシェルコンテキストメニューを表示する。</summary>

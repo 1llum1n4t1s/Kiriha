@@ -15,6 +15,7 @@ public static class Logger
 {
     private static ILog? _logger;
     private static readonly object InitLock = new();
+    public static bool IsAvailable => _logger is not null;
 
     public static void Initialize()
     {
@@ -54,15 +55,20 @@ public static class Logger
 
                 _logger = LogManager.GetLogger("Kiriha");
             }
-            catch
+            catch (Exception ex)
             {
-                // ログ基盤の初期化失敗でアプリを止めない
+                System.Diagnostics.Debug.WriteLine($"ログ基盤を初期化できませんでした: {ex}");
             }
         }
     }
 
     public static void Log(string message, LogLevel level = LogLevel.Info)
     {
+        if (_logger is null)
+        {
+            System.Diagnostics.Debug.WriteLine($"[{level}] {message}");
+            return;
+        }
         switch (level)
         {
             case LogLevel.Debug:
@@ -81,5 +87,12 @@ public static class Logger
     }
 
     public static void LogException(string message, Exception ex)
-        => _logger?.Error($"{message}: {ex}");
+    {
+        if (_logger is null)
+        {
+            System.Diagnostics.Debug.WriteLine($"[Error] {message}: {ex}");
+            return;
+        }
+        _logger.Error($"{message}: {ex}");
+    }
 }
