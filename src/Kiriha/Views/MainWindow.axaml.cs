@@ -1,4 +1,5 @@
 using System.Collections.Specialized;
+using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
@@ -6,6 +7,7 @@ using Avalonia.Input;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
+using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -45,6 +47,9 @@ public partial class MainWindow : Window
     private Point _columnDragStart;
     private bool _columnDragActive;
 
+    /// <summary>サイドバーを右クリックで選択したときにフォルダー遷移を抑止するフラグ。</summary>
+    private bool _suppressSidebarNav;
+
     /// <summary>最小化される直前の最大化状態（最小化中は Position がセンチネル値になるため、
     /// 閉じたときにこの値で最大化フラグを復元する）。</summary>
     private bool _lastKnownMaximized;
@@ -61,6 +66,8 @@ public partial class MainWindow : Window
         // 通常のバブル購読（XAML の PointerPressed="..."）ではタブの並べ替え開始を検知できない。
         // handledEventsToo: true で Handled 後も確実に拾う。
         TabsListBox.AddHandler(PointerPressedEvent, Tabs_PointerPressed, handledEventsToo: true);
+        // タブコンテナが生成されたら固定タブの背景クラスを反映する（初期表示・並べ替え後など）。
+        TabsListBox.ContainerPrepared += (_, _) => RefreshPinnedTabClasses();
         AddHandler(PointerPressedEvent, DetailColumn_PointerPressed, handledEventsToo: true);
         AddHandler(PointerMovedEvent, DetailColumn_PointerMoved, handledEventsToo: true);
         AddHandler(PointerReleasedEvent, DetailColumn_PointerReleased, handledEventsToo: true);
@@ -91,9 +98,12 @@ public partial class MainWindow : Window
         };
         Opened += onFirstOpened;
 
-        // ウィンドウ復帰時: 貼り付け活性の再評価 + PC ビューのドライブ情報更新
+        // ウィンドウ復帰時: 貼り付け活性の再評価 + 切り取り表示の再同期 + PC ビューのドライブ情報更新。
+        // エクスプローラー側で別の切り取り/コピーが行われても、Kiriha に戻った時点で半透明表示が
+        // 実際のクリップボード状態に追従する（古い「切り取り中」表示が残らない）。
         Activated += (_, _) =>
         {
+            Services.ClipboardFileService.SyncFromClipboard();
             ViewModel?.NotifyClipboardChanged();
             if (ViewModel?.SelectedTab is { IsSettingsTab: false } tab
                 && tab.CurrentPath == FileSystemService.ComputerPath)
@@ -646,17 +656,37 @@ public partial class MainWindow : Window
         }
     }
 
-    /// <summary>詳細表示ヘッダーの右クリック（列の表示 / 非表示、エクスプローラー互換）。</summary>
+    /// <summary>詳細表示ヘッダーの右クリック（幅の自動調整 / 列の表示 / 非表示、エクスプローラー互換）。
+    /// PointerReleased は ItemsControl 自体に付けているため、sender は ItemsControl になる
+    /// （中の StackPanel ではない。以前は StackPanel を期待していたため常に早期 return していた）。</summary>
     private static void ColumnHeader_PointerReleased(object? sender, PointerReleasedEventArgs e)
     {
         if (e.InitialPressMouseButton != MouseButton.Right
-            || sender is not StackPanel { DataContext: TabViewModel tab } panel)
+            || sender is not ItemsControl { DataContext: TabViewModel tab } control)
         {
             return;
         }
 
         e.Handled = true;
+        var targetColumn = (e.Source as Visual)?.FindAncestorOfType<Border>()?.DataContext as DetailColumnViewModel;
+
         var flyout = new MenuFlyout();
+
+        if (targetColumn is not null)
+        {
+            var autoFitThis = new MenuItem { Header = "この列の幅を自動調整" };
+            autoFitThis.Click += (_, _) => AutoFitColumn(tab, targetColumn);
+            flyout.Items.Add(autoFitThis);
+        }
+
+        var autoFitAll = new MenuItem { Header = "すべての列の幅を自動調整" };
+        autoFitAll.Click += (_, _) =>
+        {
+            foreach (var column in tab.DetailColumns.Where(c => c.IsVisible)) AutoFitColumn(tab, column);
+        };
+        flyout.Items.Add(autoFitAll);
+        flyout.Items.Add(new Separator());
+
         (string Header, string Key, bool Checked)[] columns =
         [
             ("更新日時", "Modified", tab.ShowColModified),
@@ -672,7 +702,55 @@ public partial class MainWindow : Window
             flyout.Items.Add(item);
         }
 
-        flyout.ShowAt(panel, showAtPointer: true);
+        flyout.ShowAt(control, showAtPointer: true);
+    }
+
+    /// <summary>自動調整で実測する最大行数。数万件のフォルダでも FormattedText 生成が UI スレッドを
+    /// 長時間ブロックしないよう、これを超える場合は全体へストライドを掛けて等間隔サンプリングする。</summary>
+    private const int AutoFitSampleLimit = 2000;
+
+    /// <summary>列の内容（現在読み込み済みの行 + ヘッダー文字列）の実測幅に合わせて列幅を調整する
+    /// （エクスプローラーの「列の幅を自動調整」相当）。大量ファイル時はサンプリングで近似する。</summary>
+    private static void AutoFitColumn(TabViewModel tab, DetailColumnViewModel column)
+    {
+        var typeface = new Typeface("Segoe UI");
+
+        double Measure(string text, double fontSize) => string.IsNullOrEmpty(text)
+            ? 0
+            : new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, fontSize, Brushes.Black).Width;
+
+        var headerWidth = Measure(column.Title, 12) + 27; // ヘッダーの左右パディング + ソート矢印分の余白
+
+        var entries = tab.Entries;
+        double contentWidth = 0;
+        if (entries.Count > 0)
+        {
+            var isName = column.Key == "Name";
+            var fontSize = isName ? 13.0 : 12.5;
+            var padding = isName ? 46.0 : 16.0; // Name: アイコン+余白+チェックボックス分 / その他: 左右パディング
+            Func<FileSystemEntry, string> selector = column.Key switch
+            {
+                "Name" => entry => entry.DisplayName,
+                "Modified" => entry => entry.ModifiedText,
+                "Created" => entry => entry.CreatedText,
+                "Type" => entry => entry.TypeText,
+                "Size" => entry => entry.SizeText,
+                _ => _ => "",
+            };
+
+            // 行数が上限を超えたら等間隔サンプリング（stride）で近似し、O(n) の FormattedText 生成を抑える。
+            var stride = entries.Count > AutoFitSampleLimit ? entries.Count / AutoFitSampleLimit : 1;
+            var maxText = 0.0;
+            for (var i = 0; i < entries.Count; i += stride)
+            {
+                var w = Measure(selector(entries[i]), fontSize);
+                if (w > maxText) maxText = w;
+            }
+
+            contentWidth = maxText + padding;
+        }
+
+        column.Width = Math.Min(600, Math.Max(headerWidth, contentWidth));
     }
 
     private void SearchBox_KeyDown(object? sender, KeyEventArgs e)
@@ -716,9 +794,12 @@ public partial class MainWindow : Window
         {
             tab.RenameRequested -= Tab_RenameRequested;
             tab.RenameRequested += Tab_RenameRequested;
+            tab.PropertyChanged -= Tab_ViewPropertyChanged;
+            tab.PropertyChanged += Tab_ViewPropertyChanged;
         }
 
         vm.Tabs.CollectionChanged += Tabs_CollectionChanged;
+        RefreshPinnedTabClasses();
     }
 
     private void Tabs_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -729,6 +810,8 @@ public partial class MainWindow : Window
             {
                 item.RenameRequested -= Tab_RenameRequested;
                 item.RenameRequested += Tab_RenameRequested;
+                item.PropertyChanged -= Tab_ViewPropertyChanged;
+                item.PropertyChanged += Tab_ViewPropertyChanged;
             }
         }
 
@@ -737,8 +820,35 @@ public partial class MainWindow : Window
             foreach (var item in e.OldItems.OfType<TabViewModel>())
             {
                 item.RenameRequested -= Tab_RenameRequested;
+                item.PropertyChanged -= Tab_ViewPropertyChanged;
             }
         }
+
+        RefreshPinnedTabClasses();
+    }
+
+    private void Tab_ViewPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(TabViewModel.IsPinned))
+        {
+            RefreshPinnedTabClasses();
+        }
+    }
+
+    /// <summary>固定タブのコンテナに "pinned" クラスを付与し、薄い背景スタイルを効かせる。
+    /// 固定状態はデータ(IsPinned)側の状態なので、擬似クラスのように code-behind で反映する。</summary>
+    private void RefreshPinnedTabClasses()
+    {
+        Dispatcher.UIThread.Post(() =>
+        {
+            foreach (var container in TabsListBox.GetRealizedContainers())
+            {
+                if (container is ListBoxItem { DataContext: TabViewModel tab } item)
+                {
+                    item.Classes.Set("pinned", tab.IsPinned);
+                }
+            }
+        }, DispatcherPriority.Loaded);
     }
 
     private async void Tab_RenameRequested(object? sender, FileSystemEntry entry)
@@ -960,7 +1070,10 @@ public partial class MainWindow : Window
             _tabDragActive = true;
             _tabDragContainer = TabContainer(_tabDragTab);
             _tabDragContainer?.Classes.Add("dragging");
+            ShowTabDragGhost(_tabDragTab);
         }
+
+        MoveTabDragGhost(position);
 
         if (TabUnderPoint(position) is { } target && target != _tabDragTab)
         {
@@ -1019,11 +1132,27 @@ public partial class MainWindow : Window
     {
         _tabDragContainer?.Classes.Remove("dragging");
         _tabDropContainer?.Classes.Remove("droptarget");
+        TabDragGhost.IsVisible = false;
         _tabDragContainer = null;
         _tabDropContainer = null;
         _tabDropTab = null;
         _tabDragTab = null;
         _tabDragActive = false;
+    }
+
+    /// <summary>ドラッグ中のタブを表す浮遊ゴーストを表示する（内容を掴んだタブに合わせる）。</summary>
+    private void ShowTabDragGhost(TabViewModel tab)
+    {
+        TabDragGhostIcon.Text = tab.IsSettingsTab ? "⚙" : "📁";
+        TabDragGhostText.Text = tab.Title;
+        TabDragGhost.IsVisible = true;
+    }
+
+    /// <summary>浮遊ゴーストをカーソルへ追従させる（掴んだ位置感を出すため少し左上にオフセット）。</summary>
+    private void MoveTabDragGhost(Point position)
+    {
+        Canvas.SetLeft(TabDragGhost, position.X - 24);
+        Canvas.SetTop(TabDragGhost, position.Y - 14);
     }
 
     private void TabNewRight_Click(object? sender, RoutedEventArgs e)
@@ -1223,6 +1352,15 @@ public partial class MainWindow : Window
         }
     }
 
+    /// <summary>検索ボックスは右寄せなので、Thumb は左辺を担う（左へドラッグ = 幅が広がる）。</summary>
+    private void SearchBoxThumb_DragDelta(object? sender, VectorEventArgs e)
+    {
+        if (ViewModel is { } vm)
+        {
+            vm.SearchBoxWidth = Math.Clamp(vm.SearchBoxWidth - e.Vector.X, 120, 480);
+        }
+    }
+
     private void SelectInvert_Click(object? sender, RoutedEventArgs e)
     {
         if (FindActiveFileList() is not { DataContext: TabViewModel tab } listBox
@@ -1318,6 +1456,25 @@ public partial class MainWindow : Window
 
     // ===== 左ペイン =====
 
+    /// <summary>サイドバーの右クリックで選択（＝フォルダー遷移）が起きないようにする。選択は ListBoxItem の
+    /// PointerPressed で起こるため、それより先に走るトンネルフェーズのハンドラを各インスタンスに登録する
+    /// （サイドバーはタブ内容の DataTemplate 内にあり、タブごとに生成されるため Loaded で毎回登録する）。</summary>
+    private void Sidebar_Loaded(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Control control)
+        {
+            control.RemoveHandler(PointerPressedEvent, Sidebar_PointerPressedTunnel);
+            control.AddHandler(PointerPressedEvent, Sidebar_PointerPressedTunnel, RoutingStrategies.Tunnel);
+        }
+    }
+
+    /// <summary>選択（＝ListBoxItem の PointerPressed）より前に走らせ、右クリックのときだけ
+    /// 遷移抑止フラグを立てる。左クリックでは通常どおり選択→遷移する。</summary>
+    private void Sidebar_PointerPressedTunnel(object? sender, PointerPressedEventArgs e)
+    {
+        _suppressSidebarNav = e.GetCurrentPoint(this).Properties.IsRightButtonPressed;
+    }
+
     private void Sidebar_SelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
         if (sender is not ListBox listBox || listBox.SelectedItem is null)
@@ -1327,6 +1484,13 @@ public partial class MainWindow : Window
 
         var selected = listBox.SelectedItem;
         listBox.SelectedItem = null;
+
+        // 右クリックでの選択はフォルダー遷移させない（右クリックメニューだけを出す）。
+        if (_suppressSidebarNav)
+        {
+            _suppressSidebarNav = false;
+            return;
+        }
 
         if (selected is not SidebarLink link || listBox.DataContext is not TabViewModel tab)
         {
@@ -1874,13 +2038,15 @@ public partial class MainWindow : Window
             return null;
         }
 
-        // サイドバーのフォルダー項目へのドロップ
+        // サイドバーのフォルダー項目へのドロップ。
+        // ここで Directory.Exists を呼ばない: DragOver はポインタ移動のたびに発火するため、切断中の
+        // ネットワークパスに対する存在確認が毎回 UI スレッドをブロックしうる。実際のドロップは
+        // DropFilesAsync（バックグラウンド）が担い、存在しない宛先はそちらでエラー処理される。
         if (listBox?.Classes.Contains("sidebar") == true)
         {
             if ((e.Source as Visual)?.FindAncestorOfType<ListBoxItem>()?.DataContext
                 is SidebarLink { IsShellCommand: false } link
-                && link.Path != FileSystemService.ComputerPath
-                && Directory.Exists(link.Path))
+                && link.Path != FileSystemService.ComputerPath)
             {
                 refreshTab = ViewModel?.SelectedTab;
                 return link.Path;
@@ -2247,7 +2413,7 @@ public partial class MainWindow : Window
             "select.week" => entry.Modified >= now.AddDays(-7), "select.old" => entry.Modified < now.AddDays(-30),
             "select.dotfiles" => entry.Name.StartsWith('.'), "select.spaces" => entry.Name.Contains(' '),
             "select.digits" => entry.Name.Any(char.IsDigit),
-            "select.readonly" => SafeAttributes(entry.FullPath).HasFlag(FileAttributes.ReadOnly), _ => false,
+            "select.readonly" => entry.IsReadOnly, _ => false,
         });
         return Task.CompletedTask;
     }
@@ -2310,7 +2476,13 @@ public partial class MainWindow : Window
         Directory.CreateDirectory(destination);
         foreach (var file in Directory.EnumerateFiles(source)) File.Copy(file, Path.Combine(destination, Path.GetFileName(file)));
         foreach (var directory in Directory.EnumerateDirectories(source))
+        {
+            // ジャンクション/シンボリックリンク（リパースポイント）は辿らない。辿ると意図しない
+            // フォルダーの中身まで巻き込み、閉路があれば無限再帰で StackOverflow（catch 不能）になる。
+            // Explorer 標準のコピー（FileOperationService 経由の他操作）もリンクは辿らない。
+            if ((new DirectoryInfo(directory).Attributes & FileAttributes.ReparsePoint) != 0) continue;
             DirectoryCopy(directory, Path.Combine(destination, Path.GetFileName(directory)));
+        }
     }
 
     private static (string Name, string Content) BackgroundTemplate(string id) => id switch
@@ -2335,11 +2507,30 @@ public partial class MainWindow : Window
     {
         if (list?.SelectedItems is not { } selected) return;
         var materialized = entries.ToList();
+        var entryCount = (list.DataContext as TabViewModel)?.Entries.Count ?? -1;
         _bulkSelectionLists.Add(list);
         try
         {
-            selected.Clear();
-            foreach (var entry in materialized) selected.Add(entry);
+            // 全件選択はネイティブの高速パスへ。SelectedItems への逐次 Add は大規模コレクションで
+            // 内部の IndexOf により O(n^2) 相当になる既知の性能問題（Avalonia #3450）があるため、
+            // 全件のときは SelectAll()、部分選択のときは Selection のバッチ更新で通知の嵐を抑える。
+            if (materialized.Count > 0 && materialized.Count == entryCount)
+            {
+                list.SelectAll();
+            }
+            else
+            {
+                list.Selection.BeginBatchUpdate();
+                try
+                {
+                    selected.Clear();
+                    foreach (var entry in materialized) selected.Add(entry);
+                }
+                finally
+                {
+                    list.Selection.EndBatchUpdate();
+                }
+            }
         }
         finally
         {

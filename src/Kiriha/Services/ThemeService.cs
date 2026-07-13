@@ -13,6 +13,11 @@ namespace Kiriha.Services;
 /// </summary>
 public static class ThemeService
 {
+    /// <summary>One Dark はダーク系だが Fluent の既定 Dark とは別配色のため、専用の ThemeVariant を用意する。
+    /// InheritVariant を Dark にしておくと、App.axaml に "OneDark" キーが無い FluentTheme 側の内部リソースは
+    /// Dark 配色にフォールバックする。全ページで同一インスタンスを参照するため static で共有する。</summary>
+    public static readonly ThemeVariant OneDark = new("OneDark", ThemeVariant.Dark);
+
     private static bool _acrylicEnabled;
 
     public static void Initialize(Application app, bool acrylicEnabled)
@@ -92,6 +97,12 @@ public static class ThemeService
     private static readonly Color DarkOmniboxBg = Color.Parse("#202124");
     private static readonly Color DarkStatusBg = Color.Parse("#2B2C2F");
 
+    private static readonly Color OneDarkTabStripBg = Color.Parse("#21252B");
+    private static readonly Color OneDarkContentBg = Color.Parse("#282C34");
+    private static readonly Color OneDarkSidebarBg = Color.Parse("#21252B");
+    private static readonly Color OneDarkOmniboxBg = Color.Parse("#1B1D23");
+    private static readonly Color OneDarkStatusBg = Color.Parse("#21252B");
+
     /// <summary>コンテンツ部の半透明度（読みやすさ優先でやや濃いめ）。</summary>
     private const byte ContentAlpha = 0xE6;
 
@@ -100,12 +111,12 @@ public static class ThemeService
 
     private static void ApplyAcrylicBackgrounds(Application app)
     {
-        var isDark = app.ActualThemeVariant == ThemeVariant.Dark;
-        var tabStrip = isDark ? DarkTabStripBg : LightTabStripBg;
-        var content = isDark ? DarkContentBg : LightContentBg;
-        var sidebar = isDark ? DarkSidebarBg : LightSidebarBg;
-        var omnibox = isDark ? DarkOmniboxBg : LightOmniboxBg;
-        var status = isDark ? DarkStatusBg : LightStatusBg;
+        var variant = app.ActualThemeVariant;
+        var (tabStrip, content, sidebar, omnibox, status) = variant == OneDark
+            ? (OneDarkTabStripBg, OneDarkContentBg, OneDarkSidebarBg, OneDarkOmniboxBg, OneDarkStatusBg)
+            : variant == ThemeVariant.Dark
+                ? (DarkTabStripBg, DarkContentBg, DarkSidebarBg, DarkOmniboxBg, DarkStatusBg)
+                : (LightTabStripBg, LightContentBg, LightSidebarBg, LightOmniboxBg, LightStatusBg);
 
         // ExperimentalAcrylicMaterial.TintColor は Color 型（Brush ではない）なので専用キーで持つ。
         // TabStripBg 自体は下で透明にすることがあるため、素の基準色はこちらに常時反映する。

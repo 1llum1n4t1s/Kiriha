@@ -5,15 +5,31 @@ namespace Kiriha.Services;
 /// <summary>閲覧中フォルダーを検索対象にせず、信頼できる実行ファイルだけを起動する。</summary>
 internal static class TrustedProcessLauncher
 {
+    // cmd.exe の第2段解釈でコマンド連結・リダイレクトを許す文字。バッチファイル(.cmd/.bat)を起動すると
+    // Windows は内部で cmd.exe を介するため、ArgumentList はこれらをエスケープできない（BatBadBut クラス）。
+    private static readonly char[] CmdShellMetaChars = ['&', '|', '<', '>', '\n', '\r'];
+
     public static void Start(string fileName, IEnumerable<string> arguments, string workingDirectory)
     {
         var executable = ResolveExecutable(fileName);
+        var args = arguments.ToArray();
+
+        // 解決先がバッチファイルの場合、外部由来のファイル名/パスに cmd メタ文字が含まれていると
+        // 任意コマンド実行に化けうるため、そうした引数を含む起動は拒否する（多重防御）。
+        var isBatch = executable.EndsWith(".cmd", StringComparison.OrdinalIgnoreCase)
+                      || executable.EndsWith(".bat", StringComparison.OrdinalIgnoreCase);
+        if (isBatch && Array.Exists(args, a => a.IndexOfAny(CmdShellMetaChars) >= 0))
+        {
+            throw new InvalidOperationException(
+                $"安全でない文字を含む引数のため、バッチファイルの起動を中止しました: {executable}");
+        }
+
         var info = new ProcessStartInfo(executable)
         {
             UseShellExecute = true,
             WorkingDirectory = workingDirectory,
         };
-        foreach (var argument in arguments)
+        foreach (var argument in args)
         {
             info.ArgumentList.Add(argument);
         }

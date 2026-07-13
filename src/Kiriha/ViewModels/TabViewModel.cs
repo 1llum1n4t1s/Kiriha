@@ -72,7 +72,7 @@ public partial class TabViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(
-        nameof(IsSortByName), nameof(IsSortByModified), nameof(IsSortByType), nameof(IsSortBySize),
+        nameof(IsSortByName), nameof(IsSortByModified), nameof(IsSortByCreated), nameof(IsSortByType), nameof(IsSortBySize),
         nameof(NameSortGlyph), nameof(ModifiedSortGlyph), nameof(TypeSortGlyph), nameof(SizeSortGlyph), nameof(CreatedSortGlyph))]
     private string _sortKey = "Name";
 
@@ -260,6 +260,14 @@ public partial class TabViewModel : ObservableObject
         catch
         {
             // プレビュー失敗は情報表示のみにフォールバック
+        }
+
+        // このコールが既に新しい選択に置き換わっている（stale）なら、末尾のリセットで
+        // 最新プレビューを消さない。Task.Run が実行前キャンセルで例外化して catch に落ちた場合に
+        // ここへフォールスルーするため、リセット前に必ず自分が最新かを確認する。
+        if (!ReferenceEquals(cts, _previewCts))
+        {
+            return;
         }
 
         PreviewBitmap?.Dispose();
@@ -519,6 +527,7 @@ public partial class TabViewModel : ObservableObject
 
     public bool IsSortByName => SortKey == "Name";
     public bool IsSortByModified => SortKey == "Modified";
+    public bool IsSortByCreated => SortKey == "Created";
     public bool IsSortByType => SortKey == "Type";
     public bool IsSortBySize => SortKey == "Size";
     public bool IsSortAscending => SortAscendingFlag;

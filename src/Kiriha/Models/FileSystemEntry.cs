@@ -31,6 +31,9 @@ public partial class FileSystemEntry : ObservableObject
     /// <summary>隠し属性（エクスプローラーと同じく薄く表示する）。</summary>
     public bool IsHidden { get; init; }
 
+    /// <summary>読み取り専用属性（列挙時に取得済み。「読み取り専用項目を選択」で同期 I/O を避けるため）。</summary>
+    public bool IsReadOnly { get; init; }
+
     /// <summary>切り取り済み（エクスプローラーと同じく半透明表示する）。</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(RowOpacity))]

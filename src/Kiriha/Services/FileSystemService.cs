@@ -58,7 +58,8 @@ public static class FileSystemService
 
         foreach (var dir in info.EnumerateDirectories())
         {
-            var hidden = (dir.Attributes & FileAttributes.Hidden) != 0;
+            var attributes = dir.Attributes;
+            var hidden = (attributes & FileAttributes.Hidden) != 0;
             if (!options.ShowHidden && hidden)
             {
                 continue;
@@ -73,6 +74,7 @@ public static class FileSystemService
                 Modified = dir.LastWriteTime,
                 Created = dir.CreationTime,
                 IsHidden = hidden,
+                IsReadOnly = (attributes & FileAttributes.ReadOnly) != 0,
                 IsCut = ClipboardFileService.IsCutPath(dir.FullName),
                 MaterialIconKey = MaterialIconService.ResolveIconKey(dir.Name, isDirectory: true, preferLight),
             });
@@ -80,7 +82,8 @@ public static class FileSystemService
 
         foreach (var file in info.EnumerateFiles())
         {
-            var hidden = (file.Attributes & FileAttributes.Hidden) != 0;
+            var attributes = file.Attributes;
+            var hidden = (attributes & FileAttributes.Hidden) != 0;
             if (!options.ShowHidden && hidden)
             {
                 continue;
@@ -100,6 +103,7 @@ public static class FileSystemService
                 Modified = file.LastWriteTime,
                 Created = file.CreationTime,
                 IsHidden = hidden,
+                IsReadOnly = (attributes & FileAttributes.ReadOnly) != 0,
                 IsCut = ClipboardFileService.IsCutPath(file.FullName),
                 MaterialIconKey = MaterialIconService.ResolveIconKey(file.Name, isDirectory: false, preferLight),
             });

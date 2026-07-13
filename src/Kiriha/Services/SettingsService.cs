@@ -34,6 +34,9 @@ public sealed class AppSettings
     /// <summary>最後に使った表示モード（新規タブの既定）。</summary>
     public string DefaultViewMode { get; set; } = "Details";
 
+    /// <summary>最後に使ったアイコンサイズ（マウスホイールで連続変更、新規タブの既定）。</summary>
+    public double DefaultIconSize { get; set; } = 28;
+
     /// <summary>前回のウィンドウサイズ（0 以下なら既定値を使う）。</summary>
     public double WindowWidth { get; set; }
 
@@ -70,6 +73,32 @@ public sealed class AppSettings
 
     /// <summary>終了時に開いていたタブのパス（RestoreAllTabs 用）。</summary>
     public List<string> OpenTabPaths { get; set; } = new();
+
+    /// <summary>終了時に設定タブ（固定ではない）が開いていたか（RestoreAllTabs 用）。</summary>
+    public bool OpenSettingsTab { get; set; }
+
+    /// <summary>詳細表示の列幅（ヘッダーの Thumb ドラッグで変更、次回起動時に復元）。</summary>
+    public double ColNameWidth { get; set; } = 300;
+
+    public double ColModifiedWidth { get; set; } = 160;
+
+    public double ColCreatedWidth { get; set; } = 170;
+
+    public double ColTypeWidth { get; set; } = 140;
+
+    public double ColSizeWidth { get; set; } = 180;
+
+    /// <summary>詳細表示の列の表示 / 非表示（ヘッダー右クリックで切替、次回起動時に復元）。</summary>
+    public bool ShowColModified { get; set; } = true;
+
+    public bool ShowColCreated { get; set; }
+
+    public bool ShowColType { get; set; } = true;
+
+    public bool ShowColSize { get; set; } = true;
+
+    /// <summary>検索ボックスの幅（境界の Thumb ドラッグで変更）。</summary>
+    public double SearchBoxWidth { get; set; } = 200;
 
     /// <summary>絵文字の代わりに Material Icon Theme のアイコンを使う（設定画面で切替）。</summary>
     public bool UseMaterialIcons { get; set; }

@@ -18,6 +18,14 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
+        // UI スレッドの async void ハンドラで漏れた例外は既定ではプロセスを落とす。ログに残した上で
+        // 続行扱いにし、単発の操作失敗でアプリ全体が落ちないようにする（AppDomain 側と合わせて多重防御）。
+        Dispatcher.UIThread.UnhandledException += (_, e) =>
+        {
+            Services.Logger.LogException("UI スレッドの未処理例外", e.Exception);
+            e.Handled = true;
+        };
+
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             var viewModel = new MainWindowViewModel();
@@ -39,15 +47,19 @@ public partial class App : Application
             {
                 mainWindow.Opened -= onFirstOpened;
 
-                if (viewModel.Settings.CheckUpdatesOnStartup)
-                {
-                    Services.UpdateService.Check4Update(mainWindow, viewModel.Settings, manually: false);
-                }
-
                 // 「起動時にタスクトレイに格納する」ON: 開いた直後に隠す（Discord 相当）。
-                if (viewModel.OptStartMinimizedToTray && !Program.StartupArgs.Any(Directory.Exists))
+                var startingMinimizedToTray = viewModel.OptStartMinimizedToTray && !Program.StartupArgs.Any(Directory.Exists);
+                if (startingMinimizedToTray)
                 {
                     mainWindow.Hide();
+                }
+
+                // 更新ダイアログは mainWindow をオーナーとして表示するため、直前で非表示にしていると
+                // 「非表示のオーナーではウィンドウを表示できない」で例外になる。トレイ格納起動時は
+                // 自動チェック自体を今回はスキップする（手動チェック、または通常起動時に改めてチェックされる）。
+                if (viewModel.Settings.CheckUpdatesOnStartup && !startingMinimizedToTray)
+                {
+                    Services.UpdateService.Check4Update(mainWindow, viewModel.Settings, manually: false);
                 }
             };
             mainWindow.Opened += onFirstOpened;

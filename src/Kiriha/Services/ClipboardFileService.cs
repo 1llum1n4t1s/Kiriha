@@ -22,6 +22,32 @@ internal static partial class ClipboardFileService
 
     public static bool IsCutPath(string path) => _cutPaths.Contains(path);
 
+    /// <summary>OS クリップボードの実状態から切り取り集合を再同期する。エクスプローラー側で別の
+    /// 切り取り/コピーが行われたときに、Kiriha 側の半透明表示が古いまま残らないようにする
+    /// （Kiriha がフォアグラウンドに戻ったタイミングで呼ぶ）。内容が変わったときだけ
+    /// CutStateChanged を発火する（自プロセスの操作での無駄な再描画を避ける）。</summary>
+    public static void SyncFromClipboard()
+    {
+        HashSet<string> current;
+        try
+        {
+            var files = GetFiles(out var isCut);
+            current = isCut
+                ? new HashSet<string>(files, StringComparer.OrdinalIgnoreCase)
+                : new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        }
+        catch
+        {
+            return;
+        }
+
+        if (!current.SetEquals(_cutPaths))
+        {
+            _cutPaths = current;
+            CutStateChanged?.Invoke(null, EventArgs.Empty);
+        }
+    }
+
     /// <summary>クリップボードにファイルがあるか（貼り付けボタンの活性制御用）。</summary>
     public static bool HasFiles() => IsClipboardFormatAvailable(CfHdrop);
 

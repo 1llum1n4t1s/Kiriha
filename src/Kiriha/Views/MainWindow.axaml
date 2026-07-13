@@ -23,31 +23,49 @@
             <Setter Property="Padding" Value="0" />
             <Setter Property="MinHeight" Value="0" />
             <Setter Property="Margin" Value="0,7,0,0" />
-            <Setter Property="CornerRadius" Value="10,10,0,0" />
+            <Setter Property="CornerRadius" Value="12,12,0,0" />
             <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <!-- Fluent既定テンプレートのフォーカスリング/選択インジケーターがタブの角丸と噛み合わず
+                 二重の枠に見えるため、背景・枠線・角丸だけを描く最小テンプレートに置き換える。
+                 PART名は既存の :pointerover / :selected セレクターと合わせている。 -->
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <ContentPresenter Name="PART_ContentPresenter"
+                                       Background="{TemplateBinding Background}"
+                                       BorderBrush="{TemplateBinding BorderBrush}"
+                                       BorderThickness="{TemplateBinding BorderThickness}"
+                                       CornerRadius="{TemplateBinding CornerRadius}"
+                                       Content="{TemplateBinding Content}"
+                                       ContentTemplate="{TemplateBinding ContentTemplate}"
+                                       Padding="{TemplateBinding Padding}" />
+                </ControlTemplate>
+            </Setter>
         </Style>
         <Style Selector="ListBox.tabs ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource TabHoverBg}" />
         </Style>
+        <!-- 固定タブ（アイコンのみ）は非選択・非ホバーでも薄い背景を出してタブの枠を見せる。
+             背景はタブ本体(ContentPresenter)層に置くので、選択/ホバー背景と入れ子にならない
+             （:not で相互排他にして二重背景を防ぐ）。pinned クラスは code-behind が付与する。 -->
+        <Style Selector="ListBox.tabs ListBoxItem.pinned:not(:selected):not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource TabIdleBg}" />
+        </Style>
         <Style Selector="ListBox.tabs ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource TabActiveBg}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource TabActiveBorder}" />
-            <Setter Property="BorderThickness" Value="1,1,1,0" />
         </Style>
         <Style Selector="ListBox.tabs ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource TabActiveBg}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource TabActiveBorder}" />
-            <Setter Property="BorderThickness" Value="1,1,1,0" />
         </Style>
+        <!-- ドラッグ中は掴んだタブがカーソルへ追従するゴースト（TabDragGhost）で表現するので、
+             元の位置は「抜けた跡」として薄く沈める（placeholder）。 -->
         <Style Selector="ListBox.tabs ListBoxItem.dragging">
-            <Setter Property="Opacity" Value="0.62" />
-            <Setter Property="RenderTransform" Value="scale(1.04)" />
-            <Setter Property="RenderTransformOrigin" Value="50%,50%" />
-            <Setter Property="ZIndex" Value="20" />
+            <Setter Property="Opacity" Value="0.3" />
         </Style>
+        <!-- ドロップ先の挿入位置を、対象タブの左辺のアクセントバーで示す。 -->
         <Style Selector="ListBox.tabs ListBoxItem.droptarget /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
-            <Setter Property="BorderThickness" Value="3,1,1,0" />
+            <Setter Property="BorderThickness" Value="3,0,0,0" />
         </Style>
         <Style Selector="Border.tabicon">
             <Setter Property="Width" Value="30" />
@@ -57,14 +75,9 @@
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
         </Style>
-        <Style Selector="Border.tabicon.pinned">
-            <Setter Property="Background" Value="{DynamicResource PinnedTabBg}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource PinnedTabBorder}" />
-            <Setter Property="BorderThickness" Value="1" />
-        </Style>
-        <Style Selector="Border.tabicon.pinned:pointerover">
-            <Setter Property="Background" Value="{DynamicResource PinnedTabHoverBg}" />
-        </Style>
+        <!-- 固定タブのアイコンは専用の背景色を持たせない。タブ自体の背景（透明 / ホバー / 選択中）が
+             そのまま透けるので、内側に別の色の箱が入れ子になって見える「二重背景」を避けられる。
+             固定タブであることはタイトル非表示・幅が縮む挙動自体で伝わる（Chrome と同じ）。 -->
 
         <!-- Fluent アイコン共通 -->
         <Style Selector="TextBlock.fico">
@@ -398,6 +411,26 @@
 
     <Grid RowDefinitions="42,*">
 
+        <!-- タブのドラッグ中に、掴んだタブがカーソルへ追従して浮くゴースト表示のオーバーレイ。
+             ヒットテストは無効（下の操作を邪魔しない）で、全面に最前面で重ねる。 -->
+        <Canvas x:Name="TabDragOverlay" Grid.Row="0" Grid.RowSpan="2"
+                IsHitTestVisible="False" ZIndex="1000">
+            <Border x:Name="TabDragGhost" IsVisible="False"
+                    Height="30" MinWidth="110" MaxWidth="240"
+                    Background="{DynamicResource TabActiveBg}"
+                    BorderBrush="{DynamicResource Divider}" BorderThickness="1"
+                    CornerRadius="8" Opacity="0.95"
+                    BoxShadow="0 8 22 0 #66000000">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
+                            Margin="8,0,12,0" Spacing="8">
+                    <TextBlock x:Name="TabDragGhostIcon" FontSize="12" VerticalAlignment="Center" />
+                    <TextBlock x:Name="TabDragGhostText" FontSize="12.5" VerticalAlignment="Center"
+                               Foreground="{DynamicResource TextPrimary}"
+                               TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+            </Border>
+        </Canvas>
+
         <!-- ===== タブストリップ（タイトルバー領域） ===== -->
         <Grid Grid.Row="0" ColumnDefinitions="Auto,Auto,*,Auto"
               Background="Transparent"
@@ -450,7 +483,7 @@
                                               Command="{Binding OpenInExplorerCommand}" />
                                 </ContextMenu>
                             </StackPanel.ContextMenu>
-                            <Border Classes="tabicon" Classes.pinned="{Binding IsPinned}">
+                            <Border Classes="tabicon">
                                 <Grid>
                                     <TextBlock Text="📁" FontSize="12"
                                                IsVisible="{Binding IsNormalTab}"
@@ -471,7 +504,9 @@
                                     VerticalAlignment="Center"
                                     Margin="0,0,8,0"
                                     Command="{Binding CloseSelfCommand}" />
-                            <Border Width="12" IsVisible="{Binding IsPinned}" />
+                            <!-- 固定タブはタイトル/閉じるボタンが無いので、アイコン枠の左マージン(6)と
+                                 対称になる幅の右スペーサーを置いてアイコンをタブ中央に揃える。 -->
+                            <Border Width="6" IsVisible="{Binding IsPinned}" />
                         </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
@@ -550,13 +585,16 @@
 
                                         <HeaderedContentControl Classes="settingscard" Header="テーマ">
                                             <StackPanel Spacing="12">
+                                                <!-- 表示は日本語、内部値（settings.json / ApplyTheme の switch）は英語のまま。
+                                                     SelectedValueBinding=Tag で ComboBoxItem.Tag を選択値として扱う。 -->
                                                 <ComboBox Classes="settingsfield"
                                                           SelectedValue="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptTheme}"
-                                                          SelectedValueBinding="{Binding}"
+                                                          SelectedValueBinding="{Binding Tag, x:DataType=ComboBoxItem}"
                                                           MinWidth="200" HorizontalAlignment="Left">
-                                                    <x:String>System</x:String>
-                                                    <x:String>Light</x:String>
-                                                    <x:String>Dark</x:String>
+                                                    <ComboBoxItem Tag="System">システム</ComboBoxItem>
+                                                    <ComboBoxItem Tag="Light">ライト</ComboBoxItem>
+                                                    <ComboBoxItem Tag="Dark">ダーク</ComboBoxItem>
+                                                    <ComboBoxItem Tag="OneDark">One Dark</ComboBoxItem>
                                                 </ComboBox>
                                                 <CheckBox Content="ウィンドウにアクリル効果（半透明ぼかし）を使う"
                                                           IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptUseAcrylicBackground}" />
@@ -822,7 +860,7 @@
                           IsVisible="{Binding IsNormalTab}">
 
                         <!-- ナビゲーション + アドレスバー（パンくず） + 検索 -->
-                        <Grid Grid.Row="0" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto"
+                        <Grid Grid.Row="0" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto,Auto"
                               Background="{DynamicResource ContentBg}">
                             <Button Grid.Column="0" Classes="nav" Content="&#xE72B;" Margin="8,0,0,0"
                                     Command="{Binding GoBackCommand}" ToolTip.Tip="戻る (右クリックで履歴)"
@@ -911,8 +949,14 @@
                                 </Grid>
                             </Border>
 
+                            <!-- 検索ボックス幅の変更 -->
+                            <Thumb Grid.Column="6" Classes="colsplit" Width="4"
+                                   DragDelta="SearchBoxThumb_DragDelta" />
+
                             <!-- 検索ボックス（絞り込み / Enter でサブフォルダー含む検索） -->
-                            <Border Grid.Column="6" Width="200" Height="34"
+                            <Border Grid.Column="7"
+                                    Width="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SearchBoxWidth}"
+                                    Height="34"
                                     Background="{DynamicResource OmniboxBg}" CornerRadius="17"
                                     Margin="0,0,12,0" VerticalAlignment="Center">
                                 <Grid ColumnDefinitions="Auto,*,Auto">
@@ -1038,6 +1082,9 @@
                                             <MenuItem Header="更新日時" ToggleType="Radio"
                                                       IsChecked="{Binding IsSortByModified}"
                                                       Command="{Binding SetSortKeyCommand}" CommandParameter="Modified" />
+                                            <MenuItem Header="作成日時" ToggleType="Radio"
+                                                      IsChecked="{Binding IsSortByCreated}"
+                                                      Command="{Binding SetSortKeyCommand}" CommandParameter="Created" />
                                             <MenuItem Header="種類" ToggleType="Radio"
                                                       IsChecked="{Binding IsSortByType}"
                                                       Command="{Binding SetSortKeyCommand}" CommandParameter="Type" />
@@ -1180,6 +1227,7 @@
                                 <ListBox Classes="sidebar"
                                          DragDrop.AllowDrop="True"
                                          ItemsSource="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SidebarItems}"
+                                         Loaded="Sidebar_Loaded"
                                          SelectionChanged="Sidebar_SelectionChanged"
                                          PointerReleased="Sidebar_PointerReleased">
                                     <ListBox.DataTemplates>

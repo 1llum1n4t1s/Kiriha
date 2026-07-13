@@ -61,6 +61,10 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private double _sidebarWidth = 230;
 
+    /// <summary>検索ボックスの幅（境界の Thumb ドラッグで変更、永続化）。</summary>
+    [ObservableProperty]
+    private double _searchBoxWidth = 200;
+
     /// <summary>プレビューペインの表示状態（Alt+P）。</summary>
     [ObservableProperty]
     private bool _showPreviewPane;
@@ -80,6 +84,11 @@ public partial class MainWindowViewModel : ObservableObject
     partial void OnSidebarWidthChanged(double value)
     {
         _settings.SidebarWidth = value; // 保存自体は終了時の SaveWindowBounds でまとめて行う
+    }
+
+    partial void OnSearchBoxWidthChanged(double value)
+    {
+        _settings.SearchBoxWidth = value; // 保存自体は終了時の SaveWindowBounds でまとめて行う
     }
 
     partial void OnShowPreviewPaneChanged(bool value)
@@ -119,6 +128,7 @@ public partial class MainWindowViewModel : ObservableObject
             {
                 "Light" => Avalonia.Styling.ThemeVariant.Light,
                 "Dark" => Avalonia.Styling.ThemeVariant.Dark,
+                "OneDark" => Services.ThemeService.OneDark,
                 _ => Avalonia.Styling.ThemeVariant.Default,
             };
 
@@ -264,7 +274,23 @@ public partial class MainWindowViewModel : ObservableObject
         ShowBookmarksBar = false;
         ShowSidebar = true;
         SidebarWidth = 230;
+        SearchBoxWidth = 200;
         ShowPreviewPane = false;
+
+        // 詳細表示の列幅・列の表示/非表示・既定の表示モード/アイコンサイズも既定へ戻す
+        // （AppSettings の初期値と一致させる。新規タブに反映され、Save は末尾でまとめて行う）。
+        _settings.ColNameWidth = 300;
+        _settings.ColModifiedWidth = 160;
+        _settings.ColCreatedWidth = 170;
+        _settings.ColTypeWidth = 140;
+        _settings.ColSizeWidth = 180;
+        _settings.ShowColModified = true;
+        _settings.ShowColCreated = false;
+        _settings.ShowColType = true;
+        _settings.ShowColSize = true;
+        _settings.DefaultViewMode = "Details";
+        _settings.DefaultIconSize = 28;
+        SettingsService.Save(_settings);
     }
 
     /// <summary>設定タブ: ログフォルダーを開く。</summary>
@@ -383,36 +409,43 @@ public partial class MainWindowViewModel : ObservableObject
         _showBookmarksBar = _settings.ShowBookmarksBar;
         _showSidebar = _settings.ShowSidebar;
         _sidebarWidth = _settings.SidebarWidth is > 120 and < 600 ? _settings.SidebarWidth : 230;
+        _searchBoxWidth = _settings.SearchBoxWidth is > 120 and < 500 ? _settings.SearchBoxWidth : 200;
         _showPreviewPane = _settings.ShowPreviewPane;
         ApplyTheme(_settings.ThemePreference);
         RefreshBookmarks();
-        BuildSidebar(QuickAccessService.GetFallbackSnapshot());
+        // 起動時はドライブ列挙（ブロックしうる I/O）をせず、フォールバックのクイックアクセスだけで即描画する。
+        // ドライブはウィンドウ表示直後の RefreshSidebarAsync（バックグラウンド）で埋まる。
+        BuildSidebar(QuickAccessService.GetFallbackSnapshot(), []);
 
         if (_settings.PinnedSettingsTab)
         {
             AddSettingsTab(pinned: true);
         }
 
-        // 前回の固定タブを復元してから通常タブを開く
+        // 前回の固定タブを復元してから通常タブを開く。
+        // ここで Directory.Exists による存在確認はしない: コンストラクタはウィンドウ生成前に UI スレッドで
+        // 同期実行されるため、切断中のネットワークパスに対する存在確認が起動全体をブロックする。
+        // 到達不能・削除済みのパスは各タブの NavigateToAsync（バックグラウンド + catch）が「開けませんでした」
+        // 表示にフォールバックするので、無条件に復元してよい。
         foreach (var path in _settings.PinnedPaths)
         {
-            if (path == FileSystemService.ComputerPath || Directory.Exists(path))
-            {
-                AddTab(path, pinned: true);
-            }
+            AddTab(path, pinned: true);
         }
 
         // 「前回開いていたタブを復元」設定（Chrome 互換）
         var restored = false;
         if (_settings.RestoreAllTabs)
         {
+            if (_settings.OpenSettingsTab && !_settings.PinnedSettingsTab)
+            {
+                SelectedTab = AddSettingsTab(pinned: false);
+                restored = true;
+            }
+
             foreach (var path in _settings.OpenTabPaths)
             {
-                if (path == FileSystemService.ComputerPath || Directory.Exists(path))
-                {
-                    SelectedTab = AddTab(path, pinned: false);
-                    restored = true;
-                }
+                SelectedTab = AddTab(path, pinned: false);
+                restored = true;
             }
         }
 
@@ -440,10 +473,26 @@ public partial class MainWindowViewModel : ObservableObject
 
     private TabViewModel AddTab(string path, bool pinned)
     {
-        var tab = new TabViewModel(path, Options);
+        var tab = new TabViewModel(path, Options)
+        {
+            ColNameWidth = _settings.ColNameWidth,
+            ColModifiedWidth = _settings.ColModifiedWidth,
+            ColCreatedWidth = _settings.ColCreatedWidth,
+            ColTypeWidth = _settings.ColTypeWidth,
+            ColSizeWidth = _settings.ColSizeWidth,
+            ShowColModified = _settings.ShowColModified,
+            ShowColCreated = _settings.ShowColCreated,
+            ShowColType = _settings.ShowColType,
+            ShowColSize = _settings.ShowColSize,
+        };
         if (Enum.TryParse<ViewMode>(_settings.DefaultViewMode, out var mode))
         {
             tab.ViewMode = mode;
+        }
+
+        if (_settings.DefaultIconSize is >= 24 and <= 160)
+        {
+            tab.IconSize = _settings.DefaultIconSize;
         }
 
         Tabs.Add(tab);
@@ -492,6 +541,30 @@ public partial class MainWindowViewModel : ObservableObject
         {
             // 最後に使った表示モードを新規タブの既定にする
             _settings.DefaultViewMode = tab.ViewMode.ToString();
+            SettingsService.Save(_settings);
+        }
+        else if (e.PropertyName == nameof(TabViewModel.IconSize))
+        {
+            // マウスホイールで連続発火するため、Col*Width と同様に即時保存はせず終了時にまとめて保存する
+            _settings.DefaultIconSize = tab.IconSize;
+        }
+        else if (e.PropertyName is nameof(TabViewModel.ColNameWidth) or nameof(TabViewModel.ColModifiedWidth)
+                 or nameof(TabViewModel.ColCreatedWidth) or nameof(TabViewModel.ColTypeWidth) or nameof(TabViewModel.ColSizeWidth))
+        {
+            // Thumb ドラッグ中に高頻度で発火するため、SidebarWidth と同様に即時保存はせず終了時にまとめて保存する
+            _settings.ColNameWidth = tab.ColNameWidth;
+            _settings.ColModifiedWidth = tab.ColModifiedWidth;
+            _settings.ColCreatedWidth = tab.ColCreatedWidth;
+            _settings.ColTypeWidth = tab.ColTypeWidth;
+            _settings.ColSizeWidth = tab.ColSizeWidth;
+        }
+        else if (e.PropertyName is nameof(TabViewModel.ShowColModified) or nameof(TabViewModel.ShowColCreated)
+                 or nameof(TabViewModel.ShowColType) or nameof(TabViewModel.ShowColSize))
+        {
+            _settings.ShowColModified = tab.ShowColModified;
+            _settings.ShowColCreated = tab.ShowColCreated;
+            _settings.ShowColType = tab.ShowColType;
+            _settings.ShowColSize = tab.ShowColSize;
             SettingsService.Save(_settings);
         }
     }
@@ -683,6 +756,7 @@ public partial class MainWindowViewModel : ObservableObject
             .Where(t => !t.IsSettingsTab && !t.IsPinned)
             .Select(t => t.CurrentPath)
             .ToList();
+        _settings.OpenSettingsTab = Tabs.Any(t => t.IsSettingsTab && !t.IsPinned);
         SettingsService.Save(_settings);
     }
 
@@ -927,12 +1001,32 @@ public partial class MainWindowViewModel : ObservableObject
 
     public async Task RefreshSidebarAsync()
     {
-        var snapshot = await Task.Run(QuickAccessService.GetSnapshot);
+        // クイックアクセス列挙とドライブ列挙（DriveInfo.IsReady / 空き容量は切断中の
+        // ネットワークドライブでブロックしうる）をまとめてバックグラウンドで取得してから再構築する。
+        var (snapshot, drives) = await Task.Run(() => (QuickAccessService.GetSnapshot(), GetDriveDisplays()));
         SidebarItems.Clear();
-        BuildSidebar(snapshot);
+        BuildSidebar(snapshot, drives);
     }
 
-    private void BuildSidebar(QuickAccessService.Snapshot quickAccess)
+    /// <summary>左ペインに並べるドライブ情報。DriveInfo へのアクセスは UI スレッドをブロックしうるため
+    /// 必ずバックグラウンドスレッドで生成し、この不変データだけを UI スレッドへ渡す。</summary>
+    private readonly record struct DriveDisplay(string Name, string Path, string Tooltip);
+
+    private static List<DriveDisplay> GetDriveDisplays()
+    {
+        var result = new List<DriveDisplay>();
+        foreach (var drive in DriveInfo.GetDrives().Where(d => d.IsReady))
+        {
+            result.Add(new DriveDisplay(
+                FileSystemService.GetDriveLabel(drive),
+                drive.RootDirectory.FullName,
+                $"空き {Models.FileSystemEntry.FormatSize(drive.AvailableFreeSpace)} / {Models.FileSystemEntry.FormatSize(drive.TotalSize)}"));
+        }
+
+        return result;
+    }
+
+    private void BuildSidebar(QuickAccessService.Snapshot quickAccess, IReadOnlyList<DriveDisplay> drives)
     {
         SidebarItems.Add(new SidebarHeader { Title = "クイックアクセス" });
         foreach (var (name, path) in quickAccess.Folders)
@@ -949,14 +1043,14 @@ public partial class MainWindowViewModel : ObservableObject
 
         SidebarItems.Add(new SidebarHeader { Title = "PC" });
         SidebarItems.Add(new SidebarLink { Name = "PC", Path = FileSystemService.ComputerPath, Icon = "🖥", Tooltip = "ドライブ一覧" });
-        foreach (var drive in DriveInfo.GetDrives().Where(d => d.IsReady))
+        foreach (var drive in drives)
         {
             SidebarItems.Add(new SidebarLink
             {
-                Name = FileSystemService.GetDriveLabel(drive),
-                Path = drive.RootDirectory.FullName,
+                Name = drive.Name,
+                Path = drive.Path,
                 Icon = "💾",
-                Tooltip = $"空き {Models.FileSystemEntry.FormatSize(drive.AvailableFreeSpace)} / {Models.FileSystemEntry.FormatSize(drive.TotalSize)}",
+                Tooltip = drive.Tooltip,
             });
         }
 

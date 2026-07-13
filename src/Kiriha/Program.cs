@@ -11,8 +11,10 @@ internal static partial class Program
 {
     private const string InstanceMutexName = "Local\\Kiriha.SingleInstance";
     private const string ActivationPipeName = "Kiriha.Activate";
+    // 起動通知の受け渡しを保護するロック。ハンドラ登録とパイプ受信の check-then-act を同一
+    // クリティカルセクションに入れ、起動直後の競合で通知が消失する（lost-wakeup）のを防ぐ。
+    private static readonly object ActivationGate = new();
     private static Action<string[]>? _activationHandler;
-    private static int _pendingActivation;
     private static string[]? _pendingActivationArgs;
     /// <summary>起動引数（フォルダーパスを渡すとそのフォルダーをタブで開く）。</summary>
     public static string[] StartupArgs { get; private set; } = [];
@@ -22,6 +24,19 @@ internal static partial class Program
     {
         StartupArgs = args;
         Logger.Initialize();
+
+        // グローバルな未処理例外をログに残す（多重防御）。async void ハンドラや fire-and-forget な
+        // Task で発生した例外は Main の try/catch には届かないため、ここで捕捉しないとユーザーの手元での
+        // クラッシュがログに残らず原因追跡が不能になる（Lhamiel と同方針）。
+        AppDomain.CurrentDomain.UnhandledException += (_, e) =>
+        {
+            if (e.ExceptionObject is Exception ex) Logger.LogException("致命的なエラー（AppDomain）", ex);
+        };
+        TaskScheduler.UnobservedTaskException += (_, e) =>
+        {
+            Logger.LogException("未観測のタスク例外", e.Exception);
+            e.SetObserved();
+        };
 
         // Velopack のブートストラップ（インストール / 更新 / アンインストール時のフック処理）。
         // 更新適用直後の再起動などはここで処理され、通常起動時はそのまま通過する。
@@ -55,10 +70,18 @@ internal static partial class Program
 
     public static void RegisterActivationHandler(Action<string[]> handler)
     {
-        _activationHandler = handler;
-        if (Interlocked.Exchange(ref _pendingActivation, 0) != 0)
+        string[]? pending;
+        lock (ActivationGate)
         {
-            handler(Interlocked.Exchange(ref _pendingActivationArgs, null) ?? []);
+            _activationHandler = handler;
+            pending = _pendingActivationArgs;
+            _pendingActivationArgs = null;
+        }
+
+        // 保留中の起動要求があればロック外で処理する（ハンドラは UI へ Post するだけなので短時間）。
+        if (pending is not null)
+        {
+            handler(pending);
         }
     }
 
@@ -82,16 +105,18 @@ internal static partial class Program
                     args[i] = await reader.ReadLineAsync() ?? string.Empty;
                 }
 
-                var handler = _activationHandler;
-                if (handler is null)
+                Action<string[]>? handler;
+                lock (ActivationGate)
                 {
-                    Interlocked.Exchange(ref _pendingActivationArgs, args);
-                    Interlocked.Exchange(ref _pendingActivation, 1);
+                    handler = _activationHandler;
+                    // ハンドラ未登録なら保留に積む（登録側が同じロック下で拾う）。
+                    if (handler is null)
+                    {
+                        _pendingActivationArgs = args;
+                    }
                 }
-                else
-                {
-                    handler(args);
-                }
+
+                handler?.Invoke(args);
             }
             catch (Exception ex)
             {

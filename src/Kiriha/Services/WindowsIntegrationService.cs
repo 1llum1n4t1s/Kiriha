@@ -70,9 +70,11 @@ public static partial class WindowsIntegrationService
                 key.DeleteValue(AppName, throwOnMissingValue: false);
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // 失敗しても致命的ではない（次回操作で再試行）
+            // グループポリシー / セキュリティソフト等で HKCU 書き込みが拒否されると設定が反映されない。
+            // 致命的ではないがログには残す（SetDefaultFolderAppEnabled と方針を揃える）。
+            Logger.LogException($"スタートアップ登録の変更に失敗しました (enabled={enabled})", ex);
         }
     }
 
@@ -127,9 +129,10 @@ public static partial class WindowsIntegrationService
                 }
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // 失敗しても致命的ではない
+            // シェル拡張の登録は EDR / セキュリティソフトにブロックされることがある。ログには残す。
+            Logger.LogException($"右クリックメニュー登録の変更に失敗しました (enabled={enabled})", ex);
         }
     }
 
