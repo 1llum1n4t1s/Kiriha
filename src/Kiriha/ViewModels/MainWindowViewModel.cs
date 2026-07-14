@@ -417,9 +417,19 @@ public partial class MainWindowViewModel : ObservableObject
         // ドライブはウィンドウ表示直後の RefreshSidebarAsync（バックグラウンド）で埋まる。
         BuildSidebar(QuickAccessService.GetFallbackSnapshot(), []);
 
+        // 終了時に選択していたタブを次回も選択状態で復元するため、これから作るタブの中から該当するものを
+        // 追いかける。NavigateToAsync は非同期のため、作成直後は CurrentPath がまだ反映されていない
+        // （既定値のまま）。よってタブの実際の CurrentPath ではなく、AddTab に渡した「復元先パス」自体で
+        // 照合する（同期的に確定しているため、非同期のタイミング競合を受けない）。
+        TabViewModel? lastSelectedCandidate = null;
+
         if (_settings.PinnedSettingsTab)
         {
-            AddSettingsTab(pinned: true);
+            var settingsTab = AddSettingsTab(pinned: true);
+            if (_settings.LastSelectedTabIsSettings)
+            {
+                lastSelectedCandidate = settingsTab;
+            }
         }
 
         // 前回の固定タブを復元してから通常タブを開く。
@@ -429,7 +439,11 @@ public partial class MainWindowViewModel : ObservableObject
         // 表示にフォールバックするので、無条件に復元してよい。
         foreach (var path in _settings.PinnedPaths)
         {
-            AddTab(path, pinned: true);
+            var tab = AddTab(path, pinned: true);
+            if (!_settings.LastSelectedTabIsSettings && WindowsPathIdentity.Instance.Equals(path, _settings.LastSelectedTabPath))
+            {
+                lastSelectedCandidate = tab;
+            }
         }
 
         // 「前回開いていたタブを復元」設定（Chrome 互換）
@@ -438,23 +452,41 @@ public partial class MainWindowViewModel : ObservableObject
         {
             if (_settings.OpenSettingsTab && !_settings.PinnedSettingsTab)
             {
-                SelectedTab = AddSettingsTab(pinned: false);
+                var settingsTab = AddSettingsTab(pinned: false);
+                SelectedTab = settingsTab;
                 restored = true;
+                if (_settings.LastSelectedTabIsSettings)
+                {
+                    lastSelectedCandidate = settingsTab;
+                }
             }
 
             foreach (var path in _settings.OpenTabPaths)
             {
-                SelectedTab = AddTab(path, pinned: false);
+                var tab = AddTab(path, pinned: false);
+                SelectedTab = tab;
                 restored = true;
+                if (!_settings.LastSelectedTabIsSettings && WindowsPathIdentity.Instance.Equals(path, _settings.LastSelectedTabPath))
+                {
+                    lastSelectedCandidate = tab;
+                }
             }
         }
 
         // コマンドライン引数のフォルダーを開く（kiriha.exe C:\path）
-        restored |= OpenShellPaths(Program.StartupArgs);
+        var openedFromArgs = OpenShellPaths(Program.StartupArgs);
+        restored |= openedFromArgs;
 
         if (!restored)
         {
             NewTab();
+        }
+
+        // シェル引数からの起動でなければ、終了時に選択していたタブを次回も選択状態で復元する
+        // （固定タブは RestoreAllTabs 設定に関わらず常に復元されるため対象になりうる）。
+        if (!openedFromArgs && lastSelectedCandidate is not null)
+        {
+            SelectedTab = lastSelectedCandidate;
         }
     }
 
@@ -757,6 +789,10 @@ public partial class MainWindowViewModel : ObservableObject
             .Select(t => t.CurrentPath)
             .ToList();
         _settings.OpenSettingsTab = Tabs.Any(t => t.IsSettingsTab && !t.IsPinned);
+
+        _settings.LastSelectedTabIsSettings = SelectedTab?.IsSettingsTab ?? false;
+        _settings.LastSelectedTabPath = SelectedTab is { IsSettingsTab: false } selected ? selected.CurrentPath : "";
+
         SettingsService.Save(_settings);
     }
 

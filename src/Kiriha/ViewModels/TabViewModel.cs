@@ -22,7 +22,6 @@ public partial class TabViewModel : ObservableObject
     private bool _suppressSearchFilter;
     private long _searchGeneration;
     private long _navigationGeneration;
-    private readonly SemaphoreSlim _fileOperationGate = new(1, 1);
 
     [ObservableProperty]
     private string _title = "PC";
@@ -618,6 +617,10 @@ public partial class TabViewModel : ObservableObject
         }
         else
         {
+            // NavigateToAsync が完了するまで CurrentPath が既定値のままだと、その間に発火する
+            // SavePinned / SaveOpenTabsAndSettings がまだ空のパスを永続化してしまう。
+            // 実際のフォルダー読み込みを待たず、ここで同期的に確定させておく。
+            CurrentPath = initialPath;
             NavigateTo(initialPath, record: false);
         }
     }
@@ -1110,29 +1113,17 @@ public partial class TabViewModel : ObservableObject
             return;
         }
 
-        if (!await _fileOperationGate.WaitAsync(0))
-        {
-            StatusText = "別のファイル操作が完了するまでお待ちください";
-            return;
-        }
+        var dest = CurrentPath;
+        // 同一フォルダーへのコピー貼り付けはエクスプローラーと同じく自動リネーム（"- コピー"）
+        var sameDir = !isCut && files.Any(f => WindowsPathIdentity.Instance.Equals(
+            Path.GetDirectoryName(f), dest));
 
-        try
-        {
-            var dest = CurrentPath;
-            // 同一フォルダーへのコピー貼り付けはエクスプローラーと同じく自動リネーム（"- コピー"）
-            var sameDir = !isCut && files.Any(f => WindowsPathIdentity.Instance.Equals(
-                Path.GetDirectoryName(f), dest));
-
-            // SHFileOperation は同期ブロッキングだが独自の進捗ダイアログを出すため背景スレッドで実行
-            var result = await Task.Run(() => FileOperationService.CopyOrMove(files, dest, move: isCut, renameOnCollision: sameDir));
-            if (result.IsSuccess && isCut) ClipboardFileService.Clear();
-            if (result.IsSuccess) Refresh();
-            else if (!result.IsCancelled) StatusText = $"貼り付けに失敗しました（エラー {result.NativeErrorCode}）";
-        }
-        finally
-        {
-            _fileOperationGate.Release();
-        }
+        // SHFileOperation は同期ブロッキングだが独自の進捗ダイアログを出すため背景スレッドで実行
+        var result = await Task.Run(() => FileOperationService.CopyOrMove(files, dest, move: isCut, renameOnCollision: sameDir));
+        if (result.IsBusy) { StatusText = "別のファイル操作が完了するまでお待ちください"; return; }
+        if (result.IsSuccess && isCut) ClipboardFileService.Clear();
+        if (result.IsSuccess) Refresh();
+        else if (!result.IsCancelled) StatusText = $"貼り付けに失敗しました（エラー {result.NativeErrorCode}）";
     }
 
     [RelayCommand(CanExecute = nameof(HasSelection))]
@@ -1144,13 +1135,6 @@ public partial class TabViewModel : ObservableObject
 
     private async Task DeleteCoreAsync(bool permanent)
     {
-        if (!await _fileOperationGate.WaitAsync(0))
-        {
-            StatusText = "別のファイル操作が完了するまでお待ちください";
-            return;
-        }
-        try
-        {
         var targets = _selection.Select(e => e.FullPath).ToList();
         // 削除後はエクスプローラーと同じく隣接項目を選択する
         var anchorIndex = _selection.Count > 0 ? Entries.IndexOf(_selection[0]) : -1;
@@ -1158,10 +1142,8 @@ public partial class TabViewModel : ObservableObject
         var result = await Task.Run(() => FileOperationService.DeleteToRecycleBin(targets, permanent));
         if (!result.IsSuccess)
         {
-            if (!result.IsCancelled)
-            {
-                StatusText = $"削除に失敗しました（エラー {result.NativeErrorCode}）";
-            }
+            if (result.IsBusy) StatusText = "別のファイル操作が完了するまでお待ちください";
+            else if (!result.IsCancelled) StatusText = $"削除に失敗しました（エラー {result.NativeErrorCode}）";
             return;
         }
         await NavigateToAsync(CurrentPath, record: false);
@@ -1169,11 +1151,6 @@ public partial class TabViewModel : ObservableObject
         if (anchorIndex >= 0 && Entries.Count > 0)
         {
             SelectedEntry = Entries[Math.Min(anchorIndex, Entries.Count - 1)];
-        }
-        }
-        finally
-        {
-            _fileOperationGate.Release();
         }
     }
 
@@ -1222,19 +1199,31 @@ public partial class TabViewModel : ObservableObject
             var first = FileOperationService.Rename(entry.FullPath, temporary);
             if (!first.IsSuccess)
             {
-                if (!first.IsCancelled) StatusText = $"名前を変更できませんでした（エラー {first.NativeErrorCode}）";
+                if (first.IsBusy) StatusText = "別のファイル操作が完了するまでお待ちください";
+                else if (!first.IsCancelled) StatusText = $"名前を変更できませんでした（エラー {first.NativeErrorCode}）";
                 return;
             }
 
             var second = FileOperationService.Rename(temporary, newPath);
             if (!second.IsSuccess)
             {
-                var rollback = FileOperationService.Rename(temporary, entry.FullPath);
-                StatusText = rollback.IsSuccess
-                    ? "名前を変更できなかったため、元の名前へ戻しました"
-                    : $"名前を変更できませんでした。一時名のまま残っています: {Path.GetFileName(temporary)}";
-                await NavigateToAsync(CurrentPath, record: false);
-                return;
+                if (second.IsBusy)
+                {
+                    // 一時名への改名は既に成功しているため、ここで諦めると一時名のまま残ってしまう。
+                    // ゲートが空くまで少し待って retry する。
+                    await Task.Delay(300);
+                    second = FileOperationService.Rename(temporary, newPath);
+                }
+
+                if (!second.IsSuccess)
+                {
+                    var rollback = FileOperationService.Rename(temporary, entry.FullPath);
+                    StatusText = rollback.IsSuccess
+                        ? "名前を変更できなかったため、元の名前へ戻しました"
+                        : $"名前を変更できませんでした。一時名のまま残っています: {Path.GetFileName(temporary)}";
+                    await NavigateToAsync(CurrentPath, record: false);
+                    return;
+                }
             }
         }
         else
@@ -1242,7 +1231,8 @@ public partial class TabViewModel : ObservableObject
             var result = FileOperationService.Rename(entry.FullPath, newPath);
             if (!result.IsSuccess)
             {
-                if (!result.IsCancelled) StatusText = $"名前を変更できませんでした（エラー {result.NativeErrorCode}）";
+                if (result.IsBusy) StatusText = "別のファイル操作が完了するまでお待ちください";
+                else if (!result.IsCancelled) StatusText = $"名前を変更できませんでした（エラー {result.NativeErrorCode}）";
                 return;
             }
         }
@@ -1305,28 +1295,19 @@ public partial class TabViewModel : ObservableObject
             return;
         }
 
-        if (!await _fileOperationGate.WaitAsync(0))
+        var result = await Task.Run(() => FileOperationService.CopyOrMove(effective, destDir, move));
+        if (result.IsSuccess)
+        {
+            Refresh();
+            StatusText = $"{effective.Count} 個の項目を{(move ? "移動" : "コピー")}しました";
+        }
+        else if (result.IsBusy)
         {
             StatusText = "別のファイル操作が完了するまでお待ちください";
-            return;
         }
-
-        try
+        else if (!result.IsCancelled)
         {
-            var result = await Task.Run(() => FileOperationService.CopyOrMove(effective, destDir, move));
-            if (result.IsSuccess)
-            {
-                Refresh();
-                StatusText = $"{effective.Count} 個の項目を{(move ? "移動" : "コピー")}しました";
-            }
-            else if (!result.IsCancelled)
-            {
-                StatusText = $"ファイル操作に失敗しました（エラー {result.NativeErrorCode}）";
-            }
-        }
-        finally
-        {
-            _fileOperationGate.Release();
+            StatusText = $"ファイル操作に失敗しました（エラー {result.NativeErrorCode}）";
         }
     }
 

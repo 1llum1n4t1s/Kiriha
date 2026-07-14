@@ -156,7 +156,14 @@ public partial class MainWindow : Window
 
         if (vm.SavedWindowMaximized)
         {
-            WindowState = WindowState.Maximized;
+            // Position 設定の直後に同期で最大化すると、BorderOnly 装飾のウィンドウは Win32 の
+            // WM_WINDOWPOSCHANGING でモニターごとの作業領域に合わせて最大化サイズ・位置を補正する際、
+            // ウィンドウの「現在位置」に基づいてモニターを判定するため、Position の反映がまだ
+            // OS 側に伝搬しきっていないと最大化前の（＝プライマリモニター側の）位置を見てしまい、
+            // セカンダリモニターに配置したはずのウィンドウがプライマリモニターで最大化されることがある。
+            // レイアウトパス後（DispatcherPriority.Loaded）まで最大化を遅らせ、Position の反映を
+            // 確実に先に完了させる。
+            Dispatcher.UIThread.Post(() => WindowState = WindowState.Maximized, DispatcherPriority.Loaded);
         }
     }
 
@@ -258,6 +265,28 @@ public partial class MainWindow : Window
                 break;
             case Key.C when ctrl && shift:
                 CopySelectedPaths(tab);
+                break;
+            // ファイル一覧にフォーカスがある時は FileList_KeyDown が先に処理して消費するため、ここは
+            // アドレスバーやサイドバー等フォーカスが別の場所にある時のフォールバック（エクスプローラーは
+            // どこにフォーカスがあってもウィンドウ内であれば効く）。CanExecute を通していない場合は
+            // 何もしない（選択なしで Ctrl+C を押しても何も起きないのと同じ挙動）。
+            case Key.X when ctrl:
+                if (tab is { IsSettingsTab: false } && tab.CutCommand.CanExecute(null)) tab.CutCommand.Execute(null);
+                break;
+            case Key.C when ctrl:
+                if (tab is { IsSettingsTab: false } && tab.CopyCommand.CanExecute(null)) tab.CopyCommand.Execute(null);
+                break;
+            case Key.V when ctrl:
+                if (tab is { IsSettingsTab: false } && tab.PasteCommand.CanExecute(null)) tab.PasteCommand.Execute(null);
+                break;
+            case Key.Delete when shift:
+                if (tab is { IsSettingsTab: false } && tab.DeletePermanentCommand.CanExecute(null)) tab.DeletePermanentCommand.Execute(null);
+                break;
+            case Key.Delete:
+                if (tab is { IsSettingsTab: false } && tab.DeleteCommand.CanExecute(null)) tab.DeleteCommand.Execute(null);
+                break;
+            case Key.F2:
+                if (tab is { IsSettingsTab: false } && tab.RenameCommand.CanExecute(null)) tab.RenameCommand.Execute(null);
                 break;
             case Key.P when ctrl && shift:
                 ShowCommandPalette();
@@ -2327,10 +2356,12 @@ public partial class MainWindow : Window
                 case "file.duplicate":
                     if (entry.IsDirectory)
                     {
-                        var result = FileOperationService.CopyOrMove([path], parent, move: false, renameOnCollision: true);
+                        // SHFileOperation は同期ブロッキングだが独自の進捗ダイアログを出すため背景スレッドで実行
+                        var result = await Task.Run(() => FileOperationService.CopyOrMove([path], parent, move: false, renameOnCollision: true));
                         if (!result.IsSuccess)
                         {
-                            if (!result.IsCancelled) tab.StatusText = $"複製に失敗しました（エラー {result.NativeErrorCode}）";
+                            if (result.IsBusy) tab.StatusText = "別のファイル操作が完了するまでお待ちください";
+                            else if (!result.IsCancelled) tab.StatusText = $"複製に失敗しました（エラー {result.NativeErrorCode}）";
                             break;
                         }
                     }

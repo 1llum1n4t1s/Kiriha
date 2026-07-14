@@ -77,6 +77,12 @@ public sealed class AppSettings
     /// <summary>終了時に設定タブ（固定ではない）が開いていたか（RestoreAllTabs 用）。</summary>
     public bool OpenSettingsTab { get; set; }
 
+    /// <summary>終了時に選択していたタブが設定タブだったか（次回起動時の選択状態復元用）。</summary>
+    public bool LastSelectedTabIsSettings { get; set; }
+
+    /// <summary>終了時に選択していたタブのパス（設定タブの場合は空。次回起動時の選択状態復元用）。</summary>
+    public string LastSelectedTabPath { get; set; } = "";
+
     /// <summary>詳細表示の列幅（ヘッダーの Thumb ドラッグで変更、次回起動時に復元）。</summary>
     public double ColNameWidth { get; set; } = 300;
 

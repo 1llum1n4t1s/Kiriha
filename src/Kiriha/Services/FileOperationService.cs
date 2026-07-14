@@ -7,12 +7,14 @@ internal enum FileOperationOutcome
     Success,
     Cancelled,
     Failed,
+    Busy,
 }
 
 internal readonly record struct FileOperationResult(FileOperationOutcome Outcome, int NativeErrorCode)
 {
     public bool IsSuccess => Outcome == FileOperationOutcome.Success;
     public bool IsCancelled => Outcome == FileOperationOutcome.Cancelled;
+    public bool IsBusy => Outcome == FileOperationOutcome.Busy;
 }
 
 /// <summary>
@@ -28,6 +30,12 @@ internal static partial class FileOperationService
 
     private const ushort FofAllowUndo = 0x0040;
     private const ushort FofRenameOnCollision = 0x0008;
+
+    /// <summary>SHFileOperationW はプロセス内で同時に複数スレッドから呼び出すと進捗ダイアログの競合等で
+    /// 失敗することがある旧世代の API（本物の Explorer が使う IFileOperation は COM インスタンスごとに
+    /// 独立して並列実行できるが、こちらは非対応）。呼び出し元（タブ・右クリックメニュー等）に関わらず
+    /// ここで直列化する。</summary>
+    private static readonly SemaphoreSlim Gate = new(1, 1);
 
     /// <summary>コピーまたは移動。競合時はエクスプローラー標準のダイアログが出る。</summary>
     public static FileOperationResult CopyOrMove(IReadOnlyList<string> sources, string destDir, bool move, bool renameOnCollision = false)
@@ -76,34 +84,48 @@ internal static partial class FileOperationService
 
     private static FileOperationResult Execute(uint func, string from, string? to, ushort flags)
     {
-        var pFrom = Marshal.StringToHGlobalUni(from);
-        var pTo = to is null ? 0 : Marshal.StringToHGlobalUni(to);
+        // 0 タイムアウトで即座に試すだけ（待たない）。取得できなければ呼び出し元に「busy」を返し、
+        // 呼び出し元が UI スレッドをブロックせず「お待ちください」等の案内を出せるようにする。
+        if (!Gate.Wait(0))
+        {
+            return new FileOperationResult(FileOperationOutcome.Busy, 0);
+        }
+
         try
         {
-            var op = new ShFileOpStruct
+            var pFrom = Marshal.StringToHGlobalUni(from);
+            var pTo = to is null ? 0 : Marshal.StringToHGlobalUni(to);
+            try
             {
-                Func = func,
-                From = pFrom,
-                To = pTo,
-                Flags = flags,
-            };
-            var error = SHFileOperationW(ref op);
-            if (error != 0)
-            {
-                return new FileOperationResult(FileOperationOutcome.Failed, error);
-            }
+                var op = new ShFileOpStruct
+                {
+                    Func = func,
+                    From = pFrom,
+                    To = pTo,
+                    Flags = flags,
+                };
+                var error = SHFileOperationW(ref op);
+                if (error != 0)
+                {
+                    return new FileOperationResult(FileOperationOutcome.Failed, error);
+                }
 
-            return op.AnyOperationsAborted != 0
-                ? new FileOperationResult(FileOperationOutcome.Cancelled, 0)
-                : new FileOperationResult(FileOperationOutcome.Success, 0);
+                return op.AnyOperationsAborted != 0
+                    ? new FileOperationResult(FileOperationOutcome.Cancelled, 0)
+                    : new FileOperationResult(FileOperationOutcome.Success, 0);
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(pFrom);
+                if (pTo != 0)
+                {
+                    Marshal.FreeHGlobal(pTo);
+                }
+            }
         }
         finally
         {
-            Marshal.FreeHGlobal(pFrom);
-            if (pTo != 0)
-            {
-                Marshal.FreeHGlobal(pTo);
-            }
+            Gate.Release();
         }
     }
 

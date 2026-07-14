@@ -11,6 +11,13 @@ namespace Kiriha;
 
 public partial class App : Application
 {
+    /// <summary>起動時チェックに加えて定期的に更新を確認する間隔（スリープ運用等で
+    /// アプリを何日も再起動しないユーザーが更新を取りこぼさないようにする）。</summary>
+    private static readonly TimeSpan PeriodicUpdateCheckInterval = TimeSpan.FromHours(6);
+
+    /// <summary>フィールドで保持して GC されないようにする（ローカル変数のままだと理論上回収されうる）。</summary>
+    private DispatcherTimer? _periodicUpdateCheckTimer;
+
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -54,12 +61,27 @@ public partial class App : Application
                     mainWindow.Hide();
                 }
 
-                // 更新ダイアログは mainWindow をオーナーとして表示するため、直前で非表示にしていると
-                // 「非表示のオーナーではウィンドウを表示できない」で例外になる。トレイ格納起動時は
-                // 自動チェック自体を今回はスキップする（手動チェック、または通常起動時に改めてチェックされる）。
-                if (viewModel.Settings.CheckUpdatesOnStartup && !startingMinimizedToTray)
+                // 更新ダイアログは非表示ウィンドウをオーナーにすると ShowDialog が例外になるため、
+                // トレイ格納起動時は owner を渡さず（ライブラリ側が独立ウィンドウとして表示する）。
+                // 「Windows スタートアップ + 起動時トレイ格納」の組み合わせは実質“常駐専用”の使い方であり、
+                // ここで自動チェック自体を丸ごとスキップすると、ユーザーが手動でアプリを再起動しない限り
+                // 永久に更新が来なくなる（実際に報告された不具合）。owner なしでも更新が見つかった時だけ
+                // ダイアログが独立して表示されるので、チェック自体は常に行う。
+                if (viewModel.Settings.CheckUpdatesOnStartup)
                 {
-                    Services.UpdateService.Check4Update(mainWindow, viewModel.Settings, manually: false);
+                    Services.UpdateService.Check4Update(
+                        startingMinimizedToTray ? null : mainWindow, viewModel.Settings, manually: false);
+                }
+
+                // 起動時チェックだけだと、スリープ運用等でアプリを何日も再起動しないユーザーは
+                // それ以降ずっと更新を取りこぼす。長時間起動しっぱなしのセッションでも定期的に
+                // 再チェックする（mainWindow がトレイ格納で非表示中なら、同じ理由で owner を渡さない）。
+                if (viewModel.Settings.CheckUpdatesOnStartup)
+                {
+                    _periodicUpdateCheckTimer = new DispatcherTimer { Interval = PeriodicUpdateCheckInterval };
+                    _periodicUpdateCheckTimer.Tick += (_, _) => Services.UpdateService.Check4Update(
+                        mainWindow.IsVisible ? mainWindow : null, viewModel.Settings, manually: false);
+                    _periodicUpdateCheckTimer.Start();
                 }
             };
             mainWindow.Opened += onFirstOpened;
