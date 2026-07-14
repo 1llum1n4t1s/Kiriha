@@ -51,7 +51,8 @@ public static class FileSystemService
         }
 
         // テーマ判定は列挙全体で 1 回だけ（行ごとに問い合わせない）
-        var preferLight = options.UseMaterialIcons && MaterialIconService.IsLightTheme();
+        var useMaterialIcons = options.UseMaterialIcons;
+        var preferLight = useMaterialIcons && MaterialIconService.IsLightTheme();
 
         var info = new DirectoryInfo(path);
         var entries = new List<FileSystemEntry>();
@@ -76,7 +77,9 @@ public static class FileSystemService
                 IsHidden = hidden,
                 IsReadOnly = (attributes & FileAttributes.ReadOnly) != 0,
                 IsCut = ClipboardFileService.IsCutPath(dir.FullName),
-                MaterialIconKey = MaterialIconService.ResolveIconKey(dir.Name, isDirectory: true, preferLight),
+                MaterialIconKey = useMaterialIcons
+                    ? MaterialIconService.ResolveIconKey(dir.Name, isDirectory: true, preferLight)
+                    : "",
             });
         }
 
@@ -105,7 +108,9 @@ public static class FileSystemService
                 IsHidden = hidden,
                 IsReadOnly = (attributes & FileAttributes.ReadOnly) != 0,
                 IsCut = ClipboardFileService.IsCutPath(file.FullName),
-                MaterialIconKey = MaterialIconService.ResolveIconKey(file.Name, isDirectory: false, preferLight),
+                MaterialIconKey = useMaterialIcons
+                    ? MaterialIconService.ResolveIconKey(file.Name, isDirectory: false, preferLight)
+                    : "",
             });
         }
 

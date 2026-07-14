@@ -357,7 +357,9 @@ public partial class TabViewModel : ObservableObject
 
         var root = CurrentPath;
         var showExt = _options.ShowExtensions;
-        var preferLight = _options.UseMaterialIcons && MaterialIconService.IsLightTheme();
+        var showHidden = _options.ShowHidden;
+        var useMaterialIcons = _options.UseMaterialIcons;
+        var preferLight = useMaterialIcons && MaterialIconService.IsLightTheme();
         var results = await Task.Run(() =>
         {
             var list = new List<FileSystemEntry>();
@@ -365,36 +367,28 @@ public partial class TabViewModel : ObservableObject
             {
                 IgnoreInaccessible = true,
                 RecurseSubdirectories = true,
-                AttributesToSkip = _options.ShowHidden ? FileAttributes.System : FileAttributes.Hidden | FileAttributes.System,
+                AttributesToSkip = showHidden ? FileAttributes.System : FileAttributes.Hidden | FileAttributes.System,
             };
-            foreach (var path in Directory.EnumerateFileSystemEntries(root, "*", options))
+            foreach (var item in new DirectoryInfo(root).EnumerateFileSystemInfos("*", options))
             {
                 if (cts.IsCancellationRequested || list.Count >= 1000)
                 {
                     break;
                 }
 
-                var name = Path.GetFileName(path);
+                var name = item.Name;
                 if (!name.Contains(query, StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
 
-                var isDir = Directory.Exists(path);
+                var isDir = item is DirectoryInfo;
                 long? size = null;
                 DateTime? modified = null;
                 try
                 {
-                    if (isDir)
-                    {
-                        modified = Directory.GetLastWriteTime(path);
-                    }
-                    else
-                    {
-                        var fi = new FileInfo(path);
-                        size = fi.Length;
-                        modified = fi.LastWriteTime;
-                    }
+                    size = item is FileInfo file ? file.Length : null;
+                    modified = item.LastWriteTime;
                 }
                 catch
                 {
@@ -405,11 +399,13 @@ public partial class TabViewModel : ObservableObject
                 {
                     Name = name,
                     DisplayName = !isDir && !showExt && Path.GetFileNameWithoutExtension(name) is { Length: > 0 } stem ? stem : name,
-                    FullPath = path,
+                    FullPath = item.FullName,
                     IsDirectory = isDir,
                     Size = size,
                     Modified = modified,
-                    MaterialIconKey = MaterialIconService.ResolveIconKey(name, isDir, preferLight),
+                    MaterialIconKey = useMaterialIcons
+                        ? MaterialIconService.ResolveIconKey(name, isDir, preferLight)
+                        : "",
                 });
             }
 
@@ -423,14 +419,9 @@ public partial class TabViewModel : ObservableObject
             return;
         }
 
-        Entries.Clear();
-        foreach (var entry in ApplySort(results))
-        {
-            Entries.Add(entry);
-        }
+        ReplaceEntries(ApplySort(results));
 
         StatusText = $"{results.Count} 件見つかりました (サブフォルダー含む{(results.Count >= 1000 ? "、上限 1000 件" : "")})";
-        OnPropertyChanged(nameof(HasNoEntries));
     }
 
     // ===== アイコンビューの画像サムネイル =====
@@ -535,7 +526,9 @@ public partial class TabViewModel : ObservableObject
     /// <summary>現在表示中のパス。FileSystemService.ComputerPath ならドライブ一覧。</summary>
     public string CurrentPath { get; private set; } = FileSystemService.ComputerPath;
 
-    public ObservableCollection<FileSystemEntry> Entries { get; } = new();
+    private List<FileSystemEntry> _entries = [];
+
+    public IReadOnlyList<FileSystemEntry> Entries => _entries;
 
     public ObservableCollection<BreadcrumbSegment> Breadcrumbs { get; } = new();
 
@@ -550,13 +543,19 @@ public partial class TabViewModel : ObservableObject
     /// 表示メニューの 特大 / 大 / 中 はこの値のプリセット。
     /// </summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IconFontSize), nameof(IconItemWidth))]
+    [NotifyPropertyChangedFor(nameof(IconFontSize), nameof(IconItemWidth), nameof(IconCellWidth), nameof(IconCellHeight))]
     private double _iconSize = 28;
 
     public double IconFontSize => IconSize;
 
     /// <summary>アイコンビューのセル幅（アイコンサイズに追従）。</summary>
     public double IconItemWidth => Math.Max(96, IconSize * 1.7);
+
+    /// <summary>ListBoxItem の余白を含む、仮想化パネル上のセル幅。</summary>
+    public double IconCellWidth => IconItemWidth + 12;
+
+    /// <summary>アイコン・2 行の名前・ListBoxItem の余白を含む、仮想化パネル上のセル高。</summary>
+    public double IconCellHeight => IconSize + 42;
 
     public bool IsViewExtraLarge => ViewMode == ViewMode.ExtraLargeIcons;
     public bool IsViewLarge => ViewMode == ViewMode.LargeIcons;
@@ -645,6 +644,20 @@ public partial class TabViewModel : ObservableObject
 
     private void OnOptionsChanged(object? sender, ShellOptionChangedEventArgs e)
     {
+        if (e.Kind == ShellOptionKind.UseMaterialIcons)
+        {
+            var enabled = _options.UseMaterialIcons;
+            var preferLight = enabled && MaterialIconService.IsLightTheme();
+            foreach (var entry in _allEntries.Concat(Entries).Distinct())
+            {
+                entry.UpdateMaterialIconKey(enabled, preferLight);
+            }
+
+            OnPropertyChanged(nameof(ShowMaterialIcons));
+            OnPropertyChanged(nameof(UseEmojiIcons));
+            return;
+        }
+
         OnPropertyChanged(nameof(ShowHidden));
         OnPropertyChanged(nameof(ShowExtensions));
         OnPropertyChanged(nameof(ShowCheckBoxes));
@@ -820,11 +833,7 @@ public partial class TabViewModel : ObservableObject
         }
         var filtered = filteredQuery.ToList();
 
-        Entries.Clear();
-        foreach (var entry in filtered)
-        {
-            Entries.Add(entry);
-        }
+        ReplaceEntries(filtered);
 
         var conditions = new List<string>();
         if (_extensionFilter is not null) conditions.Add($"種類: {_extensionFilterName}");
@@ -832,6 +841,19 @@ public partial class TabViewModel : ObservableObject
         StatusText = conditions.Count == 0
             ? $"{filtered.Count} 個の項目"
             : $"{filtered.Count} 個の項目 ({string.Join(" / ", conditions)})";
+    }
+
+    /// <summary>一覧をスナップショット単位で置換し、3 つの ListBox へ各 1 回だけ通知する。</summary>
+    private void ReplaceEntries(IEnumerable<FileSystemEntry> entries)
+    {
+        SelectedEntry = null;
+        if (_selection.Count > 0)
+        {
+            SetSelection([]);
+        }
+
+        _entries = entries as List<FileSystemEntry> ?? entries.ToList();
+        OnPropertyChanged(nameof(Entries));
         OnPropertyChanged(nameof(HasNoEntries));
     }
 
@@ -868,7 +890,30 @@ public partial class TabViewModel : ObservableObject
             SortAscendingFlag = true;
         }
 
-        Refresh();
+        ResortEntries();
+    }
+
+    /// <summary>ディスクを再列挙せず、現在の母集合と表示中の結果だけを並べ替える。</summary>
+    public void ResortEntries()
+    {
+        var selectedPath = SelectedEntry?.FullPath;
+        _allEntries = ApplySort(_allEntries).ToList();
+        var sortedVisibleEntries = ApplySort(Entries.ToList()).ToList();
+        ReplaceEntries(sortedVisibleEntries);
+
+        if (selectedPath is not null)
+        {
+            SelectedEntry = Entries.FirstOrDefault(entry =>
+                WindowsPathIdentity.Instance.Equals(entry.FullPath, selectedPath));
+        }
+    }
+
+    /// <summary>並べ替え条件をまとめて変更し、一覧へ 1 回だけ反映する。</summary>
+    public void SetSort(string key, bool ascending)
+    {
+        SortKey = key;
+        SortAscendingFlag = ascending;
+        ResortEntries();
     }
 
     private void BuildBreadcrumbs(string path)
@@ -1137,7 +1182,7 @@ public partial class TabViewModel : ObservableObject
     {
         var targets = _selection.Select(e => e.FullPath).ToList();
         // 削除後はエクスプローラーと同じく隣接項目を選択する
-        var anchorIndex = _selection.Count > 0 ? Entries.IndexOf(_selection[0]) : -1;
+        var anchorIndex = _selection.Count > 0 ? _entries.IndexOf(_selection[0]) : -1;
 
         var result = await Task.Run(() => FileOperationService.DeleteToRecycleBin(targets, permanent));
         if (!result.IsSuccess)
@@ -1266,15 +1311,13 @@ public partial class TabViewModel : ObservableObject
     [RelayCommand]
     private void SetSortKey(string key)
     {
-        SortKey = key;
-        Refresh();
+        SetSort(key, SortAscendingFlag);
     }
 
     [RelayCommand]
     private void SetSortAscending(string ascending)
     {
-        SortAscendingFlag = ascending == "True";
-        Refresh();
+        SetSort(SortKey, ascending == "True");
     }
 
     /// <summary>ドロップ / DnD 移動のファイル操作（背景スレッド実行 + 完了後更新）。</summary>

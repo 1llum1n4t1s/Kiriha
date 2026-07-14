@@ -568,10 +568,10 @@ public partial class MainWindow : Window
             case "select-invert": SelectInvert_Click(null, new RoutedEventArgs()); break;
             case "select-folders": SelectMatching(list, e => e.IsDirectory); break;
             case "select-files": SelectMatching(list, e => !e.IsDirectory); break;
-            case "sort-name-asc": tab.SortKey = "Name"; tab.SortAscendingFlag = true; tab.RefreshCommand.Execute(null); break;
-            case "sort-name-desc": tab.SortKey = "Name"; tab.SortAscendingFlag = false; tab.RefreshCommand.Execute(null); break;
-            case "sort-modified-desc": tab.SortKey = "Modified"; tab.SortAscendingFlag = false; tab.RefreshCommand.Execute(null); break;
-            case "sort-size-desc": tab.SortKey = "Size"; tab.SortAscendingFlag = false; tab.RefreshCommand.Execute(null); break;
+            case "sort-name-asc": tab.SetSort("Name", ascending: true); break;
+            case "sort-name-desc": tab.SetSort("Name", ascending: false); break;
+            case "sort-modified-desc": tab.SetSort("Modified", ascending: false); break;
+            case "sort-size-desc": tab.SetSort("Size", ascending: false); break;
             default:
                 if (action.StartsWith("view-") && Enum.TryParse<ViewMode>(action[5..], out var mode)) tab.ViewMode = mode;
                 else tab.StatusText = $"未定義の操作です: {action}";
@@ -2334,7 +2334,7 @@ public partial class MainWindow : Window
             tab.StatusText = "ハッシュを計算しています...";
             try
             {
-                var hash = await Task.Run(() => ComputeHash(path, action.Id));
+                var hash = await ComputeHashAsync(path, action.Id);
                 await SetClipboardTextAsync(hash, tab);
             }
             catch (Exception ex) { Logger.LogException($"ハッシュ計算に失敗しました: {path}", ex); tab.StatusText = $"ハッシュを計算できませんでした: {ex.Message}"; }
@@ -2469,16 +2469,25 @@ public partial class MainWindow : Window
         return path.Replace('\\', '/');
     }
 
-    private static string ComputeHash(string path, string id)
+    private static async Task<string> ComputeHashAsync(string path, string id)
     {
-        using var stream = File.OpenRead(path);
-        using System.Security.Cryptography.HashAlgorithm algorithm = id switch
+        using var stream = File.Open(path, new FileStreamOptions
         {
-            "file.hash-sha256" => System.Security.Cryptography.SHA256.Create(),
-            "file.hash-sha1" => System.Security.Cryptography.SHA1.Create(),
-            _ => System.Security.Cryptography.MD5.Create(),
+            Mode = FileMode.Open,
+            Access = FileAccess.Read,
+            Share = FileShare.Read,
+            Options = FileOptions.Asynchronous | FileOptions.SequentialScan,
+        });
+        var algorithm = id switch
+        {
+            "file.hash-sha256" => System.Security.Cryptography.HashAlgorithmName.SHA256,
+            "file.hash-sha1" => System.Security.Cryptography.HashAlgorithmName.SHA1,
+            _ => System.Security.Cryptography.HashAlgorithmName.MD5,
         };
-        return Convert.ToHexString(algorithm.ComputeHash(stream)).ToLowerInvariant();
+        var hash = await System.Security.Cryptography.CryptographicOperations
+            .HashDataAsync(algorithm, stream)
+            .ConfigureAwait(false);
+        return Convert.ToHexStringLower(hash);
     }
 
     private static void StartProcess(string fileName, IEnumerable<string> args, string workingDirectory)

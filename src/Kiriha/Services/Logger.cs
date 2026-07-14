@@ -15,7 +15,6 @@ public static class Logger
 {
     private static ILog? _logger;
     private static readonly object InitLock = new();
-    public static bool IsAvailable => _logger is not null;
 
     public static void Initialize()
     {

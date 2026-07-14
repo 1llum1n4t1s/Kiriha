@@ -56,10 +56,19 @@ public partial class FileSystemEntry : ObservableObject
     }
 
     /// <summary>Material Icon Theme のアイコンキー（拡張子/ファイル名/フォルダー名から解決済み）。</summary>
-    public required string MaterialIconKey { get; init; }
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(MaterialIcon))]
+    private string _materialIconKey = "";
 
-    /// <summary>Material Icon Theme の SVG（キャッシュ済み）。ドライブは対象外で常に null。</summary>
-    public Avalonia.Media.IImage? MaterialIcon => IsDrive ? null : Services.MaterialIconService.GetImage(MaterialIconKey);
+    /// <summary>Material Icon Theme の PNG（キャッシュ済み）。ドライブとキー未解決時は null。</summary>
+    public Avalonia.Media.IImage? MaterialIcon
+        => IsDrive || MaterialIconKey.Length == 0 ? null : Services.MaterialIconService.GetImage(MaterialIconKey);
+
+    /// <summary>設定切替時に、フォルダーを再列挙せず Material アイコンキーだけを更新する。</summary>
+    public void UpdateMaterialIconKey(bool enabled, bool preferLight)
+        => MaterialIconKey = enabled && !IsDrive
+            ? Services.MaterialIconService.ResolveIconKey(Name, IsDirectory, preferLight)
+            : "";
 
     /// <summary>切り取り / 隠し属性を反映した行の不透明度。</summary>
     public double RowOpacity => IsCut ? 0.45 : IsHidden ? 0.6 : 1.0;
