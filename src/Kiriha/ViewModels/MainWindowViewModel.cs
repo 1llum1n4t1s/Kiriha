@@ -61,6 +61,18 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private double _sidebarWidth = 230;
 
+    /// <summary>タブをウィンドウ左側へ縦に並べる。</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(UseHorizontalTabs))]
+    private bool _useVerticalTabs;
+
+    /// <summary>横タブ表示中か。XAML の表示切り替え用。</summary>
+    public bool UseHorizontalTabs => !UseVerticalTabs;
+
+    /// <summary>垂直タブバーの幅（Thumb ドラッグで変更、永続化）。</summary>
+    [ObservableProperty]
+    private double _verticalTabWidth = 240;
+
     /// <summary>検索ボックスの幅（境界の Thumb ドラッグで変更、永続化）。</summary>
     [ObservableProperty]
     private double _searchBoxWidth = 200;
@@ -86,6 +98,17 @@ public partial class MainWindowViewModel : ObservableObject
         _settings.SidebarWidth = value; // 保存自体は終了時の SaveWindowBounds でまとめて行う
     }
 
+    partial void OnUseVerticalTabsChanged(bool value)
+    {
+        _settings.UseVerticalTabs = value;
+        SettingsService.Save(_settings);
+    }
+
+    partial void OnVerticalTabWidthChanged(double value)
+    {
+        _settings.VerticalTabWidth = value; // 保存自体は終了時の SaveWindowBounds でまとめて行う
+    }
+
     partial void OnSearchBoxWidthChanged(double value)
     {
         _settings.SearchBoxWidth = value; // 保存自体は終了時の SaveWindowBounds でまとめて行う
@@ -103,6 +126,9 @@ public partial class MainWindowViewModel : ObservableObject
 
     [RelayCommand]
     private void ToggleSidebar() => ShowSidebar = !ShowSidebar;
+
+    [RelayCommand]
+    private void ToggleVerticalTabs() => UseVerticalTabs = !UseVerticalTabs;
 
     [RelayCommand]
     private void TogglePreviewPane() => ShowPreviewPane = !ShowPreviewPane;
@@ -274,6 +300,8 @@ public partial class MainWindowViewModel : ObservableObject
         ShowBookmarksBar = false;
         ShowSidebar = true;
         SidebarWidth = 230;
+        UseVerticalTabs = false;
+        VerticalTabWidth = 240;
         SearchBoxWidth = 200;
         ShowPreviewPane = false;
 
@@ -409,6 +437,8 @@ public partial class MainWindowViewModel : ObservableObject
         _showBookmarksBar = _settings.ShowBookmarksBar;
         _showSidebar = _settings.ShowSidebar;
         _sidebarWidth = _settings.SidebarWidth is > 120 and < 600 ? _settings.SidebarWidth : 230;
+        _useVerticalTabs = _settings.UseVerticalTabs;
+        _verticalTabWidth = _settings.VerticalTabWidth is >= 180 and <= 420 ? _settings.VerticalTabWidth : 240;
         _searchBoxWidth = _settings.SearchBoxWidth is > 120 and < 500 ? _settings.SearchBoxWidth : 200;
         _showPreviewPane = _settings.ShowPreviewPane;
         ApplyTheme(_settings.ThemePreference);

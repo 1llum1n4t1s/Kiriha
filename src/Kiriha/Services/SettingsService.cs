@@ -59,6 +59,12 @@ public sealed class AppSettings
     /// <summary>左ペインの幅。</summary>
     public double SidebarWidth { get; set; } = 230;
 
+    /// <summary>タブをウィンドウ左側へ縦に並べる。</summary>
+    public bool UseVerticalTabs { get; set; }
+
+    /// <summary>垂直タブバーの幅。</summary>
+    public double VerticalTabWidth { get; set; } = 240;
+
     /// <summary>プレビューペインの表示状態（Alt+P）。</summary>
     public bool ShowPreviewPane { get; set; }
 

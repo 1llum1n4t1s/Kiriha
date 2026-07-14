@@ -62,6 +62,73 @@
             <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
             <Setter Property="BorderThickness" Value="3,0,0,0" />
         </Style>
+        <Style Selector="ListBox.tabs ListBoxItem.droptarget-after /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
+            <Setter Property="BorderThickness" Value="0,0,3,0" />
+        </Style>
+
+        <!-- 垂直タブ。色は既存トークンだけを使い、選択状態は濃い面 + アクセント線で明確にする。 -->
+        <Style Selector="ListBox.verticaltabs">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Padding" Value="8,2,8,8" />
+        </Style>
+        <Style Selector="ListBox.verticaltabs ListBoxItem">
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="MinHeight" Value="0" />
+            <Setter Property="Margin" Value="0,1" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <ContentPresenter Name="PART_ContentPresenter"
+                                      Background="{TemplateBinding Background}"
+                                      BorderBrush="{TemplateBinding BorderBrush}"
+                                      BorderThickness="{TemplateBinding BorderThickness}"
+                                      CornerRadius="{TemplateBinding CornerRadius}"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      HorizontalContentAlignment="Stretch"
+                                      Padding="{TemplateBinding Padding}" />
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="ListBox.verticaltabs ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource TabHoverBg}" />
+        </Style>
+        <Style Selector="ListBox.verticaltabs ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource TabActiveBg}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
+            <Setter Property="BorderThickness" Value="3,0,0,0" />
+        </Style>
+        <Style Selector="ListBox.verticaltabs ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource TabActiveBg}" />
+        </Style>
+        <Style Selector="ListBox.verticaltabs ListBoxItem.dragging">
+            <Setter Property="Opacity" Value="0.3" />
+        </Style>
+        <Style Selector="ListBox.verticaltabs ListBoxItem.droptarget /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
+            <Setter Property="BorderThickness" Value="0,3,0,0" />
+        </Style>
+        <Style Selector="ListBox.verticaltabs ListBoxItem.droptarget-after /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
+            <Setter Property="BorderThickness" Value="0,0,0,3" />
+        </Style>
+        <Style Selector="Button.verticaltabaction">
+            <Setter Property="Height" Value="30" />
+            <Setter Property="MinWidth" Value="30" />
+            <Setter Property="Padding" Value="8,0" />
+            <Setter Property="CornerRadius" Value="7" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondary}" />
+        </Style>
+        <Style Selector="Button.verticaltabaction:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource HoverBg}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+        </Style>
         <Style Selector="Border.tabicon">
             <Setter Property="Width" Value="30" />
             <Setter Property="Height" Value="26" />
@@ -264,6 +331,34 @@
             <Setter Property="Padding" Value="0,2" />
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         </Style>
+        <Style Selector="ListBox.files.list ListBoxItem">
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="CornerRadius" Value="0" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        </Style>
+        <Style Selector="ListBox.files.list ListBoxItem:pointerover">
+            <Setter Property="Background" Value="{DynamicResource HoverBg}" />
+        </Style>
+        <Style Selector="ListBox.files.list ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource HoverBg}" />
+            <Setter Property="CornerRadius" Value="0" />
+        </Style>
+        <Style Selector="ListBox.files.list ListBoxItem:selected">
+            <Setter Property="Background" Value="{DynamicResource HoverBg}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        <Style Selector="ListBox.files.list ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource HoverBg}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="0" />
+        </Style>
+        <Style Selector="ListBox.files.list ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource HoverBg}" />
+        </Style>
 
         <!-- ファイル一覧（アイコン表示）のセル -->
         <Style Selector="ListBox.icons ListBoxItem">
@@ -415,11 +510,11 @@
             </ExperimentalAcrylicBorder.Material>
         </ExperimentalAcrylicBorder>
 
-    <Grid RowDefinitions="42,*">
+    <Grid RowDefinitions="42,*" ColumnDefinitions="Auto,*">
 
         <!-- タブのドラッグ中に、掴んだタブがカーソルへ追従して浮くゴースト表示のオーバーレイ。
              ヒットテストは無効（下の操作を邪魔しない）で、全面に最前面で重ねる。 -->
-        <Canvas x:Name="TabDragOverlay" Grid.Row="0" Grid.RowSpan="2"
+        <Canvas x:Name="TabDragOverlay" Grid.Row="0" Grid.RowSpan="2" Grid.ColumnSpan="2"
                 IsHitTestVisible="False" ZIndex="1000">
             <Border x:Name="TabDragGhost" IsVisible="False"
                     Height="30" MinWidth="110" MaxWidth="240"
@@ -438,13 +533,35 @@
         </Canvas>
 
         <!-- ===== タブストリップ（タイトルバー領域） ===== -->
-        <Grid Grid.Row="0" ColumnDefinitions="Auto,Auto,*,Auto"
+        <Grid Grid.Row="0" Grid.ColumnSpan="2" ColumnDefinitions="Auto,Auto,Auto,*,Auto"
               Background="Transparent"
               PointerPressed="TitleBar_PointerPressed"
               DoubleTapped="TitleBar_DoubleTapped">
 
-            <ListBox x:Name="TabsListBox" Grid.Column="0" Classes="tabs" Margin="10,0,0,0"
+            <!-- Edge と同じ位置に、横タブから垂直タブへ切り替える入口を置く。 -->
+            <Button x:Name="VerticalTabModeButton" Grid.Column="0" Classes="nav" Width="30" Height="30"
+                    Margin="8,6,2,0" Content="☰" FontFamily="Segoe UI Symbol"
+                    AutomationProperties.Name="垂直タブに切り替える"
+                    IsVisible="{Binding UseHorizontalTabs}"
+                    Command="{Binding ToggleVerticalTabsCommand}"
+                    ToolTip.Tip="垂直タブに切り替える" />
+
+            <!-- 垂直表示ではタブ列を左へ移し、タイトルバーは現在の場所を簡潔に示す。 -->
+            <StackPanel Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal"
+                        Margin="14,0,0,0" Spacing="10" VerticalAlignment="Center"
+                        IsHitTestVisible="False" IsVisible="{Binding UseVerticalTabs}">
+                <TextBlock Text="Kiriha" FontWeight="SemiBold" FontSize="12.5"
+                           Foreground="{DynamicResource TextPrimary}" />
+                <Border Width="1" Height="16" Background="{DynamicResource Divider}" />
+                <TextBlock Text="{Binding SelectedTab.Title}" MaxWidth="360" FontSize="12.5"
+                           Foreground="{DynamicResource TextSecondary}"
+                           TextTrimming="CharacterEllipsis" />
+            </StackPanel>
+
+            <ListBox x:Name="TabsListBox" Grid.Column="1" Classes="tabs" Margin="2,0,0,0"
                      Height="42" ClipToBounds="True"
+                     AutomationProperties.Name="横タブ"
+                     IsVisible="{Binding UseHorizontalTabs}"
                      ScrollViewer.VerticalScrollBarVisibility="Disabled"
                      ScrollViewer.HorizontalScrollBarVisibility="Hidden"
                      ItemsSource="{Binding Tabs}"
@@ -518,13 +635,15 @@
                 </ListBox.ItemTemplate>
             </ListBox>
 
-            <Button Grid.Column="1" Classes="nav" Width="28" Height="28"
+            <Button x:Name="HorizontalNewTabButton" Grid.Column="2" Classes="nav" Width="28" Height="28"
                     Margin="6,7,0,0" Content="&#xE710;" FontSize="12"
+                    AutomationProperties.Name="新しいタブ"
+                    IsVisible="{Binding UseHorizontalTabs}"
                     Command="{Binding NewTabCommand}"
                     ToolTip.Tip="新しいタブ" />
 
             <!-- キャプションボタン（WindowDecorations=BorderOnly のためシステム側は描画されない） -->
-            <StackPanel Grid.Column="3" Orientation="Horizontal"
+            <StackPanel Grid.Column="4" Orientation="Horizontal"
                         HorizontalAlignment="Right" VerticalAlignment="Top">
                 <Button Classes="caption" Content="&#xE921;" Click="Minimize_Click" />
                 <Button Classes="caption" Content="&#xE922;" Click="MaximizeRestore_Click" />
@@ -532,8 +651,120 @@
             </StackPanel>
         </Grid>
 
+        <!-- ===== 垂直タブバー ===== -->
+        <Grid Grid.Row="1" Grid.Column="0" ColumnDefinitions="*,4"
+              Width="{Binding VerticalTabWidth}"
+              IsVisible="{Binding UseVerticalTabs}">
+            <Border Grid.Column="0" Background="{DynamicResource ContentBg}">
+                <Grid RowDefinitions="Auto,*,Auto">
+                    <Grid Grid.Row="0" Height="46" Margin="12,5,8,3"
+                          ColumnDefinitions="*,Auto,Auto" ColumnSpacing="4">
+                        <TextBlock Text="タブ" FontSize="12.5" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextSecondary}"
+                                   VerticalAlignment="Center" Margin="4,0,0,0" />
+                        <Button x:Name="VerticalNewTabButton" Grid.Column="1" Classes="verticaltabaction"
+                                Command="{Binding NewTabCommand}"
+                                AutomationProperties.Name="新しいタブ"
+                                ToolTip.Tip="新しいタブ (Ctrl+T)">
+                            <TextBlock Classes="fico" Text="&#xE710;" FontSize="12" />
+                        </Button>
+                        <Button x:Name="HorizontalTabModeButton" Grid.Column="2" Classes="verticaltabaction" Content="横タブ"
+                                FontSize="11.5"
+                                AutomationProperties.Name="横タブに切り替える"
+                                Command="{Binding ToggleVerticalTabsCommand}"
+                                ToolTip.Tip="横タブに戻す" />
+                    </Grid>
+
+                    <ListBox x:Name="VerticalTabsListBox" Grid.Row="1" Classes="verticaltabs"
+                             AutomationProperties.Name="垂直タブ"
+                             ItemsSource="{Binding Tabs}"
+                             SelectedItem="{Binding SelectedTab}"
+                             DragDrop.AllowDrop="True"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             ScrollViewer.VerticalScrollBarVisibility="Auto"
+                             PointerMoved="Tabs_PointerMoved"
+                             PointerReleased="Tabs_PointerReleased">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate x:DataType="vm:TabViewModel">
+                                <Grid Height="36" ColumnDefinitions="38,*,Auto"
+                                      AutomationProperties.Name="{Binding Title}"
+                                      Background="Transparent" ToolTip.Tip="{Binding PathText}">
+                                    <Grid.ContextMenu>
+                                        <ContextMenu Opened="TabMenu_Opened">
+                                            <MenuItem Header="新しいタブを右に開く" Click="TabNewRight_Click" />
+                                            <MenuItem Header="タブを複製" Click="TabDuplicate_Click"
+                                                      IsVisible="{Binding IsNormalTab}" />
+                                            <Separator />
+                                            <MenuItem Header="タブを固定"
+                                                      IsVisible="{Binding !IsPinned}"
+                                                      Command="{Binding TogglePinCommand}" />
+                                            <MenuItem Header="タブの固定を解除"
+                                                      IsVisible="{Binding IsPinned}"
+                                                      Command="{Binding TogglePinCommand}" />
+                                            <Separator />
+                                            <MenuItem Header="タブを閉じる"
+                                                      Command="{Binding CloseSelfCommand}" />
+                                            <MenuItem Header="右側のタブを閉じる" Click="TabCloseRight_Click" />
+                                            <MenuItem Header="他のタブを閉じる" Click="TabCloseOthers_Click" />
+                                            <MenuItem Header="タブの詳細操作" Tag="tabActions" />
+                                            <Separator />
+                                            <MenuItem Header="閉じたタブを開く" Click="TabReopen_Click"
+                                                      InputGesture="Ctrl+Shift+T" />
+                                            <MenuItem Header="最近閉じたタブ" Tag="recent" />
+                                            <Separator />
+                                            <MenuItem Header="パスのコピー" Click="TabCopyPath_Click" />
+                                            <MenuItem Header="エクスプローラーで開く"
+                                                      Command="{Binding OpenInExplorerCommand}" />
+                                        </ContextMenu>
+                                    </Grid.ContextMenu>
+
+                                    <Grid Grid.Column="0">
+                                        <TextBlock Text="📁" FontSize="13"
+                                                   IsVisible="{Binding IsNormalTab}"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        <TextBlock Text="⚙" FontSize="13"
+                                                   IsVisible="{Binding IsSettingsTab}"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Grid>
+                                    <TextBlock Grid.Column="1" Text="{Binding Title}"
+                                               Margin="0,0,8,0" FontSize="12.5"
+                                               Foreground="{DynamicResource TextPrimary}"
+                                               VerticalAlignment="Center"
+                                               TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Grid.Column="2" Classes="fico" Text="&#xE718;"
+                                               IsVisible="{Binding IsPinned}" FontSize="11"
+                                               Margin="0,0,10,0" VerticalAlignment="Center"
+                                               Foreground="{DynamicResource TextSecondary}"
+                                               ToolTip.Tip="固定タブ" />
+                                    <Button Grid.Column="2" Classes="tabclose" Content="&#xE8BB;"
+                                            IsVisible="{Binding !IsPinned}"
+                                            AutomationProperties.Name="タブを閉じる"
+                                            Margin="0,0,8,0" VerticalAlignment="Center"
+                                            Command="{Binding CloseSelfCommand}" />
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <Button x:Name="VerticalSettingsButton" Grid.Row="2" Classes="verticaltabaction" Height="38"
+                            Margin="12,4,8,10" HorizontalContentAlignment="Left"
+                            AutomationProperties.Name="設定を開く"
+                            Command="{Binding OpenSettingsCommand}"
+                            ToolTip.Tip="設定を開く">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="⚙" FontSize="13" VerticalAlignment="Center" />
+                            <TextBlock Text="設定" FontSize="12.5" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </Border>
+            <Thumb x:Name="VerticalTabsResizeThumb" Grid.Column="1" Classes="colsplit" Width="4"
+                   AutomationProperties.Name="垂直タブバーの幅を変更"
+                   DragDelta="VerticalTabsThumb_DragDelta" />
+        </Grid>
+
         <!-- ===== 選択中タブの中身 ===== -->
-        <ContentControl Grid.Row="1" Content="{Binding SelectedTab}">
+        <ContentControl Grid.Row="1" Grid.Column="1" Content="{Binding SelectedTab}">
             <ContentControl.ContentTemplate>
                 <DataTemplate x:DataType="vm:TabViewModel">
                     <Panel Background="{DynamicResource ContentBg}">
@@ -577,6 +808,15 @@
                                                           IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptShowCheckBoxes}" />
                                                 <CheckBox Content="お気に入りバーを表示する (Ctrl+Shift+B)"
                                                           IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ShowBookmarksBar}" />
+                                            </StackPanel>
+                                        </HeaderedContentControl>
+
+                                        <HeaderedContentControl Classes="settingscard" Header="タブバー">
+                                            <StackPanel Classes="settingsfields">
+                                                <CheckBox Content="タブをウィンドウ左側へ縦に並べる"
+                                                          IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).UseVerticalTabs}" />
+                                                <TextBlock Classes="settingscaption"
+                                                           Text="タブ名を広く確認でき、タブ数が増えても縦スクロールで移動できます。左端の境界をドラッグすると幅を変更できます。" />
                                             </StackPanel>
                                         </HeaderedContentControl>
 
@@ -867,7 +1107,7 @@
 
                         <!-- ナビゲーション + アドレスバー（パンくず） + 検索 -->
                         <Grid Grid.Row="0" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto,Auto"
-                              Background="{DynamicResource ContentBg}">
+                              Background="{DynamicResource TabActiveBg}">
                             <Button Grid.Column="0" Classes="nav" Content="&#xE72B;" Margin="8,0,0,0"
                                     Command="{Binding GoBackCommand}" ToolTip.Tip="戻る (右クリックで履歴)"
                                     PointerReleased="NavBack_PointerReleased"
@@ -1001,7 +1241,7 @@
 
                         <!-- お気に入りバー（Ctrl+Shift+B で表示切替 / DnD 登録 / Chrome 互換右クリック） -->
                         <Border Grid.Row="1" Classes="bookmarkbar" Height="32"
-                                Background="{DynamicResource ContentBg}"
+                                Background="{DynamicResource TabActiveBg}"
                                 BorderBrush="{DynamicResource Divider}" BorderThickness="0,0,0,1"
                                 IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ShowBookmarksBar}"
                                 DragDrop.AllowDrop="True"
@@ -1308,8 +1548,6 @@
                                              DragDrop.AllowDrop="True"
                                              DoubleTapped="FileList_DoubleTapped"
                                              SelectionChanged="FileList_SelectionChanged"
-                                             PointerPressed="FileList_PointerPressed"
-                                             PointerMoved="FileList_PointerMoved"
                                              PointerReleased="FileList_PointerReleased"
                                              KeyDown="FileList_KeyDown">
                                         <ListBox.ItemTemplate>
@@ -1373,24 +1611,34 @@
                                             ToolTip.Tip="クリックして選択を解除" />
 
                                     <!-- 一覧 / 小アイコン表示 -->
-                                    <ListBox Classes="files"
+                                    <ListBox Classes="files list"
                                              IsVisible="{Binding IsListView}"
                                              ItemsSource="{Binding Entries}"
                                              SelectedItem="{Binding SelectedEntry}"
                                              SelectionMode="Multiple"
                                              Background="Transparent"
+                                             Padding="12,8,0,0"
+                                             ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                             ScrollViewer.VerticalScrollBarVisibility="Disabled"
                                              DragDrop.AllowDrop="True"
                                              DoubleTapped="FileList_DoubleTapped"
                                              SelectionChanged="FileList_SelectionChanged"
-                                             PointerPressed="FileList_PointerPressed"
-                                             PointerMoved="FileList_PointerMoved"
                                              PointerReleased="FileList_PointerReleased"
                                              KeyDown="FileList_KeyDown">
+                                        <ListBox.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <c:VirtualizingWrapPanel Orientation="Vertical"
+                                                                         ItemWidth="220"
+                                                                         MaximumItemWidth="380"
+                                                                         ItemHeight="{Binding ListRowHeight}"
+                                                                         CacheRows="1" />
+                                            </ItemsPanelTemplate>
+                                        </ListBox.ItemsPanel>
                                         <ListBox.ItemTemplate>
                                             <DataTemplate x:DataType="m:FileSystemEntry">
-                                                <StackPanel Orientation="Horizontal" Spacing="10" Margin="8,0"
+                                                <StackPanel Orientation="Horizontal" Spacing="6" Margin="8,0"
                                                             Background="Transparent"
-                                                            Height="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).RowHeight}"
+                                                            Height="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).ListRowHeight}"
                                                             Opacity="{Binding RowOpacity}">
                                                     <CheckBox MinWidth="0" Padding="0" Margin="0,0,-4,0"
                                                               IsVisible="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).ShowCheckBoxes}"
@@ -1418,8 +1666,6 @@
                                              DragDrop.AllowDrop="True"
                                              DoubleTapped="FileList_DoubleTapped"
                                              SelectionChanged="FileList_SelectionChanged"
-                                             PointerPressed="FileList_PointerPressed"
-                                             PointerMoved="FileList_PointerMoved"
                                              PointerReleased="FileList_PointerReleased"
                                              KeyDown="FileList_KeyDown">
                                         <ListBox.ItemsPanel>

@@ -125,10 +125,13 @@ public partial class TabViewModel : ObservableObject
 
     /// <summary>コンパクトビュー（行の高さを詰める）。</summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(RowHeight))]
+    [NotifyPropertyChangedFor(nameof(RowHeight), nameof(ListRowHeight))]
     private bool _isCompactView;
 
     public double RowHeight => IsCompactView ? 24 : 30;
+
+    /// <summary>Windows エクスプローラーの一覧表示に合わせた行高。</summary>
+    public double ListRowHeight => IsCompactView ? 18 : 20;
 
     // ===== プレビューペイン =====
 
