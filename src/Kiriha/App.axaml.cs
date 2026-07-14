@@ -38,6 +38,7 @@ public partial class App : Application
             var viewModel = new MainWindowViewModel();
             Services.ThemeService.Initialize(this, viewModel.OptUseAcrylicBackground);
             var mainWindow = new MainWindow { DataContext = viewModel };
+            mainWindow.ApplySavedWindowPlacementBeforeShow();
             desktop.MainWindow = mainWindow;
             Program.RegisterActivationHandler(args => Dispatcher.UIThread.Post(() =>
             {

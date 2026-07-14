@@ -50,6 +50,16 @@ public sealed class AppSettings
     /// <summary>前回最大化で終了したか。</summary>
     public bool WindowMaximized { get; set; }
 
+    /// <summary>終了時にウィンドウが表示されていたモニターの作業領域。
+    /// 最大化時も同じモニターへ復元するために使う。</summary>
+    public int WindowMonitorX { get; set; } = int.MinValue;
+
+    public int WindowMonitorY { get; set; } = int.MinValue;
+
+    public int WindowMonitorWidth { get; set; }
+
+    public int WindowMonitorHeight { get; set; }
+
     /// <summary>ウィンドウのサイズと位置を保存して次回復元する（設定画面で切替、既定 ON）。</summary>
     public bool RememberWindowBounds { get; set; } = true;
 

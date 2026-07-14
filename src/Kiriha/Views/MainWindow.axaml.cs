@@ -99,12 +99,11 @@ public partial class MainWindow : Window
             }
         };
         // Opened はトレイ格納からの Show() 復元でも再発火するため、初回起動時の
-        // サイズ・位置復元は最初の1回だけに限定する（購読解除して多重適用を防ぐ）。
+        // サイドバー更新は最初の1回だけに限定する（購読解除して多重実行を防ぐ）。
         EventHandler? onFirstOpened = null;
         onFirstOpened = (_, _) =>
         {
             Opened -= onFirstOpened;
-            ApplySavedWindowSize();
             if (ViewModel is { } vm) _ = vm.RefreshSidebarAsync();
         };
         Opened += onFirstOpened;
@@ -138,7 +137,8 @@ public partial class MainWindow : Window
 
     // ===== ウィンドウサイズの復元 / 保存 =====
 
-    private void ApplySavedWindowSize()
+    /// <summary>初回表示より前に保存済みのサイズ・位置・最大化状態を適用する。</summary>
+    public void ApplySavedWindowPlacementBeforeShow()
     {
         if (ViewModel is not { } vm)
         {
@@ -157,41 +157,49 @@ public partial class MainWindow : Window
             Height = size.Height;
         }
 
+        // 最大化で終了した場合は、通常時の復元座標とは別に保存したモニターを優先する。
+        // 最大化ウィンドウだけを別モニターへ移動しても通常座標は変わらないため、通常座標だけを
+        // 基準にすると再起動後に元のモニターで最大化されてしまう。
+        MonitorWorkingArea? maximizedWorkingArea = null;
+        if (vm.SavedWindowMaximized
+            && vm.SavedWindowMonitorWorkingArea is { } savedMonitor
+            && WindowPlacementService.TryResolveSavedMonitor(
+                savedMonitor.X,
+                savedMonitor.Y,
+                savedMonitor.Width,
+                savedMonitor.Height,
+                out var resolvedMonitor))
+        {
+            maximizedWorkingArea = resolvedMonitor;
+        }
+
         // 外部モニターを外した等でモニター構成が変わっていた場合、保存位置をそのまま復元すると
         // ウィンドウが画面外に開いて見失うことがあるため、現在接続中のどれかの画面に
         // タイトルバー付近が収まる場合のみ復元する（収まらなければ既定の起動位置に任せる）。
-        if (vm.SavedWindowPosition is { } pos && IsPositionOnAnyScreen(pos.X, pos.Y))
+        PixelPoint? initialPosition = null;
+        if (maximizedWorkingArea is { } wa)
         {
-            Position = new PixelPoint(pos.X, pos.Y);
+            // 最大化先を OS に確実に認識させるため、最大化前の通常ウィンドウを対象モニター内へ置く。
+            // 端から少し内側なら解像度や DPI が異なるモニターでも確実にその画面へ所属する。
+            initialPosition = new PixelPoint(wa.X + Math.Min(80, wa.Width / 4),
+                wa.Y + Math.Min(80, wa.Height / 4));
+        }
+        else if (vm.SavedWindowPosition is { } pos
+                 && WindowPlacementService.IsPositionOnAnyMonitor(pos.X, pos.Y))
+        {
+            initialPosition = new PixelPoint(pos.X, pos.Y);
+        }
+
+        if (initialPosition is { } position)
+        {
+            WindowStartupLocation = WindowStartupLocation.Manual;
+            Position = position;
         }
 
         if (vm.SavedWindowMaximized)
         {
-            // Position 設定の直後に同期で最大化すると、BorderOnly 装飾のウィンドウは Win32 の
-            // WM_WINDOWPOSCHANGING でモニターごとの作業領域に合わせて最大化サイズ・位置を補正する際、
-            // ウィンドウの「現在位置」に基づいてモニターを判定するため、Position の反映がまだ
-            // OS 側に伝搬しきっていないと最大化前の（＝プライマリモニター側の）位置を見てしまい、
-            // セカンダリモニターに配置したはずのウィンドウがプライマリモニターで最大化されることがある。
-            // レイアウトパス後（DispatcherPriority.Loaded）まで最大化を遅らせ、Position の反映を
-            // 確実に先に完了させる。
-            Dispatcher.UIThread.Post(() => WindowState = WindowState.Maximized, DispatcherPriority.Loaded);
+            WindowState = WindowState.Maximized;
         }
-    }
-
-    private bool IsPositionOnAnyScreen(int x, int y)
-    {
-        const int probeSize = 40;
-        foreach (var screen in Screens.All)
-        {
-            var wa = screen.WorkingArea;
-            if (x + probeSize > wa.X && x < wa.X + wa.Width
-                && y + probeSize > wa.Y && y < wa.Y + wa.Height)
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
@@ -216,14 +224,19 @@ public partial class MainWindow : Window
 
     protected override void OnClosing(WindowClosingEventArgs e)
     {
+        var monitor = Screens.ScreenFromWindow(this)?.WorkingArea;
+        var monitorWorkingArea = monitor is { } wa
+            ? (wa.X, wa.Y, wa.Width, wa.Height)
+            : ((int X, int Y, int Width, int Height)?)null;
+
         if (WindowState == WindowState.Minimized)
         {
-            ViewModel?.SaveWindowMaximizedFlag(_lastKnownMaximized);
+            ViewModel?.SaveWindowMaximizedFlag(_lastKnownMaximized, monitorWorkingArea);
         }
         else
         {
             ViewModel?.SaveWindowBounds(Width, Height, Position.X, Position.Y,
-                WindowState == WindowState.Maximized);
+                WindowState == WindowState.Maximized, monitorWorkingArea);
         }
 
         base.OnClosing(e);

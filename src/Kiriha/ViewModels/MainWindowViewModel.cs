@@ -780,7 +780,13 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     /// <summary>ウィンドウの位置・サイズ・最大化状態・開いていたタブの保存（終了時に呼ばれる）。</summary>
-    public void SaveWindowBounds(double width, double height, int x, int y, bool maximized)
+    public void SaveWindowBounds(
+        double width,
+        double height,
+        int x,
+        int y,
+        bool maximized,
+        (int X, int Y, int Width, int Height)? monitorWorkingArea)
     {
         // 「ウィンドウのサイズと位置を保存する」が OFF のときはウィンドウ枠の情報は書き換えず、
         // 開いていたタブなどセッション情報だけを保存する。
@@ -795,6 +801,7 @@ public partial class MainWindowViewModel : ObservableObject
             }
 
             _settings.WindowMaximized = maximized;
+            SaveWindowMonitor(monitorWorkingArea);
         }
 
         SaveOpenTabsAndSettings();
@@ -802,14 +809,30 @@ public partial class MainWindowViewModel : ObservableObject
 
     /// <summary>最小化中に閉じられた場合の保存（Win32 は最小化中の座標をセンチネル値 (-32000,-32000)
     /// で返すため、位置・サイズは前回保存済みの値を維持し最大化フラグだけ更新する）。</summary>
-    public void SaveWindowMaximizedFlag(bool maximized)
+    public void SaveWindowMaximizedFlag(
+        bool maximized,
+        (int X, int Y, int Width, int Height)? monitorWorkingArea)
     {
         if (_settings.RememberWindowBounds)
         {
             _settings.WindowMaximized = maximized;
+            SaveWindowMonitor(monitorWorkingArea);
         }
 
         SaveOpenTabsAndSettings();
+    }
+
+    private void SaveWindowMonitor((int X, int Y, int Width, int Height)? monitorWorkingArea)
+    {
+        if (monitorWorkingArea is not { Width: > 0, Height: > 0 } monitor)
+        {
+            return;
+        }
+
+        _settings.WindowMonitorX = monitor.X;
+        _settings.WindowMonitorY = monitor.Y;
+        _settings.WindowMonitorWidth = monitor.Width;
+        _settings.WindowMonitorHeight = monitor.Height;
     }
 
     private void SaveOpenTabsAndSettings()
@@ -839,6 +862,16 @@ public partial class MainWindowViewModel : ObservableObject
             : null;
 
     public bool SavedWindowMaximized => _settings.WindowMaximized;
+
+    /// <summary>終了時にウィンドウが表示されていたモニターの作業領域。</summary>
+    public (int X, int Y, int Width, int Height)? SavedWindowMonitorWorkingArea
+        => _settings.WindowMonitorX != int.MinValue
+           && _settings.WindowMonitorY != int.MinValue
+           && _settings.WindowMonitorWidth > 0
+           && _settings.WindowMonitorHeight > 0
+            ? (_settings.WindowMonitorX, _settings.WindowMonitorY,
+                _settings.WindowMonitorWidth, _settings.WindowMonitorHeight)
+            : null;
 
     // ===== タブ操作（Chrome 互換） =====
 
