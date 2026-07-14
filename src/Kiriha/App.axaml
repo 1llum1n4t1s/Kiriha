@@ -38,31 +38,35 @@
                 </ResourceDictionary>
                 <!-- Chrome ダーク配色 -->
                 <ResourceDictionary x:Key="Dark">
-                    <SolidColorBrush x:Key="TabStripBg" Color="#202124" />
-                    <SolidColorBrush x:Key="TabIdleBg" Color="#2A2B2F" />
-                    <SolidColorBrush x:Key="TabHoverBg" Color="#34363B" />
-                    <SolidColorBrush x:Key="TabActiveBg" Color="#45474D" />
-                    <SolidColorBrush x:Key="ContentBg" Color="#35363A" />
-                    <SolidColorBrush x:Key="OmniboxBg" Color="#202124" />
-                    <SolidColorBrush x:Key="SidebarBg" Color="#2B2C2F" />
-                    <SolidColorBrush x:Key="StatusBg" Color="#2B2C2F" />
+                    <!-- 黒系サーフェスは土台・面・操作状態の3段階だけに限定する。 -->
+                    <Color x:Key="NeutralBase">#202124</Color>
+                    <Color x:Key="NeutralSurface">#2B2C2F</Color>
+                    <Color x:Key="NeutralInteractive">#3C4043</Color>
+                    <SolidColorBrush x:Key="TabStripBg" Color="{StaticResource NeutralBase}" />
+                    <SolidColorBrush x:Key="TabIdleBg" Color="{StaticResource NeutralSurface}" />
+                    <SolidColorBrush x:Key="TabHoverBg" Color="{StaticResource NeutralInteractive}" />
+                    <SolidColorBrush x:Key="TabActiveBg" Color="{StaticResource NeutralBase}" />
+                    <SolidColorBrush x:Key="ContentBg" Color="{StaticResource NeutralSurface}" />
+                    <SolidColorBrush x:Key="OmniboxBg" Color="{StaticResource NeutralBase}" />
+                    <SolidColorBrush x:Key="SidebarBg" Color="{StaticResource NeutralSurface}" />
+                    <SolidColorBrush x:Key="StatusBg" Color="{StaticResource NeutralSurface}" />
                     <SolidColorBrush x:Key="TextPrimary" Color="#E8EAED" />
                     <SolidColorBrush x:Key="TextSecondary" Color="#9AA0A6" />
                     <SolidColorBrush x:Key="TextTertiary" Color="#9AA0A6" />
-                    <SolidColorBrush x:Key="Divider" Color="#4A4B4F" />
-                    <SolidColorBrush x:Key="HoverBg" Color="#4A4B4F" />
-                    <SolidColorBrush x:Key="CrumbHoverBg" Color="#45474B" />
-                    <SolidColorBrush x:Key="CaptionHoverBg" Color="#5F6368" />
-                    <SolidColorBrush x:Key="TabCloseHoverBg" Color="#5F6368" />
-                    <SolidColorBrush x:Key="StatusDivider" Color="#5F6368" />
-                    <SolidColorBrush x:Key="SettingsPageBg" Color="#25282E" />
-                    <SolidColorBrush x:Key="SettingsNavBg" Color="#2C3037" />
-                    <SolidColorBrush x:Key="SettingsCardBg" Color="#30343B" />
-                    <SolidColorBrush x:Key="SettingsCardBorder" Color="#464C56" />
-                    <SolidColorBrush x:Key="SettingsNavSelected" Color="#484E58" />
-                    <SolidColorBrush x:Key="SettingsHeroBg" Color="#293746" />
-                    <SolidColorBrush x:Key="SettingsIconBg" Color="#344C65" />
-                    <SolidColorBrush x:Key="SettingsButtonBg" Color="#50555F" />
+                    <SolidColorBrush x:Key="Divider" Color="{StaticResource NeutralInteractive}" />
+                    <SolidColorBrush x:Key="HoverBg" Color="{StaticResource NeutralInteractive}" />
+                    <SolidColorBrush x:Key="CrumbHoverBg" Color="{StaticResource NeutralInteractive}" />
+                    <SolidColorBrush x:Key="CaptionHoverBg" Color="{StaticResource NeutralInteractive}" />
+                    <SolidColorBrush x:Key="TabCloseHoverBg" Color="{StaticResource NeutralInteractive}" />
+                    <SolidColorBrush x:Key="StatusDivider" Color="{StaticResource NeutralInteractive}" />
+                    <SolidColorBrush x:Key="SettingsPageBg" Color="{StaticResource NeutralBase}" />
+                    <SolidColorBrush x:Key="SettingsNavBg" Color="{StaticResource NeutralSurface}" />
+                    <SolidColorBrush x:Key="SettingsCardBg" Color="{StaticResource NeutralSurface}" />
+                    <SolidColorBrush x:Key="SettingsCardBorder" Color="{StaticResource NeutralInteractive}" />
+                    <SolidColorBrush x:Key="SettingsNavSelected" Color="{StaticResource NeutralInteractive}" />
+                    <SolidColorBrush x:Key="SettingsHeroBg" Color="{StaticResource NeutralSurface}" />
+                    <SolidColorBrush x:Key="SettingsIconBg" Color="{StaticResource NeutralInteractive}" />
+                    <SolidColorBrush x:Key="SettingsButtonBg" Color="{StaticResource NeutralSurface}" />
                     <Color x:Key="AcrylicTintColor">#202124</Color>
                 </ResourceDictionary>
                 <!-- One Dark 配色（Atom One Dark 由来の青みがかったダーク）。
@@ -70,31 +74,35 @@
                      組み込みリテラルしか文字列から変換できないため、カスタムバリアントは x:Static で
                      ThemeService.OneDark の静的インスタンスを直接参照する必要がある。 -->
                 <ResourceDictionary x:Key="{x:Static services:ThemeService.OneDark}">
-                    <SolidColorBrush x:Key="TabStripBg" Color="#21252B" />
-                    <SolidColorBrush x:Key="TabIdleBg" Color="#272B32" />
-                    <SolidColorBrush x:Key="TabHoverBg" Color="#2C313A" />
-                    <SolidColorBrush x:Key="TabActiveBg" Color="#282C34" />
-                    <SolidColorBrush x:Key="ContentBg" Color="#282C34" />
-                    <SolidColorBrush x:Key="OmniboxBg" Color="#1B1D23" />
-                    <SolidColorBrush x:Key="SidebarBg" Color="#21252B" />
-                    <SolidColorBrush x:Key="StatusBg" Color="#21252B" />
+                    <!-- One Dark も同じ3役へ正規化し、青みだけをテーマの個性として残す。 -->
+                    <Color x:Key="NeutralBase">#21252B</Color>
+                    <Color x:Key="NeutralSurface">#282C34</Color>
+                    <Color x:Key="NeutralInteractive">#3E4451</Color>
+                    <SolidColorBrush x:Key="TabStripBg" Color="{StaticResource NeutralBase}" />
+                    <SolidColorBrush x:Key="TabIdleBg" Color="{StaticResource NeutralSurface}" />
+                    <SolidColorBrush x:Key="TabHoverBg" Color="{StaticResource NeutralInteractive}" />
+                    <SolidColorBrush x:Key="TabActiveBg" Color="{StaticResource NeutralInteractive}" />
+                    <SolidColorBrush x:Key="ContentBg" Color="{StaticResource NeutralSurface}" />
+                    <SolidColorBrush x:Key="OmniboxBg" Color="{StaticResource NeutralBase}" />
+                    <SolidColorBrush x:Key="SidebarBg" Color="{StaticResource NeutralSurface}" />
+                    <SolidColorBrush x:Key="StatusBg" Color="{StaticResource NeutralSurface}" />
                     <SolidColorBrush x:Key="TextPrimary" Color="#ABB2BF" />
                     <SolidColorBrush x:Key="TextSecondary" Color="#828997" />
                     <SolidColorBrush x:Key="TextTertiary" Color="#5C6370" />
-                    <SolidColorBrush x:Key="Divider" Color="#3E4451" />
-                    <SolidColorBrush x:Key="HoverBg" Color="#2C313A" />
-                    <SolidColorBrush x:Key="CrumbHoverBg" Color="#333842" />
-                    <SolidColorBrush x:Key="CaptionHoverBg" Color="#3E4451" />
-                    <SolidColorBrush x:Key="TabCloseHoverBg" Color="#3E4451" />
-                    <SolidColorBrush x:Key="StatusDivider" Color="#3E4451" />
-                    <SolidColorBrush x:Key="SettingsPageBg" Color="#21252B" />
-                    <SolidColorBrush x:Key="SettingsNavBg" Color="#282C34" />
-                    <SolidColorBrush x:Key="SettingsCardBg" Color="#2C313A" />
-                    <SolidColorBrush x:Key="SettingsCardBorder" Color="#3E4451" />
-                    <SolidColorBrush x:Key="SettingsNavSelected" Color="#2C4356" />
-                    <SolidColorBrush x:Key="SettingsHeroBg" Color="#1F2937" />
-                    <SolidColorBrush x:Key="SettingsIconBg" Color="#2C4356" />
-                    <SolidColorBrush x:Key="SettingsButtonBg" Color="#3E4451" />
+                    <SolidColorBrush x:Key="Divider" Color="{StaticResource NeutralInteractive}" />
+                    <SolidColorBrush x:Key="HoverBg" Color="{StaticResource NeutralInteractive}" />
+                    <SolidColorBrush x:Key="CrumbHoverBg" Color="{StaticResource NeutralInteractive}" />
+                    <SolidColorBrush x:Key="CaptionHoverBg" Color="{StaticResource NeutralInteractive}" />
+                    <SolidColorBrush x:Key="TabCloseHoverBg" Color="{StaticResource NeutralInteractive}" />
+                    <SolidColorBrush x:Key="StatusDivider" Color="{StaticResource NeutralInteractive}" />
+                    <SolidColorBrush x:Key="SettingsPageBg" Color="{StaticResource NeutralBase}" />
+                    <SolidColorBrush x:Key="SettingsNavBg" Color="{StaticResource NeutralSurface}" />
+                    <SolidColorBrush x:Key="SettingsCardBg" Color="{StaticResource NeutralSurface}" />
+                    <SolidColorBrush x:Key="SettingsCardBorder" Color="{StaticResource NeutralInteractive}" />
+                    <SolidColorBrush x:Key="SettingsNavSelected" Color="{StaticResource NeutralInteractive}" />
+                    <SolidColorBrush x:Key="SettingsHeroBg" Color="{StaticResource NeutralSurface}" />
+                    <SolidColorBrush x:Key="SettingsIconBg" Color="{StaticResource NeutralInteractive}" />
+                    <SolidColorBrush x:Key="SettingsButtonBg" Color="{StaticResource NeutralSurface}" />
                     <Color x:Key="AcrylicTintColor">#21252B</Color>
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>

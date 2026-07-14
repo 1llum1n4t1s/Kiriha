@@ -25,7 +25,7 @@
             <Setter Property="MinHeight" Value="0" />
             <Setter Property="Margin" Value="0,7,0,0" />
             <Setter Property="CornerRadius" Value="12,12,0,0" />
-            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Background" Value="{DynamicResource TabIdleBg}" />
             <Setter Property="BorderThickness" Value="0" />
             <!-- Fluent既定テンプレートのフォーカスリング/選択インジケーターがタブの角丸と噛み合わず
                  二重の枠に見えるため、背景・枠線・角丸だけを描く最小テンプレートに置き換える。
@@ -45,12 +45,6 @@
         </Style>
         <Style Selector="ListBox.tabs ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource TabHoverBg}" />
-        </Style>
-        <!-- 固定タブ（アイコンのみ）は非選択・非ホバーでも薄い背景を出してタブの枠を見せる。
-             背景はタブ本体(ContentPresenter)層に置くので、選択/ホバー背景と入れ子にならない
-             （:not で相互排他にして二重背景を防ぐ）。pinned クラスは code-behind が付与する。 -->
-        <Style Selector="ListBox.tabs ListBoxItem.pinned:not(:selected):not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource TabIdleBg}" />
         </Style>
         <Style Selector="ListBox.tabs ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource TabActiveBg}" />
@@ -76,7 +70,7 @@
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
         </Style>
-        <!-- 固定タブのアイコンは専用の背景色を持たせない。タブ自体の背景（透明 / ホバー / 選択中）が
+        <!-- 固定タブのアイコンは専用の背景色を持たせない。タブ自体の背景（非選択 / ホバー / 選択中）が
              そのまま透けるので、内側に別の色の箱が入れ子になって見える「二重背景」を避けられる。
              固定タブであることはタイトル非表示・幅が縮む挙動自体で伝わる（Chrome と同じ）。 -->
 

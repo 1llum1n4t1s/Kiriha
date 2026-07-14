@@ -66,8 +66,6 @@ public partial class MainWindow : Window
         // 通常のバブル購読（XAML の PointerPressed="..."）ではタブの並べ替え開始を検知できない。
         // handledEventsToo: true で Handled 後も確実に拾う。
         TabsListBox.AddHandler(PointerPressedEvent, Tabs_PointerPressed, handledEventsToo: true);
-        // タブコンテナが生成されたら固定タブの背景クラスを反映する（初期表示・並べ替え後など）。
-        TabsListBox.ContainerPrepared += (_, _) => RefreshPinnedTabClasses();
         AddHandler(PointerPressedEvent, DetailColumn_PointerPressed, handledEventsToo: true);
         AddHandler(PointerMovedEvent, DetailColumn_PointerMoved, handledEventsToo: true);
         AddHandler(PointerReleasedEvent, DetailColumn_PointerReleased, handledEventsToo: true);
@@ -823,12 +821,9 @@ public partial class MainWindow : Window
         {
             tab.RenameRequested -= Tab_RenameRequested;
             tab.RenameRequested += Tab_RenameRequested;
-            tab.PropertyChanged -= Tab_ViewPropertyChanged;
-            tab.PropertyChanged += Tab_ViewPropertyChanged;
         }
 
         vm.Tabs.CollectionChanged += Tabs_CollectionChanged;
-        RefreshPinnedTabClasses();
     }
 
     private void Tabs_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -839,8 +834,6 @@ public partial class MainWindow : Window
             {
                 item.RenameRequested -= Tab_RenameRequested;
                 item.RenameRequested += Tab_RenameRequested;
-                item.PropertyChanged -= Tab_ViewPropertyChanged;
-                item.PropertyChanged += Tab_ViewPropertyChanged;
             }
         }
 
@@ -849,35 +842,8 @@ public partial class MainWindow : Window
             foreach (var item in e.OldItems.OfType<TabViewModel>())
             {
                 item.RenameRequested -= Tab_RenameRequested;
-                item.PropertyChanged -= Tab_ViewPropertyChanged;
             }
         }
-
-        RefreshPinnedTabClasses();
-    }
-
-    private void Tab_ViewPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(TabViewModel.IsPinned))
-        {
-            RefreshPinnedTabClasses();
-        }
-    }
-
-    /// <summary>固定タブのコンテナに "pinned" クラスを付与し、薄い背景スタイルを効かせる。
-    /// 固定状態はデータ(IsPinned)側の状態なので、擬似クラスのように code-behind で反映する。</summary>
-    private void RefreshPinnedTabClasses()
-    {
-        Dispatcher.UIThread.Post(() =>
-        {
-            foreach (var container in TabsListBox.GetRealizedContainers())
-            {
-                if (container is ListBoxItem { DataContext: TabViewModel tab } item)
-                {
-                    item.Classes.Set("pinned", tab.IsPinned);
-                }
-            }
-        }, DispatcherPriority.Loaded);
     }
 
     private async void Tab_RenameRequested(object? sender, FileSystemEntry entry)

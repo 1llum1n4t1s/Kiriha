@@ -92,16 +92,16 @@ public static class ThemeService
     private static readonly Color LightStatusBg = Color.Parse("#F8F9FA");
 
     private static readonly Color DarkTabStripBg = Color.Parse("#202124");
-    private static readonly Color DarkContentBg = Color.Parse("#35363A");
+    private static readonly Color DarkContentBg = Color.Parse("#2B2C2F");
     private static readonly Color DarkSidebarBg = Color.Parse("#2B2C2F");
     private static readonly Color DarkOmniboxBg = Color.Parse("#202124");
     private static readonly Color DarkStatusBg = Color.Parse("#2B2C2F");
 
     private static readonly Color OneDarkTabStripBg = Color.Parse("#21252B");
     private static readonly Color OneDarkContentBg = Color.Parse("#282C34");
-    private static readonly Color OneDarkSidebarBg = Color.Parse("#21252B");
-    private static readonly Color OneDarkOmniboxBg = Color.Parse("#1B1D23");
-    private static readonly Color OneDarkStatusBg = Color.Parse("#21252B");
+    private static readonly Color OneDarkSidebarBg = Color.Parse("#282C34");
+    private static readonly Color OneDarkOmniboxBg = Color.Parse("#21252B");
+    private static readonly Color OneDarkStatusBg = Color.Parse("#282C34");
 
     /// <summary>コンテンツ部の半透明度（読みやすさ優先でやや濃いめ）。</summary>
     private const byte ContentAlpha = 0xE6;
