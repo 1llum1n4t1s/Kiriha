@@ -40,7 +40,16 @@ internal static partial class Program
 
         // Velopack のブートストラップ（インストール / 更新 / アンインストール時のフック処理）。
         // 更新適用直後の再起動などはここで処理され、通常起動時はそのまま通過する。
-        VelopackApp.Build().Run();
+        VelopackApp.Build()
+            .OnBeforeUninstallFastCallback(_ =>
+            {
+                // アンインストール後に削除済み EXE への参照を残さないよう、
+                // Kiriha が HKCU に追加した Windows 統合を同期的に解除する。
+                WindowsIntegrationService.SetStartupEnabled(false);
+                WindowsIntegrationService.SetExplorerMenuEnabled(false);
+                WindowsIntegrationService.SetDefaultFolderAppEnabled(false);
+            })
+            .Run();
 
         using var instanceMutex = new Mutex(initiallyOwned: true, InstanceMutexName, out var isFirstInstance);
         if (!isFirstInstance)

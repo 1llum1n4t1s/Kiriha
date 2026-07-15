@@ -897,13 +897,13 @@ public partial class MainWindow : Window
         var ok = new Button { Content = "OK", IsDefault = true, MinWidth = 80, HorizontalContentAlignment = HorizontalAlignment.Center };
         var cancel = new Button { Content = "キャンセル", IsCancel = true, MinWidth = 80, HorizontalContentAlignment = HorizontalAlignment.Center };
 
-        var dialog = new Window
+        var dialog = new ThemedDialogWindow(ViewModel?.OptUseAcrylicBackground ?? false)
         {
             Title = title,
             SizeToContent = SizeToContent.WidthAndHeight,
             WindowStartupLocation = WindowStartupLocation.CenterOwner,
             CanResize = false,
-            Content = new StackPanel
+            DialogContent = new StackPanel
             {
                 Margin = new Thickness(16),
                 Spacing = 12,

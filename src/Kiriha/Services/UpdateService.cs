@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Threading;
 using Kiriha.Models;
+using Kiriha.Views;
 using Velopack;
 using Velopack.Sources;
 
@@ -59,7 +60,9 @@ public static class UpdateService
                         LogLevel.Warning);
                     if (manually && owner is not null)
                     {
-                        await ShowInfoAsync(owner, "開発環境での実行のため、更新チェックをスキップしました。");
+                        await ShowInfoAsync(
+                            owner, settings.UseAcrylicBackground,
+                            "開発環境での実行のため、更新チェックをスキップしました。");
                     }
 
                     return;
@@ -69,6 +72,10 @@ public static class UpdateService
                 {
                     Strings = KirihaUpdateStrings.Instance,
                     IgnoredTagName = settings.IgnoreUpdateTag,
+                    // 更新ダイアログ本体も Kiriha のアクリル設定に合わせる。
+                    ChromeMode = settings.UseAcrylicBackground
+                        ? VelopackUpdateDialog.WindowChromeMode.Custom
+                        : VelopackUpdateDialog.WindowChromeMode.System,
                 };
                 options.VersionIgnored += tag =>
                     Dispatcher.UIThread.Post(() =>
@@ -115,7 +122,7 @@ public static class UpdateService
         });
     }
 
-    private static async Task ShowInfoAsync(Window owner, string message)
+    private static async Task ShowInfoAsync(Window owner, bool useAcrylic, string message)
     {
         var ok = new Button
         {
@@ -125,13 +132,13 @@ public static class UpdateService
             HorizontalContentAlignment = HorizontalAlignment.Center,
             HorizontalAlignment = HorizontalAlignment.Right,
         };
-        var dialog = new Window
+        var dialog = new ThemedDialogWindow(useAcrylic)
         {
             Title = "Kiriha の更新",
             SizeToContent = SizeToContent.WidthAndHeight,
             WindowStartupLocation = WindowStartupLocation.CenterOwner,
             CanResize = false,
-            Content = new StackPanel
+            DialogContent = new StackPanel
             {
                 Margin = new Avalonia.Thickness(20),
                 Spacing = 16,

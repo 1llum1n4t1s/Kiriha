@@ -105,6 +105,7 @@
             <Setter Property="Margin" Value="8,4,8,10" />
             <Setter Property="Padding" Value="8,0" />
             <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         </Style>
         <!-- タイトルバー上の共通操作。 -->
@@ -560,7 +561,7 @@
         </Canvas>
 
         <!-- ===== 垂直タブ専用タイトルバー ===== -->
-        <Grid Grid.Row="0" Grid.ColumnSpan="2" ColumnDefinitions="Auto,*,Auto,Auto"
+        <Grid Grid.Row="0" Grid.ColumnSpan="2" ColumnDefinitions="Auto,*,Auto"
               Background="Transparent"
               PointerPressed="TitleBar_PointerPressed"
               DoubleTapped="TitleBar_DoubleTapped">
@@ -577,16 +578,8 @@
                            TextTrimming="CharacterEllipsis" />
             </Grid>
 
-            <Button x:Name="SettingsButton" Grid.Column="2" Classes="tabstripaction"
-                    Margin="0,5,4,5"
-                    AutomationProperties.Name="設定を開く"
-                    Command="{Binding OpenSettingsCommand}"
-                    ToolTip.Tip="設定を開く">
-                <TextBlock Classes="fico" Text="&#xE713;" FontSize="12" />
-            </Button>
-
             <!-- キャプションボタン（WindowDecorations=BorderOnly のためシステム側は描画されない） -->
-            <StackPanel Grid.Column="3" Orientation="Horizontal"
+            <StackPanel Grid.Column="2" Orientation="Horizontal"
                         HorizontalAlignment="Right" VerticalAlignment="Top">
                 <Button Classes="caption" Content="&#xE921;" Click="Minimize_Click" />
                 <Button Classes="caption" Content="&#xE922;" Click="MaximizeRestore_Click" />
@@ -601,7 +594,7 @@
                 <!-- アクリルON時は透明にして、タイトルバーと同じ全画面材をそのまま見せる。
                      OFF時はタブストリップ基準色の不透明面へ戻す。 -->
                 <Border Background="{DynamicResource VerticalTabsSurfaceBg}">
-                    <Grid RowDefinitions="*,Auto">
+                    <Grid RowDefinitions="*,Auto,Auto">
                     <ListBox x:Name="VerticalTabsListBox" Grid.Row="0" Classes="verticaltabs"
                              AutomationProperties.Name="垂直タブ"
                              ItemsSource="{Binding Tabs}"
@@ -675,6 +668,7 @@
 
                     <Button x:Name="VerticalNewTabButton" Grid.Row="1"
                             Classes="verticaltabaction verticalnewtab"
+                            Margin="8,4,8,2"
                             Command="{Binding NewTabCommand}"
                             AutomationProperties.Name="新しいタブ"
                             ToolTip.Tip="新しいタブ (Ctrl+T)">
@@ -687,6 +681,21 @@
                             <TextBlock Grid.Column="2" Text="Ctrl+T" FontSize="11.5"
                                        Margin="8,0,2,0" VerticalAlignment="Center"
                                        Foreground="{DynamicResource TextSecondary}" />
+                        </Grid>
+                    </Button>
+
+                    <Button x:Name="SettingsButton" Grid.Row="2"
+                            Classes="verticaltabaction verticalnewtab"
+                            Margin="8,0,8,10"
+                            AutomationProperties.Name="設定を開く"
+                            Command="{Binding OpenSettingsCommand}"
+                            ToolTip.Tip="設定を開く">
+                        <Grid ColumnDefinitions="28,*">
+                            <TextBlock Grid.Column="0" Classes="fico" Text="&#xE713;" FontSize="12"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1" Text="設定" FontSize="12.5"
+                                       Margin="6,0,0,0" VerticalAlignment="Center"
+                                       Foreground="{DynamicResource TextPrimary}" />
                         </Grid>
                     </Button>
                     </Grid>
@@ -1571,7 +1580,8 @@
                                         <ListBox.ItemsPanel>
                                             <ItemsPanelTemplate>
                                                 <c:VirtualizingWrapPanel ItemWidth="{Binding IconCellWidth}"
-                                                                         ItemHeight="{Binding IconCellHeight}" />
+                                                                         ItemHeight="{Binding IconCellHeight}"
+                                                                         AutoItemHeight="True" />
                                             </ItemsPanelTemplate>
                                         </ListBox.ItemsPanel>
                                         <ListBox.ItemTemplate>
@@ -1592,14 +1602,16 @@
                                                                Width="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).IconFontSize}"
                                                                Height="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).IconFontSize}"
                                                                Stretch="Uniform" />
-                                                        <TextBlock Text="{Binding Icon}"
-                                                                   IsVisible="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).UseEmojiIcons}"
-                                                                   FontSize="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).IconFontSize}"
-                                                                   HorizontalAlignment="Center" />
+                                                        <Viewbox IsVisible="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).UseEmojiIcons}"
+                                                                 Width="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).IconFontSize}"
+                                                                 Height="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).IconFontSize}"
+                                                                 Stretch="Uniform"
+                                                                 HorizontalAlignment="Center">
+                                                            <TextBlock Text="{Binding Icon}" FontSize="64" />
+                                                        </Viewbox>
                                                     </Panel>
                                                     <TextBlock Text="{Binding DisplayName}" FontSize="12"
                                                                Foreground="{DynamicResource TextPrimary}" TextWrapping="Wrap"
-                                                               MaxLines="2" TextTrimming="CharacterEllipsis"
                                                                TextAlignment="Center" />
                                                 </StackPanel>
                                             </DataTemplate>

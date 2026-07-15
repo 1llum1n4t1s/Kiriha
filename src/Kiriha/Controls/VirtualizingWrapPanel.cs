@@ -7,7 +7,7 @@ using Avalonia.Layout;
 namespace Kiriha.Controls;
 
 /// <summary>
-/// 均一サイズのセルを折り返し配置し、表示行と前後のキャッシュ行だけを実体化するパネル。
+/// セルを折り返し配置し、必要に応じて内容に合わせた行高を確保しながら、表示行と前後のキャッシュ行だけを実体化するパネル。
 /// ListBox の選択・キーボード操作・ドラッグ＆ドロップを保つため、ItemsPanel として使用する。
 /// </summary>
 public sealed class VirtualizingWrapPanel : VirtualizingPanel
@@ -41,6 +41,9 @@ public sealed class VirtualizingWrapPanel : VirtualizingPanel
             2,
             validate: value => value >= 0);
 
+    public static readonly StyledProperty<bool> AutoItemHeightProperty =
+        AvaloniaProperty.Register<VirtualizingWrapPanel, bool>(nameof(AutoItemHeight));
+
     private readonly SortedDictionary<int, Control> _realized = [];
     private readonly Dictionary<Control, int> _indices = [];
     private readonly Dictionary<Control, object?> _recycleKeys = [];
@@ -51,6 +54,9 @@ public sealed class VirtualizingWrapPanel : VirtualizingPanel
     private int _rows = 1;
     private int _verticalColumnCount;
     private double[] _verticalColumnOffsets = [0];
+    private int _horizontalColumnCount;
+    private double[] _horizontalRowHeights = [];
+    private double[] _horizontalRowOffsets = [0];
 
     static VirtualizingWrapPanel()
     {
@@ -59,11 +65,13 @@ public sealed class VirtualizingWrapPanel : VirtualizingPanel
             ItemWidthProperty,
             MaximumItemWidthProperty,
             ItemHeightProperty,
-            CacheRowsProperty);
-        OrientationProperty.Changed.AddClassHandler<VirtualizingWrapPanel>((panel, _) => panel.ResetVerticalLayout());
-        ItemWidthProperty.Changed.AddClassHandler<VirtualizingWrapPanel>((panel, _) => panel.ResetVerticalLayout());
-        MaximumItemWidthProperty.Changed.AddClassHandler<VirtualizingWrapPanel>((panel, _) => panel.ResetVerticalLayout());
-        ItemHeightProperty.Changed.AddClassHandler<VirtualizingWrapPanel>((panel, _) => panel.ResetVerticalLayout());
+            CacheRowsProperty,
+            AutoItemHeightProperty);
+        OrientationProperty.Changed.AddClassHandler<VirtualizingWrapPanel>((panel, _) => panel.ResetLayouts());
+        ItemWidthProperty.Changed.AddClassHandler<VirtualizingWrapPanel>((panel, _) => panel.ResetLayouts());
+        MaximumItemWidthProperty.Changed.AddClassHandler<VirtualizingWrapPanel>((panel, _) => panel.ResetLayouts());
+        ItemHeightProperty.Changed.AddClassHandler<VirtualizingWrapPanel>((panel, _) => panel.ResetLayouts());
+        AutoItemHeightProperty.Changed.AddClassHandler<VirtualizingWrapPanel>((panel, _) => panel.ResetHorizontalLayout());
     }
 
     public VirtualizingWrapPanel()
@@ -106,6 +114,13 @@ public sealed class VirtualizingWrapPanel : VirtualizingPanel
         set => SetValue(CacheRowsProperty, value);
     }
 
+    /// <summary>横方向配置で、各行の内容に合わせて ItemHeight 以上の高さを確保する。</summary>
+    public bool AutoItemHeight
+    {
+        get => GetValue(AutoItemHeightProperty);
+        set => SetValue(AutoItemHeightProperty, value);
+    }
+
     protected override Size MeasureOverride(Size availableSize)
     {
         var itemCount = Items.Count;
@@ -118,6 +133,11 @@ public sealed class VirtualizingWrapPanel : VirtualizingPanel
         if (Orientation == Avalonia.Layout.Orientation.Vertical)
         {
             return MeasureVertical(availableSize, itemCount);
+        }
+
+        if (AutoItemHeight)
+        {
+            return MeasureHorizontalAutoHeight(availableSize, itemCount);
         }
 
         var availableWidth = ResolveAvailableWidth(availableSize.Width);
@@ -153,6 +173,51 @@ public sealed class VirtualizingWrapPanel : VirtualizingPanel
         }
 
         return new Size(availableWidth, rowCount * ItemHeight);
+    }
+
+    private Size MeasureHorizontalAutoHeight(Size availableSize, int itemCount)
+    {
+        var availableWidth = ResolveAvailableWidth(availableSize.Width);
+        _columns = Math.Max(1, (int)Math.Floor(availableWidth / ItemWidth));
+        var rowCount = (itemCount + _columns - 1) / _columns;
+        EnsureHorizontalLayout(rowCount);
+
+        var viewportTop = Math.Max(0, _viewport.Top);
+        var viewportHeight = _viewport.Height;
+        if (!double.IsFinite(viewportHeight) || viewportHeight <= 0)
+        {
+            viewportHeight = double.IsFinite(availableSize.Height) && availableSize.Height > 0
+                ? availableSize.Height
+                : ItemHeight * 6;
+        }
+
+        var firstRow = Math.Max(0, FindHorizontalRow(viewportTop) - CacheRows);
+        var lastRow = Math.Min(
+            rowCount - 1,
+            FindHorizontalRow(viewportTop + viewportHeight - double.Epsilon) + CacheRows);
+        var firstIndex = firstRow * _columns;
+        var lastIndex = Math.Min(itemCount - 1, ((lastRow + 1) * _columns) - 1);
+
+        RecycleOutside(firstIndex, lastIndex);
+        for (var index = firstIndex; index <= lastIndex; index++)
+        {
+            Realize(index);
+        }
+
+        var rowHeightChanged = false;
+        var constraint = new Size(ItemWidth, double.PositiveInfinity);
+        foreach (var (index, control) in _realized)
+        {
+            control.Measure(constraint);
+            rowHeightChanged |= UpdateHorizontalRowHeight(index, control.DesiredSize.Height);
+        }
+
+        if (rowHeightChanged)
+        {
+            BuildHorizontalRowOffsets();
+        }
+
+        return new Size(availableWidth, _horizontalRowOffsets[^1]);
     }
 
     private Size MeasureVertical(Size availableSize, int itemCount)
@@ -219,6 +284,7 @@ public sealed class VirtualizingWrapPanel : VirtualizingPanel
         NotifyCollectionChangedEventArgs e)
     {
         RecycleAll();
+        ResetHorizontalLayout();
         ResetVerticalLayout();
         InvalidateMeasure();
     }
@@ -249,7 +315,15 @@ public sealed class VirtualizingWrapPanel : VirtualizingPanel
         }
         else
         {
-            control.Measure(new Size(ItemWidth, ItemHeight));
+            control.Measure(new Size(ItemWidth, AutoItemHeight ? double.PositiveInfinity : ItemHeight));
+            if (AutoItemHeight)
+            {
+                EnsureHorizontalLayout(Math.Max(1, (Items.Count + _columns - 1) / _columns));
+                if (UpdateHorizontalRowHeight(index, control.DesiredSize.Height))
+                {
+                    BuildHorizontalRowOffsets();
+                }
+            }
         }
 
         control.Arrange(GetItemRect(index));
@@ -278,7 +352,10 @@ public sealed class VirtualizingWrapPanel : VirtualizingPanel
         }
 
         var current = from is Control control ? IndexFromContainer(control) : -1;
-        var visibleRows = Math.Max(1, (int)Math.Floor(_viewport.Height / ItemHeight));
+        var navigationRowHeight = AutoItemHeight && _horizontalRowHeights.Length > 0
+            ? _horizontalRowOffsets[^1] / _horizontalRowHeights.Length
+            : ItemHeight;
+        var visibleRows = Math.Max(1, (int)Math.Floor(_viewport.Height / navigationRowHeight));
         var target = Orientation == Avalonia.Layout.Orientation.Vertical
             ? GetVerticalNavigationTarget(direction, current)
             : direction switch
@@ -393,7 +470,67 @@ public sealed class VirtualizingWrapPanel : VirtualizingPanel
 
         var column = index % _columns;
         var row = index / _columns;
+        if (AutoItemHeight && row < _horizontalRowHeights.Length)
+        {
+            return new Rect(
+                column * ItemWidth,
+                _horizontalRowOffsets[row],
+                ItemWidth,
+                _horizontalRowHeights[row]);
+        }
+
         return new Rect(column * ItemWidth, row * ItemHeight, ItemWidth, ItemHeight);
+    }
+
+    private void EnsureHorizontalLayout(int rowCount)
+    {
+        if (_horizontalColumnCount == _columns && _horizontalRowHeights.Length == rowCount)
+        {
+            return;
+        }
+
+        _horizontalColumnCount = _columns;
+        _horizontalRowHeights = Enumerable.Repeat(ItemHeight, rowCount).ToArray();
+        BuildHorizontalRowOffsets();
+    }
+
+    private bool UpdateHorizontalRowHeight(int index, double desiredHeight)
+    {
+        var row = index / _columns;
+        if (row < 0 || row >= _horizontalRowHeights.Length || !double.IsFinite(desiredHeight))
+        {
+            return false;
+        }
+
+        var height = Math.Max(ItemHeight, desiredHeight);
+        if (height <= _horizontalRowHeights[row])
+        {
+            return false;
+        }
+
+        _horizontalRowHeights[row] = height;
+        return true;
+    }
+
+    private void BuildHorizontalRowOffsets()
+    {
+        _horizontalRowOffsets = new double[_horizontalRowHeights.Length + 1];
+        for (var row = 0; row < _horizontalRowHeights.Length; row++)
+        {
+            _horizontalRowOffsets[row + 1] = _horizontalRowOffsets[row] + _horizontalRowHeights[row];
+        }
+    }
+
+    private int FindHorizontalRow(double y)
+    {
+        if (_horizontalRowHeights.Length == 0)
+        {
+            return 0;
+        }
+
+        var offsetIndex = Array.BinarySearch(_horizontalRowOffsets, y);
+        var row = offsetIndex >= 0 ? offsetIndex : ~offsetIndex - 1;
+        return Math.Clamp(row, 0, _horizontalRowHeights.Length - 1);
     }
 
     private void BuildVerticalColumnOffsets(int columnCount)
@@ -430,6 +567,19 @@ public sealed class VirtualizingWrapPanel : VirtualizingPanel
         _verticalColumnWidths.Clear();
         _verticalColumnOffsets = [0];
         _verticalColumnCount = 0;
+    }
+
+    private void ResetHorizontalLayout()
+    {
+        _horizontalColumnCount = 0;
+        _horizontalRowHeights = [];
+        _horizontalRowOffsets = [0];
+    }
+
+    private void ResetLayouts()
+    {
+        ResetHorizontalLayout();
+        ResetVerticalLayout();
     }
 
     private Control Realize(int index)
