@@ -10,6 +10,7 @@
                 <!-- Chrome ライト配色 -->
                 <ResourceDictionary x:Key="Light">
                     <SolidColorBrush x:Key="TabStripBg" Color="#DEE1E6" />
+                    <SolidColorBrush x:Key="VerticalTabsSurfaceBg" Color="#DEE1E6" />
                     <SolidColorBrush x:Key="TabIdleBg" Color="#EAECEF" />
                     <SolidColorBrush x:Key="TabHoverBg" Color="#F1F3F5" />
                     <SolidColorBrush x:Key="TabActiveBg" Color="#FFFFFF" />
@@ -43,6 +44,7 @@
                     <Color x:Key="NeutralSurface">#2B2C2F</Color>
                     <Color x:Key="NeutralInteractive">#3C4043</Color>
                     <SolidColorBrush x:Key="TabStripBg" Color="{StaticResource NeutralBase}" />
+                    <SolidColorBrush x:Key="VerticalTabsSurfaceBg" Color="{StaticResource NeutralBase}" />
                     <SolidColorBrush x:Key="TabIdleBg" Color="{StaticResource NeutralInteractive}" />
                     <SolidColorBrush x:Key="TabHoverBg" Color="{StaticResource NeutralSurface}" />
                     <SolidColorBrush x:Key="TabActiveBg" Color="{StaticResource NeutralBase}" />
@@ -79,6 +81,7 @@
                     <Color x:Key="NeutralSurface">#282C34</Color>
                     <Color x:Key="NeutralInteractive">#3E4451</Color>
                     <SolidColorBrush x:Key="TabStripBg" Color="{StaticResource NeutralBase}" />
+                    <SolidColorBrush x:Key="VerticalTabsSurfaceBg" Color="{StaticResource NeutralBase}" />
                     <SolidColorBrush x:Key="TabIdleBg" Color="{StaticResource NeutralInteractive}" />
                     <SolidColorBrush x:Key="TabHoverBg" Color="{StaticResource NeutralSurface}" />
                     <SolidColorBrush x:Key="TabActiveBg" Color="{StaticResource NeutralBase}" />

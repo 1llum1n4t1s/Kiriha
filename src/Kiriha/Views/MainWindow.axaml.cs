@@ -22,6 +22,10 @@ public partial class MainWindow : Window
     private PointerPressedEventArgs? _dragPressArgs;
     private ListBox? _dragListBox;
     private SidebarLink? _dragSidebarLink;
+    private IReadOnlyList<FileSystemEntry>? _dragSelectionSnapshot;
+    private DragPreviewWindow? _fileDragPreview;
+    private Control? _fileDropTargetControl;
+    private int _fileDropVisualRevision;
     private Point _dragStartPoint;
     private bool _dragInProgress;
     private readonly HashSet<ListBox> _bulkSelectionLists = [];
@@ -63,6 +67,7 @@ public partial class MainWindow : Window
 
         // DnD 受け入れ（DragDrop.AllowDrop を立てた要素からバブルしてくる）
         AddHandler(DragDrop.DragOverEvent, OnDragOver);
+        AddHandler(DragDrop.DragLeaveEvent, OnDragLeave);
         AddHandler(DragDrop.DropEvent, OnDrop);
 
         // ListBoxItem は選択処理で PointerPressed を Handled 済みにするため、ファイル一覧と
@@ -77,7 +82,6 @@ public partial class MainWindow : Window
         // ListBoxItem が選択処理で PointerPressed を Handled 済みにするため、
         // 通常のバブル購読（XAML の PointerPressed="..."）ではタブの並べ替え開始を検知できない。
         // handledEventsToo: true で Handled 後も確実に拾う。
-        TabsListBox.AddHandler(PointerPressedEvent, Tabs_PointerPressed, handledEventsToo: true);
         VerticalTabsListBox.AddHandler(PointerPressedEvent, Tabs_PointerPressed, handledEventsToo: true);
         AddHandler(PointerPressedEvent, DetailColumn_PointerPressed, handledEventsToo: true);
         AddHandler(PointerMovedEvent, DetailColumn_PointerMoved, handledEventsToo: true);
@@ -447,19 +451,17 @@ public partial class MainWindow : Window
 
     protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
     {
-        // タブバー / お気に入りバー上の縦ホイールは横スクロールに変換
+        // お気に入りバー上の縦ホイールは横スクロールに変換する。
+        // 垂直タブは ListBox 標準の縦スクロールをそのまま使う。
         if (!e.KeyModifiers.HasFlag(KeyModifiers.Control) && e.Source is Visual wheelSource)
         {
-            var overTabs = wheelSource.FindAncestorOfType<ListBox>()?.Classes.Contains("tabs") == true;
             var overBookmarks = wheelSource.GetVisualAncestors().OfType<Border>()
                 .Any(b => b.Classes.Contains("bookmarkbar"));
-            if (overTabs || overBookmarks)
+            if (overBookmarks)
             {
-                var scroller = overTabs
-                    ? wheelSource.FindAncestorOfType<ListBox>()?.GetVisualDescendants().OfType<ScrollViewer>().FirstOrDefault()
-                    : wheelSource.GetVisualAncestors().OfType<Border>()
-                        .First(b => b.Classes.Contains("bookmarkbar"))
-                        .GetVisualDescendants().OfType<ScrollViewer>().FirstOrDefault();
+                var scroller = wheelSource.GetVisualAncestors().OfType<Border>()
+                    .First(b => b.Classes.Contains("bookmarkbar"))
+                    .GetVisualDescendants().OfType<ScrollViewer>().FirstOrDefault();
                 if (scroller is not null)
                 {
                     scroller.Offset = scroller.Offset.WithX(scroller.Offset.X - e.Delta.Y * 48);
@@ -953,14 +955,6 @@ public partial class MainWindow : Window
 
     private void TitleBar_DoubleTapped(object? sender, TappedEventArgs e)
     {
-        // タブバーの空き領域ダブルクリックは新規タブ（Chrome 互換）、それ以外は最大化切替
-        if ((e.Source as Visual)?.FindAncestorOfType<ListBox>()?.Classes.Contains("tabs") == true
-            && (e.Source as Visual)?.FindAncestorOfType<ListBoxItem>() is null)
-        {
-            ViewModel?.NewTabCommand.Execute(null);
-            return;
-        }
-
         ToggleMaximize();
     }
 
@@ -1106,9 +1100,7 @@ public partial class MainWindow : Window
             var targetContainer = TabContainer(target);
             var targetOrigin = targetContainer?.TranslatePoint(default, this);
             var dropAfter = targetContainer is not null && targetOrigin is { } origin
-                && (_tabDragListBox?.Classes.Contains("verticaltabs") == true
-                    ? position.Y >= origin.Y + targetContainer.Bounds.Height / 2
-                    : position.X >= origin.X + targetContainer.Bounds.Width / 2);
+                && position.Y >= origin.Y + targetContainer.Bounds.Height / 2;
 
             if (_tabDropContainer is not null)
             {
@@ -1162,13 +1154,6 @@ public partial class MainWindow : Window
             var reopen = new MenuItem { Header = "閉じたタブを開く", InputGesture = new KeyGesture(Key.T, KeyModifiers.Control | KeyModifiers.Shift) };
             reopen.Click += (_, _) => ViewModel?.ReopenClosedTabCommand.Execute(null);
             flyout.Items.Add(reopen);
-            flyout.Items.Add(new Separator());
-            var changeLayout = new MenuItem
-            {
-                Header = ViewModel?.UseVerticalTabs == true ? "横タブに切り替える" : "垂直タブに切り替える",
-            };
-            changeLayout.Click += (_, _) => ViewModel?.ToggleVerticalTabsCommand.Execute(null);
-            flyout.Items.Add(changeLayout);
             flyout.ShowAt((Control)sender!, showAtPointer: true);
             e.Handled = true;
         }
@@ -1188,7 +1173,7 @@ public partial class MainWindow : Window
     }
 
     private ListBoxItem? TabContainer(TabViewModel tab)
-        => (_tabDragListBox ?? TabsListBox).GetVisualDescendants().OfType<ListBoxItem>()
+        => (_tabDragListBox ?? VerticalTabsListBox).GetVisualDescendants().OfType<ListBoxItem>()
             .FirstOrDefault(item => ReferenceEquals(item.DataContext, tab));
 
     private void EndTabDrag()
@@ -1414,7 +1399,7 @@ public partial class MainWindow : Window
     {
         if (ViewModel is { } vm)
         {
-            vm.SidebarWidth = Math.Clamp(vm.SidebarWidth + e.Vector.X, 140, 500);
+            vm.SidebarWidth = Math.Round(Math.Clamp(vm.SidebarWidth + e.Vector.X, 140, 500));
         }
     }
 
@@ -1422,7 +1407,7 @@ public partial class MainWindow : Window
     {
         if (ViewModel is { } vm)
         {
-            vm.VerticalTabWidth = Math.Clamp(vm.VerticalTabWidth + e.Vector.X, 180, 420);
+            vm.VerticalTabWidth = Math.Round(Math.Clamp(vm.VerticalTabWidth + e.Vector.X, 180, 420));
         }
     }
 
@@ -2029,6 +2014,12 @@ public partial class MainWindow : Window
             _dragPressArgs = e;
             _dragListBox = listBox;
             _dragSidebarLink = null;
+            // 複数選択済みの項目を押すとListBox既定処理が選択を1件へ縮めるため、
+            // トンネル段階の選択状態を保持してExplorer同様にまとめてドラッグする。
+            _dragSelectionSnapshot = item.IsSelected
+                && listBox.SelectedItems?.OfType<FileSystemEntry>().ToList() is { Count: > 1 } selected
+                    ? selected
+                    : null;
             _dragStartPoint = e.GetPosition(this);
             _dragInProgress = false;
             return;
@@ -2053,6 +2044,7 @@ public partial class MainWindow : Window
             _dragPressArgs = e;
             _dragListBox = listBox;
             _dragSidebarLink = link;
+            _dragSelectionSnapshot = null;
             _dragStartPoint = e.GetPosition(this);
             _dragInProgress = false;
             return;
@@ -2090,8 +2082,15 @@ public partial class MainWindow : Window
             return;
         }
 
-        if (_dragListBox.DataContext is not TabViewModel tab
-            || _dragListBox.SelectedItems?.OfType<FileSystemEntry>().ToList() is not { Count: > 0 } selection)
+        if (_dragListBox.DataContext is not TabViewModel tab)
+        {
+            ResetDragSource();
+            return;
+        }
+
+        var selection = _dragSelectionSnapshot
+                        ?? _dragListBox.SelectedItems?.OfType<FileSystemEntry>().ToList();
+        if (selection is not { Count: > 0 })
         {
             ResetDragSource();
             return;
@@ -2120,7 +2119,7 @@ public partial class MainWindow : Window
         try
         {
             var transfer = new DataTransfer();
-            var itemCount = 0;
+            var previewEntries = new List<(string Path, bool IsDirectory)>();
             foreach (var entry in entries)
             {
                 IStorageItem? item = entry.IsDirectory
@@ -2129,15 +2128,17 @@ public partial class MainWindow : Window
                 if (item is not null)
                 {
                     transfer.Add(DataTransferItem.CreateFile(item));
-                    itemCount++;
+                    previewEntries.Add(entry);
                 }
             }
 
-            if (itemCount == 0)
+            if (previewEntries.Count == 0)
             {
                 return;
             }
 
+            _fileDragPreview = new DragPreviewWindow(previewEntries);
+            _fileDragPreview.Show(this);
             var effect = await DragDrop.DoDragDropAsync(pressArgs, transfer, DragDropEffects.Copy | DragDropEffects.Move);
             if (refreshTab is not null && effect.HasFlag(DragDropEffects.Move))
             {
@@ -2148,7 +2149,19 @@ public partial class MainWindow : Window
         }
         finally
         {
+            CloseFileDragPreview();
+            ClearFileDropVisual();
             ResetDragSource();
+        }
+    }
+
+    private void CloseFileDragPreview()
+    {
+        var preview = _fileDragPreview;
+        _fileDragPreview = null;
+        if (preview?.IsVisible == true)
+        {
+            preview.Close();
         }
     }
 
@@ -2157,6 +2170,7 @@ public partial class MainWindow : Window
         _dragPressArgs = null;
         _dragListBox = null;
         _dragSidebarLink = null;
+        _dragSelectionSnapshot = null;
         _dragInProgress = false;
     }
 
@@ -2178,7 +2192,7 @@ public partial class MainWindow : Window
         var listBox = (e.Source as Visual)?.FindAncestorOfType<ListBox>();
 
         // タブバーへのドロップ = そのタブのフォルダーへ
-        if (listBox?.Classes.Contains("tabs") == true)
+        if (listBox?.Classes.Contains("verticaltabs") == true)
         {
             if ((e.Source as Visual)?.FindAncestorOfType<ListBoxItem>()?.DataContext
                 is TabViewModel { IsSettingsTab: false } targetTab
@@ -2223,28 +2237,48 @@ public partial class MainWindow : Window
         var files = GetDroppedPaths(e);
         if (files.Count == 0)
         {
+            ClearFileDropVisual();
             return;
         }
 
         if (IsOnBookmarkBar(e))
         {
             e.DragEffects = DragDropEffects.Copy;
+            UpdateFileDropVisual(e, files, destination: null, DragDropEffects.Copy, isBookmark: true);
             e.Handled = true;
             return;
         }
 
         if (ResolveAnyDropTarget(e, out _) is not { } dest)
         {
+            e.DragEffects = DragDropEffects.None;
+            ClearFileDropVisual();
+            e.Handled = true;
             return;
         }
 
         e.DragEffects = ResolveDropEffect(e, files, dest);
+        UpdateFileDropVisual(e, files, dest, e.DragEffects, isBookmark: false);
         e.Handled = true;
+    }
+
+    private void OnDragLeave(object? sender, DragEventArgs e)
+    {
+        // 子要素間の移動でも DragLeave は発火する。直後に別要素の DragOver が来なかった場合だけ消す。
+        var revision = _fileDropVisualRevision;
+        DispatcherTimer.RunOnce(() =>
+        {
+            if (revision == _fileDropVisualRevision)
+            {
+                ClearFileDropVisual();
+            }
+        }, TimeSpan.FromMilliseconds(45));
     }
 
     private void OnDrop(object? sender, DragEventArgs e)
     {
         var files = GetDroppedPaths(e);
+        ClearFileDropVisual();
         if (files.Count == 0)
         {
             return;
@@ -2271,6 +2305,128 @@ public partial class MainWindow : Window
         var move = ResolveDropEffect(e, files, destDir) == DragDropEffects.Move;
         e.Handled = true;
         _ = refreshTab.DropFilesAsync(files, destDir, move);
+    }
+
+    private void UpdateFileDropVisual(
+        DragEventArgs e,
+        IReadOnlyList<string> files,
+        string? destination,
+        DragDropEffects effect,
+        bool isBookmark)
+    {
+        _fileDropVisualRevision++;
+        var targetControl = ResolveFileDropVisualControl(e, isBookmark);
+        if (!ReferenceEquals(_fileDropTargetControl, targetControl))
+        {
+            _fileDropTargetControl?.Classes.Remove("filedroptarget");
+            _fileDropTargetControl = targetControl;
+            _fileDropTargetControl?.Classes.Add("filedroptarget");
+        }
+
+        var targetName = ResolveFileDropTargetName(targetControl, destination);
+        FileDropActionGlyph.Text = isBookmark ? "★" : effect.HasFlag(DragDropEffects.Copy) ? "+" : "↓";
+        FileDropActionText.Text = isBookmark
+            ? "お気に入りに追加"
+            : effect.HasFlag(DragDropEffects.Copy)
+                ? $"{targetName} へコピー"
+                : $"{targetName} へ移動";
+
+        var firstName = Path.GetFileName(files[0].TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+        FileDropDetailText.Text = files.Count == 1
+            ? string.IsNullOrWhiteSpace(firstName) ? files[0] : firstName
+            : $"{files.Count} 個の項目";
+
+        _fileDragPreview?.SetDropOperation(effect, isBookmark);
+        FileDropOverlay.IsVisible = true;
+        var position = e.GetPosition(FileDropOverlay);
+        var badgeLeft = Math.Clamp(position.X + 14, 8, Math.Max(8, FileDropOverlay.Bounds.Width - 46));
+        var badgeTop = Math.Clamp(position.Y + 14, 8, Math.Max(8, FileDropOverlay.Bounds.Height - 46));
+        Canvas.SetLeft(FileDropPointerBadge, badgeLeft);
+        Canvas.SetTop(FileDropPointerBadge, badgeTop);
+
+        FileDropActionBanner.Measure(new Size(
+            Math.Max(0, FileDropOverlay.Bounds.Width - 16),
+            Math.Max(0, FileDropOverlay.Bounds.Height - 16)));
+        var bannerSize = FileDropActionBanner.DesiredSize;
+        var bannerLeft = position.X + 60;
+        if (bannerLeft + bannerSize.Width > FileDropOverlay.Bounds.Width - 8)
+        {
+            bannerLeft = position.X - bannerSize.Width - 20;
+        }
+
+        // ドラッグプレビューはカーソルの右下へ出るため、行き先表示は基本的に上へ逃がす。
+        var bannerTop = position.Y - bannerSize.Height - 22;
+        if (bannerTop < 8)
+        {
+            bannerTop = position.Y + 60;
+        }
+
+        Canvas.SetLeft(FileDropActionBanner, Math.Clamp(
+            bannerLeft,
+            8,
+            Math.Max(8, FileDropOverlay.Bounds.Width - bannerSize.Width - 8)));
+        Canvas.SetTop(FileDropActionBanner, Math.Clamp(
+            bannerTop,
+            8,
+            Math.Max(8, FileDropOverlay.Bounds.Height - bannerSize.Height - 8)));
+    }
+
+    private static Control? ResolveFileDropVisualControl(DragEventArgs e, bool isBookmark)
+    {
+        var source = e.Source as Visual;
+        if (isBookmark)
+        {
+            return source as Border is { } sourceBorder && sourceBorder.Classes.Contains("bookmarkbar")
+                ? sourceBorder
+                : source?.GetVisualAncestors().OfType<Border>()
+                    .FirstOrDefault(border => border.Classes.Contains("bookmarkbar"));
+        }
+
+        var item = source as ListBoxItem ?? source?.FindAncestorOfType<ListBoxItem>();
+        return item?.DataContext switch
+        {
+            FileSystemEntry { IsDirectory: true } => item,
+            SidebarLink { IsShellCommand: false, Path: var path }
+                when path != FileSystemService.ComputerPath => item,
+            TabViewModel { IsSettingsTab: false, CurrentPath: var path }
+                when path != FileSystemService.ComputerPath => item,
+            _ => null,
+        };
+    }
+
+    private string ResolveFileDropTargetName(Control? targetControl, string? destination)
+    {
+        var name = targetControl?.DataContext switch
+        {
+            FileSystemEntry entry => entry.DisplayName,
+            SidebarLink link => link.Name,
+            TabViewModel tab => tab.Title,
+            _ => null,
+        };
+        if (!string.IsNullOrWhiteSpace(name))
+        {
+            return name;
+        }
+
+        if (ViewModel?.SelectedTab is { IsSettingsTab: false } selected
+            && string.Equals(selected.CurrentPath, destination, StringComparison.OrdinalIgnoreCase))
+        {
+            return selected.Title;
+        }
+
+        var leaf = destination is null
+            ? null
+            : Path.GetFileName(destination.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+        return string.IsNullOrWhiteSpace(leaf) ? destination ?? "現在のフォルダー" : leaf;
+    }
+
+    private void ClearFileDropVisual()
+    {
+        _fileDropVisualRevision++;
+        _fileDropTargetControl?.Classes.Remove("filedroptarget");
+        _fileDropTargetControl = null;
+        FileDropOverlay.IsVisible = false;
+        _fileDragPreview?.SetDropOperation(DragDropEffects.None, isBookmark: false);
     }
 
     private static List<string> GetDroppedPaths(DragEventArgs e)

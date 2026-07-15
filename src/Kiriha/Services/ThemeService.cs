@@ -125,6 +125,9 @@ public static class ThemeService
         // ウィンドウ自体の背景（Window.Background）はアクリル有効時のみ透明にし、
         // ExperimentalAcrylicBorder のぼかしをそのまま見せる。無効時は従来どおり不透明。
         app.Resources["TabStripBg"] = new SolidColorBrush(_acrylicEnabled ? Colors.Transparent : tabStrip);
+        // 垂直タブはタイトルバーと全画面のアクリル材を共有する。ON時は前景面を透明にし、
+        // OFF時は同じ基準色の不透明面で覆って従来表示へ戻す。
+        app.Resources["VerticalTabsSurfaceBg"] = new SolidColorBrush(_acrylicEnabled ? Colors.Transparent : tabStrip);
         app.Resources["ContentBg"] = new SolidColorBrush(WithAlpha(content, _acrylicEnabled ? ContentAlpha : (byte)0xFF));
         app.Resources["SidebarBg"] = new SolidColorBrush(WithAlpha(sidebar, _acrylicEnabled ? ChromeAlpha : (byte)0xFF));
         app.Resources["OmniboxBg"] = new SolidColorBrush(WithAlpha(omnibox, _acrylicEnabled ? ChromeAlpha : (byte)0xFF));

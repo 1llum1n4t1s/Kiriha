@@ -14,6 +14,8 @@ internal static partial class ClipboardFileService
     private const uint DropEffectCopy = 1;
     private const uint DropEffectMove = 2;
 
+    private const string FileGroupDescriptorW = "FileGroupDescriptorW";
+
     /// <summary>この プロセスで切り取り中のパス集合（エクスプローラー同様の半透明表示用）。</summary>
     private static HashSet<string> _cutPaths = new(StringComparer.OrdinalIgnoreCase);
 
@@ -48,8 +50,16 @@ internal static partial class ClipboardFileService
         }
     }
 
-    /// <summary>クリップボードにファイルがあるか（貼り付けボタンの活性制御用）。</summary>
-    public static bool HasFiles() => IsClipboardFormatAvailable(CfHdrop);
+    /// <summary>クリップボードにファイルがあるか（貼り付けボタンの活性制御用）。
+    /// 通常のパス一覧に加え、RDP や Outlook が提供する仮想ファイルも対象にする。</summary>
+    public static bool HasFiles() => IsClipboardFormatAvailable(CfHdrop) || HasVirtualFiles();
+
+    /// <summary>RDP のファイル転送で使われる OLE 仮想ファイル形式があるか。</summary>
+    public static bool HasVirtualFiles()
+    {
+        var format = RegisterClipboardFormatW(FileGroupDescriptorW);
+        return format != 0 && IsClipboardFormatAvailable(format);
+    }
 
     /// <summary>ファイル一覧をクリップボードへ設定する（cut = true で切り取り）。</summary>
     public static bool SetFiles(IReadOnlyList<string> paths, bool cut)

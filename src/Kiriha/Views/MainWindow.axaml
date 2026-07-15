@@ -12,67 +12,14 @@
         ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaTitleBarHeightHint="42"
         WindowDecorations="BorderOnly"
+        UseLayoutRounding="True"
         Background="{DynamicResource TabStripBg}">
 
     <Window.Styles>
-        <!-- Chrome 風タブ -->
-        <Style Selector="ListBox.tabs">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="Padding" Value="0" />
-        </Style>
-        <Style Selector="ListBox.tabs ListBoxItem">
-            <Setter Property="Padding" Value="0" />
-            <Setter Property="MinHeight" Value="0" />
-            <Setter Property="Margin" Value="0,7,0,0" />
-            <Setter Property="CornerRadius" Value="12,12,0,0" />
-            <Setter Property="Background" Value="{DynamicResource TabIdleBg}" />
-            <Setter Property="BorderThickness" Value="0" />
-            <!-- Fluent既定テンプレートのフォーカスリング/選択インジケーターがタブの角丸と噛み合わず
-                 二重の枠に見えるため、背景・枠線・角丸だけを描く最小テンプレートに置き換える。
-                 PART名は既存の :pointerover / :selected セレクターと合わせている。 -->
-            <Setter Property="Template">
-                <ControlTemplate>
-                    <ContentPresenter Name="PART_ContentPresenter"
-                                       Background="{TemplateBinding Background}"
-                                       BorderBrush="{TemplateBinding BorderBrush}"
-                                       BorderThickness="{TemplateBinding BorderThickness}"
-                                       CornerRadius="{TemplateBinding CornerRadius}"
-                                       Content="{TemplateBinding Content}"
-                                       ContentTemplate="{TemplateBinding ContentTemplate}"
-                                       Padding="{TemplateBinding Padding}" />
-                </ControlTemplate>
-            </Setter>
-        </Style>
-        <Style Selector="ListBox.tabs ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource TabHoverBg}" />
-        </Style>
-        <Style Selector="ListBox.tabs ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource TabActiveBg}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
-            <Setter Property="BorderThickness" Value="0,0,0,2" />
-        </Style>
-        <Style Selector="ListBox.tabs ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource TabActiveBg}" />
-        </Style>
-        <!-- ドラッグ中は掴んだタブがカーソルへ追従するゴースト（TabDragGhost）で表現するので、
-             元の位置は「抜けた跡」として薄く沈める（placeholder）。 -->
-        <Style Selector="ListBox.tabs ListBoxItem.dragging">
-            <Setter Property="Opacity" Value="0.3" />
-        </Style>
-        <!-- ドロップ先の挿入位置を、対象タブの左辺のアクセントバーで示す。 -->
-        <Style Selector="ListBox.tabs ListBoxItem.droptarget /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
-            <Setter Property="BorderThickness" Value="3,0,0,0" />
-        </Style>
-        <Style Selector="ListBox.tabs ListBoxItem.droptarget-after /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
-            <Setter Property="BorderThickness" Value="0,0,3,0" />
-        </Style>
-
         <!-- 垂直タブ。色は既存トークンだけを使い、選択状態は濃い面 + アクセント線で明確にする。 -->
         <Style Selector="ListBox.verticaltabs">
             <Setter Property="Background" Value="Transparent" />
-            <Setter Property="Padding" Value="8,2,8,8" />
+            <Setter Property="Padding" Value="8,6,8,0" />
         </Style>
         <Style Selector="ListBox.verticaltabs ListBoxItem">
             <Setter Property="Padding" Value="0" />
@@ -102,7 +49,7 @@
         <Style Selector="ListBox.verticaltabs ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource TabActiveBg}" />
             <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
-            <Setter Property="BorderThickness" Value="3,0,0,0" />
+            <Setter Property="BorderThickness" Value="2,0,0,0" />
         </Style>
         <Style Selector="ListBox.verticaltabs ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource TabActiveBg}" />
@@ -153,18 +100,49 @@
             <Setter Property="Background" Value="{DynamicResource SelectedBg}" />
             <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
         </Style>
-        <Style Selector="Border.tabicon">
-            <Setter Property="Width" Value="30" />
-            <Setter Property="Height" Value="26" />
-            <Setter Property="Margin" Value="6,0,0,0" />
+        <Style Selector="Button.verticalnewtab">
+            <Setter Property="Height" Value="34" />
+            <Setter Property="Margin" Value="8,4,8,10" />
+            <Setter Property="Padding" Value="8,0" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        </Style>
+        <!-- タイトルバー上の共通操作。 -->
+        <Style Selector="Button.tabstripaction">
+            <Setter Property="Width" Value="32" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="MinHeight" Value="0" />
+            <Setter Property="Padding" Value="0" />
             <Setter Property="CornerRadius" Value="8" />
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondary}" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <ContentPresenter Name="PART_ContentPresenter"
+                                      Background="{TemplateBinding Background}"
+                                      BorderBrush="{TemplateBinding BorderBrush}"
+                                      BorderThickness="{TemplateBinding BorderThickness}"
+                                      CornerRadius="{TemplateBinding CornerRadius}"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      Padding="{TemplateBinding Padding}"
+                                      HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+                </ControlTemplate>
+            </Setter>
         </Style>
-        <!-- 固定タブのアイコンは専用の背景色を持たせない。タブ自体の背景（非選択 / ホバー / 選択中）が
-             そのまま透けるので、内側に別の色の箱が入れ子になって見える「二重背景」を避けられる。
-             固定タブであることはタイトル非表示・幅が縮む挙動自体で伝わる（Chrome と同じ）。 -->
-
+        <Style Selector="Button.tabstripaction:pointerover">
+            <Setter Property="Background" Value="{DynamicResource HoverBg}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+        </Style>
+        <Style Selector="Button.tabstripaction:pressed">
+            <Setter Property="Background" Value="{DynamicResource SelectedBg}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+        </Style>
         <!-- Fluent アイコン共通 -->
         <Style Selector="TextBlock.fico">
             <Setter Property="FontFamily" Value="Segoe Fluent Icons,Segoe MDL2 Assets" />
@@ -299,6 +277,10 @@
                 </ControlTemplate>
             </Setter>
         </Style>
+        <!-- 垂直タブ / クイックアクセスの両境界は、同じ5pxヒット領域の中央に同じ1px線を描く。 -->
+        <Style Selector="Thumb.panesplit">
+            <Setter Property="Width" Value="5" />
+        </Style>
         <!-- アドレスバーと検索ボックスの間は、リサイズ領域だけを残して区切り線を描かない -->
         <Style Selector="Thumb.searchsplit">
             <Setter Property="Width" Value="4" />
@@ -389,6 +371,27 @@
             <Setter Property="Padding" Value="4" />
             <Setter Property="CornerRadius" Value="6" />
             <Setter Property="Margin" Value="2" />
+        </Style>
+
+        <!-- ファイルD&D中の実ドロップ先。表示モードに関係なく同じアクセント表現を使う。 -->
+        <Style Selector="ListBoxItem.filedroptarget">
+            <Setter Property="Background" Value="{DynamicResource AccentSelectionBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
+            <Setter Property="BorderThickness" Value="3" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="RenderTransform" Value="scale(1.015)" />
+            <Setter Property="Panel.ZIndex" Value="20" />
+        </Style>
+        <Style Selector="ListBoxItem.filedroptarget /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource AccentSelectionBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
+            <Setter Property="BorderThickness" Value="3" />
+            <Setter Property="CornerRadius" Value="8" />
+        </Style>
+        <Style Selector="Border.bookmarkbar.filedroptarget">
+            <Setter Property="Background" Value="{DynamicResource AccentSelectionBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
+            <Setter Property="BorderThickness" Value="0,0,0,3" />
         </Style>
 
         <!-- ===== 設定タブ（Lhamiel / Shisui / RealTimeTranslator の実装を調査し数値を合わせた共通デザイン言語） =====
@@ -556,118 +559,34 @@
             </Border>
         </Canvas>
 
-        <!-- ===== タブストリップ（タイトルバー領域） ===== -->
-        <Grid Grid.Row="0" Grid.ColumnSpan="2" ColumnDefinitions="Auto,Auto,Auto,*,Auto"
+        <!-- ===== 垂直タブ専用タイトルバー ===== -->
+        <Grid Grid.Row="0" Grid.ColumnSpan="2" ColumnDefinitions="Auto,*,Auto,Auto"
               Background="Transparent"
               PointerPressed="TitleBar_PointerPressed"
               DoubleTapped="TitleBar_DoubleTapped">
 
-            <!-- Edge と同じ位置に、横タブから垂直タブへ切り替える入口を置く。 -->
-            <Button x:Name="VerticalTabModeButton" Grid.Column="0" Classes="nav" Width="30" Height="30"
-                    Margin="8,6,2,0" Content="☰" FontFamily="Segoe UI Symbol"
-                    AutomationProperties.Name="垂直タブに切り替える"
-                    IsVisible="{Binding UseHorizontalTabs}"
-                    Command="{Binding ToggleVerticalTabsCommand}"
-                    ToolTip.Tip="垂直タブに切り替える" />
-
-            <!-- 垂直表示ではタブ列を左へ移し、タイトルバーは現在の場所を簡潔に示す。 -->
-            <StackPanel Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal"
-                        Margin="14,0,0,0" Spacing="10" VerticalAlignment="Center"
-                        IsHitTestVisible="False" IsVisible="{Binding UseVerticalTabs}">
-                <TextBlock Text="Kiriha" FontWeight="SemiBold" FontSize="12.5"
-                           Foreground="{DynamicResource TextPrimary}" />
-                <Border Width="1" Height="16" Background="{DynamicResource Divider}" />
-                <TextBlock Text="{Binding SelectedTab.Title}" MaxWidth="360" FontSize="12.5"
-                           Foreground="{DynamicResource TextSecondary}"
+            <!-- タブバーと同じ幅の領域にアプリ名と現在のタブ名をまとめ、左ペインの起点を揃える。 -->
+            <Grid Grid.Column="0" Width="{Binding VerticalTabWidth}" Margin="12,0,10,0"
+                  ColumnDefinitions="Auto,Auto,*" IsHitTestVisible="False">
+                <TextBlock Grid.Column="0" Text="Kiriha" FontSize="12.5" FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center" />
+                <Border Grid.Column="1" Width="1" Height="16" Margin="10,0"
+                        Background="{DynamicResource Divider}" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="2" Text="{Binding SelectedTab.Title}" FontSize="12.5"
+                           Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center"
                            TextTrimming="CharacterEllipsis" />
-            </StackPanel>
+            </Grid>
 
-            <ListBox x:Name="TabsListBox" Grid.Column="1" Classes="tabs" Margin="2,0,0,0"
-                     Height="42" ClipToBounds="True"
-                     AutomationProperties.Name="横タブ"
-                     IsVisible="{Binding UseHorizontalTabs}"
-                     ScrollViewer.VerticalScrollBarVisibility="Disabled"
-                     ScrollViewer.HorizontalScrollBarVisibility="Hidden"
-                     ItemsSource="{Binding Tabs}"
-                     SelectedItem="{Binding SelectedTab}"
-                     DragDrop.AllowDrop="True"
-                     PointerMoved="Tabs_PointerMoved"
-                     PointerReleased="Tabs_PointerReleased">
-                <ListBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Orientation="Horizontal" Spacing="1" />
-                    </ItemsPanelTemplate>
-                </ListBox.ItemsPanel>
-                <ListBox.ItemTemplate>
-                    <DataTemplate x:DataType="vm:TabViewModel">
-                        <StackPanel Orientation="Horizontal" Height="35" Background="Transparent"
-                                    ToolTip.Tip="{Binding PathText}">
-                            <StackPanel.ContextMenu>
-                                <ContextMenu Opened="TabMenu_Opened">
-                                    <MenuItem Header="新しいタブを右に開く" Click="TabNewRight_Click" />
-                                    <MenuItem Header="タブを複製" Click="TabDuplicate_Click"
-                                              IsVisible="{Binding IsNormalTab}" />
-                                    <Separator />
-                                    <MenuItem Header="タブを固定"
-                                              IsVisible="{Binding !IsPinned}"
-                                              Command="{Binding TogglePinCommand}" />
-                                    <MenuItem Header="タブの固定を解除"
-                                              IsVisible="{Binding IsPinned}"
-                                              Command="{Binding TogglePinCommand}" />
-                                    <Separator />
-                                    <MenuItem Header="タブを閉じる"
-                                              Command="{Binding CloseSelfCommand}" />
-                                    <MenuItem Header="右側のタブを閉じる" Click="TabCloseRight_Click" />
-                                    <MenuItem Header="他のタブを閉じる" Click="TabCloseOthers_Click" />
-                                    <MenuItem Header="タブの詳細操作" Tag="tabActions" />
-                                    <Separator />
-                                    <MenuItem Header="閉じたタブを開く" Click="TabReopen_Click"
-                                              InputGesture="Ctrl+Shift+T" />
-                                    <MenuItem Header="最近閉じたタブ" Tag="recent" />
-                                    <Separator />
-                                    <MenuItem Header="パスのコピー" Click="TabCopyPath_Click" />
-                                    <MenuItem Header="エクスプローラーで開く"
-                                              Command="{Binding OpenInExplorerCommand}" />
-                                </ContextMenu>
-                            </StackPanel.ContextMenu>
-                            <Border Classes="tabicon">
-                                <Grid>
-                                    <TextBlock Text="📁" FontSize="12"
-                                               IsVisible="{Binding IsNormalTab}"
-                                               HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                    <TextBlock Text="⚙" FontSize="12"
-                                               IsVisible="{Binding IsSettingsTab}"
-                                               HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                </Grid>
-                            </Border>
-                            <TextBlock Text="{Binding Title}"
-                                       IsVisible="{Binding !IsPinned}"
-                                       Width="128" Margin="8,0,4,0" FontSize="12.5"
-                                       Foreground="{DynamicResource TextPrimary}"
-                                       VerticalAlignment="Center"
-                                       TextTrimming="CharacterEllipsis" />
-                            <Button Classes="tabclose" Content="&#xE8BB;"
-                                    IsVisible="{Binding !IsPinned}"
-                                    VerticalAlignment="Center"
-                                    Margin="0,0,8,0"
-                                    Command="{Binding CloseSelfCommand}" />
-                            <!-- 固定タブはタイトル/閉じるボタンが無いので、アイコン枠の左マージン(6)と
-                                 対称になる幅の右スペーサーを置いてアイコンをタブ中央に揃える。 -->
-                            <Border Width="6" IsVisible="{Binding IsPinned}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-
-            <Button x:Name="HorizontalNewTabButton" Grid.Column="2" Classes="nav" Width="28" Height="28"
-                    Margin="6,7,0,0" Content="&#xE710;" FontSize="12"
-                    AutomationProperties.Name="新しいタブ"
-                    IsVisible="{Binding UseHorizontalTabs}"
-                    Command="{Binding NewTabCommand}"
-                    ToolTip.Tip="新しいタブ" />
+            <Button x:Name="SettingsButton" Grid.Column="2" Classes="tabstripaction"
+                    Margin="0,5,4,5"
+                    AutomationProperties.Name="設定を開く"
+                    Command="{Binding OpenSettingsCommand}"
+                    ToolTip.Tip="設定を開く">
+                <TextBlock Classes="fico" Text="&#xE713;" FontSize="12" />
+            </Button>
 
             <!-- キャプションボタン（WindowDecorations=BorderOnly のためシステム側は描画されない） -->
-            <StackPanel Grid.Column="4" Orientation="Horizontal"
+            <StackPanel Grid.Column="3" Orientation="Horizontal"
                         HorizontalAlignment="Right" VerticalAlignment="Top">
                 <Button Classes="caption" Content="&#xE921;" Click="Minimize_Click" />
                 <Button Classes="caption" Content="&#xE922;" Click="MaximizeRestore_Click" />
@@ -676,31 +595,14 @@
         </Grid>
 
         <!-- ===== 垂直タブバー ===== -->
-        <Grid Grid.Row="1" Grid.Column="0" ColumnDefinitions="*,4"
-              Width="{Binding VerticalTabWidth}"
-              IsVisible="{Binding UseVerticalTabs}">
-            <Border Grid.Column="0" Background="{DynamicResource ContentBg}">
-                <Grid RowDefinitions="Auto,*,Auto">
-                    <Grid Grid.Row="0" Height="38" Margin="12,4,8,2"
-                          ColumnDefinitions="*,Auto,Auto" ColumnSpacing="4">
-                        <TextBlock Text="タブ" FontSize="12.5" FontWeight="SemiBold"
-                                   Foreground="{DynamicResource TextSecondary}"
-                                   VerticalAlignment="Center" Margin="4,0,0,0" />
-                        <Button x:Name="VerticalNewTabButton" Grid.Column="1" Classes="verticaltabaction"
-                                Width="28" Padding="0"
-                                Command="{Binding NewTabCommand}"
-                                AutomationProperties.Name="新しいタブ"
-                                ToolTip.Tip="新しいタブ (Ctrl+T)">
-                            <TextBlock Classes="fico" Text="&#xE710;" FontSize="12" />
-                        </Button>
-                        <Button x:Name="HorizontalTabModeButton" Grid.Column="2" Classes="verticaltabaction" Content="横タブ"
-                                FontSize="11.5"
-                                AutomationProperties.Name="横タブに切り替える"
-                                Command="{Binding ToggleVerticalTabsCommand}"
-                                ToolTip.Tip="横タブに戻す" />
-                    </Grid>
-
-                    <ListBox x:Name="VerticalTabsListBox" Grid.Row="1" Classes="verticaltabs"
+        <Grid Grid.Row="1" Grid.Column="0" ColumnDefinitions="*,Auto"
+              Width="{Binding VerticalTabWidth}">
+            <Grid Grid.Column="0" ClipToBounds="True">
+                <!-- アクリルON時は透明にして、タイトルバーと同じ全画面材をそのまま見せる。
+                     OFF時はタブストリップ基準色の不透明面へ戻す。 -->
+                <Border Background="{DynamicResource VerticalTabsSurfaceBg}">
+                    <Grid RowDefinitions="*,Auto">
+                    <ListBox x:Name="VerticalTabsListBox" Grid.Row="0" Classes="verticaltabs"
                              AutomationProperties.Name="垂直タブ"
                              ItemsSource="{Binding Tabs}"
                              SelectedItem="{Binding SelectedTab}"
@@ -711,12 +613,12 @@
                              PointerReleased="Tabs_PointerReleased">
                         <ListBox.ItemTemplate>
                             <DataTemplate x:DataType="vm:TabViewModel">
-                                <Grid Height="36" ColumnDefinitions="38,*,Auto"
+                                <Grid Height="34" ColumnDefinitions="36,*,Auto"
                                       AutomationProperties.Name="{Binding Title}"
                                       Background="Transparent" ToolTip.Tip="{Binding PathText}">
                                     <Grid.ContextMenu>
                                         <ContextMenu Opened="TabMenu_Opened">
-                                            <MenuItem Header="新しいタブを右に開く" Click="TabNewRight_Click" />
+                                            <MenuItem Header="新しいタブを下に開く" Click="TabNewRight_Click" />
                                             <MenuItem Header="タブを複製" Click="TabDuplicate_Click"
                                                       IsVisible="{Binding IsNormalTab}" />
                                             <Separator />
@@ -729,7 +631,7 @@
                                             <Separator />
                                             <MenuItem Header="タブを閉じる"
                                                       Command="{Binding CloseSelfCommand}" />
-                                            <MenuItem Header="右側のタブを閉じる" Click="TabCloseRight_Click" />
+                                            <MenuItem Header="下側のタブを閉じる" Click="TabCloseRight_Click" />
                                             <MenuItem Header="他のタブを閉じる" Click="TabCloseOthers_Click" />
                                             <MenuItem Header="タブの詳細操作" Tag="tabActions" />
                                             <Separator />
@@ -771,28 +673,45 @@
                         </ListBox.ItemTemplate>
                     </ListBox>
 
-                    <Button x:Name="VerticalSettingsButton" Grid.Row="2" Classes="verticaltabaction" Height="38"
-                            Margin="12,4,8,10" HorizontalContentAlignment="Left"
-                            AutomationProperties.Name="設定を開く"
-                            Command="{Binding OpenSettingsCommand}"
-                            ToolTip.Tip="設定を開く">
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <TextBlock Text="⚙" FontSize="13" VerticalAlignment="Center" />
-                            <TextBlock Text="設定" FontSize="12.5" VerticalAlignment="Center" />
-                        </StackPanel>
+                    <Button x:Name="VerticalNewTabButton" Grid.Row="1"
+                            Classes="verticaltabaction verticalnewtab"
+                            Command="{Binding NewTabCommand}"
+                            AutomationProperties.Name="新しいタブ"
+                            ToolTip.Tip="新しいタブ (Ctrl+T)">
+                        <Grid ColumnDefinitions="28,*,Auto">
+                            <TextBlock Grid.Column="0" Classes="fico" Text="&#xE710;" FontSize="12"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1" Text="新しいタブ" FontSize="12.5"
+                                       Margin="6,0,0,0" VerticalAlignment="Center"
+                                       Foreground="{DynamicResource TextPrimary}" />
+                            <TextBlock Grid.Column="2" Text="Ctrl+T" FontSize="11.5"
+                                       Margin="8,0,2,0" VerticalAlignment="Center"
+                                       Foreground="{DynamicResource TextSecondary}" />
+                        </Grid>
                     </Button>
-                </Grid>
-            </Border>
-            <Thumb x:Name="VerticalTabsResizeThumb" Grid.Column="1" Classes="colsplit" Width="4"
+                    </Grid>
+                </Border>
+            </Grid>
+            <Thumb x:Name="VerticalTabsResizeThumb" Grid.Column="1" Classes="colsplit panesplit"
                    AutomationProperties.Name="垂直タブバーの幅を変更"
                    DragDelta="VerticalTabsThumb_DragDelta" />
         </Grid>
 
         <!-- ===== 選択中タブの中身 ===== -->
-        <ContentControl Grid.Row="1" Grid.Column="1" Content="{Binding SelectedTab}">
+        <ContentControl Grid.Row="1" Grid.Column="1" Margin="6"
+                        Content="{Binding SelectedTab}">
             <ContentControl.ContentTemplate>
                 <DataTemplate x:DataType="vm:TabViewModel">
-                    <Panel Background="{DynamicResource ContentBg}">
+                    <Border x:Name="ContentIsland"
+                            Background="{DynamicResource ContentBg}"
+                            BorderBrush="{DynamicResource Divider}" BorderThickness="1"
+                            CornerRadius="10">
+                    <Border.Clip>
+                        <!-- ClipToBounds は矩形なので、実寸へ追従する角丸ジオメトリで子要素まで切り抜く。 -->
+                        <RectangleGeometry Rect="{Binding Bounds, ElementName=ContentIsland}"
+                                           RadiusX="10" RadiusY="10" />
+                    </Border.Clip>
+                    <Panel>
 
                     <!-- 設定タブの中身。Lhamiel / Shisui / RealTimeTranslator の実装を直接調査し、
                          浮遊カード状サイドバー TabControl + HeaderedContentControl 積みの数値を実測値どおりに再現。 -->
@@ -833,15 +752,6 @@
                                                           IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptShowCheckBoxes}" />
                                                 <CheckBox Content="お気に入りバーを表示する (Ctrl+Shift+B)"
                                                           IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ShowBookmarksBar}" />
-                                            </StackPanel>
-                                        </HeaderedContentControl>
-
-                                        <HeaderedContentControl Classes="settingscard" Header="タブバー">
-                                            <StackPanel Classes="settingsfields">
-                                                <CheckBox Content="タブをウィンドウ左側へ縦に並べる"
-                                                          IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).UseVerticalTabs}" />
-                                                <TextBlock Classes="settingscaption"
-                                                           Text="タブ名を広く確認でき、タブ数が増えても縦スクロールで移動できます。左端の境界をドラッグすると幅を変更できます。" />
                                             </StackPanel>
                                         </HeaderedContentControl>
 
@@ -951,12 +861,12 @@
                                 </ScrollViewer>
                             </TabItem>
 
-                            <!-- ===== 更新 ===== -->
+                            <!-- ===== 更新と情報 ===== -->
                             <TabItem>
                                 <TabItem.Header>
                                     <StackPanel Orientation="Horizontal" Spacing="10">
                                         <TextBlock Classes="fico" Text="&#xE895;" FontSize="15" VerticalAlignment="Center" />
-                                        <TextBlock Text="更新" VerticalAlignment="Center" />
+                                        <TextBlock Text="更新と情報" VerticalAlignment="Center" />
                                     </StackPanel>
                                 </TabItem.Header>
                                 <ScrollViewer>
@@ -968,19 +878,39 @@
                                                                HorizontalAlignment="Center" VerticalAlignment="Center" />
                                                 </Border>
                                                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                                    <TextBlock Classes="settingsh1" Text="更新" />
-                                                    <TextBlock Classes="settingsherosubtitle" Text="Kirihaを最新の状態に保ちます" />
+                                                    <TextBlock Classes="settingsh1" Text="更新と情報" />
+                                                    <TextBlock Classes="settingsherosubtitle" Text="Kirihaのバージョン確認とアップデートを管理します" />
                                                 </StackPanel>
                                             </Grid>
                                         </Border>
-                                        <HeaderedContentControl Classes="settingscard" Header="自動更新">
-                                            <StackPanel Spacing="10">
-                                                <CheckBox Content="起動時に更新を確認する"
+                                        <HeaderedContentControl Classes="settingscard" Header="バージョンと更新">
+                                            <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
+                                                <Border Grid.RowSpan="2" Grid.Column="0" Width="58" Height="58" Margin="0,0,16,0"
+                                                        Background="{DynamicResource SettingsIconBg}" CornerRadius="14">
+                                                    <Image Width="48" Height="48" Source="avares://Kiriha/icon/app_icon.png"
+                                                           RenderOptions.BitmapInterpolationMode="HighQuality"
+                                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Border>
+                                                <StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).VersionText}"
+                                                               FontSize="15" FontWeight="SemiBold"
+                                                               Foreground="{DynamicResource TextPrimary}" />
+                                                    <TextBlock Text=".NET 10 / Avalonia UI / Native AOT" Margin="0,4,0,0"
+                                                               FontSize="12.5" Foreground="{DynamicResource TextSecondary}" />
+                                                </StackPanel>
+                                                <CheckBox Grid.Row="1" Grid.Column="1" Margin="0,12,0,0"
+                                                          Content="起動時に更新を確認する"
                                                           IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptCheckUpdatesOnStartup}" />
-                                                <Button Classes="cmd" Content="今すぐ更新を確認" Click="CheckUpdate_Click"
-                                                        HorizontalAlignment="Left"
+                                                <Button Grid.RowSpan="2" Grid.Column="2" Classes="cmd"
+                                                        Content="今すぐ更新を確認" Click="CheckUpdate_Click"
+                                                        Margin="20,0,0,0" VerticalAlignment="Center"
                                                         BorderBrush="{DynamicResource Divider}" BorderThickness="1" />
-                                            </StackPanel>
+                                            </Grid>
+                                        </HeaderedContentControl>
+                                        <HeaderedContentControl Classes="settingscard" Header="Kiriha について">
+                                            <TextBlock FontSize="13" LineHeight="22" TextWrapping="Wrap"
+                                                       Foreground="{DynamicResource TextSecondary}"
+                                                       Text="Windows Explorerのファイル操作と、Chromeのタブ・アドレスバー・お気に入り操作を一つの画面にまとめています。設定は現在のユーザーに保存されます。" />
                                         </HeaderedContentControl>
                                     </StackPanel>
                                 </ScrollViewer>
@@ -1068,61 +998,6 @@
                                 </ScrollViewer>
                             </TabItem>
 
-                            <!-- ===== バージョン情報 ===== -->
-                            <TabItem>
-                                <TabItem.Header>
-                                    <StackPanel Orientation="Horizontal" Spacing="10">
-                                        <TextBlock Classes="fico" Text="&#xE946;" FontSize="15" VerticalAlignment="Center" />
-                                        <TextBlock Text="バージョン情報" VerticalAlignment="Center" />
-                                    </StackPanel>
-                                </TabItem.Header>
-                                <ScrollViewer>
-                                    <StackPanel MaxWidth="860" HorizontalAlignment="Stretch" Margin="0,0,12,0">
-                                        <StackPanel Margin="4,0,0,22" Orientation="Horizontal">
-                                            <Border Width="76" Height="76" Margin="0,0,18,0"
-                                                    Background="{DynamicResource SettingsHeroBg}"
-                                                    BorderBrush="{DynamicResource SettingsCardBorder}" BorderThickness="1"
-                                                    CornerRadius="18" BoxShadow="0 8 20 0 #22000000">
-                                                <Image Width="64" Height="64" Source="avares://Kiriha/icon/app_icon.png"
-                                                       RenderOptions.BitmapInterpolationMode="HighQuality"
-                                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                            </Border>
-                                            <StackPanel VerticalAlignment="Center">
-                                                <TextBlock Text="Kiriha" FontSize="30" FontWeight="Bold"
-                                                           Foreground="{DynamicResource TextPrimary}" />
-                                                <TextBlock Text="Chromeの操作感とExplorerの機能を融合したファイルマネージャー"
-                                                           FontSize="13" Foreground="{DynamicResource TextSecondary}" />
-                                            </StackPanel>
-                                        </StackPanel>
-
-                                        <Border Classes="settingscard">
-                                            <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
-                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="バージョン"
-                                                           Margin="0,0,22,0" VerticalAlignment="Center"
-                                                           FontSize="13" Foreground="{DynamicResource TextSecondary}" />
-                                                <TextBlock Grid.Row="0" Grid.Column="1"
-                                                           Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).VersionText}"
-                                                           FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center"
-                                                           Foreground="{DynamicResource TextPrimary}" />
-                                                <Button Grid.RowSpan="2" Grid.Column="2" Classes="cmd"
-                                                        Content="アップデートを確認" Click="CheckUpdate_Click" />
-                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="実行環境"
-                                                           Margin="0,10,22,0" FontSize="13"
-                                                           Foreground="{DynamicResource TextSecondary}" />
-                                                <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,10,0,0"
-                                                           Text=".NET 10 / Avalonia UI / Native AOT"
-                                                           FontSize="13" Foreground="{DynamicResource TextPrimary}" />
-                                            </Grid>
-                                        </Border>
-
-                                        <HeaderedContentControl Classes="settingscard" Header="Kiriha について">
-                                            <TextBlock FontSize="13" LineHeight="22" TextWrapping="Wrap"
-                                                       Foreground="{DynamicResource TextSecondary}"
-                                                       Text="Windows Explorerのファイル操作と、Chromeのタブ・アドレスバー・お気に入り操作を一つの画面にまとめています。設定は現在のユーザーに保存されます。" />
-                                        </HeaderedContentControl>
-                                    </StackPanel>
-                                </ScrollViewer>
-                            </TabItem>
                         </TabControl>
                         </Grid>
                     </Border>
@@ -1523,7 +1398,7 @@
                             </Border>
 
                             <!-- 左ペイン幅の変更 -->
-                            <Thumb Grid.Column="1" Classes="colsplit" Width="4"
+                            <Thumb Grid.Column="1" Classes="colsplit panesplit"
                                    IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ShowSidebar}"
                                    DragDelta="SidebarThumb_DragDelta" />
 
@@ -1804,9 +1679,43 @@
                         </Border>
                     </Grid>
                     </Panel>
+                    </Border>
                 </DataTemplate>
             </ContentControl.ContentTemplate>
         </ContentControl>
+
+        <!-- ファイルD&Dの受け側フィードバック。対象オブジェクト自体は filedroptarget で強調する。 -->
+        <Grid x:Name="FileDropOverlay" Grid.Row="1" Grid.Column="1"
+              IsVisible="False" IsHitTestVisible="False" ClipToBounds="True">
+            <Canvas>
+                <Border x:Name="FileDropActionBanner" MinWidth="190" MaxWidth="320" Padding="14,9"
+                        Background="{DynamicResource ContentBg}"
+                        BorderBrush="{DynamicResource SystemAccentColor}" BorderThickness="2"
+                        CornerRadius="12" BoxShadow="0 8 24 0 #52000000">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Border Width="28" Height="28" CornerRadius="14"
+                                Background="{DynamicResource AccentBrush}">
+                            <TextBlock x:Name="FileDropActionGlyph" Text="↓" FontSize="17" FontWeight="Bold"
+                                       Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock x:Name="FileDropActionText" FontSize="13" FontWeight="Bold"
+                                       Foreground="{DynamicResource TextPrimary}" TextTrimming="CharacterEllipsis" />
+                            <TextBlock x:Name="FileDropDetailText" FontSize="11.5"
+                                       Foreground="{DynamicResource TextSecondary}" TextTrimming="CharacterEllipsis" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border x:Name="FileDropPointerBadge" Width="38" Height="38" CornerRadius="19"
+                        Background="{DynamicResource AccentBrush}"
+                        BorderBrush="White" BorderThickness="2"
+                        BoxShadow="0 5 16 0 #66000000">
+                    <TextBlock Text="↓" FontSize="21" FontWeight="Bold" Foreground="White"
+                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+            </Canvas>
+        </Grid>
     </Grid>
     </Panel>
 </Window>

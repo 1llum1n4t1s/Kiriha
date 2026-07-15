@@ -1,0 +1,51 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Kiriha.Views.DragPreviewWindow"
+        Width="286" Height="92"
+        WindowDecorations="None"
+        CanResize="False"
+        ShowActivated="False"
+        ShowInTaskbar="False"
+        Topmost="True"
+        Background="Transparent">
+    <Grid Margin="8,6,12,12">
+        <!-- 複数項目を掴んでいる感触を、後方へずらしたカードで表す。 -->
+        <Border x:Name="BackCard2" Margin="14,8,0,0" CornerRadius="13"
+                Background="{DynamicResource AccentSelectionBrush}"
+                BorderBrush="{DynamicResource SystemAccentColor}" BorderThickness="1"
+                Opacity="0.45" />
+        <Border x:Name="BackCard1" Margin="7,4,7,4" CornerRadius="13"
+                Background="{DynamicResource AccentSelectionBrush}"
+                BorderBrush="{DynamicResource SystemAccentColor}" BorderThickness="1"
+                Opacity="0.72" />
+
+        <Border Margin="0,0,14,8" Padding="11,9"
+                Background="{DynamicResource ContentBg}"
+                BorderBrush="{DynamicResource SystemAccentColor}" BorderThickness="2"
+                CornerRadius="13" BoxShadow="0 9 24 0 #62000000">
+            <Grid ColumnDefinitions="42,*,Auto" ColumnSpacing="9">
+                <Border Width="38" Height="38" CornerRadius="9"
+                        Background="{DynamicResource AccentSelectionBrush}">
+                    <TextBlock x:Name="DragPreviewIcon" FontSize="22"
+                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock x:Name="DragPreviewTitle" FontSize="12.5" FontWeight="SemiBold"
+                               MaxWidth="150" TextTrimming="CharacterEllipsis"
+                               Foreground="{DynamicResource TextPrimary}" />
+                    <TextBlock x:Name="DragPreviewDetail" FontSize="11"
+                               Foreground="{DynamicResource TextSecondary}" />
+                </StackPanel>
+
+                <Border Grid.Column="2" MinWidth="52" Padding="8,4" CornerRadius="9"
+                        Background="{DynamicResource AccentBrush}"
+                        VerticalAlignment="Center">
+                    <TextBlock x:Name="DragPreviewOperation" Text="ドラッグ中" FontSize="10.5"
+                               FontWeight="SemiBold" Foreground="White"
+                               HorizontalAlignment="Center" />
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

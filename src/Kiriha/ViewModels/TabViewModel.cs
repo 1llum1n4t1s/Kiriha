@@ -41,7 +41,7 @@ public partial class TabViewModel : ObservableObject
     [ObservableProperty]
     private FileSystemEntry? _selectedEntry;
 
-    /// <summary>Chrome のタブ固定に相当。固定タブは終了時に保存され次回復元される。</summary>
+    /// <summary>Chrome のタブ固定に相当。固定タブは現在の階層に固定され、終了時に保存される。</summary>
     [ObservableProperty]
     private bool _isPinned;
 
@@ -58,6 +58,9 @@ public partial class TabViewModel : ObservableObject
 
     /// <summary>タブ自身（✕ ボタン / コンテキストメニュー）からの閉じる要求。</summary>
     public event EventHandler? CloseRequested;
+
+    /// <summary>固定タブから別階層へ移動しようとしたとき、新しい通常タブで開く要求。</summary>
+    public event Action<string>? PinnedNavigationRequested;
 
     /// <summary>名前の変更 UI の表示要求（View 側でダイアログを出す）。</summary>
     public event EventHandler<FileSystemEntry>? RenameRequested;
@@ -696,6 +699,17 @@ public partial class TabViewModel : ObservableObject
     public async Task NavigateToAsync(string path, bool record = true)
     {
         if (_isDetached) return;
+
+        // 固定タブは現在の階層そのものを表す。更新（同一パスの再読み込み）だけはこのタブ内で行い、
+        // フォルダー・パンくず・アドレス入力などからの別階層への移動は所有元へ新規タブとして委譲する。
+        if (IsPinned && !IsSettingsTab && !WindowsPathIdentity.Instance.Equals(path, CurrentPath))
+        {
+            IsEditingPath = false;
+            PathText = CurrentPath == FileSystemService.ComputerPath ? "PC" : CurrentPath;
+            PinnedNavigationRequested?.Invoke(path);
+            return;
+        }
+
         var generation = Interlocked.Increment(ref _navigationGeneration);
         // 同一パスの再読み込み（更新）ではスクロール / 選択を維持する
         var preserveSelection = WindowsPathIdentity.Instance.Equals(path, CurrentPath) ? SelectedEntry?.FullPath : null;
@@ -1156,12 +1170,30 @@ public partial class TabViewModel : ObservableObject
         }
 
         var files = ClipboardFileService.GetFiles(out var isCut);
-        if (files.Count == 0)
+        var hasVirtualFiles = files.Count == 0 && ClipboardFileService.HasVirtualFiles();
+        if (files.Count == 0 && !hasVirtualFiles)
         {
             return;
         }
 
         var dest = CurrentPath;
+        if (hasVirtualFiles)
+        {
+            // RDP の仮想ファイルはローカルパスを持たない。Explorer と同じフォルダー背景の
+            // paste verb に IDataObject / FileContents の取得を任せる。
+            if (!ShellContextMenuService.InvokeDirectoryBackgroundVerb(0, dest, "paste"))
+            {
+                StatusText = "仮想ファイルを貼り付けられませんでした";
+                return;
+            }
+
+            // Shell の貼り付けは非同期で完了することがある。初回更新を補助し、以後は
+            // DirectoryObservationService の変更通知で一覧を追従させる。
+            await Task.Delay(500);
+            Refresh();
+            return;
+        }
+
         // 同一フォルダーへのコピー貼り付けはエクスプローラーと同じく自動リネーム（"- コピー"）
         var sameDir = !isCut && files.Any(f => WindowsPathIdentity.Instance.Equals(
             Path.GetDirectoryName(f), dest));
@@ -1541,6 +1573,20 @@ public partial class TabViewModel : ObservableObject
 
     [RelayCommand]
     private void TogglePin() => IsPinned = !IsPinned;
+
+    partial void OnIsPinnedChanged(bool value)
+    {
+        if (!value)
+        {
+            return;
+        }
+
+        // 固定時点より前の履歴から別階層へ抜けられないよう、履歴も階層と一緒に固定する。
+        _back.Clear();
+        _forward.Clear();
+        GoBackCommand.NotifyCanExecuteChanged();
+        GoForwardCommand.NotifyCanExecuteChanged();
+    }
 
     [RelayCommand]
     private void CloseSelf() => CloseRequested?.Invoke(this, EventArgs.Empty);

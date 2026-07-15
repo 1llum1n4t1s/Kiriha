@@ -61,14 +61,6 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private double _sidebarWidth = 230;
 
-    /// <summary>タブをウィンドウ左側へ縦に並べる。</summary>
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(UseHorizontalTabs))]
-    private bool _useVerticalTabs;
-
-    /// <summary>横タブ表示中か。XAML の表示切り替え用。</summary>
-    public bool UseHorizontalTabs => !UseVerticalTabs;
-
     /// <summary>垂直タブバーの幅（Thumb ドラッグで変更、永続化）。</summary>
     [ObservableProperty]
     private double _verticalTabWidth = 240;
@@ -98,12 +90,6 @@ public partial class MainWindowViewModel : ObservableObject
         _settings.SidebarWidth = value; // 保存自体は終了時の SaveWindowBounds でまとめて行う
     }
 
-    partial void OnUseVerticalTabsChanged(bool value)
-    {
-        _settings.UseVerticalTabs = value;
-        SettingsService.Save(_settings);
-    }
-
     partial void OnVerticalTabWidthChanged(double value)
     {
         _settings.VerticalTabWidth = value; // 保存自体は終了時の SaveWindowBounds でまとめて行う
@@ -126,9 +112,6 @@ public partial class MainWindowViewModel : ObservableObject
 
     [RelayCommand]
     private void ToggleSidebar() => ShowSidebar = !ShowSidebar;
-
-    [RelayCommand]
-    private void ToggleVerticalTabs() => UseVerticalTabs = !UseVerticalTabs;
 
     [RelayCommand]
     private void TogglePreviewPane() => ShowPreviewPane = !ShowPreviewPane;
@@ -300,7 +283,6 @@ public partial class MainWindowViewModel : ObservableObject
         ShowBookmarksBar = false;
         ShowSidebar = true;
         SidebarWidth = 230;
-        UseVerticalTabs = false;
         VerticalTabWidth = 240;
         SearchBoxWidth = 200;
         ShowPreviewPane = false;
@@ -436,9 +418,11 @@ public partial class MainWindowViewModel : ObservableObject
 
         _showBookmarksBar = _settings.ShowBookmarksBar;
         _showSidebar = _settings.ShowSidebar;
-        _sidebarWidth = _settings.SidebarWidth is > 120 and < 600 ? _settings.SidebarWidth : 230;
-        _useVerticalTabs = _settings.UseVerticalTabs;
-        _verticalTabWidth = _settings.VerticalTabWidth is >= 180 and <= 420 ? _settings.VerticalTabWidth : 240;
+        _sidebarWidth = _settings.SidebarWidth is > 120 and < 600 ? Math.Round(_settings.SidebarWidth) : 230;
+        _verticalTabWidth = _settings.VerticalTabWidth is >= 180 and <= 420 ? Math.Round(_settings.VerticalTabWidth) : 240;
+        // 旧バージョンが保存した小数幅はレイアウト丸めで線がぼやけない整数値へ移行する。
+        _settings.SidebarWidth = _sidebarWidth;
+        _settings.VerticalTabWidth = _verticalTabWidth;
         _searchBoxWidth = _settings.SearchBoxWidth is > 120 and < 500 ? _settings.SearchBoxWidth : 200;
         _showPreviewPane = _settings.ShowPreviewPane;
         ApplyTheme(_settings.ThemePreference);
@@ -559,6 +543,7 @@ public partial class MainWindowViewModel : ObservableObject
 
         Tabs.Add(tab);
         tab.CloseRequested += (_, _) => CloseTab(tab);
+        tab.PinnedNavigationRequested += OpenPinnedNavigationInNewTab;
         tab.PropertyChanged += Tab_PropertyChanged;
         tab.IsPinned = pinned;
         tab.SetPreviewEnabled(ShowPreviewPane);
@@ -588,11 +573,6 @@ public partial class MainWindowViewModel : ObservableObject
         if (e.PropertyName == nameof(TabViewModel.IsPinned))
         {
             ReorderPinned(tab);
-            SavePinned();
-        }
-        else if (e.PropertyName == nameof(TabViewModel.PathText) && tab.IsPinned)
-        {
-            // 固定タブの移動先も保存し、次回同じ場所で復元する
             SavePinned();
         }
         else if (e.PropertyName == nameof(TabViewModel.Title) && ReferenceEquals(tab, SelectedTab))
@@ -664,6 +644,7 @@ public partial class MainWindowViewModel : ObservableObject
         }
 
         tab.Detach();
+        tab.PinnedNavigationRequested -= OpenPinnedNavigationInNewTab;
         tab.PropertyChanged -= Tab_PropertyChanged;
         if (!tab.IsSettingsTab)
         {
@@ -882,6 +863,9 @@ public partial class MainWindowViewModel : ObservableObject
         SelectedTab = tab;
     }
 
+    /// <summary>固定タブの階層を維持したまま、移動先を選択状態の通常タブとして開く。</summary>
+    private void OpenPinnedNavigationInNewTab(string path) => OpenInNewTab(path);
+
     /// <summary>バックグラウンドの新しいタブで開く（Chrome の中クリックと同じく選択を移さない）。</summary>
     public void OpenInNewTabBackground(string path) => AddTab(path, pinned: false);
 
@@ -907,7 +891,7 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
-    /// <summary>タブを左右に 1 つ移動する（Ctrl+Shift+PgUp/PgDn）。</summary>
+    /// <summary>タブを上下に 1 つ移動する（Ctrl+Shift+PgUp/PgDn）。</summary>
     public void MoveSelectedTab(int direction)
     {
         if (SelectedTab is { } tab)
@@ -925,7 +909,7 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
-    /// <summary>「新しいタブを右に開く」。</summary>
+    /// <summary>「新しいタブを下に開く」。</summary>
     public void NewTabToRight(TabViewModel anchor)
     {
         var tab = AddTab(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), pinned: false);
@@ -960,7 +944,7 @@ public partial class MainWindowViewModel : ObservableObject
         SelectedTab = tab;
     }
 
-    /// <summary>右側のタブを閉じる（固定タブは残す）。</summary>
+    /// <summary>下側のタブを閉じる（固定タブは残す）。</summary>
     public void CloseTabsToRight(TabViewModel anchor)
     {
         var index = Tabs.IndexOf(anchor);

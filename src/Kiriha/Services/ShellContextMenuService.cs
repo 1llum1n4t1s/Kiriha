@@ -72,6 +72,110 @@ internal static partial class ShellContextMenuService
         }
     }
 
+    /// <summary>
+    /// 指定フォルダーの背景コンテキストメニューにある Shell verb を実行する。
+    /// RDP の FileGroupDescriptorW / FileContents など、パスを持たない仮想ファイルの
+    /// 貼り付けは Explorer と同じ "paste" verb に処理を任せる。
+    /// </summary>
+    public static bool InvokeDirectoryBackgroundVerb(nint hwnd, string directoryPath, string verb)
+    {
+        if (hwnd == 0)
+        {
+            hwnd = GetActiveWindow();
+        }
+
+        var result = SHParseDisplayName(directoryPath, 0, out var pidl, 0, out _);
+        if (result < 0 || pidl == 0)
+        {
+            return LogBackgroundVerbFailure("SHParseDisplayName", result);
+        }
+
+        try
+        {
+            result = SHBindToParent(pidl, IidIShellFolder, out var parentPtr, out var childPidl);
+            if (result < 0 || parentPtr == 0)
+            {
+                return LogBackgroundVerbFailure("SHBindToParent", result);
+            }
+
+            var wrappers = new StrategyBasedComWrappers();
+            var parent = (IShellFolder)wrappers.GetOrCreateObjectForComInstance(
+                parentPtr,
+                CreateObjectFlags.None);
+            Marshal.Release(parentPtr);
+
+            result = parent.BindToObject(childPidl, 0, IidIShellFolder, out var folderPtr);
+            if (result < 0 || folderPtr == 0)
+            {
+                return LogBackgroundVerbFailure("IShellFolder.BindToObject", result);
+            }
+
+            var folder = (IShellFolder)wrappers.GetOrCreateObjectForComInstance(
+                folderPtr,
+                CreateObjectFlags.None);
+            Marshal.Release(folderPtr);
+
+            result = folder.CreateViewObject(hwnd, IidIContextMenu, out var contextMenuPtr);
+            if (result < 0 || contextMenuPtr == 0)
+            {
+                return LogBackgroundVerbFailure("IShellFolder.CreateViewObject", result);
+            }
+
+            var menu = (IContextMenu)wrappers.GetOrCreateObjectForComInstance(
+                contextMenuPtr,
+                CreateObjectFlags.None);
+            Marshal.Release(contextMenuPtr);
+            return InvokeVerb(menu, hwnd, verb);
+        }
+        finally
+        {
+            Marshal.FreeCoTaskMem(pidl);
+        }
+    }
+
+    private static bool InvokeVerb(IContextMenu menu, nint hwnd, string verb)
+    {
+        var hmenu = CreatePopupMenu();
+        if (hmenu == 0)
+        {
+            return false;
+        }
+
+        var verbPtr = Marshal.StringToHGlobalAnsi(verb);
+        try
+        {
+            var result = menu.QueryContextMenu(hmenu, 0, 1, 0x7FFF, 0);
+            if (result < 0)
+            {
+                return LogBackgroundVerbFailure("IContextMenu.QueryContextMenu", result);
+            }
+
+            unsafe
+            {
+                var info = new CmInvokeCommandInfo
+                {
+                    Size = (uint)sizeof(CmInvokeCommandInfo),
+                    Hwnd = hwnd,
+                    Verb = verbPtr,
+                    Show = 1,
+                };
+                result = menu.InvokeCommand((nint)(&info));
+                return result >= 0 || LogBackgroundVerbFailure("IContextMenu.InvokeCommand", result);
+            }
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(verbPtr);
+            DestroyMenu(hmenu);
+        }
+    }
+
+    private static bool LogBackgroundVerbFailure(string step, int result)
+    {
+        Logger.Log($"フォルダー背景の Shell verb 実行失敗: {step}, HRESULT=0x{result:X8}", LogLevel.Warning);
+        return false;
+    }
+
     /// <summary>pidl の親フォルダー経由で IContextMenu を取得する。</summary>
     private static IContextMenu? GetContextMenu(nint hwnd, nint pidl)
     {
@@ -214,6 +318,9 @@ internal static partial class ShellContextMenuService
     [LibraryImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool SetForegroundWindow(nint hwnd);
+
+    [LibraryImport("user32.dll")]
+    private static partial nint GetActiveWindow();
 }
 
 [GeneratedComInterface]
