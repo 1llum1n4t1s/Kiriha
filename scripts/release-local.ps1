@@ -157,7 +157,7 @@ foreach ($runtime in $Runtimes) {
             --packDir $publishDir `
             --outputDir $ArtifactsDir `
             --channel $config.Channel `
-            --shortcuts 'StartMenu,Desktop' `
+            --shortcuts 'StartMenuRoot,Desktop' `
             --signParams $SignParams
     }
 }

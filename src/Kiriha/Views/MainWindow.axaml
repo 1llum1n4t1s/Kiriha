@@ -591,8 +591,7 @@
         <Grid Grid.Row="1" Grid.Column="0" ColumnDefinitions="*,Auto"
               Width="{Binding VerticalTabWidth}">
             <Grid Grid.Column="0" ClipToBounds="True">
-                <!-- アクリルON時は透明にして、タイトルバーと同じ全画面材をそのまま見せる。
-                     OFF時はタブストリップ基準色の不透明面へ戻す。 -->
+                <!-- ON/OFFともにタイトルバーと同じウィンドウ背景をそのまま見せる。 -->
                 <Border Background="{DynamicResource VerticalTabsSurfaceBg}">
                     <Grid RowDefinitions="*,Auto,Auto">
                     <ListBox x:Name="VerticalTabsListBox" Grid.Row="0" Classes="verticaltabs"
