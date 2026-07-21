@@ -12,6 +12,7 @@ internal static partial class Program
     private const string InstanceMutexName = "Local\\Kiriha.SingleInstance";
     private const string ActivationPipeName = "Kiriha.Activate";
     private const string AppUserModelId = "velopack.Kiriha";
+    private const string LegacyStartMenuFolderName = "1llum1n4t1s";
     // 起動通知の受け渡しを保護するロック。ハンドラ登録とパイプ受信の check-then-act を同一
     // クリティカルセクションに入れ、起動直後の競合で通知が消失する（lost-wakeup）のを防ぐ。
     private static readonly object ActivationGate = new();
@@ -44,6 +45,8 @@ internal static partial class Program
         // Velopack のブートストラップ（インストール / 更新 / アンインストール時のフック処理）。
         // 更新適用直後の再起動などはここで処理され、通常起動時はそのまま通過する。
         VelopackApp.Build()
+            .OnAfterInstallFastCallback(_ => MigrateLegacyStartMenuShortcut())
+            .OnAfterUpdateFastCallback(_ => MigrateLegacyStartMenuShortcut())
             .OnBeforeUninstallFastCallback(_ =>
             {
                 // アンインストール後に削除済み EXE への参照を残さないよう、
@@ -53,6 +56,10 @@ internal static partial class Program
                 WindowsIntegrationService.SetDefaultFolderAppEnabled(false);
             })
             .Run();
+
+        // v1.0.10以前のStartMenu指定で作られたショートカットを、現在のStartMenuRootへ移す。
+        // 通常起動時にも補正し、旧版からの更新経路や既に更新済みの環境を取りこぼさない。
+        MigrateLegacyStartMenuShortcut();
 
         using var instanceMutex = new Mutex(initiallyOwned: true, InstanceMutexName, out var isFirstInstance);
         if (!isFirstInstance)
@@ -167,6 +174,39 @@ internal static partial class Program
     {
         try { _ = SetCurrentProcessExplicitAppUserModelID(AppUserModelId); }
         catch { /* シェル連携の失敗だけで起動を止めない */ }
+    }
+
+    private static void MigrateLegacyStartMenuShortcut()
+    {
+        try
+        {
+            var programsDirectory = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.StartMenu),
+                "Programs");
+            var legacyDirectory = Path.Combine(programsDirectory, LegacyStartMenuFolderName);
+            var legacyShortcut = Path.Combine(legacyDirectory, "Kiriha.lnk");
+            if (!File.Exists(legacyShortcut)) return;
+
+            var rootShortcut = Path.Combine(programsDirectory, "Kiriha.lnk");
+            if (File.Exists(rootShortcut))
+            {
+                File.Delete(legacyShortcut);
+            }
+            else
+            {
+                File.Move(legacyShortcut, rootShortcut);
+            }
+
+            // 同じ発行者フォルダーに別アプリが残っている場合は、そのフォルダーを維持する。
+            if (!Directory.EnumerateFileSystemEntries(legacyDirectory).Any())
+            {
+                Directory.Delete(legacyDirectory);
+            }
+        }
+        catch
+        {
+            // スタートメニューの補正失敗だけでインストール・更新・通常起動を止めない。
+        }
     }
 
     [LibraryImport("shell32.dll", StringMarshalling = StringMarshalling.Utf16)]
