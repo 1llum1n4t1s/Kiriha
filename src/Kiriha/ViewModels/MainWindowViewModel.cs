@@ -33,7 +33,11 @@ public partial class MainWindowViewModel : ObservableObject
     public string WindowTitle
         => SelectedTab is { } tab && tab.Title.Length > 0 ? $"{tab.Title} - Kiriha" : "Kiriha";
 
-    partial void OnSelectedTabChanged(TabViewModel? value) => OnPropertyChanged(nameof(WindowTitle));
+    partial void OnSelectedTabChanged(TabViewModel? value)
+    {
+        OnPropertyChanged(nameof(WindowTitle));
+        value?.EnsureCurrentPathAvailable();
+    }
 
     /// <summary>ステータスバーの表示状態（表示メニューで切替）。</summary>
     [ObservableProperty]
@@ -449,8 +453,8 @@ public partial class MainWindowViewModel : ObservableObject
         // 前回の固定タブを復元してから通常タブを開く。
         // ここで Directory.Exists による存在確認はしない: コンストラクタはウィンドウ生成前に UI スレッドで
         // 同期実行されるため、切断中のネットワークパスに対する存在確認が起動全体をブロックする。
-        // 到達不能・削除済みのパスは各タブの NavigateToAsync（バックグラウンド + catch）が「開けませんでした」
-        // 表示にフォールバックするので、無条件に復元してよい。
+        // 削除済みのパスは各タブの NavigateToAsync（バックグラウンド）が PC 表示へフォールバックするため、
+        // ここでは無条件に復元してよい。
         foreach (var path in _settings.PinnedPaths)
         {
             var tab = AddTab(path, pinned: true);

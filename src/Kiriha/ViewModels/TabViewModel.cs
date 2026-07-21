@@ -736,6 +736,34 @@ public partial class TabViewModel : ObservableObject
     public void NavigateTo(string path, bool record = true)
         => _ = NavigateToAsync(path, record);
 
+    /// <summary>タブが選択された時点で、表示中の実フォルダーが引き続き存在するか確認する。</summary>
+    public void EnsureCurrentPathAvailable()
+        => _ = EnsureCurrentPathAvailableAsync();
+
+    private async Task EnsureCurrentPathAvailableAsync()
+    {
+        if (_isDetached || IsSettingsTab || CurrentPath == FileSystemService.ComputerPath)
+        {
+            return;
+        }
+
+        var path = CurrentPath;
+        try
+        {
+            var exists = await Task.Run(() => Directory.Exists(path), _lifetimeCts.Token);
+            if (!exists && !_isDetached && string.Equals(path, CurrentPath, StringComparison.OrdinalIgnoreCase))
+            {
+                // Exists はアクセス不能時にも false になる。実際の列挙で「存在しない」ことを確認してから
+                // NavigateToAsync 側の PC フォールバックを適用する。
+                await NavigateToAsync(path, record: false);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // タブ破棄時のキャンセルは正常終了として扱う。
+        }
+    }
+
     public async Task NavigateToAsync(string path, bool record = true)
     {
         if (_isDetached) return;
@@ -755,17 +783,43 @@ public partial class TabViewModel : ObservableObject
         var preserveSelection = WindowsPathIdentity.Instance.Equals(path, CurrentPath) ? SelectedEntry?.FullPath : null;
 
         List<FileSystemEntry> entries;
-        try
+        while (true)
         {
-            entries = await Task.Run(() => FileSystemService.GetEntries(path, _options), _lifetimeCts.Token);
-        }
-        catch (OperationCanceledException) { return; }
-        catch (Exception ex)
-        {
-            Logger.LogException($"フォルダーを開けませんでした: {path}", ex);
-            StatusText = $"開けませんでした: {ex.Message}";
-            PathText = CurrentPath;
-            return;
+            try
+            {
+                entries = await Task.Run(() => FileSystemService.GetEntries(path, _options), _lifetimeCts.Token);
+                break;
+            }
+            catch (OperationCanceledException) { return; }
+            catch (DirectoryNotFoundException ex) when (path != FileSystemService.ComputerPath)
+            {
+                bool currentFolderExists;
+                try
+                {
+                    currentFolderExists = await Task.Run(() => Directory.Exists(path), _lifetimeCts.Token);
+                }
+                catch (OperationCanceledException) { return; }
+
+                // 列挙中に子項目だけが削除された場合は、表示中のフォルダー自体が消えたとは扱わない。
+                if (currentFolderExists)
+                {
+                    Logger.LogException($"フォルダーを開けませんでした: {path}", ex);
+                    StatusText = $"開けませんでした: {ex.Message}";
+                    PathText = CurrentPath;
+                    return;
+                }
+
+                Logger.LogException($"フォルダーが存在しないため PC に移動します: {path}", ex);
+                path = FileSystemService.ComputerPath;
+                preserveSelection = null;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException($"フォルダーを開けませんでした: {path}", ex);
+                StatusText = $"開けませんでした: {ex.Message}";
+                PathText = CurrentPath;
+                return;
+            }
         }
 
         if (_isDetached || generation != _navigationGeneration)
