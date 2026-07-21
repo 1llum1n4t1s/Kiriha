@@ -67,6 +67,7 @@ public partial class TabViewModel : ObservableObject
     public event EventHandler<FileSystemEntry>? RenameRequested;
 
     private List<FileSystemEntry> _selection = new();
+    private readonly HashSet<string> _pendingNewFolderPaths = new(StringComparer.OrdinalIgnoreCase);
 
     public ObservableCollection<DetailColumnViewModel> DetailColumns { get; }
 
@@ -1285,6 +1286,10 @@ public partial class TabViewModel : ObservableObject
     /// <summary>名前の変更を確定する（View のダイアログから呼ばれる）。バリデーション付き。</summary>
     public async Task CommitRenameAsync(FileSystemEntry entry, string newName)
     {
+        // OK でダイアログを閉じた時点で新規作成の保留状態は終了する。
+        // 入力不備で改名できなかった場合も、後の通常リネームのキャンセルで削除されないようにする。
+        _pendingNewFolderPaths.Remove(entry.FullPath);
+
         newName = newName.Trim();
         if (newName.Length == 0 || newName == entry.Name)
         {
@@ -1428,7 +1433,7 @@ public partial class TabViewModel : ObservableObject
         }
     }
 
-    /// <summary>「新規作成 > フォルダー」。作成後は選択して即リネーム入力へ（エクスプローラーと同じ）。</summary>
+    /// <summary>新規フォルダーを作成し、選択して即リネーム入力へ（エクスプローラーと同じ）。</summary>
     public void CreateNewFolder()
         => _ = CreateNewFolderAsync();
 
@@ -1443,6 +1448,7 @@ public partial class TabViewModel : ObservableObject
         {
             var path = GetUniquePath("新しいフォルダー", "");
             Directory.CreateDirectory(path);
+            _pendingNewFolderPaths.Add(path);
             await NavigateToAsync(CurrentPath, record: false);
 
             var created = Entries.FirstOrDefault(e => string.Equals(e.FullPath, path, StringComparison.OrdinalIgnoreCase));
@@ -1455,6 +1461,26 @@ public partial class TabViewModel : ObservableObject
         catch (Exception ex)
         {
             StatusText = $"作成できませんでした: {ex.Message}";
+        }
+    }
+
+    /// <summary>新規フォルダーの名前入力をキャンセルした場合だけ、作成済みの空フォルダーを取り消す。</summary>
+    public async Task CancelPendingNewFolderAsync(FileSystemEntry entry)
+    {
+        if (!_pendingNewFolderPaths.Remove(entry.FullPath) || !Directory.Exists(entry.FullPath))
+        {
+            return;
+        }
+
+        try
+        {
+            // ダイアログ表示中に内容が追加されていた場合は IOException になり、誤削除しない。
+            Directory.Delete(entry.FullPath);
+            await NavigateToAsync(CurrentPath, record: false);
+        }
+        catch (Exception ex)
+        {
+            StatusText = $"新規フォルダーの作成を取り消せませんでした: {ex.Message}";
         }
     }
 

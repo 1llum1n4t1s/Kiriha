@@ -36,6 +36,8 @@
                     <SolidColorBrush x:Key="SettingsIconBg" Color="#D7E7FA" />
                     <SolidColorBrush x:Key="SettingsButtonBg" Color="#E8EDF3" />
                     <Color x:Key="AcrylicTintColor">#DEE1E6</Color>
+                    <Color x:Key="DialogWindowColor">#F2F2F7</Color>
+                    <SolidColorBrush x:Key="DialogWindowBrush" Color="#F2F2F7" />
                 </ResourceDictionary>
                 <!-- Chrome ダーク配色 -->
                 <ResourceDictionary x:Key="Dark">
@@ -70,6 +72,8 @@
                     <SolidColorBrush x:Key="SettingsIconBg" Color="{StaticResource NeutralInteractive}" />
                     <SolidColorBrush x:Key="SettingsButtonBg" Color="{StaticResource NeutralSurface}" />
                     <Color x:Key="AcrylicTintColor">#202124</Color>
+                    <Color x:Key="DialogWindowColor">#1C1C1E</Color>
+                    <SolidColorBrush x:Key="DialogWindowBrush" Color="#1C1C1E" />
                 </ResourceDictionary>
                 <!-- One Dark 配色（Atom One Dark 由来の青みがかったダーク）。
                      ThemeDictionaries のキーは ThemeVariant 型で、既定コンバーターは Light/Dark/Default の
@@ -107,8 +111,11 @@
                     <SolidColorBrush x:Key="SettingsIconBg" Color="{StaticResource NeutralInteractive}" />
                     <SolidColorBrush x:Key="SettingsButtonBg" Color="{StaticResource NeutralSurface}" />
                     <Color x:Key="AcrylicTintColor">#21252B</Color>
+                    <Color x:Key="DialogWindowColor">#1C1C1E</Color>
+                    <SolidColorBrush x:Key="DialogWindowBrush" Color="#1C1C1E" />
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
+            <SolidColorBrush x:Key="DialogAccentTintBrush" Color="Transparent" />
         </ResourceDictionary>
     </Application.Resources>
 

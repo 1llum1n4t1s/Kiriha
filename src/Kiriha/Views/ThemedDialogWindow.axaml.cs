@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Media;
 
 namespace Kiriha.Views;
 
@@ -20,6 +21,10 @@ public partial class ThemedDialogWindow : Window
             ? [WindowTransparencyLevel.AcrylicBlur, WindowTransparencyLevel.None]
             : [WindowTransparencyLevel.None];
         AcrylicBackdrop.IsVisible = useAcrylic;
+        if (useAcrylic)
+        {
+            ContentSurface.Background = Brushes.Transparent;
+        }
         ContentSurface.Padding = useAcrylic ? new Thickness(0, 32, 0, 0) : default;
     }
 

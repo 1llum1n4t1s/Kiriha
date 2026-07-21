@@ -29,6 +29,13 @@ public partial class MainWindow : Window
     private Point _dragStartPoint;
     private bool _dragInProgress;
     private readonly HashSet<ListBox> _bulkSelectionLists = [];
+    private ListBox? _marqueeListBox;
+    private Visual? _marqueeSurface;
+    private IPointer? _marqueePointer;
+    private HashSet<FileSystemEntry> _marqueeSelectionBaseline = [];
+    private Point _marqueeStartPoint;
+    private KeyModifiers _marqueeModifiers;
+    private bool _marqueeActive;
     private static readonly IReadOnlyDictionary<string, HashSet<string>> SelectionExtensionSets =
         new Dictionary<string, HashSet<string>>(StringComparer.Ordinal)
         {
@@ -78,6 +85,7 @@ public partial class MainWindow : Window
             RoutingStrategies.Tunnel, handledEventsToo: true);
         AddHandler(PointerReleasedEvent, DragSource_PointerReleased,
             RoutingStrategies.Tunnel, handledEventsToo: true);
+        AddHandler(PointerCaptureLostEvent, MarqueeSelection_PointerCaptureLost, handledEventsToo: true);
 
         // ListBoxItem が選択処理で PointerPressed を Handled 済みにするため、
         // 通常のバブル購読（XAML の PointerPressed="..."）ではタブの並べ替え開始を検知できない。
@@ -888,51 +896,21 @@ public partial class MainWindow : Window
         {
             await tab.CommitRenameAsync(entry, newName);
         }
+        else
+        {
+            await tab.CancelPendingNewFolderAsync(entry);
+        }
     }
 
     /// <summary>テキスト入力ダイアログ（名前の変更 / お気に入りフォルダー名など）。確定時のみ文字列を返す。</summary>
     private async Task<string?> PromptTextAsync(string title, string initial, int? selectionLength = null)
     {
-        var box = new TextBox { Text = initial, MinWidth = 300 };
-        var ok = new Button { Content = "OK", IsDefault = true, MinWidth = 80, HorizontalContentAlignment = HorizontalAlignment.Center };
-        var cancel = new Button { Content = "キャンセル", IsCancel = true, MinWidth = 80, HorizontalContentAlignment = HorizontalAlignment.Center };
-
-        var dialog = new ThemedDialogWindow(ViewModel?.OptUseAcrylicBackground ?? false)
-        {
-            Title = title,
-            SizeToContent = SizeToContent.WidthAndHeight,
-            WindowStartupLocation = WindowStartupLocation.CenterOwner,
-            CanResize = false,
-            DialogContent = new StackPanel
-            {
-                Margin = new Thickness(16),
-                Spacing = 12,
-                Children =
-                {
-                    box,
-                    new StackPanel
-                    {
-                        Orientation = Orientation.Horizontal,
-                        Spacing = 8,
-                        HorizontalAlignment = HorizontalAlignment.Right,
-                        Children = { ok, cancel },
-                    },
-                },
-            },
-        };
-
-        var confirmed = false;
-        ok.Click += (_, _) => { confirmed = true; dialog.Close(); };
-        cancel.Click += (_, _) => dialog.Close();
-        dialog.Opened += (_, _) =>
-        {
-            box.Focus();
-            box.SelectionStart = 0;
-            box.SelectionEnd = selectionLength ?? initial.Length;
-        };
-
-        await dialog.ShowDialog(this);
-        return confirmed ? box.Text : null;
+        var dialog = new TextInputDialog(
+            title,
+            initial,
+            selectionLength ?? initial.Length,
+            ViewModel?.OptUseAcrylicBackground ?? false);
+        return await dialog.ShowDialog<string?>(this);
     }
 
     // ===== タイトルバー / タブストリップ =====
@@ -2027,9 +2005,13 @@ public partial class MainWindow : Window
 
         if (listBox is not null && isFileList)
         {
-            // 背景クリックで選択解除（エクスプローラーと同じ）
-            listBox.UnselectAll();
-            ResetDragSource();
+            // 空白部分の左ドラッグは、エクスプローラーと同じ範囲選択へ切り替える。
+            // スクロールバー上では開始せず、通常のスクロール操作を維持する。
+            if (!TryStartMarqueeSelection(listBox, e))
+            {
+                ResetDragSource();
+            }
+
             return;
         }
 
@@ -2055,6 +2037,12 @@ public partial class MainWindow : Window
 
     private void DragSource_PointerMoved(object? sender, PointerEventArgs e)
     {
+        if (_marqueeListBox is not null && ReferenceEquals(e.Pointer, _marqueePointer))
+        {
+            UpdateMarqueeSelection(e);
+            return;
+        }
+
         if (_dragPressArgs is null || _dragInProgress || _dragListBox is null)
         {
             return;
@@ -2105,6 +2093,18 @@ public partial class MainWindow : Window
 
     private void DragSource_PointerReleased(object? sender, PointerReleasedEventArgs e)
     {
+        if (_marqueeListBox is not null && ReferenceEquals(e.Pointer, _marqueePointer))
+        {
+            var wasActive = _marqueeActive;
+            ResetMarqueeSelection(releasePointer: true);
+            if (wasActive)
+            {
+                e.Handled = true;
+            }
+
+            return;
+        }
+
         if (!_dragInProgress)
         {
             ResetDragSource();
@@ -2172,6 +2172,168 @@ public partial class MainWindow : Window
         _dragSidebarLink = null;
         _dragSelectionSnapshot = null;
         _dragInProgress = false;
+    }
+
+    // ===== 背景ドラッグによる範囲選択 =====
+
+    private bool TryStartMarqueeSelection(ListBox? listBox, PointerPressedEventArgs e)
+    {
+        if (listBox is null
+            || !listBox.IsEffectivelyVisible
+            || !e.GetCurrentPoint(this).Properties.IsLeftButtonPressed
+            || e.Source is Visual source
+            && (source.FindAncestorOfType<ListBoxItem>() is not null
+                || source.FindAncestorOfType<ScrollBar>() is not null))
+        {
+            return false;
+        }
+
+        ResetDragSource();
+        ResetMarqueeSelection(releasePointer: true);
+
+        _marqueeListBox = listBox;
+        _marqueeSurface = listBox.GetVisualParent();
+        _marqueePointer = e.Pointer;
+        _marqueeModifiers = e.KeyModifiers;
+        _marqueeSelectionBaseline = listBox.SelectedItems?.OfType<FileSystemEntry>().ToHashSet() ?? [];
+
+        if (GetMarqueeSurfaceBounds() is not { } surfaceBounds)
+        {
+            ResetMarqueeSelection(releasePointer: false);
+            return false;
+        }
+
+        _marqueeStartPoint = ClampToRect(e.GetPosition(FileSelectionOverlay), surfaceBounds);
+        if (!_marqueeModifiers.HasFlag(KeyModifiers.Control))
+        {
+            ApplyBulkSelection(listBox, []);
+        }
+
+        listBox.Focus();
+        e.Pointer.Capture(listBox);
+        e.Handled = true;
+        return true;
+    }
+
+    private void UpdateMarqueeSelection(PointerEventArgs e)
+    {
+        if (_marqueeListBox is not { } listBox
+            || !e.GetCurrentPoint(this).Properties.IsLeftButtonPressed
+            || GetMarqueeSurfaceBounds() is not { } surfaceBounds)
+        {
+            ResetMarqueeSelection(releasePointer: true);
+            return;
+        }
+
+        var current = ClampToRect(e.GetPosition(FileSelectionOverlay), surfaceBounds);
+        if (!_marqueeActive
+            && Math.Abs(current.X - _marqueeStartPoint.X) < 4
+            && Math.Abs(current.Y - _marqueeStartPoint.Y) < 4)
+        {
+            return;
+        }
+
+        _marqueeActive = true;
+        var selectionBounds = RectFromPoints(_marqueeStartPoint, current);
+        Canvas.SetLeft(FileSelectionRectangle, selectionBounds.X);
+        Canvas.SetTop(FileSelectionRectangle, selectionBounds.Y);
+        FileSelectionRectangle.Width = selectionBounds.Width;
+        FileSelectionRectangle.Height = selectionBounds.Height;
+        FileSelectionRectangle.IsVisible = true;
+
+        var intersecting = new HashSet<FileSystemEntry>();
+        foreach (var container in listBox.GetVisualDescendants().OfType<ListBoxItem>())
+        {
+            if (!container.IsEffectivelyVisible
+                || container.DataContext is not FileSystemEntry entry
+                || container.TranslatePoint(default, FileSelectionOverlay) is not { } origin)
+            {
+                continue;
+            }
+
+            var itemBounds = new Rect(origin, container.Bounds.Size);
+            if (selectionBounds.Intersects(itemBounds))
+            {
+                intersecting.Add(entry);
+            }
+        }
+
+        HashSet<FileSystemEntry> selected;
+        if (_marqueeModifiers.HasFlag(KeyModifiers.Control))
+        {
+            selected = [.. _marqueeSelectionBaseline];
+            foreach (var entry in intersecting)
+            {
+                if (!selected.Add(entry))
+                {
+                    selected.Remove(entry);
+                }
+            }
+        }
+        else
+        {
+            selected = intersecting;
+        }
+
+        var ordered = listBox.DataContext is TabViewModel tab
+            ? tab.Entries.Where(selected.Contains)
+            : selected;
+        ApplyBulkSelection(listBox, ordered);
+        e.Handled = true;
+    }
+
+    private Rect? GetMarqueeSurfaceBounds()
+    {
+        if (_marqueeSurface is null
+            || _marqueeSurface.TranslatePoint(default, FileSelectionOverlay) is not { } origin
+            || _marqueeSurface.Bounds.Width <= 0
+            || _marqueeSurface.Bounds.Height <= 0)
+        {
+            return null;
+        }
+
+        return new Rect(origin, _marqueeSurface.Bounds.Size);
+    }
+
+    private static Point ClampToRect(Point point, Rect bounds)
+        => new(
+            Math.Clamp(point.X, bounds.Left, bounds.Right),
+            Math.Clamp(point.Y, bounds.Top, bounds.Bottom));
+
+    private static Rect RectFromPoints(Point first, Point second)
+        => new(
+            Math.Min(first.X, second.X),
+            Math.Min(first.Y, second.Y),
+            Math.Abs(second.X - first.X),
+            Math.Abs(second.Y - first.Y));
+
+    private void MarqueeSelection_PointerCaptureLost(object? sender, PointerCaptureLostEventArgs e)
+    {
+        if (ReferenceEquals(e.Pointer, _marqueePointer))
+        {
+            ResetMarqueeSelection(releasePointer: false);
+        }
+    }
+
+    private void ResetMarqueeSelection(bool releasePointer)
+    {
+        var pointer = _marqueePointer;
+        var listBox = _marqueeListBox;
+
+        _marqueeListBox = null;
+        _marqueeSurface = null;
+        _marqueePointer = null;
+        _marqueeSelectionBaseline = [];
+        _marqueeModifiers = KeyModifiers.None;
+        _marqueeActive = false;
+        FileSelectionRectangle.IsVisible = false;
+        FileSelectionRectangle.Width = 0;
+        FileSelectionRectangle.Height = 0;
+
+        if (releasePointer && pointer is not null && ReferenceEquals(pointer.Captured, listBox))
+        {
+            pointer.Capture(null);
+        }
     }
 
     // ===== DnD（ドロップ受け入れ） =====
@@ -2510,8 +2672,15 @@ public partial class MainWindow : Window
 
     private void FileListClearArea_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        FindActiveFileList()?.UnselectAll();
-        e.Handled = true;
+        TryStartMarqueeSelection(FindActiveFileList(), e);
+    }
+
+    private void FileListSurface_PointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (!e.Handled)
+        {
+            TryStartMarqueeSelection(FindActiveFileList(), e);
+        }
     }
 
     private async void IconItem_EffectiveViewportChanged(object? sender, EffectiveViewportChangedEventArgs e)
@@ -2889,32 +3058,11 @@ public partial class MainWindow : Window
         }
     }
 
-    private void NewButton_Click(object? sender, RoutedEventArgs e)
+    private void NewFolderButton_Click(object? sender, RoutedEventArgs e)
     {
-        if (sender is not Button { DataContext: TabViewModel tab } button)
+        if (sender is Button { DataContext: TabViewModel tab })
         {
-            return;
-        }
-
-        var flyout = new MenuFlyout { Placement = PlacementMode.BottomEdgeAlignedLeft };
-        PopulateNewItems(flyout.Items, tab);
-        flyout.ShowAt(button);
-    }
-
-    private static void PopulateNewItems(ItemCollection items, TabViewModel tab)
-    {
-        var folder = new MenuItem { Header = "フォルダー", Icon = new TextBlock { Text = "📁" } };
-        folder.Click += (_, _) => tab.CreateNewFolder();
-        items.Add(folder);
-
-        items.Add(new Separator());
-
-        foreach (var template in ShellNewService.GetTemplates())
-        {
-            var item = new MenuItem { Header = template.DisplayName, Icon = new TextBlock { Text = "📄" } };
-            var captured = template;
-            item.Click += (_, _) => tab.CreateFromTemplate(captured);
-            items.Add(item);
+            tab.CreateNewFolder();
         }
     }
 

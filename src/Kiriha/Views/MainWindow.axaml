@@ -1201,12 +1201,11 @@
                         <Border Grid.Row="2" Background="{DynamicResource ContentBg}"
                                 BorderBrush="{DynamicResource Divider}" BorderThickness="0,0,0,1">
                             <StackPanel Orientation="Horizontal" Margin="10,0" Spacing="2">
-                                <Button Classes="cmd" VerticalAlignment="Center" Click="NewButton_Click"
+                                <Button Classes="cmd" VerticalAlignment="Center" Click="NewFolderButton_Click"
                                         IsEnabled="{Binding CanCreateNew}">
                                     <StackPanel Orientation="Horizontal" Spacing="6">
                                         <TextBlock Classes="fico" Text="&#xE710;" FontSize="14" VerticalAlignment="Center" />
-                                        <TextBlock Text="新規作成" VerticalAlignment="Center" />
-                                        <TextBlock Classes="fico" Text="&#xE70D;" FontSize="9" VerticalAlignment="Center" />
+                                        <TextBlock Text="新規フォルダ作成" VerticalAlignment="Center" />
                                     </StackPanel>
                                 </Button>
 
@@ -1451,7 +1450,7 @@
                                 <Border Grid.Row="0" Height="1" Background="{DynamicResource Divider}" VerticalAlignment="Bottom"
                                         IsVisible="{Binding IsDetailsView}" />
 
-                                <Panel Grid.Row="1">
+                                <Panel Grid.Row="1" PointerPressed="FileListSurface_PointerPressed">
                                     <!-- 詳細表示 -->
                                     <ListBox Classes="files details"
                                              Margin="0,0,30,0"
@@ -1627,6 +1626,7 @@
                                     <!-- 空フォルダー表示 -->
                                     <TextBlock Text="このフォルダーは空です。"
                                                IsVisible="{Binding HasNoEntries}"
+                                               IsHitTestVisible="False"
                                                Foreground="{DynamicResource TextSecondary}"
                                                FontSize="13"
                                                HorizontalAlignment="Center" Margin="0,60,0,0" />
@@ -1702,6 +1702,15 @@
                 </DataTemplate>
             </ContentControl.ContentTemplate>
         </ContentControl>
+
+        <!-- ファイル一覧の空白部分をドラッグしたときの範囲選択。実体の選択は表示中ListBoxへ反映する。 -->
+        <Canvas x:Name="FileSelectionOverlay" Grid.Row="1" Grid.Column="1" Margin="6"
+                IsHitTestVisible="False" ClipToBounds="True" ZIndex="800">
+            <Border x:Name="FileSelectionRectangle" IsVisible="False"
+                    Background="{DynamicResource AccentSelectionBrush}"
+                    BorderBrush="{DynamicResource SystemAccentColor}"
+                    BorderThickness="1" CornerRadius="2" />
+        </Canvas>
 
         <!-- ファイルD&Dの受け側フィードバック。対象オブジェクト自体は filedroptarget で強調する。 -->
         <Grid x:Name="FileDropOverlay" Grid.Row="1" Grid.Column="1"

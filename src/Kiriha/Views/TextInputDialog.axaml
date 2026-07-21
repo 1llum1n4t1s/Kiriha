@@ -1,0 +1,71 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Kiriha.Views.TextInputDialog"
+        Width="420"
+        SizeToContent="Height"
+        Background="Transparent"
+        CanResize="False"
+        CanMinimize="True"
+        CanMaximize="True"
+        ExtendClientAreaTitleBarHeightHint="32"
+        ExtendClientAreaToDecorationsHint="True"
+        TransparencyLevelHint="AcrylicBlur"
+        WindowStartupLocation="CenterOwner"
+        FontFamily="Yu Gothic UI, Segoe UI, Microsoft YaHei, Malgun Gothic, Noto Sans CJK, sans-serif">
+    <Window.Styles>
+        <!-- Lhamiel のダイアログ用コントロール外観に限定して合わせる。 -->
+        <Style Selector="TextBox.dialogInput">
+            <Setter Property="CornerRadius" Value="10" />
+        </Style>
+        <Style Selector="Button.dialogAction">
+            <Setter Property="MinWidth" Value="100" />
+            <Setter Property="Padding" Value="16,8" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+    </Window.Styles>
+
+    <Panel>
+        <ExperimentalAcrylicBorder x:Name="AcrylicBackdrop" IsHitTestVisible="False">
+            <ExperimentalAcrylicBorder.Material>
+                <ExperimentalAcrylicMaterial BackgroundSource="Digger"
+                                             MaterialOpacity="0.65"
+                                             TintColor="{DynamicResource DialogWindowColor}"
+                                             TintOpacity="0.8" />
+            </ExperimentalAcrylicBorder.Material>
+        </ExperimentalAcrylicBorder>
+
+        <Border x:Name="OpaqueFallback"
+                Background="{DynamicResource DialogWindowBrush}"
+                IsHitTestVisible="False"
+                IsVisible="False" />
+
+        <Border x:Name="AccentTintOverlay"
+                Background="{DynamicResource DialogAccentTintBrush}"
+                IsHitTestVisible="False" />
+
+        <Grid Margin="28,44,28,20" RowDefinitions="Auto,Auto">
+            <TextBox x:Name="InputBox"
+                     Grid.Row="0"
+                     Classes="dialogInput"
+                     Margin="0,0,0,20" />
+
+            <StackPanel Grid.Row="1"
+                        HorizontalAlignment="Right"
+                        Orientation="Horizontal"
+                        Spacing="10">
+                <Button x:Name="OkButton"
+                        Classes="dialogAction"
+                        Content="OK"
+                        IsDefault="True"
+                        Click="OkButton_Click" />
+                <Button x:Name="CancelButton"
+                        Classes="dialogAction"
+                        Content="キャンセル"
+                        IsCancel="True"
+                        Click="CancelButton_Click" />
+            </StackPanel>
+        </Grid>
+    </Panel>
+</Window>

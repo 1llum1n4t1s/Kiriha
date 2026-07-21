@@ -69,6 +69,8 @@ public static class ThemeService
         app.Resources["AccentBrush"] = new SolidColorBrush(accent);
         app.Resources["AccentSelectionBrush"] = new SolidColorBrush(Color.FromArgb(0x38, accent.R, accent.G, accent.B));
         app.Resources["AccentHoverBrush"] = new SolidColorBrush(Color.FromArgb(0x20, accent.R, accent.G, accent.B));
+        // Lhamiel のダイアログと同じ、ごく薄いアクセント tint（約9%）。
+        app.Resources["DialogAccentTintBrush"] = new SolidColorBrush(Color.FromArgb(0x18, accent.R, accent.G, accent.B));
 
         ApplyAcrylicBackgrounds(app);
     }
