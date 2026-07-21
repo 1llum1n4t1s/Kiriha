@@ -11,6 +11,7 @@ internal static partial class Program
 {
     private const string InstanceMutexName = "Local\\Kiriha.SingleInstance";
     private const string ActivationPipeName = "Kiriha.Activate";
+    private const string AppUserModelId = "velopack.Kiriha";
     // 起動通知の受け渡しを保護するロック。ハンドラ登録とパイプ受信の check-then-act を同一
     // クリティカルセクションに入れ、起動直後の競合で通知が消失する（lost-wakeup）のを防ぐ。
     private static readonly object ActivationGate = new();
@@ -22,6 +23,8 @@ internal static partial class Program
     [STAThread]
     public static void Main(string[] args)
     {
+        TrySetCurrentProcessAppUserModelId();
+
         StartupArgs = args;
         Logger.Initialize();
 
@@ -159,6 +162,15 @@ internal static partial class Program
         var existing = Process.GetProcessesByName("Kiriha").FirstOrDefault(p => p.Id != current);
         if (existing is not null) AllowSetForegroundWindow(existing.Id);
     }
+
+    private static void TrySetCurrentProcessAppUserModelId()
+    {
+        try { _ = SetCurrentProcessExplicitAppUserModelID(AppUserModelId); }
+        catch { /* シェル連携の失敗だけで起動を止めない */ }
+    }
+
+    [LibraryImport("shell32.dll", StringMarshalling = StringMarshalling.Utf16)]
+    private static partial int SetCurrentProcessExplicitAppUserModelID(string appId);
 
     [LibraryImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]

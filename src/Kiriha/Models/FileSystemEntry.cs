@@ -39,7 +39,7 @@ public partial class FileSystemEntry : ObservableObject
     [NotifyPropertyChangedFor(nameof(RowOpacity))]
     private bool _isCut;
 
-    /// <summary>アイコンビュー用の画像サムネイル（非同期ロード）。</summary>
+    /// <summary>アイコンビュー用の画像・動画・PDFサムネイル（非同期ロード）。</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasThumbnail), nameof(HasNoThumbnail))]
     private Avalonia.Media.Imaging.Bitmap? _thumbnail;
@@ -82,8 +82,14 @@ public partial class FileSystemEntry : ObservableObject
             return Path.GetExtension(Name).ToLowerInvariant() switch
             {
                 ".jpg" or ".jpeg" or ".png" or ".gif" or ".bmp" or ".webp" or ".ico" or ".svg" => "🖼",
+                ".3fr" or ".ari" or ".arw" or ".bay" or ".cap" or ".cr2" or ".cr3" or ".crw"
+                    or ".dcr" or ".dcs" or ".dng" or ".drf" or ".eip" or ".erf" or ".fff" or ".gpr"
+                    or ".iiq" or ".k25" or ".kdc" or ".mef" or ".mos" or ".mrw" or ".nef" or ".nrw"
+                    or ".orf" or ".pef" or ".ptx" or ".pxn" or ".raf" or ".raw" or ".rw2" or ".rwl"
+                    or ".rwz" or ".sr2" or ".srf" or ".srw" or ".x3f" => "📷",
                 ".mp3" or ".wav" or ".flac" or ".m4a" or ".ogg" or ".aac" or ".wma" => "🎵",
-                ".mp4" or ".mkv" or ".avi" or ".mov" or ".wmv" or ".webm" => "🎬",
+                ".mp4" or ".m4v" or ".mkv" or ".avi" or ".mov" or ".wmv" or ".webm"
+                    or ".mpg" or ".mpeg" or ".mts" or ".m2ts" => "🎬",
                 ".zip" or ".7z" or ".rar" or ".tar" or ".gz" or ".xz" or ".cab" => "🗜",
                 ".exe" or ".msi" or ".bat" or ".cmd" or ".ps1" => "⚙",
                 ".pdf" => "📕",

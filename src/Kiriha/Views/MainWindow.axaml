@@ -366,7 +366,14 @@
         <Style Selector="ListBox.files.list ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource HoverBg}" />
         </Style>
-
+        <Style Selector="ListBox.files.smallicons">
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+        </Style>
+        <Style Selector="ListBox.files.listview">
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled" />
+        </Style>
         <!-- ファイル一覧（アイコン表示）のセル -->
         <Style Selector="ListBox.icons ListBoxItem">
             <Setter Property="Padding" Value="4" />
@@ -1520,14 +1527,14 @@
 
                                     <!-- 一覧 / 小アイコン表示 -->
                                     <ListBox Classes="files list"
+                                             Classes.smallicons="{Binding IsViewSmall}"
+                                             Classes.listview="{Binding IsViewList}"
                                              IsVisible="{Binding IsListView}"
                                              ItemsSource="{Binding Entries}"
                                              SelectedItem="{Binding SelectedEntry}"
                                              SelectionMode="Multiple"
                                              Background="Transparent"
                                              Padding="12,8,0,0"
-                                             ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                                             ScrollViewer.VerticalScrollBarVisibility="Disabled"
                                              DragDrop.AllowDrop="True"
                                              DoubleTapped="FileList_DoubleTapped"
                                              SelectionChanged="FileList_SelectionChanged"
@@ -1535,7 +1542,7 @@
                                              KeyDown="FileList_KeyDown">
                                         <ListBox.ItemsPanel>
                                             <ItemsPanelTemplate>
-                                                <c:VirtualizingWrapPanel Orientation="Vertical"
+                                                <c:VirtualizingWrapPanel Orientation="{Binding ListOrientation}"
                                                                          ItemWidth="220"
                                                                          MaximumItemWidth="380"
                                                                          ItemHeight="{Binding ListRowHeight}"
@@ -1594,6 +1601,7 @@
                                                     <Image Source="{Binding Thumbnail}"
                                                            IsVisible="{Binding HasThumbnail}"
                                                            Height="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).IconFontSize}"
+                                                           RenderOptions.BitmapInterpolationMode="HighQuality"
                                                            Stretch="Uniform" />
                                                     <Panel IsVisible="{Binding HasNoThumbnail}">
                                                         <Image Source="{Binding MaterialIcon}"

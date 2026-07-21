@@ -52,6 +52,7 @@ public partial class TabViewModel : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(
         nameof(IsDetailsView), nameof(IsListView), nameof(IsIconsView), nameof(IconFontSize),
+        nameof(ListOrientation),
         nameof(IsViewExtraLarge), nameof(IsViewLarge), nameof(IsViewMedium),
         nameof(IsViewSmall), nameof(IsViewList), nameof(IsViewDetails))]
     private ViewMode _viewMode = ViewMode.Details;
@@ -155,6 +156,17 @@ public partial class TabViewModel : ObservableObject
 
     private static readonly string[] ImageExtensions =
         [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".ico"];
+
+    private static readonly string[] VideoThumbnailExtensions =
+        [".mp4", ".m4v", ".mkv", ".avi", ".mov", ".wmv", ".webm", ".mpg", ".mpeg", ".mts", ".m2ts"];
+
+    private static readonly string[] RawThumbnailExtensions =
+    [
+        ".3fr", ".ari", ".arw", ".bay", ".cap", ".cr2", ".cr3", ".crw", ".dcr", ".dcs",
+        ".dng", ".drf", ".eip", ".erf", ".fff", ".gpr", ".iiq", ".k25", ".kdc", ".mef",
+        ".mos", ".mrw", ".nef", ".nrw", ".orf", ".pef", ".ptx", ".pxn", ".raf", ".raw",
+        ".rw2", ".rwl", ".rwz", ".sr2", ".srf", ".srw", ".x3f",
+    ];
 
     private static readonly string[] TextExtensions =
         [".txt", ".md", ".log", ".json", ".xml", ".yaml", ".yml", ".ini", ".cs", ".js", ".ts", ".py", ".html", ".css", ".csv", ".bat", ".ps1"];
@@ -430,9 +442,11 @@ public partial class TabViewModel : ObservableObject
         StatusText = $"{results.Count} 件見つかりました (サブフォルダー含む{(results.Count >= 1000 ? "、上限 1000 件" : "")})";
     }
 
-    // ===== アイコンビューの画像サムネイル =====
+    // ===== アイコンビューの画像・動画・PDFサムネイル =====
 
     private CancellationTokenSource? _thumbnailCts;
+    // 最大160論理pxを200% DPIでも等倍表示できる解像度。画質と一覧のメモリ使用量を両立する。
+    private const int ThumbnailPixelSize = 320;
     private readonly SemaphoreSlim _thumbnailGate = new(4, 4);
     private readonly ConcurrentDictionary<string, byte> _loadingThumbnails = new(StringComparer.OrdinalIgnoreCase);
 
@@ -460,9 +474,14 @@ public partial class TabViewModel : ObservableObject
 
     public async Task EnsureThumbnailAsync(FileSystemEntry entry)
     {
+        var extension = Path.GetExtension(entry.Name).ToLowerInvariant();
+        var isImage = ImageExtensions.Contains(extension);
+        var isPdf = extension == ".pdf";
+        var useShellThumbnail = VideoThumbnailExtensions.Contains(extension)
+            || RawThumbnailExtensions.Contains(extension);
         if (!IsIconsView || _isDetached || entry.IsDirectory || entry.Thumbnail is not null
-            || !ImageExtensions.Contains(Path.GetExtension(entry.Name).ToLowerInvariant())
-            || entry.Size is null or > 32 * 1024 * 1024
+            || (!isImage && !isPdf && !useShellThumbnail)
+            || (isImage && entry.Size is null or > 32 * 1024 * 1024)
             || !_loadingThumbnails.TryAdd(entry.FullPath, 0))
         {
             return;
@@ -476,16 +495,30 @@ public partial class TabViewModel : ObservableObject
             {
                 var bmp = await Task.Run(() =>
                 {
+                    token.ThrowIfCancellationRequested();
+                    if (isPdf)
+                    {
+                        return PdfThumbnailService.TryGetThumbnail(entry.FullPath, ThumbnailPixelSize);
+                    }
+
+                    if (useShellThumbnail)
+                    {
+                        return ShellThumbnailService.TryGetThumbnail(entry.FullPath, ThumbnailPixelSize);
+                    }
+
                     using var stream = File.OpenRead(entry.FullPath);
-                    return Bitmap.DecodeToWidth(stream, 128);
+                    return Bitmap.DecodeToWidth(stream, ThumbnailPixelSize);
                 }, token);
-                if (!token.IsCancellationRequested && IsIconsView && _allEntries.Contains(entry))
+                if (bmp is not null
+                    && !token.IsCancellationRequested
+                    && IsIconsView
+                    && _allEntries.Contains(entry))
                 {
                     entry.Thumbnail = bmp;
                 }
                 else
                 {
-                    bmp.Dispose();
+                    bmp?.Dispose();
                 }
             }
             finally
@@ -543,6 +576,12 @@ public partial class TabViewModel : ObservableObject
     public bool IsListView => ViewMode is ViewMode.List or ViewMode.SmallIcons;
 
     public bool IsIconsView => ViewMode is ViewMode.ExtraLargeIcons or ViewMode.LargeIcons or ViewMode.MediumIcons;
+
+    /// <summary>小アイコンは横方向へ折り返し、一覧は縦方向を埋めてから次の列へ進む。</summary>
+    public Avalonia.Layout.Orientation ListOrientation
+        => ViewMode == ViewMode.SmallIcons
+            ? Avalonia.Layout.Orientation.Horizontal
+            : Avalonia.Layout.Orientation.Vertical;
 
     /// <summary>
     /// アイコン表示のサイズ（Finder のスライダーと同じ無段階ズーム）。
