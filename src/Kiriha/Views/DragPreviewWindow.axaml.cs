@@ -98,15 +98,17 @@ public partial class DragPreviewWindow : Window
         }
     }
 
-    public void SetDropOperation(DragDropEffects effect, bool isBookmark)
+    public void SetDropOperation(DragDropEffects effect, bool isBookmark, bool isTabOpen = false)
     {
-        _resolvedOperationText = isBookmark
-            ? "追加"
-            : effect.HasFlag(DragDropEffects.Copy)
-                ? "コピー"
-                : effect.HasFlag(DragDropEffects.Move)
-                    ? "移動"
-                    : "ドラッグ中";
+        _resolvedOperationText = isTabOpen
+            ? "タブで開く"
+            : isBookmark
+                ? "追加"
+                : effect.HasFlag(DragDropEffects.Copy)
+                    ? "コピー"
+                    : effect.HasFlag(DragDropEffects.Move)
+                        ? "移動"
+                        : "ドラッグ中";
     }
 
     private static bool IsKeyDown(int virtualKey) => (GetKeyState(virtualKey) & 0x8000) != 0;

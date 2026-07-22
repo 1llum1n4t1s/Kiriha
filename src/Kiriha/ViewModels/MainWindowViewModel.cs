@@ -38,6 +38,7 @@ public partial class MainWindowViewModel : ObservableObject
     {
         OnPropertyChanged(nameof(WindowTitle));
         value?.EnsureCurrentPathAvailable();
+        _ = SyncSidebarTreeToCurrentPathAsync();
     }
 
     /// <summary>ステータスバーの表示状態（表示メニューで切替）。</summary>
@@ -88,6 +89,156 @@ public partial class MainWindowViewModel : ObservableObject
     {
         _settings.ShowSidebar = value;
         SettingsService.Save(_settings);
+    }
+
+    partial void OnShowStatusBarChanged(bool value)
+    {
+        _settings.ShowStatusBar = value;
+        SettingsService.Save(_settings);
+    }
+
+    /// <summary>サイドバーにクイックアクセスの代わりに XP 風フォルダーツリーを表示する。</summary>
+    [ObservableProperty]
+    private bool _showSidebarTree;
+
+    /// <summary>ツリー表示のルート（デスクトップ 1 ノード。子は展開時に遅延列挙）。</summary>
+    public ObservableCollection<Models.FolderTreeNode> SidebarTreeRoots { get; } = [];
+
+    /// <summary>ツリービューの選択ノード（TreeView.SelectedItem と双方向。プログラム側からの現在地同期にも使う）。</summary>
+    [ObservableProperty]
+    private Models.FolderTreeNode? _sidebarTreeSelectedItem;
+
+    partial void OnShowSidebarTreeChanged(bool value)
+    {
+        _settings.SidebarShowTree = value;
+        SettingsService.Save(_settings);
+        if (value)
+        {
+            EnsureSidebarTree();
+            _ = SyncSidebarTreeToCurrentPathAsync();
+        }
+    }
+
+    /// <summary>同期処理の世代。ナビゲーション連打時に古い同期結果で選択を上書きしない。</summary>
+    private int _treeSyncGeneration;
+
+    /// <summary>選択中タブの現在フォルダーまでツリーを展開して選択状態にする。</summary>
+    public async Task SyncSidebarTreeToCurrentPathAsync()
+    {
+        try
+        {
+            await SyncSidebarTreeToCurrentPathCoreAsync();
+        }
+        catch (Exception ex)
+        {
+            // 呼び出し元は fire-and-forget のため、ここで握りつぶさず必ずログへ残す
+            Logger.LogException("サイドバーツリーの現在地同期に失敗しました", ex);
+        }
+    }
+
+    private async Task SyncSidebarTreeToCurrentPathCoreAsync()
+    {
+        if (!ShowSidebarTree || SidebarTreeRoots.Count == 0
+            || SelectedTab is not { IsSettingsTab: false } tab)
+        {
+            return;
+        }
+
+        var path = tab.CurrentPath;
+        var generation = Interlocked.Increment(ref _treeSyncGeneration);
+        var node = SidebarTreeRoots[0];
+        node.IsExpanded = true;
+        await node.EnsureChildrenAsync();
+        if (generation != _treeSyncGeneration)
+        {
+            return;
+        }
+
+        // PC（ドライブ一覧）はマイ コンピュータを選択する
+        if (path == FileSystemService.ComputerPath)
+        {
+            SelectTreeNode(node.Children.FirstOrDefault(c => c.Kind == Models.FolderTreeNode.NodeKind.Computer));
+            return;
+        }
+
+        while (!WindowsPathIdentity.Instance.Equals(node.Path, path))
+        {
+            // デスクトップ直下はマイ ドキュメント → デスクトップ配下の実フォルダーの順で優先し、
+            // どれにも該当しないパスはマイ コンピュータ（ドライブ）経由で辿る。
+            var next = node.Children.FirstOrDefault(c => IsSelfOrAncestorOf(c.Path, path))
+                       ?? (node.Kind == Models.FolderTreeNode.NodeKind.Desktop
+                           ? node.Children.FirstOrDefault(c => c.Kind == Models.FolderTreeNode.NodeKind.Computer)
+                           : null);
+            if (next is null)
+            {
+                Logger.Log(
+                    $"ツリー同期: {node.Name} (子 {node.Children.Count} 件) から {path} へ降下できませんでした",
+                    LogLevel.Warning);
+                return;
+            }
+
+            node = next;
+            node.IsExpanded = true;
+            await node.EnsureChildrenAsync();
+            if (generation != _treeSyncGeneration)
+            {
+                return;
+            }
+        }
+
+        SelectTreeNode(node);
+    }
+
+    private void SelectTreeNode(Models.FolderTreeNode? node)
+    {
+        if (node is not null)
+        {
+            node.IsExpanded = true;
+            SidebarTreeSelectedItem = node;
+        }
+    }
+
+    /// <summary>candidate が target 自身またはその祖先ディレクトリかどうか。</summary>
+    private static bool IsSelfOrAncestorOf(string candidate, string target)
+    {
+        if (candidate.Length == 0)
+        {
+            return false;
+        }
+
+        // ルート ("C:\") は TrimEndingDirectorySeparator で区切りが残るため、二重付与しないように整える
+        var prefix = Path.TrimEndingDirectorySeparator(candidate);
+        if (!prefix.EndsWith(Path.DirectorySeparatorChar))
+        {
+            prefix += Path.DirectorySeparatorChar;
+        }
+
+        return WindowsPathIdentity.Instance.Equals(candidate, target)
+               || target.StartsWith(prefix, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private void EnsureSidebarTree()
+    {
+        if (SidebarTreeRoots.Count > 0)
+        {
+            return;
+        }
+
+        var root = new Models.FolderTreeNode
+        {
+            Name = "デスクトップ",
+            Path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+            Icon = "🖥",
+            Kind = Models.FolderTreeNode.NodeKind.Desktop,
+        };
+        SidebarTreeRoots.Add(root);
+        // XP と同じく既定で展開する（子はここで遅延ロードされる）
+        root.IsExpanded = true;
+    }
+
+    partial void OnPreviewWidthChanged(double value)
+    {
+        _settings.PreviewWidth = value; // 保存自体は終了時の SaveWindowBounds でまとめて行う
     }
 
     partial void OnSidebarWidthChanged(double value)
@@ -459,6 +610,13 @@ public partial class MainWindowViewModel : ObservableObject
         _settings.VerticalTabWidth = _verticalTabWidth;
         _searchBoxWidth = _settings.SearchBoxWidth is > 120 and < 500 ? _settings.SearchBoxWidth : 200;
         _showPreviewPane = _settings.ShowPreviewPane;
+        _previewWidth = _settings.PreviewWidth is >= 180 and <= 600 ? _settings.PreviewWidth : 280;
+        _showStatusBar = _settings.ShowStatusBar;
+        _showSidebarTree = _settings.SidebarShowTree;
+        if (_showSidebarTree)
+        {
+            EnsureSidebarTree();
+        }
         ApplyTheme(_settings.ThemePreference);
         RefreshBookmarks();
         // 起動時はドライブ列挙（ブロックしうる I/O）をせず、フォールバックのクイックアクセスだけで即描画する。
@@ -567,6 +725,7 @@ public partial class MainWindowViewModel : ObservableObject
             ShowColCreated = _settings.ShowColCreated,
             ShowColType = _settings.ShowColType,
             ShowColSize = _settings.ShowColSize,
+            IsCompactView = _settings.CompactView,
         };
 
         Tabs.Add(tab);
@@ -645,6 +804,20 @@ public partial class MainWindowViewModel : ObservableObject
             _settings.ColCreatedWidth = tab.ColCreatedWidth;
             _settings.ColTypeWidth = tab.ColTypeWidth;
             _settings.ColSizeWidth = tab.ColSizeWidth;
+        }
+        else if (e.PropertyName == nameof(TabViewModel.CurrentPath))
+        {
+            // 選択中タブのフォルダー移動へツリービューの展開・選択を追従させる
+            if (ReferenceEquals(tab, SelectedTab))
+            {
+                _ = SyncSidebarTreeToCurrentPathAsync();
+            }
+        }
+        else if (e.PropertyName == nameof(TabViewModel.IsCompactView))
+        {
+            // 表示メニューで切り替えたら新規タブの既定と次回起動時の状態として保存する
+            _settings.CompactView = tab.IsCompactView;
+            SettingsService.Save(_settings);
         }
         else if (e.PropertyName is nameof(TabViewModel.ShowColModified) or nameof(TabViewModel.ShowColCreated)
                  or nameof(TabViewModel.ShowColType) or nameof(TabViewModel.ShowColSize))
@@ -1046,6 +1219,21 @@ public partial class MainWindowViewModel : ObservableObject
             {
                 SavePinned();
             }
+        }
+    }
+
+    /// <summary>フォルダー群を指定位置へ新しいタブとして開いて選択する（タブバーへのドロップ用）。
+    /// 固定タブブロックより前には挿入しない。</summary>
+    public void OpenFolderTabsAt(IEnumerable<string> paths, int index)
+    {
+        var pinnedCount = Tabs.Count(t => t.IsPinned);
+        index = Math.Clamp(index, pinnedCount, Tabs.Count);
+        foreach (var path in paths.Where(Directory.Exists))
+        {
+            var tab = AddTab(Path.GetFullPath(path), pinned: false);
+            MoveTab(tab, Math.Min(index, Tabs.Count - 1));
+            SelectedTab = tab;
+            index = Tabs.IndexOf(tab) + 1;
         }
     }
 

@@ -1,0 +1,29 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Kiriha.Controls.FileIconPresenter"
+             x:Name="Root">
+    <!-- 詳細 / 一覧 / アイコンの 3 ビューで共通のファイルアイコン表示。
+         選択中のアイコンセット（Material / Windows / 絵文字）を Owner の表示フラグで切り替える。 -->
+    <Panel VerticalAlignment="Center">
+        <Image Source="{Binding #Root.Entry.MaterialIcon}"
+               IsVisible="{Binding #Root.Owner.ShowMaterialIcons, FallbackValue=False}"
+               Width="{Binding #Root.IconSize}" Height="{Binding #Root.IconSize}"
+               Stretch="Uniform" VerticalAlignment="Center" />
+        <Image Source="{Binding #Root.Entry.WindowsIcon}"
+               IsVisible="{Binding #Root.Owner.ShowWindowsIcons, FallbackValue=False}"
+               Width="{Binding #Root.IconSize}" Height="{Binding #Root.IconSize}"
+               Stretch="Uniform" VerticalAlignment="Center" />
+        <Panel IsVisible="{Binding #Root.Owner.ShowOriginalIcons, FallbackValue=False}">
+            <!-- 詳細 / 一覧: 素の絵文字テキスト。アイコンビュー: IconSize へ拡大（ScaleEmoji=True） -->
+            <TextBlock Text="{Binding #Root.Entry.Icon}"
+                       FontSize="{Binding #Root.EmojiFontSize}"
+                       IsVisible="{Binding !#Root.ScaleEmoji}"
+                       VerticalAlignment="Center" />
+            <Viewbox IsVisible="{Binding #Root.ScaleEmoji}"
+                     Width="{Binding #Root.IconSize}" Height="{Binding #Root.IconSize}"
+                     Stretch="Uniform" HorizontalAlignment="Center">
+                <TextBlock Text="{Binding #Root.Entry.Icon}" FontSize="64" />
+            </Viewbox>
+        </Panel>
+    </Panel>
+</UserControl>
