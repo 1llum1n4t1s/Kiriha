@@ -2467,7 +2467,7 @@ private void ExecutePaletteAction(TabViewModel tab, string action)
         // タブバー全域は「新しいタブで開く」（タブ行の上下どちら寄りかで挿入位置を決める）
         if (IsOnVerticalTabStrip(e))
         {
-            if (files.FirstOrDefault(Directory.Exists) is { } firstFolder)
+            if (TryGetDraggedFolder(files, out var firstFolder))
             {
                 e.DragEffects = DragDropEffects.Copy;
                 UpdateFileDropVisual(e, DragDropEffects.Copy, isBookmark: false, isTabOpen: true);
@@ -2500,6 +2500,38 @@ private void ExecutePaletteAction(TabViewModel tab, string action)
     /// エクスプローラーと同じく反応させない。</summary>
     private static bool IsSelfDrop(IReadOnlyList<string> files, string destination)
         => files.Any(file => WindowsPathIdentity.Instance.Equals(file, destination));
+
+    private string? _dragFolderCheckKey;
+    private string? _dragFolderCheckFirstFolder;
+
+    /// <summary>ドラッグ中のパス群に含まれる最初のフォルダーを返す。DragOver はポインタ移動のたびに
+    /// 発火するため同期の Directory.Exists は使わず（切断中のネットワークパスで UI がブロックする、
+    /// ResolveAnyDropTarget と同じ方針）、ドラッグセッションごとに 1 回だけバックグラウンドで判定して
+    /// 以降はキャッシュを返す。判定完了までは「フォルダーなし」として扱う。</summary>
+    private bool TryGetDraggedFolder(IReadOnlyList<string> files, out string firstFolder)
+    {
+        var key = string.Join("|", files);
+        if (!string.Equals(key, _dragFolderCheckKey, StringComparison.OrdinalIgnoreCase))
+        {
+            _dragFolderCheckKey = key;
+            _dragFolderCheckFirstFolder = null;
+            var snapshot = files.ToArray();
+            _ = Task.Run(() =>
+            {
+                var folder = snapshot.FirstOrDefault(Directory.Exists);
+                Dispatcher.UIThread.Post(() =>
+                {
+                    if (string.Equals(key, _dragFolderCheckKey, StringComparison.OrdinalIgnoreCase))
+                    {
+                        _dragFolderCheckFirstFolder = folder;
+                    }
+                });
+            });
+        }
+
+        firstFolder = _dragFolderCheckFirstFolder ?? "";
+        return firstFolder.Length > 0;
+    }
 
     private void OnDragLeave(object? sender, DragEventArgs e)
     {
