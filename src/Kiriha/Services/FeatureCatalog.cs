@@ -2,23 +2,22 @@ using Kiriha.Models;
 
 namespace Kiriha.Services;
 
-/// <summary>アプリ全体から利用する場所移動・種別絞り込み・一覧操作の定義。</summary>
+/// <summary>アプリ全体から利用する種別絞り込み・一覧操作の定義。</summary>
 public static class FeatureCatalog
 {
     public static IReadOnlyList<FeatureCommand> All { get; } = Build();
 
     private static List<FeatureCommand> Build()
     {
-        var result = new List<FeatureCommand>(100);
-        AddLocations(result);
+        var result = new List<FeatureCommand>(75);
         AddFilters(result);
         AddActions(result);
-        if (result.Count != 100)
+        if (result.Count != 75)
         {
             throw new InvalidOperationException($"アプリ機能の定義数が不正です（現在 {result.Count} 件）");
         }
 
-        var validKinds = new HashSet<string>(["location", "filter", "action"], StringComparer.Ordinal);
+        var validKinds = new HashSet<string>(["filter", "action"], StringComparer.Ordinal);
         if (result.Any(x => !validKinds.Contains(x.Kind) || string.IsNullOrWhiteSpace(x.Value)))
         {
             throw new InvalidOperationException("アプリ機能に未定義の種類または空の値があります");
@@ -36,26 +35,6 @@ public static class FeatureCatalog
         }
 
         return result;
-    }
-
-    private static void AddLocations(List<FeatureCommand> items)
-    {
-        (string Title, string Value)[] locations =
-        [
-            ("ホームへ移動", "UserProfile"), ("デスクトップへ移動", "Desktop"),
-            ("ドキュメントへ移動", "MyDocuments"), ("ダウンロードへ移動", "Downloads"),
-            ("画像へ移動", "MyPictures"), ("音楽へ移動", "MyMusic"), ("動画へ移動", "MyVideos"),
-            ("お気に入りへ移動", "Favorites"), ("最近使った項目へ移動", "Recent"),
-            ("送るメニューへ移動", "SendTo"), ("スタートメニューへ移動", "StartMenu"),
-            ("スタートアップへ移動", "Startup"), ("テンプレートへ移動", "Templates"),
-            ("ローカル AppData へ移動", "LocalApplicationData"), ("Roaming AppData へ移動", "ApplicationData"),
-            ("共通 AppData へ移動", "CommonApplicationData"), ("Program Files へ移動", "ProgramFiles"),
-            ("Program Files (x86) へ移動", "ProgramFilesX86"), ("Windows フォルダーへ移動", "Windows"),
-            ("System32 へ移動", "System"), ("一時フォルダーへ移動", "Temp"),
-            ("パブリックへ移動", "Public"), ("OneDrive へ移動", "OneDrive"),
-            ("ユーザーフォルダーへ移動", "Users"), ("PC（ドライブ一覧）へ移動", "Computer"),
-        ];
-        items.AddRange(locations.Select(x => new FeatureCommand(x.Title, "場所", "location", x.Value)));
     }
 
     private static void AddFilters(List<FeatureCommand> items)

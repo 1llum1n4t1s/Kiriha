@@ -137,10 +137,11 @@ public partial class TabViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(RowHeight), nameof(ListRowHeight))]
     private bool _isCompactView;
 
-    public double RowHeight => IsCompactView ? 24 : 30;
+    // 通常時は Windows 11 エクスプローラーの標準間隔相当、コンパクト時は従来の詰めた行高
+    public double RowHeight => IsCompactView ? 24 : 36;
 
     /// <summary>Windows エクスプローラーの一覧表示に合わせた行高。</summary>
-    public double ListRowHeight => IsCompactView ? 18 : 20;
+    public double ListRowHeight => IsCompactView ? 18 : 22;
 
     // ===== プレビューペイン =====
 
@@ -372,6 +373,9 @@ public partial class TabViewModel : ObservableObject
             return;
         }
 
+        // Enter からの即時実行時、保留中の絞り込みデバウンスが後から発火して
+        // 検索結果を上書きしないようにキャンセルしておく（デバウンス経由の呼び出しでは無害）。
+        _filterDebounceCts?.Cancel();
         _searchCts?.Cancel();
         var cts = CancellationTokenSource.CreateLinkedTokenSource(_lifetimeCts.Token);
         _searchCts = cts;
@@ -379,12 +383,16 @@ public partial class TabViewModel : ObservableObject
         StatusText = "検索中... (サブフォルダーを含む)";
 
         var root = CurrentPath;
+        var extensionFilter = _extensionFilter;
         var showExt = _options.ShowExtensions;
         var showHidden = _options.ShowHidden;
         var useMaterialIcons = _options.IconSet == FileIconSet.Material;
         var preferLight = useMaterialIcons && MaterialIconService.IsLightTheme();
-        var results = await Task.Run(() =>
+        var (results, truncated) = await Task.Run(() =>
         {
+            // 打ち切り発生の判定は「上限到達で break したか」で行う。ちょうど 1000 件ヒットの
+            // 完全走査を「打ち切り」と誤表示しないため、件数だけでは判定しない。
+            var wasTruncated = false;
             var list = new List<FileSystemEntry>();
             var options = new EnumerationOptions
             {
@@ -394,8 +402,14 @@ public partial class TabViewModel : ObservableObject
             };
             foreach (var item in new DirectoryInfo(root).EnumerateFileSystemInfos("*", options))
             {
-                if (cts.IsCancellationRequested || list.Count >= 1000)
+                if (cts.IsCancellationRequested)
                 {
+                    break;
+                }
+
+                if (list.Count >= 1000)
+                {
+                    wasTruncated = true;
                     break;
                 }
 
@@ -406,6 +420,12 @@ public partial class TabViewModel : ObservableObject
                 }
 
                 var isDir = item is DirectoryInfo;
+                // 種類フィルター（コマンドパレットの拡張子絞り込み）併用時は通常の絞り込みと同じ条件を適用する
+                if (extensionFilter is not null && (isDir || !extensionFilter.Contains(Path.GetExtension(name))))
+                {
+                    continue;
+                }
+
                 long? size = null;
                 DateTime? modified = null;
                 try
@@ -432,7 +452,7 @@ public partial class TabViewModel : ObservableObject
                 });
             }
 
-            return list;
+            return (list, wasTruncated);
         }, cts.Token);
 
         if (cts.IsCancellationRequested || _isDetached || generation != _searchGeneration
@@ -444,7 +464,9 @@ public partial class TabViewModel : ObservableObject
 
         ReplaceEntries(ApplySort(results));
 
-        StatusText = $"{results.Count} 件見つかりました (サブフォルダー含む{(results.Count >= 1000 ? "、上限 1000 件" : "")})";
+        StatusText = truncated
+            ? $"{results.Count} 件で打ち切りました (上限 1000 件到達、未走査のサブフォルダーがあります。検索語を絞ると続きを確認できます)"
+            : $"{results.Count} 件見つかりました (サブフォルダー含む)";
     }
 
     // ===== アイコンビューの画像・動画・PDFサムネイル =====
@@ -581,8 +603,15 @@ public partial class TabViewModel : ObservableObject
     public bool IsSortAscending => SortAscendingFlag;
     public bool IsSortDescending => !SortAscendingFlag;
 
-    /// <summary>現在表示中のパス。FileSystemService.ComputerPath ならドライブ一覧。</summary>
-    public string CurrentPath { get; private set; } = FileSystemService.ComputerPath;
+    private string _currentPath = FileSystemService.ComputerPath;
+
+    /// <summary>現在表示中のパス。FileSystemService.ComputerPath ならドライブ一覧。
+    /// 変更通知はサイドバーのツリー同期（MainWindowViewModel）が購読する。</summary>
+    public string CurrentPath
+    {
+        get => _currentPath;
+        private set => SetProperty(ref _currentPath, value);
+    }
 
     private List<FileSystemEntry> _entries = [];
 
@@ -710,12 +739,24 @@ public partial class TabViewModel : ObservableObject
         }
     }
 
+    /// <summary>タブバーへのフォルダードロップ中に挿入位置を示す、表示専用の半透明プレビュータブか。</summary>
+    public bool IsDropPreview { get; }
+
+    /// <summary>タブ行の不透明度（プレビュータブは半透明で仮配置される）。</summary>
+    public double TabRowOpacity => IsDropPreview ? 0.45 : 1.0;
+
+    /// <summary>ドロップ位置プレビュー用のタブを作る。フォルダー列挙・監視は行わない表示専用。</summary>
+    internal static TabViewModel CreateDropPreview(string path, ShellOptions options)
+        => new(path, options, folderViewSettings: null, initialViewSettings: null,
+            isSettingsTab: false, isDropPreview: true);
+
     internal TabViewModel(
         string initialPath,
         ShellOptions options,
         FolderViewSettingsService? folderViewSettings,
         FolderViewSettings? initialViewSettings,
-        bool isSettingsTab = false)
+        bool isSettingsTab = false,
+        bool isDropPreview = false)
     {
         _options = options;
         _folderViewSettings = folderViewSettings;
@@ -728,6 +769,7 @@ public partial class TabViewModel : ObservableObject
             new(this, "Size", "サイズ"),
         ];
         IsSettingsTab = isSettingsTab;
+        IsDropPreview = isDropPreview;
         if (!isSettingsTab && initialViewSettings is not null)
         {
             ApplyFolderViewSettings(initialViewSettings);
@@ -740,6 +782,15 @@ public partial class TabViewModel : ObservableObject
         {
             Title = "設定";
             PathText = "設定";
+        }
+        else if (isDropPreview)
+        {
+            // 表示専用: フォルダー列挙も監視もせず、タイトルとパスだけ整えて仮配置に使う
+            CurrentPath = initialPath;
+            PathText = initialPath;
+            Title = Path.GetFileName(Path.TrimEndingDirectorySeparator(initialPath)) is { Length: > 0 } name
+                ? name
+                : initialPath;
         }
         else
         {
@@ -1061,9 +1112,17 @@ public partial class TabViewModel : ObservableObject
         try
         {
             await Task.Delay(180, token);
-            if (!token.IsCancellationRequested && !_isDetached)
+            if (token.IsCancellationRequested || _isDetached)
             {
-                ApplyFilter();
+                return;
+            }
+
+            // まず現在のフォルダー内を即時絞り込みで表示し、続けてサブフォルダーを含む
+            // 検索結果で置き換える（エクスプローラーの検索ボックスと同等の見え方）。
+            ApplyFilter();
+            if (SearchText.Trim().Length > 0)
+            {
+                await SearchRecursiveAsync();
             }
         }
         catch (OperationCanceledException)
@@ -1091,6 +1150,7 @@ public partial class TabViewModel : ObservableObject
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
         _extensionFilterName = displayName;
         ApplyFilter();
+        RefreshRecursiveSearchIfActive();
     }
 
     public void ClearExtensionFilter()
@@ -1098,6 +1158,17 @@ public partial class TabViewModel : ObservableObject
         _extensionFilter = null;
         _extensionFilterName = "";
         ApplyFilter();
+        RefreshRecursiveSearchIfActive();
+    }
+
+    /// <summary>サブフォルダーを含む検索結果を表示中に種類フィルターが変わった場合、
+    /// ApplyFilter（現在のフォルダーの母集合のみ）で上書きされた一覧を再帰検索で復元する。</summary>
+    private void RefreshRecursiveSearchIfActive()
+    {
+        if (SearchText.Trim().Length > 0)
+        {
+            _ = SearchRecursiveAsync();
+        }
     }
 
     /// <summary>検索テキストで現在のフォルダー内容を絞り込む。</summary>

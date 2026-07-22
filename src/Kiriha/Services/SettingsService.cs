@@ -72,6 +72,9 @@ public sealed class AppSettings
     /// <summary>左ペインの表示状態。</summary>
     public bool ShowSidebar { get; set; } = true;
 
+    /// <summary>左ペインにクイックアクセスの代わりに XP 風フォルダーツリーを表示する。</summary>
+    public bool SidebarShowTree { get; set; }
+
     /// <summary>左ペインの幅。</summary>
     public double SidebarWidth { get; set; } = 230;
 
@@ -80,6 +83,15 @@ public sealed class AppSettings
 
     /// <summary>プレビューペインの表示状態（Alt+P）。</summary>
     public bool ShowPreviewPane { get; set; }
+
+    /// <summary>プレビューペインの幅（境界の Thumb ドラッグで変更）。</summary>
+    public double PreviewWidth { get; set; } = 280;
+
+    /// <summary>ステータスバーの表示状態（表示メニューで切替）。</summary>
+    public bool ShowStatusBar { get; set; } = true;
+
+    /// <summary>コンパクトビュー（行の高さを詰める。表示メニューで切替、新規タブの既定）。</summary>
+    public bool CompactView { get; set; }
 
     /// <summary>テーマ（System / Light / Dark）。</summary>
     public string ThemePreference { get; set; } = "System";

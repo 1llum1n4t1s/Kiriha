@@ -1,0 +1,298 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Kiriha.ViewModels"
+             xmlns:m="using:Kiriha.Models"
+             xmlns:c="using:Kiriha.Controls"
+             x:Class="Kiriha.Views.SettingsView"
+             x:DataType="vm:TabViewModel">
+    <!-- 設定タブの中身。MainWindow.axaml から分離（DataContext は TabViewModel、ウィンドウ設定へは $parent[Window] 経由）。 -->
+    <Border Background="{DynamicResource SettingsPageBg}">
+                        <Grid Margin="24">
+                        <TabControl Classes="settingsnav">
+
+                            <!-- ===== 表示 ===== -->
+                            <TabItem>
+                                <TabItem.Header>
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <TextBlock Classes="fico" Text="&#xE890;" FontSize="15" VerticalAlignment="Center" />
+                                        <TextBlock Text="表示" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </TabItem.Header>
+                                <ScrollViewer>
+                                    <StackPanel MaxWidth="860" HorizontalAlignment="Stretch" Margin="0,0,12,0">
+                                        <Border Classes="settingshero">
+                                            <Grid ColumnDefinitions="Auto,*">
+                                                <Border Classes="settingsheroicon">
+                                                    <TextBlock Classes="fico" Text="&#xE890;" FontSize="21"
+                                                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Border>
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                    <TextBlock Classes="settingsh1" Text="表示" />
+                                                    <TextBlock Classes="settingsherosubtitle" Text="ファイル一覧の見え方とKirihaの外観を調整します" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+
+                                        <HeaderedContentControl Classes="settingscard" Header="エクスプローラー表示">
+                                            <StackPanel Classes="settingsfields">
+                                                <CheckBox Content="隠しファイルを表示する"
+                                                          IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptShowHidden}" />
+                                                <CheckBox Content="ファイル名拡張子を表示する"
+                                                          IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptShowExtensions}" />
+                                                <CheckBox Content="項目チェックボックスを表示する"
+                                                          IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptShowCheckBoxes}" />
+                                                <CheckBox Content="お気に入りバーを表示する (Ctrl+Shift+B)"
+                                                          IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ShowBookmarksBar}" />
+                                            </StackPanel>
+                                        </HeaderedContentControl>
+
+                                        <HeaderedContentControl Classes="settingscard" Header="アイコン">
+                                            <StackPanel Classes="settingsfields">
+                                                <ComboBox Classes="settingsfield"
+                                                          ItemsSource="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IconSetOptions}"
+                                                          SelectedItem="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptIconSet, Mode=TwoWay}"
+                                                          MinWidth="240" HorizontalAlignment="Left" />
+                                                <TextBlock Classes="settingscaption" Margin="0,6,0,0"
+                                                           TextWrapping="Wrap"
+                                                           Text="マテリアルアイコンテーマでは material-icon-theme（MIT License, © Material Extensions）を使用します。Windows標準では、エクスプローラーと同じShellアイコンを表示します。" />
+                                            </StackPanel>
+                                        </HeaderedContentControl>
+
+                                        <HeaderedContentControl Classes="settingscard" Header="テーマ">
+                                            <StackPanel Spacing="12">
+                                                <!-- 表示は日本語、内部値（settings.json / ApplyTheme の switch）は英語のまま。
+                                                     SelectedValueBinding=Tag で ComboBoxItem.Tag を選択値として扱う。 -->
+                                                <ComboBox Classes="settingsfield"
+                                                          SelectedValue="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptTheme}"
+                                                          SelectedValueBinding="{Binding Tag, x:DataType=ComboBoxItem}"
+                                                          MinWidth="200" HorizontalAlignment="Left">
+                                                    <ComboBoxItem Tag="System">システム</ComboBoxItem>
+                                                    <ComboBoxItem Tag="Light">ライト</ComboBoxItem>
+                                                    <ComboBoxItem Tag="Dark">ダーク</ComboBoxItem>
+                                                    <ComboBoxItem Tag="OneDark">One Dark</ComboBoxItem>
+                                                </ComboBox>
+                                                <CheckBox Content="ウィンドウにアクリル効果（半透明ぼかし）を使う"
+                                                          IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptUseAcrylicBackground}" />
+                                            </StackPanel>
+                                        </HeaderedContentControl>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+
+                            <!-- ===== 起動 ===== -->
+                            <TabItem>
+                                <TabItem.Header>
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <TextBlock Classes="fico" Text="&#xE7E8;" FontSize="15" VerticalAlignment="Center" />
+                                        <TextBlock Text="起動" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </TabItem.Header>
+                                <ScrollViewer>
+                                    <StackPanel MaxWidth="860" HorizontalAlignment="Stretch" Margin="0,0,12,0">
+                                        <Border Classes="settingshero">
+                                            <Grid ColumnDefinitions="Auto,*">
+                                                <Border Classes="settingsheroicon">
+                                                    <TextBlock Classes="fico" Text="&#xE7E8;" FontSize="21"
+                                                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Border>
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                    <TextBlock Classes="settingsh1" Text="起動" />
+                                                    <TextBlock Classes="settingsherosubtitle" Text="起動方法、Windows統合、タスクトレイを管理します" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                        <HeaderedContentControl Classes="settingscard" Header="起動時の動作">
+                                            <StackPanel Spacing="8">
+                                                <TextBlock Classes="settingscaption" Margin="0"
+                                                           Text="新しいタブで開くフォルダー（空欄でユーザーフォルダー）" />
+                                                <TextBox Classes="settingsfield"
+                                                         Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptStartupPath}"
+                                                         MinWidth="400" HorizontalAlignment="Left" />
+                                                <CheckBox Content="終了時に開いていたタブを次回復元する" Margin="0,8,0,0"
+                                                          IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptRestoreAllTabs}" />
+                                            </StackPanel>
+                                        </HeaderedContentControl>
+
+                                        <HeaderedContentControl Classes="settingscard" Header="ウィンドウ">
+                                            <StackPanel Classes="settingsfields">
+                                                <CheckBox Content="ウィンドウのサイズと位置を保存する"
+                                                          IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptRememberWindowBounds}" />
+                                                <TextBlock Classes="settingscaption"
+                                                           Text="OFF にすると、次回は既定のサイズ・位置で起動します。" />
+                                            </StackPanel>
+                                        </HeaderedContentControl>
+
+                                        <HeaderedContentControl Classes="settingscard" Header="Windows 統合">
+                                            <StackPanel Classes="settingsfields">
+                                                <CheckBox Content="Windows のスタートアップに登録する"
+                                                          IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptRunAtStartup}" />
+                                                <TextBlock Classes="settingscaption"
+                                                           Text="サインイン時に Kiriha を自動で起動します。" />
+                                                <CheckBox Content="エクスプローラーの右クリックメニューに「Kiriha で開く」を追加する" Margin="0,8,0,0"
+                                                          IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptExplorerContextMenu}" />
+                                                <TextBlock Classes="settingscaption"
+                                                           Text="フォルダーやフォルダー内の背景を右クリックしたときに、そのフォルダーを Kiriha で開けます。" />
+                                                <CheckBox Content="フォルダーとドライブを開く既定のアプリを Kiriha にする" Margin="0,8,0,0"
+                                                          IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptDefaultFolderApp}" />
+                                                <TextBlock Classes="settingscaption" TextWrapping="Wrap"
+                                                           Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptDefaultFolderAppStatus}" />
+                                            </StackPanel>
+                                        </HeaderedContentControl>
+
+                                        <HeaderedContentControl Classes="settingscard" Header="タスクトレイ">
+                                            <StackPanel Classes="settingsfields">
+                                                <CheckBox Content="最小化時にタスクトレイに格納する"
+                                                          IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptMinimizeToTray}" />
+                                                <TextBlock Classes="settingscaption"
+                                                           Text="最小化するとタスクバーから消え、タスクトレイのアイコンから復元できます。" />
+                                                <CheckBox Content="起動時にタスクトレイに格納する" Margin="0,8,0,0"
+                                                          IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptStartMinimizedToTray}" />
+                                                <TextBlock Classes="settingscaption"
+                                                           Text="起動直後はウィンドウを表示せず、タスクトレイに格納した状態で開始します。" />
+                                            </StackPanel>
+                                        </HeaderedContentControl>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+
+                            <!-- ===== 更新と情報 ===== -->
+                            <TabItem>
+                                <TabItem.Header>
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <TextBlock Classes="fico" Text="&#xE895;" FontSize="15" VerticalAlignment="Center" />
+                                        <TextBlock Text="更新と情報" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </TabItem.Header>
+                                <ScrollViewer>
+                                    <StackPanel MaxWidth="860" HorizontalAlignment="Stretch" Margin="0,0,12,0">
+                                        <Border Classes="settingshero">
+                                            <Grid ColumnDefinitions="Auto,*">
+                                                <Border Classes="settingsheroicon">
+                                                    <TextBlock Classes="fico" Text="&#xE895;" FontSize="21"
+                                                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Border>
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                    <TextBlock Classes="settingsh1" Text="更新と情報" />
+                                                    <TextBlock Classes="settingsherosubtitle" Text="Kirihaのバージョン確認とアップデートを管理します" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                        <HeaderedContentControl Classes="settingscard" Header="バージョンと更新">
+                                            <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
+                                                <Border Grid.RowSpan="2" Grid.Column="0" Width="58" Height="58" Margin="0,0,16,0"
+                                                        Background="{DynamicResource SettingsIconBg}" CornerRadius="14">
+                                                    <Image Width="48" Height="48" Source="avares://Kiriha/icon/app_icon.png"
+                                                           RenderOptions.BitmapInterpolationMode="HighQuality"
+                                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Border>
+                                                <StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).VersionText}"
+                                                               FontSize="15" FontWeight="SemiBold"
+                                                               Foreground="{DynamicResource TextPrimary}" />
+                                                    <TextBlock Text=".NET 10 / Avalonia UI / Native AOT" Margin="0,4,0,0"
+                                                               FontSize="12.5" Foreground="{DynamicResource TextSecondary}" />
+                                                </StackPanel>
+                                                <CheckBox Grid.Row="1" Grid.Column="1" Margin="0,12,0,0"
+                                                          Content="起動時に更新を確認する"
+                                                          IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptCheckUpdatesOnStartup}" />
+                                                <Button Grid.RowSpan="2" Grid.Column="2" Classes="cmd"
+                                                        Content="今すぐ更新を確認" Click="CheckUpdate_Click"
+                                                        Margin="20,0,0,0" VerticalAlignment="Center"
+                                                        BorderBrush="{DynamicResource Divider}" BorderThickness="1" />
+                                            </Grid>
+                                        </HeaderedContentControl>
+                                        <HeaderedContentControl Classes="settingscard" Header="Kiriha について">
+                                            <TextBlock FontSize="13" LineHeight="22" TextWrapping="Wrap"
+                                                       Foreground="{DynamicResource TextSecondary}"
+                                                       Text="Windows Explorerのファイル操作と、Chromeのタブ・アドレスバー・お気に入り操作を一つの画面にまとめています。設定は現在のユーザーに保存されます。" />
+                                        </HeaderedContentControl>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+
+                            <!-- ===== メンテナンス ===== -->
+                            <TabItem>
+                                <TabItem.Header>
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <TextBlock Classes="fico" Text="&#xE90F;" FontSize="15" VerticalAlignment="Center" />
+                                        <TextBlock Text="メンテナンス" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </TabItem.Header>
+                                <ScrollViewer>
+                                    <StackPanel MaxWidth="860" HorizontalAlignment="Stretch" Margin="0,0,12,0">
+                                        <Border Classes="settingshero">
+                                            <Grid ColumnDefinitions="Auto,*">
+                                                <Border Classes="settingsheroicon">
+                                                    <TextBlock Classes="fico" Text="&#xE90F;" FontSize="21"
+                                                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Border>
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                    <TextBlock Classes="settingsh1" Text="メンテナンス" />
+                                                    <TextBlock Classes="settingsherosubtitle" Text="キャッシュ、ログ、設定データを管理します" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                        <HeaderedContentControl Classes="settingscard" Header="データとキャッシュ">
+                                            <StackPanel Spacing="10">
+                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                    <Button Classes="cmd" Content="クイックアクセスを再読み込み"
+                                                            Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ReloadSidebarCommand}"
+                                                            BorderBrush="{DynamicResource Divider}" BorderThickness="1" />
+                                                    <Button Classes="cmd" Content="ログフォルダーを開く"
+                                                            Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OpenLogFolderCommand}"
+                                                            BorderBrush="{DynamicResource Divider}" BorderThickness="1" />
+                                                </StackPanel>
+                                                <Button Classes="cmd" Content="設定をリセット"
+                                                        Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ResetSettingsCommand}"
+                                                        HorizontalAlignment="Left"
+                                                        BorderBrush="{DynamicResource Divider}" BorderThickness="1" />
+                                            </StackPanel>
+                                        </HeaderedContentControl>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+
+                            <!-- ===== ショートカット ===== -->
+                            <TabItem>
+                                <TabItem.Header>
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <TextBlock Classes="fico" Text="&#xE765;" FontSize="15" VerticalAlignment="Center" />
+                                        <TextBlock Text="ショートカット" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </TabItem.Header>
+                                <ScrollViewer>
+                                    <StackPanel MaxWidth="860" HorizontalAlignment="Stretch" Margin="0,0,12,0">
+                                        <Border Classes="settingshero">
+                                            <Grid ColumnDefinitions="Auto,*">
+                                                <Border Classes="settingsheroicon">
+                                                    <TextBlock Classes="fico" Text="&#xE765;" FontSize="21"
+                                                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Border>
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                    <TextBlock Classes="settingsh1" Text="ショートカット" />
+                                                    <TextBlock Classes="settingsherosubtitle" Text="キーボードで素早く操作するための一覧です" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                        <Grid ColumnDefinitions="*,14,*" RowDefinitions="Auto,Auto">
+                                            <HeaderedContentControl Grid.Row="0" Grid.Column="0" Classes="settingscard" Header="タブ">
+                                                <TextBlock FontSize="12.5" Foreground="{DynamicResource TextSecondary}" LineHeight="24"
+                                                           Text="Ctrl+T　新しいタブ&#x0a;Ctrl+W　タブを閉じる&#x0a;Ctrl+Shift+T　閉じたタブを開く&#x0a;Ctrl+Tab　タブを切り替える&#x0a;Ctrl+1..9　指定タブを選択" />
+                                            </HeaderedContentControl>
+                                            <HeaderedContentControl Grid.Row="0" Grid.Column="2" Classes="settingscard" Header="移動と表示">
+                                                <TextBlock FontSize="12.5" Foreground="{DynamicResource TextSecondary}" LineHeight="24"
+                                                           Text="Ctrl+L / F4　アドレス入力&#x0a;Ctrl+F / F3　検索&#x0a;Alt+← / →　戻る・進む&#x0a;Alt+↑　1つ上へ&#x0a;F5　更新 / F11　全画面" />
+                                            </HeaderedContentControl>
+                                            <HeaderedContentControl Grid.Row="1" Grid.ColumnSpan="3" Classes="settingscard" Header="ファイル操作">
+                                                <TextBlock FontSize="12.5" Foreground="{DynamicResource TextSecondary}" LineHeight="24"
+                                                           Text="Ctrl+X / C / V　切り取り・コピー・貼り付け　　Delete / Shift+Delete　削除・完全削除&#x0a;F2　名前の変更　　Alt+Enter　プロパティ　　Ctrl+Shift+N　新しいフォルダー　　Alt+P　プレビュー" />
+                                            </HeaderedContentControl>
+                                        </Grid>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+
+                        </TabControl>
+                        </Grid>
+    </Border>
+</UserControl>
