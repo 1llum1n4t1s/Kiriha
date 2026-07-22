@@ -15,7 +15,7 @@ internal static partial class Program
     private const string LegacyStartMenuFolderName = "1llum1n4t1s";
     // 起動通知の受け渡しを保護するロック。ハンドラ登録とパイプ受信の check-then-act を同一
     // クリティカルセクションに入れ、起動直後の競合で通知が消失する（lost-wakeup）のを防ぐ。
-    private static readonly object ActivationGate = new();
+    private static readonly Lock ActivationGate = new();
     private static Action<string[]>? _activationHandler;
     private static string[]? _pendingActivationArgs;
     /// <summary>起動引数（フォルダーパスを渡すとそのフォルダーをタブで開く）。</summary>
@@ -166,8 +166,16 @@ internal static partial class Program
     private static void AllowExistingInstanceForeground()
     {
         var current = Environment.ProcessId;
-        var existing = Process.GetProcessesByName("Kiriha").FirstOrDefault(p => p.Id != current);
-        if (existing is not null) AllowSetForegroundWindow(existing.Id);
+        var processes = Process.GetProcessesByName("Kiriha");
+        try
+        {
+            var existing = processes.FirstOrDefault(p => p.Id != current);
+            if (existing is not null) AllowSetForegroundWindow(existing.Id);
+        }
+        finally
+        {
+            foreach (var process in processes) process.Dispose();
+        }
     }
 
     private static void TrySetCurrentProcessAppUserModelId()

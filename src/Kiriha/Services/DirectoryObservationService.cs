@@ -3,10 +3,14 @@ namespace Kiriha.Services;
 /// <summary>同一フォルダーの監視をタブ間で共有し、変更通知をまとめて配信する。</summary>
 internal static class DirectoryObservationService
 {
-    private static readonly object Gate = new();
+    private static readonly Lock Gate = new();
     private static readonly Dictionary<string, Observation> Observations = new(WindowsPathIdentity.Instance);
 
-    public static IDisposable? Subscribe(string path, Action callback)
+    /// <summary>
+    /// 変更通知を購読する。callback には「最後に観測したファイルシステムイベントの UTC 時刻」を渡す。
+    /// 購読側はこの時刻より後に一覧を読み込み済みなら再読み込みを省略できる（多重リフレッシュ防止）。
+    /// </summary>
+    public static IDisposable? Subscribe(string path, Action<DateTime> callback)
     {
         try
         {
@@ -28,7 +32,7 @@ internal static class DirectoryObservationService
         }
     }
 
-    private static void Unsubscribe(string path, Action callback)
+    private static void Unsubscribe(string path, Action<DateTime> callback)
     {
         lock (Gate)
         {
@@ -46,7 +50,8 @@ internal static class DirectoryObservationService
     {
         private readonly FileSystemWatcher _watcher;
         private CancellationTokenSource? _debounce;
-        public List<Action> Callbacks { get; } = [];
+        private long _lastEventTicksUtc;
+        public List<Action<DateTime>> Callbacks { get; } = [];
 
         public Observation(string path)
         {
@@ -64,7 +69,10 @@ internal static class DirectoryObservationService
 
         private void Changed(object sender, FileSystemEventArgs e)
         {
-            _debounce?.Cancel();
+            Interlocked.Exchange(ref _lastEventTicksUtc, DateTime.UtcNow.Ticks);
+            var previous = _debounce;
+            previous?.Cancel();
+            previous?.Dispose();
             var cts = new CancellationTokenSource();
             _debounce = cts;
             _ = NotifyAfterDelayAsync(cts.Token);
@@ -75,9 +83,10 @@ internal static class DirectoryObservationService
             try
             {
                 await Task.Delay(600, token);
-                Action[] callbacks;
+                var lastEventUtc = new DateTime(Interlocked.Read(ref _lastEventTicksUtc), DateTimeKind.Utc);
+                Action<DateTime>[] callbacks;
                 lock (Gate) callbacks = Callbacks.ToArray();
-                foreach (var callback in callbacks) callback();
+                foreach (var callback in callbacks) callback(lastEventUtc);
             }
             catch (OperationCanceledException) { }
         }
@@ -85,11 +94,12 @@ internal static class DirectoryObservationService
         public void Dispose()
         {
             _debounce?.Cancel();
+            _debounce?.Dispose();
             _watcher.Dispose();
         }
     }
 
-    private sealed class Subscription(string path, Action callback) : IDisposable
+    private sealed class Subscription(string path, Action<DateTime> callback) : IDisposable
     {
         private int _disposed;
         public void Dispose()

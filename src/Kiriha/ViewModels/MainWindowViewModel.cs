@@ -13,6 +13,9 @@ public partial class MainWindowViewModel : ObservableObject
     private readonly AppSettings _settings;
     private readonly FolderViewSettingsService _folderViewSettings;
 
+    /// <summary>コンパクトビューの全タブ伝播中に PropertyChanged の再入で多重処理しないためのフラグ。</summary>
+    private bool _isPropagatingCompactView;
+
     /// <summary>共有アプリ設定（UpdateService が IgnoreUpdateTag を読み書きする）。</summary>
     public AppSettings Settings => _settings;
 
@@ -826,9 +829,26 @@ public partial class MainWindowViewModel : ObservableObject
         }
         else if (e.PropertyName == nameof(TabViewModel.IsCompactView))
         {
-            // 表示メニューで切り替えたら新規タブの既定と次回起動時の状態として保存する
-            _settings.CompactView = tab.IsCompactView;
-            SettingsService.Save(_settings);
+            // コンパクトビューはアプリ一律の設定。どのタブで切り替えても全タブへ反映し、
+            // 次回起動時の状態として保存する（伝播中の再入は無視）。
+            if (!_isPropagatingCompactView)
+            {
+                _isPropagatingCompactView = true;
+                try
+                {
+                    foreach (var t in Tabs)
+                    {
+                        t.IsCompactView = tab.IsCompactView;
+                    }
+                }
+                finally
+                {
+                    _isPropagatingCompactView = false;
+                }
+
+                _settings.CompactView = tab.IsCompactView;
+                SettingsService.Save(_settings);
+            }
         }
         else if (e.PropertyName is nameof(TabViewModel.ShowColModified) or nameof(TabViewModel.ShowColCreated)
                  or nameof(TabViewModel.ShowColType) or nameof(TabViewModel.ShowColSize))

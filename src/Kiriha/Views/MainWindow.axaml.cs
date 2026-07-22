@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Collections.Specialized;
 using System.Globalization;
 using Avalonia;
@@ -36,8 +37,8 @@ public partial class MainWindow : Window
     private Point _marqueeStartPoint;
     private KeyModifiers _marqueeModifiers;
     private bool _marqueeActive;
-    private static readonly IReadOnlyDictionary<string, HashSet<string>> SelectionExtensionSets =
-        new Dictionary<string, HashSet<string>>(StringComparer.Ordinal)
+    private static readonly FrozenDictionary<string, FrozenSet<string>> SelectionExtensionSets =
+        new Dictionary<string, FrozenSet<string>>(StringComparer.Ordinal)
         {
             ["select.images"] = ExtSet(".jpg;.jpeg;.png;.gif;.bmp;.webp;.tif;.tiff;.heic;.avif"),
             ["select.videos"] = ExtSet(".mp4;.mkv;.avi;.mov;.wmv;.webm;.m4v"),
@@ -46,7 +47,7 @@ public partial class MainWindow : Window
             ["select.archives"] = ExtSet(".zip;.7z;.rar;.tar;.gz;.bz2;.xz"),
             ["select.code"] = ExtSet(".cs;.cpp;.c;.h;.js;.ts;.py;.rs;.go;.java;.kt;.swift;.php;.rb;.vue;.svelte;.axaml"),
             ["select.executable"] = ExtSet(".exe;.com;.bat;.cmd;.ps1;.msi"),
-        };
+        }.ToFrozenDictionary(StringComparer.Ordinal);
 
     private TabViewModel? _tabDragTab;
     private Point _tabDragStart;
@@ -300,7 +301,7 @@ public partial class MainWindow : Window
                 // 新しいウィンドウ
                 if (Environment.ProcessPath is { } exe)
                 {
-                    System.Diagnostics.Process.Start(exe);
+                    System.Diagnostics.Process.Start(exe)?.Dispose();
                 }
 
                 break;
@@ -522,7 +523,16 @@ public partial class MainWindow : Window
         }
 
         var text = string.Join(Environment.NewLine, tab.Selection.Select(s => $"\"{s.FullPath}\""));
-        await Clipboard.SetTextAsync(text);
+        try
+        {
+            await Clipboard.SetTextAsync(text);
+        }
+        catch (Exception ex)
+        {
+            // 他プロセスがクリップボードを掴んでいる場合など。async void なので未捕捉のまま落とさない。
+            Logger.LogException("パスのコピーに失敗しました", ex);
+            tab.StatusText = "クリップボードへコピーできませんでした";
+        }
     }
 
     private async void FocusPathBox(TabViewModel? tab)
@@ -541,7 +551,16 @@ public partial class MainWindow : Window
             box?.Focus();
             box?.SelectAll();
         });
-        await copyTask;
+        try
+        {
+            await copyTask;
+        }
+        catch (Exception ex)
+        {
+            // クリップボード確保失敗はフォーカス動作を妨げない。async void なので未捕捉のまま落とさない。
+            Logger.LogException("現在パスのクリップボードコピーに失敗しました", ex);
+            tab.StatusText = "クリップボードへコピーできませんでした";
+        }
     }
 
     private void FocusSearchBox()
@@ -689,7 +708,7 @@ private void ExecutePaletteAction(TabViewModel tab, string action)
     {
         if (Environment.ProcessPath is { } exe)
         {
-            System.Diagnostics.Process.Start(exe);
+            System.Diagnostics.Process.Start(exe)?.Dispose();
         }
     }
 
@@ -1512,7 +1531,7 @@ private void ExecutePaletteAction(TabViewModel tab, string action)
             try
             {
                 System.Diagnostics.Process.Start(
-                    new System.Diagnostics.ProcessStartInfo(link.Path) { UseShellExecute = true });
+                    new System.Diagnostics.ProcessStartInfo(link.Path) { UseShellExecute = true })?.Dispose();
             }
             catch
             {
@@ -2961,7 +2980,7 @@ private void ExecutePaletteAction(TabViewModel tab, string action)
 
     private static string QuoteJson(string text) => $"\"{System.Text.Json.JsonEncodedText.Encode(text)}\"";
     private static string EscapeMarkdown(string text) => text.Replace("[", "\\[").Replace("]", "\\]");
-    private static HashSet<string> ExtSet(string value) => value.Split(';').ToHashSet(StringComparer.OrdinalIgnoreCase);
+    private static FrozenSet<string> ExtSet(string value) => value.Split(';').ToFrozenSet(StringComparer.OrdinalIgnoreCase);
     private static FileAttributes SafeAttributes(string path) { try { return File.GetAttributes(path); } catch { return 0; } }
 
     private static string ToWslPath(string path)
@@ -3107,13 +3126,22 @@ private void ExecutePaletteAction(TabViewModel tab, string action)
 
     /// <summary>
     /// シェル verb（削除・貼り付け・圧縮など）は InvokeCommand 復帰後に非同期で完了することがあるため、
-    /// 完了タイミングの揺れを吸収できるよう時間差で複数回一覧を再読み込みする。
+    /// 完了タイミングの揺れを吸収できるよう時間差の再読み込みを仕掛ける。
+    /// 通常はフォルダー監視（DirectoryObservationService）が先に変更を拾って一覧を更新するので、
+    /// 各時限発火は「verb 実行以降にまだ一度も再読み込みされていない場合」だけ動く監視の保険とする。
     /// </summary>
     internal static void RefreshAfterShellOperation(TabViewModel tab)
     {
+        var invokedAtUtc = DateTime.UtcNow;
         foreach (var delay in (int[])[700, 2500])
         {
-            DispatcherTimer.RunOnce(() => tab.NavigateTo(tab.CurrentPath, record: false), TimeSpan.FromMilliseconds(delay));
+            DispatcherTimer.RunOnce(() =>
+            {
+                if (tab.LastListLoadStartUtc <= invokedAtUtc)
+                {
+                    tab.NavigateTo(tab.CurrentPath, record: false);
+                }
+            }, TimeSpan.FromMilliseconds(delay));
         }
     }
 

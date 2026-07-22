@@ -11,7 +11,8 @@ internal sealed class WindowsPathIdentity : IEqualityComparer<string>
     public int GetHashCode(string value)
         => StringComparer.OrdinalIgnoreCase.GetHashCode(Normalize(value));
 
-    private static string Normalize(string? path)
+    /// <summary>比較・辞書キーに使う正規形（ComputerPath 特例 + 末尾区切り除去）。パス正規化の唯一の正本。</summary>
+    internal static string Normalize(string? path)
     {
         if (string.IsNullOrEmpty(path) || path == FileSystemService.ComputerPath)
         {

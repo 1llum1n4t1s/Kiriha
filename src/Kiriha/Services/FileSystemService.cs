@@ -66,6 +66,13 @@ public static class FileSystemService
                 continue;
             }
 
+            // Explorer パリティ: Hidden+System 両方付き（保護された OS 項目。Documents 配下の
+            // My Music 等の互換ジャンクションなど）は「隠しファイルを表示」ON でも表示しない。
+            if (hidden && (attributes & FileAttributes.System) != 0)
+            {
+                continue;
+            }
+
             entries.Add(new FileSystemEntry
             {
                 Name = dir.Name,
@@ -88,6 +95,12 @@ public static class FileSystemService
             var attributes = file.Attributes;
             var hidden = (attributes & FileAttributes.Hidden) != 0;
             if (!options.ShowHidden && hidden)
+            {
+                continue;
+            }
+
+            // Explorer パリティ: Hidden+System 両方付き（desktop.ini 等）は常に非表示。
+            if (hidden && (attributes & FileAttributes.System) != 0)
             {
                 continue;
             }

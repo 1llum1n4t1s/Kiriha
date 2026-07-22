@@ -14,7 +14,7 @@ public enum LogLevel
 public static class Logger
 {
     private static ILog? _logger;
-    private static readonly object InitLock = new();
+    private static readonly Lock InitLock = new();
 
     public static void Initialize()
     {

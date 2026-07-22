@@ -40,8 +40,8 @@ internal sealed class FolderViewSettingsService
     private static readonly string SettingsPath = Path.Combine(SettingsDirectory, "folder-views.json");
     private static readonly string BackupPath = SettingsPath + ".bak";
 
-    private readonly object _gate = new();
-    private readonly object _writeGate = new();
+    private readonly Lock _gate = new();
+    private readonly Lock _writeGate = new();
     private readonly Dictionary<string, FolderViewSettings> _settings = new(WindowsPathIdentity.Instance);
     private readonly Timer _saveTimer;
     private bool _dirty;
@@ -253,16 +253,7 @@ internal sealed class FolderViewSettingsService
     }
 
     private static string NormalizePath(string path)
-    {
-        if (string.IsNullOrWhiteSpace(path))
-        {
-            return "";
-        }
-
-        return path == FileSystemService.ComputerPath
-            ? path
-            : Path.TrimEndingDirectorySeparator(path);
-    }
+        => WindowsPathIdentity.Normalize(path);
 
     private static bool HasSameViewSettings(FolderViewSettings left, FolderViewSettings right)
         => left.ViewMode == right.ViewMode

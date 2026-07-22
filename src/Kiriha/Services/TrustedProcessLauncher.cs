@@ -34,7 +34,7 @@ internal static class TrustedProcessLauncher
             info.ArgumentList.Add(argument);
         }
 
-        Process.Start(info);
+        Process.Start(info)?.Dispose();
     }
 
     private static string ResolveExecutable(string fileName)

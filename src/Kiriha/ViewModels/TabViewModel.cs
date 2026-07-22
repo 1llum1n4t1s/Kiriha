@@ -349,11 +349,16 @@ public partial class TabViewModel : ObservableObject
         _watcherSubscription = DirectoryObservationService.Subscribe(path, OnObservedDirectoryChanged);
     }
 
-    private void OnObservedDirectoryChanged()
+    /// <summary>現在パスの一覧列挙を最後に開始した UTC 時刻。多重リフレッシュ抑止の判定に使う。</summary>
+    internal DateTime LastListLoadStartUtc { get; private set; }
+
+    private void OnObservedDirectoryChanged(DateTime lastEventUtc)
     {
         Dispatcher.UIThread.Post(() =>
         {
-            if (!_isDetached && SearchText.Length == 0)
+            // 最後のファイルシステムイベントより後に列挙を開始済みなら、その読み込みが
+            // 変更を反映済みなので再読み込みしない（操作直後の明示 Refresh との二重走行防止）。
+            if (!_isDetached && SearchText.Length == 0 && LastListLoadStartUtc <= lastEventUtc)
             {
                 NavigateTo(CurrentPath, record: false);
             }
@@ -388,72 +393,92 @@ public partial class TabViewModel : ObservableObject
         var showHidden = _options.ShowHidden;
         var useMaterialIcons = _options.IconSet == FileIconSet.Material;
         var preferLight = useMaterialIcons && MaterialIconService.IsLightTheme();
-        var (results, truncated) = await Task.Run(() =>
+        List<FileSystemEntry> results;
+        bool truncated;
+        try
         {
-            // 打ち切り発生の判定は「上限到達で break したか」で行う。ちょうど 1000 件ヒットの
-            // 完全走査を「打ち切り」と誤表示しないため、件数だけでは判定しない。
-            var wasTruncated = false;
-            var list = new List<FileSystemEntry>();
-            var options = new EnumerationOptions
+            (results, truncated) = await Task.Run(() =>
             {
-                IgnoreInaccessible = true,
-                RecurseSubdirectories = true,
-                AttributesToSkip = showHidden ? FileAttributes.System : FileAttributes.Hidden | FileAttributes.System,
-            };
-            foreach (var item in new DirectoryInfo(root).EnumerateFileSystemInfos("*", options))
+                // 打ち切り発生の判定は「上限到達で break したか」で行う。ちょうど 1000 件ヒットの
+                // 完全走査を「打ち切り」と誤表示しないため、件数だけでは判定しない。
+                var wasTruncated = false;
+                var list = new List<FileSystemEntry>();
+                var options = new EnumerationOptions
+                {
+                    IgnoreInaccessible = true,
+                    RecurseSubdirectories = true,
+                    AttributesToSkip = showHidden ? FileAttributes.System : FileAttributes.Hidden | FileAttributes.System,
+                };
+                foreach (var item in new DirectoryInfo(root).EnumerateFileSystemInfos("*", options))
+                {
+                    if (cts.IsCancellationRequested)
+                    {
+                        break;
+                    }
+
+                    if (list.Count >= 1000)
+                    {
+                        wasTruncated = true;
+                        break;
+                    }
+
+                    var name = item.Name;
+                    if (!name.Contains(query, StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    var isDir = item is DirectoryInfo;
+                    // 種類フィルター（コマンドパレットの拡張子絞り込み）併用時は通常の絞り込みと同じ条件を適用する
+                    if (extensionFilter is not null && (isDir || !extensionFilter.Contains(Path.GetExtension(name))))
+                    {
+                        continue;
+                    }
+
+                    long? size = null;
+                    DateTime? modified = null;
+                    try
+                    {
+                        size = item is FileInfo file ? file.Length : null;
+                        modified = item.LastWriteTime;
+                    }
+                    catch
+                    {
+                        // 情報が取れなくても一覧には出す
+                    }
+
+                    list.Add(new FileSystemEntry
+                    {
+                        Name = name,
+                        DisplayName = !isDir && !showExt && Path.GetFileNameWithoutExtension(name) is { Length: > 0 } stem ? stem : name,
+                        FullPath = item.FullName,
+                        IsDirectory = isDir,
+                        Size = size,
+                        Modified = modified,
+                        MaterialIconKey = useMaterialIcons
+                            ? MaterialIconService.ResolveIconKey(name, isDir, preferLight)
+                            : "",
+                    });
+                }
+
+                return (list, wasTruncated);
+            }, cts.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+        catch (Exception ex)
+        {
+            // ルート消失やドライブ切断など。無言のまま「検索中...」表示で止めない（NavigateToAsync と同じ規約）。
+            Logger.LogException($"再帰検索に失敗しました: {root}", ex);
+            if (!_isDetached && generation == _searchGeneration)
             {
-                if (cts.IsCancellationRequested)
-                {
-                    break;
-                }
-
-                if (list.Count >= 1000)
-                {
-                    wasTruncated = true;
-                    break;
-                }
-
-                var name = item.Name;
-                if (!name.Contains(query, StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-
-                var isDir = item is DirectoryInfo;
-                // 種類フィルター（コマンドパレットの拡張子絞り込み）併用時は通常の絞り込みと同じ条件を適用する
-                if (extensionFilter is not null && (isDir || !extensionFilter.Contains(Path.GetExtension(name))))
-                {
-                    continue;
-                }
-
-                long? size = null;
-                DateTime? modified = null;
-                try
-                {
-                    size = item is FileInfo file ? file.Length : null;
-                    modified = item.LastWriteTime;
-                }
-                catch
-                {
-                    // 情報が取れなくても一覧には出す
-                }
-
-                list.Add(new FileSystemEntry
-                {
-                    Name = name,
-                    DisplayName = !isDir && !showExt && Path.GetFileNameWithoutExtension(name) is { Length: > 0 } stem ? stem : name,
-                    FullPath = item.FullName,
-                    IsDirectory = isDir,
-                    Size = size,
-                    Modified = modified,
-                    MaterialIconKey = useMaterialIcons
-                        ? MaterialIconService.ResolveIconKey(name, isDir, preferLight)
-                        : "",
-                });
+                StatusText = $"検索に失敗しました: {ex.Message}";
             }
 
-            return (list, wasTruncated);
-        }, cts.Token);
+            return;
+        }
 
         if (cts.IsCancellationRequested || _isDetached || generation != _searchGeneration
             || !string.Equals(root, CurrentPath, StringComparison.OrdinalIgnoreCase)
@@ -925,6 +950,7 @@ public partial class TabViewModel : ObservableObject
         {
             try
             {
+                LastListLoadStartUtc = DateTime.UtcNow;
                 entries = await Task.Run(() => FileSystemService.GetEntries(path, _options), _lifetimeCts.Token);
                 break;
             }
@@ -1212,21 +1238,36 @@ public partial class TabViewModel : ObservableObject
 
     private void UpdateFreeSpace(string path)
     {
-        try
+        // DriveInfo.AvailableFreeSpace は同期 P/Invoke で、切断中のネットワークドライブでは
+        // OS のタイムアウトまで UI スレッドをブロックするため、取得は背景スレッドで行う。
+        FreeSpaceText = "";
+        if (path == FileSystemService.ComputerPath || Path.GetPathRoot(path) is not { Length: > 0 } root)
         {
-            if (path != FileSystemService.ComputerPath && Path.GetPathRoot(path) is { Length: > 0 } root)
-            {
-                var drive = new DriveInfo(root);
-                FreeSpaceText = $"空き領域: {FileSystemEntry.FormatSize(drive.AvailableFreeSpace)}";
-                return;
-            }
-        }
-        catch
-        {
-            // ネットワークドライブ切断などは表示なしで続行
+            return;
         }
 
-        FreeSpaceText = "";
+        var generation = _navigationGeneration;
+        _ = Task.Run(() =>
+        {
+            string text;
+            try
+            {
+                text = $"空き領域: {FileSystemEntry.FormatSize(new DriveInfo(root).AvailableFreeSpace)}";
+            }
+            catch
+            {
+                // ネットワークドライブ切断などは表示なしで続行
+                return;
+            }
+
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (!_isDetached && generation == _navigationGeneration)
+                {
+                    FreeSpaceText = text;
+                }
+            });
+        });
     }
 
     /// <summary>詳細表示のカラムヘッダークリック（同じ列なら昇順 / 降順をトグル、エクスプローラーと同じ）。</summary>
@@ -1285,17 +1326,13 @@ public partial class TabViewModel : ObservableObject
             return;
         }
 
-        string rootLabel;
-        try
-        {
-            rootLabel = FileSystemService.GetDriveLabel(new DriveInfo(root));
-        }
-        catch
-        {
-            rootLabel = root.TrimEnd(Path.DirectorySeparatorChar);
-        }
-
+        // ボリュームラベル取得（DriveInfo.VolumeLabel）は同期 P/Invoke で、切断ドライブでは
+        // UI スレッドを長時間ブロックし得るため、キャッシュ表記で即時構築し背景で最新へ差し替える。
+        var rootLabel = DriveLabelCache.TryGetValue(root, out var cachedLabel)
+            ? cachedLabel
+            : root.TrimEnd(Path.DirectorySeparatorChar);
         Breadcrumbs.Add(new BreadcrumbSegment { Name = rootLabel, Path = root });
+        RefreshDriveLabelAsync(root);
 
         var rest = path[root.Length..].Trim(Path.DirectorySeparatorChar);
         if (rest.Length == 0)
@@ -1311,6 +1348,38 @@ public partial class TabViewModel : ObservableObject
         }
     }
 
+    /// <summary>ドライブ表記（例: "Windows (C:)"）のセッション内キャッシュ。UI スレッドからのみ触る。</summary>
+    private static readonly Dictionary<string, string> DriveLabelCache = new(WindowsPathIdentity.Instance);
+
+    /// <summary>ボリュームラベルを背景で取得し、パンくずのルート表記とキャッシュを最新化する。</summary>
+    private void RefreshDriveLabelAsync(string root)
+    {
+        var generation = _navigationGeneration;
+        _ = Task.Run(() =>
+        {
+            string label;
+            try
+            {
+                label = FileSystemService.GetDriveLabel(new DriveInfo(root));
+            }
+            catch
+            {
+                // 切断ドライブなどはフォールバック表記のまま
+                return;
+            }
+
+            Dispatcher.UIThread.Post(() =>
+            {
+                DriveLabelCache[root] = label;
+                if (!_isDetached && generation == _navigationGeneration
+                    && Breadcrumbs.Count > 1 && Breadcrumbs[1].Path == root && Breadcrumbs[1].Name != label)
+                {
+                    Breadcrumbs[1] = new BreadcrumbSegment { Name = label, Path = root };
+                }
+            });
+        });
+    }
+
     /// <summary>エントリを開く（フォルダーは移動、ファイルは関連付けで起動）。</summary>
     public void Open(FileSystemEntry entry)
     {
@@ -1322,7 +1391,7 @@ public partial class TabViewModel : ObservableObject
 
         try
         {
-            Process.Start(new ProcessStartInfo(entry.FullPath) { UseShellExecute = true });
+            Process.Start(new ProcessStartInfo(entry.FullPath) { UseShellExecute = true })?.Dispose();
         }
         catch (Exception ex)
         {
@@ -1355,7 +1424,7 @@ public partial class TabViewModel : ObservableObject
         {
             try
             {
-                Process.Start(new ProcessStartInfo(input) { UseShellExecute = true });
+                Process.Start(new ProcessStartInfo(input) { UseShellExecute = true })?.Dispose();
                 PathText = CurrentPath == FileSystemService.ComputerPath ? "PC" : CurrentPath;
             }
             catch (Exception ex)
@@ -1517,18 +1586,24 @@ public partial class TabViewModel : ObservableObject
         {
             // RDP の仮想ファイルはローカルパスを持たない。Explorer と同じフォルダー背景の
             // paste verb に IDataObject / FileContents の取得を任せる。
+            var pasteInvokedAtUtc = DateTime.UtcNow;
             if (!ShellContextMenuService.InvokeDirectoryBackgroundVerb(0, dest, "paste"))
             {
                 StatusText = "仮想ファイルを貼り付けられませんでした";
                 return;
             }
 
-            // Shell の貼り付けは非同期で完了することがある。時間差で複数回更新して完了タイミングの
-            // 揺れを吸収し、以後は DirectoryObservationService の変更通知で一覧を追従させる。
-            await Task.Delay(500);
-            Refresh();
-            await Task.Delay(2000);
-            Refresh();
+            // Shell の貼り付けは非同期で完了することがある。通常はフォルダー監視が先に一覧を
+            // 更新するため、時限の再読み込みは「まだ一度も更新されていない場合」だけの保険とする。
+            foreach (var delayMs in (int[])[500, 2000])
+            {
+                await Task.Delay(delayMs);
+                if (LastListLoadStartUtc <= pasteInvokedAtUtc)
+                {
+                    Refresh();
+                }
+            }
+
             return;
         }
 
@@ -1707,8 +1782,7 @@ public partial class TabViewModel : ObservableObject
 
         // 自分自身の場所へのドロップは無視（エクスプローラーと同じ）
         var effective = files
-            .Where(f => !string.Equals(Path.GetDirectoryName(f)?.TrimEnd(Path.DirectorySeparatorChar),
-                destDir.TrimEnd(Path.DirectorySeparatorChar), StringComparison.OrdinalIgnoreCase))
+            .Where(f => !WindowsPathIdentity.Instance.Equals(Path.GetDirectoryName(f), destDir))
             .ToList();
         if (effective.Count == 0)
         {

@@ -11,7 +11,7 @@
         Width="1100" Height="720"
         MinWidth="560" MinHeight="360"
         ExtendClientAreaToDecorationsHint="True"
-        ExtendClientAreaTitleBarHeightHint="42"
+        ExtendClientAreaTitleBarHeightHint="32"
         WindowDecorations="BorderOnly"
         UseLayoutRounding="True"
         Background="{DynamicResource TabStripBg}">
@@ -31,7 +31,7 @@
             </ExperimentalAcrylicBorder.Material>
         </ExperimentalAcrylicBorder>
 
-    <Grid RowDefinitions="42,*" ColumnDefinitions="Auto,*">
+    <Grid RowDefinitions="32,*" ColumnDefinitions="Auto,*">
 
         <!-- タブのドラッグ中に、掴んだタブがカーソルへ追従して浮くゴースト表示のオーバーレイ。
              ヒットテストは無効（下の操作を邪魔しない）で、全面に最前面で重ねる。 -->
