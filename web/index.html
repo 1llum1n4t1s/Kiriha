@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kiriha — タブで軽やかに使える Windows ファイルマネージャー</title>
-  <meta name="description" content="Kiriha（キリハ）は Chrome のようなタブ操作と Windows Explorer の使い勝手を組み合わせた、無料・オープンソースの Windows ファイルマネージャーです。Native AOT で軽快に起動し、標準シェルメニューや Explorer 互換のコピー＆ペースト、ドラッグ＆ドロップに対応します。" />
+  <meta name="description" content="Kiriha（キリハ）は Chrome のような垂直タブと Windows Explorer の使い勝手を組み合わせた、無料・オープンソースの Windows ファイルマネージャーです。標準シェルメニュー、Explorer 互換のコピー＆ペーストと DnD、フォルダーツリー、コマンドパレットに対応。x64 / ARM64 両対応で軽快に動作します。" />
   <meta name="keywords" content="Kiriha, キリハ, ファイルマネージャー, ファイラー, Windows, タブ, Explorer, Avalonia, Native AOT, オープンソース" />
   <meta name="author" content="1llum1n4t1s" />
   <meta name="robots" content="index, follow" />
@@ -95,8 +95,8 @@
       flex: 0 0 auto;
       border: 1px solid rgba(255,255,255,.16);
       border-radius: 11px;
-      background: linear-gradient(150deg, #1d6fe0, #48b5fb);
-      box-shadow: 0 9px 26px rgba(33, 131, 235, .28), inset 0 1px rgba(255,255,255,.22);
+      background: linear-gradient(150deg, #ffc844, #f39a0b);
+      box-shadow: 0 9px 26px rgba(243, 156, 12, .3), inset 0 1px rgba(255,255,255,.32);
     }
     .brand-mark::before {
       content: "";
@@ -172,32 +172,38 @@
       transform-origin: center;
     }
     .window::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(118deg, rgba(255,255,255,.07), transparent 28%); }
-    .tabbar { height: 43px; display: flex; align-items: end; gap: 5px; padding: 0 12px; background: #0b1119; }
-    .tab { height: 34px; min-width: 148px; padding: 0 13px; display: flex; align-items: center; gap: 8px; border-radius: 10px 10px 0 0; background: #182433; color: #dbe7f3; font-size: .68rem; }
-    .tab .mini-folder { width: 13px; height: 10px; border-radius: 2px; background: #4ea7f4; }
-    .tab .close { margin-left: auto; color: #7e8fa1; }
-    .new-tab { align-self: center; color: #8192a4; font-size: 1.1rem; }
-    .caption { margin-left: auto; align-self: center; display: flex; gap: 18px; padding: 0 4px 2px; color: #8798a9; font-size: .75rem; }
+    .titlebar { height: 32px; display: flex; align-items: center; gap: 10px; padding: 0 13px; background: #0b1119; color: #dbe7f3; font-size: .66rem; font-weight: 700; }
+    .titlebar .t-sub { color: #7e8fa1; font-weight: 500; }
+    .caption { margin-left: auto; display: flex; gap: 16px; color: #8798a9; font-size: .72rem; }
+    .app-body { display: grid; grid-template-columns: 128px minmax(0, 1fr); }
+    .vtabs { display: flex; flex-direction: column; gap: 4px; padding: 9px 7px; background: #0b1119; }
+    .vtab { height: 30px; display: flex; align-items: center; gap: 7px; padding: 0 9px; border-radius: 8px; color: #9eafbf; font-size: .6rem; }
+    .vtab.active { background: #182433; color: #eaf5ff; }
+    .vtab .mini-folder { width: 12px; height: 9px; border-radius: 2px; background: #eeb63f; flex: 0 0 auto; }
+    .vtab .pin, .vtab .close { margin-left: auto; color: #7e8fa1; font-size: .62rem; }
+    .vtab-new { margin-top: 6px; padding: 0 9px; color: #8192a4; font-size: .62rem; }
+    .main-col { min-width: 0; border-left: 1px solid #202f3f; }
     .toolbar { display: grid; grid-template-columns: auto minmax(0,1fr) 124px; align-items: center; gap: 10px; height: 53px; padding: 0 14px; border-bottom: 1px solid #202f3f; background: #121c28; }
     .nav-actions { display: flex; gap: 8px; color: #8194a8; font-size: .8rem; }
-    .omnibox, .searchbox { height: 32px; display: flex; align-items: center; padding: 0 12px; border: 1px solid #26394c; border-radius: 8px; background: #0d1620; color: #aab8c6; font-size: .64rem; }
+    .omnibox, .searchbox { height: 32px; display: flex; align-items: center; padding: 0 12px; overflow: hidden; border: 1px solid #26394c; border-radius: 8px; background: #0d1620; color: #aab8c6; font-size: .64rem; white-space: nowrap; }
     .crumb { color: #eef6ff; font-weight: 600; }
     .sep { padding: 0 8px; color: #52677a; }
     .searchbox { color: #65798d; }
-    .commandbar { height: 43px; display: flex; align-items: center; gap: 7px; padding: 0 14px; border-bottom: 1px solid #202f3f; color: #a9b8c6; font-size: .61rem; }
-    .commandbar span { padding: 5px 8px; border-radius: 5px; }
+    .commandbar { height: 43px; display: flex; align-items: center; gap: 7px; padding: 0 14px; overflow: hidden; border-bottom: 1px solid #202f3f; color: #a9b8c6; font-size: .61rem; }
+    .commandbar span { padding: 5px 8px; border-radius: 5px; white-space: nowrap; }
     .commandbar .primary { color: #dcecff; background: #21364b; }
     .file-body { display: grid; grid-template-columns: 118px minmax(0,1fr); min-height: 300px; }
     .side { padding: 13px 8px; border-right: 1px solid #202f3f; background: #0f1823; }
+    .side-toggle { margin: 0 4px 11px; padding: 6px 8px; border: 1px solid #26394c; border-radius: 999px; color: #cfe0ef; background: #16222f; font-size: .56rem; font-weight: 700; text-align: center; }
     .side-title { margin: 4px 8px 8px; color: #667c90; font-size: .55rem; font-weight: 700; text-transform: uppercase; }
     .side-item { display: flex; align-items: center; gap: 7px; height: 28px; padding: 0 8px; border-radius: 6px; color: #9eafbf; font-size: .59rem; }
     .side-item.active { color: #eaf5ff; background: #1d3043; }
-    .side-dot { width: 8px; height: 7px; border-radius: 2px; background: #4c9ce7; opacity: .85; }
+    .side-dot { width: 8px; height: 7px; border-radius: 2px; background: #e2b04a; opacity: .9; }
     .files { display: grid; grid-template-columns: repeat(4, 1fr); align-content: start; gap: 8px; padding: 20px 18px 26px; }
     .file { min-width: 0; padding: 12px 4px 9px; border: 1px solid transparent; border-radius: 9px; text-align: center; color: #adbdcc; font-size: .57rem; }
     .file.selected { border-color: #31577b; background: rgba(47, 111, 170, .18); }
-    .folder-icon { position: relative; width: 48px; height: 34px; margin: 5px auto 10px; border-radius: 4px 7px 7px 7px; background: linear-gradient(145deg, #4294e5, #75c5ff); box-shadow: inset 0 1px rgba(255,255,255,.22); }
-    .folder-icon::before { content: ""; position: absolute; left: 0; top: -5px; width: 22px; height: 9px; border-radius: 4px 4px 0 0; background: #5cb0f5; }
+    .folder-icon { position: relative; width: 48px; height: 34px; margin: 5px auto 10px; border-radius: 4px 7px 7px 7px; background: linear-gradient(145deg, #e9b23a, #f8d275); box-shadow: inset 0 1px rgba(255,255,255,.3); }
+    .folder-icon::before { content: ""; position: absolute; left: 0; top: -5px; width: 22px; height: 9px; border-radius: 4px 4px 0 0; background: #ddA630; }
     .folder-icon.code::after { content: "‹/›"; position: absolute; inset: 5px 0 0; display: grid; place-items: center; color: white; font-size: .75rem; font-weight: 800; }
     .file-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .status { height: 26px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; border-top: 1px solid #202f3f; color: #6d8194; font-size: .55rem; }
@@ -253,7 +259,7 @@
     .download-head { position: relative; display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 30px; }
     .download-head h2 { margin-bottom: 4px; }
     .free { padding: 7px 11px; border: 1px solid rgba(117,230,170,.27); border-radius: 999px; color: var(--success); background: rgba(117,230,170,.07); font-size: .69rem; font-weight: 800; }
-    .download-grid { position: relative; display: grid; grid-template-columns: 1.35fr .65fr; gap: 12px; }
+    .download-grid { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
     .download-card { min-height: 89px; padding: 16px 18px; display: flex; align-items: center; gap: 16px; border: 1px solid var(--line); border-radius: 14px; background: rgba(6,12,18,.42); transition: .22s ease; }
     .download-card:hover { transform: translateY(-3px); border-color: #4d7397; background: rgba(25,45,64,.65); }
     .download-card.primary { border-color: #3a76a9; background: linear-gradient(135deg, rgba(45,129,204,.25), rgba(6,12,18,.42)); }
@@ -298,6 +304,7 @@
       .toolbar { grid-template-columns: auto minmax(0,1fr); }
       .searchbox { display: none; }
       .commandbar span:nth-child(n+5) { display: none; }
+      .app-body { grid-template-columns: 104px minmax(0,1fr); }
       .file-body { grid-template-columns: 88px minmax(0,1fr); min-height: 250px; }
       .side-item { padding-inline: 5px; }
       .files { grid-template-columns: repeat(3,1fr); padding: 17px 9px; }
@@ -319,7 +326,9 @@
       .files { grid-template-columns: repeat(2,1fr); }
       .file:nth-child(n+7) { display: none; }
       .caption { gap: 11px; }
-      .tab { min-width: 124px; }
+      .app-body { grid-template-columns: 1fr; }
+      .vtabs { display: none; }
+      .main-col { border-left: 0; }
       .cta .btn { width: 100%; }
     }
     @media (prefers-reduced-motion: reduce) {
@@ -356,6 +365,7 @@
           <div class="badges reveal" style="--delay: 40ms">
             <span class="badge"><span class="dot"></span>無料・オープンソース</span>
             <span class="badge">Windows 10 / 11</span>
+            <span class="badge">x64 / ARM64</span>
             <span class="badge">Native AOT · .NET 10</span>
           </div>
           <h1 id="hero-title" class="reveal" style="--delay: 100ms"><span class="gradient-text">Kiriha</span></h1>
@@ -378,41 +388,50 @@
           </div>
         </div>
 
-        <div class="window reveal" style="--delay: 180ms" role="img" aria-label="Kiriha のファイルマネージャー画面イメージ">
-          <div class="tabbar">
-            <div class="tab"><span class="mini-folder"></span><span>IMT</span><span class="close">×</span></div>
-            <div class="tab"><span class="mini-folder"></span><span>dev</span><span class="close">×</span></div>
-            <span class="new-tab">＋</span>
+        <div class="window reveal" style="--delay: 180ms" role="img" aria-label="Kiriha のファイルマネージャー画面イメージ（左側の垂直タブとフォルダーツリー）">
+          <div class="titlebar">
+            <span>Kiriha</span><span class="t-sub">IMT</span>
             <span class="caption"><span>—</span><span>□</span><span>×</span></span>
           </div>
-          <div class="toolbar">
-            <div class="nav-actions"><span>←</span><span>→</span><span>↻</span><span>↑</span></div>
-            <div class="omnibox"><span class="crumb">PC</span><span class="sep">›</span><span class="crumb">Windows (C:)</span><span class="sep">›</span><span class="crumb">Users</span><span class="sep">›</span><span class="crumb">IMT</span></div>
-            <div class="searchbox">⌕&nbsp; IMT の検索</div>
-          </div>
-          <div class="commandbar"><span class="primary">＋ 新規作成</span><span>切り取り</span><span>コピー</span><span>貼り付け</span><span>並べ替え⌄</span><span>表示⌄</span><span>場所⌄</span><span>種類⌄</span></div>
-          <div class="file-body">
-            <aside class="side" aria-hidden="true">
-              <div class="side-title">クイックアクセス</div>
-              <div class="side-item active"><span class="side-dot"></span>IMT</div>
-              <div class="side-item"><span class="side-dot"></span>デスクトップ</div>
-              <div class="side-item"><span class="side-dot"></span>dev</div>
-              <div class="side-item"><span class="side-dot"></span>ドキュメント</div>
-              <div class="side-title" style="margin-top:12px">PC</div>
-              <div class="side-item"><span class="side-dot"></span>Windows (C:)</div>
+          <div class="app-body">
+            <aside class="vtabs" aria-hidden="true">
+              <div class="vtab"><span class="mini-folder"></span><span>Desktop</span><span class="pin">📌</span></div>
+              <div class="vtab"><span class="mini-folder"></span><span>dev</span><span class="pin">📌</span></div>
+              <div class="vtab"><span class="mini-folder"></span><span>Shisui</span><span class="close">×</span></div>
+              <div class="vtab active"><span class="mini-folder"></span><span>IMT</span><span class="close">×</span></div>
+              <div class="vtab-new">＋ 新しいタブ　Ctrl+T</div>
             </aside>
-            <div class="files" aria-hidden="true">
-              <div class="file"><div class="folder-icon"></div><div class="file-name">Desktop</div></div>
-              <div class="file selected"><div class="folder-icon code"></div><div class="file-name">dev</div></div>
-              <div class="file"><div class="folder-icon"></div><div class="file-name">Documents</div></div>
-              <div class="file"><div class="folder-icon"></div><div class="file-name">Downloads</div></div>
-              <div class="file"><div class="folder-icon"></div><div class="file-name">Pictures</div></div>
-              <div class="file"><div class="folder-icon"></div><div class="file-name">Projects</div></div>
-              <div class="file"><div class="folder-icon"></div><div class="file-name">Saved Games</div></div>
-              <div class="file"><div class="folder-icon"></div><div class="file-name">Videos</div></div>
+            <div class="main-col">
+              <div class="toolbar">
+                <div class="nav-actions"><span>←</span><span>→</span><span>↻</span><span>↑</span></div>
+                <div class="omnibox"><span class="crumb">PC</span><span class="sep">›</span><span class="crumb">Windows (C:)</span><span class="sep">›</span><span class="crumb">Users</span><span class="sep">›</span><span class="crumb">IMT</span></div>
+                <div class="searchbox">⌕&nbsp; IMT の検索</div>
+              </div>
+              <div class="commandbar"><span class="primary">＋ 新規フォルダ作成</span><span>切り取り</span><span>コピー</span><span>貼り付け</span><span>並べ替え⌄</span><span>表示⌄</span><span>種類⌄</span><span>ツール⌄</span></div>
+              <div class="file-body">
+                <aside class="side" aria-hidden="true">
+                  <div class="side-toggle">🌲 ツリー表示</div>
+                  <div class="side-title">クイックアクセス</div>
+                  <div class="side-item active"><span class="side-dot"></span>IMT</div>
+                  <div class="side-item"><span class="side-dot"></span>デスクトップ</div>
+                  <div class="side-item"><span class="side-dot"></span>dev</div>
+                  <div class="side-title" style="margin-top:12px">PC</div>
+                  <div class="side-item"><span class="side-dot"></span>Windows (C:)</div>
+                </aside>
+                <div class="files" aria-hidden="true">
+                  <div class="file"><div class="folder-icon"></div><div class="file-name">Desktop</div></div>
+                  <div class="file selected"><div class="folder-icon code"></div><div class="file-name">dev</div></div>
+                  <div class="file"><div class="folder-icon"></div><div class="file-name">Documents</div></div>
+                  <div class="file"><div class="folder-icon"></div><div class="file-name">Downloads</div></div>
+                  <div class="file"><div class="folder-icon"></div><div class="file-name">Pictures</div></div>
+                  <div class="file"><div class="folder-icon"></div><div class="file-name">Projects</div></div>
+                  <div class="file"><div class="folder-icon"></div><div class="file-name">Saved Games</div></div>
+                  <div class="file"><div class="folder-icon"></div><div class="file-name">Videos</div></div>
+                </div>
+              </div>
+              <div class="status"><span>61 個の項目</span><span>空き領域: 204 GB　 ●━━━━━━</span></div>
             </div>
           </div>
-          <div class="status"><span>70 個の項目</span><span>空き領域: 203 GB　 ●━━━━━━</span></div>
         </div>
       </div>
     </section>
@@ -420,11 +439,11 @@
     <section class="strip" aria-label="主要機能">
       <div class="wrap strip-inner">
         <span class="strip-label">Built for Windows</span>
-        <span class="chip">Tabbed browsing</span>
+        <span class="chip">Vertical tabs</span>
         <span class="chip">Shell context menu</span>
-        <span class="chip">Quick Access</span>
+        <span class="chip">Quick Access &amp; Tree</span>
         <span class="chip">Clipboard &amp; DnD</span>
-        <span class="chip">Live accent color</span>
+        <span class="chip">Command palette</span>
         <span class="chip">Auto update</span>
       </div>
     </section>
@@ -441,59 +460,74 @@
         <div class="feature-grid">
           <article class="card wide reveal" style="--delay: 30ms">
             <div class="card-icon" aria-hidden="true">＋</div>
-            <span class="card-kicker">Chrome-like Tabs</span>
-            <h3>迷わず使えるタブ操作</h3>
-            <p>新規タブ、固定、復元、ドラッグ並べ替え、中クリックで閉じる。Chrome と同じ感覚でフォルダーを整理できます。</p>
-            <div class="tags"><span>Ctrl+T</span><span>Ctrl+W</span><span>Ctrl+Tab</span><span>Pin</span><span>Restore</span></div>
+            <span class="card-kicker">Vertical Tabs</span>
+            <h3>迷わず使える垂直タブ</h3>
+            <p>新規タブ、固定、複製、復元、ドラッグ並べ替え、中クリックで閉じる。フォルダーをタブバーへドロップすれば新しいタブで開きます。固定タブと幅は次回起動時に復元されます。</p>
+            <div class="tags"><span>Ctrl+T</span><span>Ctrl+W</span><span>Ctrl+Tab</span><span>Pin</span><span>Drop to open</span></div>
           </article>
 
           <article class="card reveal" style="--delay: 80ms">
             <div class="card-icon" aria-hidden="true">⋯</div>
             <span class="card-kicker">Real Windows Shell</span>
             <h3>本物のシェルメニュー</h3>
-            <p>コピー、削除、プロパティ、Open with、拡張機能が追加した項目まで、Windows 標準の右クリックメニューがそのまま動きます。</p>
+            <p>コピー、削除、プロパティ、Open with、拡張機能が追加した項目まで、Windows 標準の右クリックメニューがそのまま動きます。「新規作成」メニューも Explorer と同じ内容です。</p>
           </article>
 
           <article class="card reveal" style="--delay: 30ms">
             <div class="card-icon" aria-hidden="true">↔</div>
             <span class="card-kicker">Explorer Compatible</span>
             <h3>コピーも DnD も相互互換</h3>
-            <p>Explorer と Kiriha の間で切り取り・コピー・貼り付け、ドラッグ＆ドロップが自然につながります。</p>
+            <p>Explorer と Kiriha の間で切り取り・コピー・貼り付け、ドラッグ＆ドロップが自然につながります。削除はごみ箱へ、進捗も Windows 標準ダイアログで表示。</p>
           </article>
 
           <article class="card reveal" style="--delay: 80ms">
             <div class="card-icon" aria-hidden="true">⌕</div>
             <span class="card-kicker">Search &amp; Filter</span>
             <h3>探す操作をすぐ近くに</h3>
-            <p>インクリメンタル検索、サブフォルダーを含む再帰検索、メディア・文書・開発ファイルなどの種別フィルターを搭載。</p>
+            <p>検索ボックスに入力するだけでサブフォルダーを含めて検索。メディア・文書・開発ファイルなどの種別フィルターや、条件を指定した一括選択も使えます。</p>
           </article>
 
           <article class="card reveal" style="--delay: 130ms">
             <div class="card-icon" aria-hidden="true">⌘</div>
             <span class="card-kicker">Command Palette</span>
             <h3>機能を横断検索</h3>
-            <p><strong>Ctrl+Shift+P</strong> でコマンドパレットを開き、タブ、表示、選択、ファイル操作を名前から実行できます。</p>
+            <p><strong>Ctrl+Shift+P</strong> でコマンドパレットを開き、タブ、表示、選択、ファイル操作を名前から実行。ターミナルで開く、ハッシュ計算などのツール群も揃っています。</p>
           </article>
 
-          <article class="card reveal" style="--delay: 30ms">
+          <article class="card wide reveal" style="--delay: 30ms">
             <div class="card-icon" aria-hidden="true">◫</div>
             <span class="card-kicker">Views &amp; Preview</span>
             <h3>用途に合わせた表示</h3>
-            <p>詳細・一覧・連続ズーム可能なアイコン表示、画像サムネイル、Alt+P のプレビューペイン、列のカスタマイズに対応。</p>
+            <p>詳細・一覧・なめらかにズームできるアイコン表示。画像・動画・PDF・RAW のサムネイル、Alt+P のプレビューペイン、列のカスタマイズとコンパクトビューに対応。表示と並べ替えはフォルダーごとに記憶されます。</p>
+            <div class="tags"><span>Details</span><span>Icons zoom</span><span>Thumbnails</span><span>Alt+P</span><span>Per-folder</span></div>
           </article>
 
           <article class="card reveal" style="--delay: 80ms">
-            <div class="card-icon" aria-hidden="true">◐</div>
-            <span class="card-kicker">Windows Theme</span>
-            <h3>テーマとアクセントに追従</h3>
-            <p>Windows のダーク / ライトテーマとアクセントカラーを即時反映。Material Icon Theme のカラーアイコンにも切り替えられます。</p>
+            <div class="card-icon" aria-hidden="true">🌲</div>
+            <span class="card-kicker">Sidebar &amp; Bookmarks</span>
+            <h3>ツリーもお気に入りも</h3>
+            <p>Windows 標準のクイックアクセスに加え、ワンクリックでフォルダーツリー表示へ切り替え。現在地に自動追従します。Chrome 互換のお気に入りバーも Ctrl+Shift+B で。</p>
           </article>
 
-          <article class="card reveal" style="--delay: 130ms">
+          <article class="card reveal" style="--delay: 30ms">
+            <div class="card-icon" aria-hidden="true">◐</div>
+            <span class="card-kicker">Theme &amp; Icons</span>
+            <h3>テーマとアイコンを選べる</h3>
+            <p>Windows のダーク / ライトとアクセントカラーへ即時追従、One Dark とアクリル効果も選択可能。ファイルアイコンは絵文字 / Material / Windows 標準の 3 セットから。</p>
+          </article>
+
+          <article class="card reveal" style="--delay: 80ms">
             <div class="card-icon" aria-hidden="true">⚡</div>
             <span class="card-kicker">Native AOT</span>
             <h3>軽快なネイティブ起動</h3>
             <p>.NET 10 Native AOT の自己完結型アプリ。別途ランタイムをインストールする必要はありません。</p>
+          </article>
+
+          <article class="card reveal" style="--delay: 130ms">
+            <div class="card-icon" aria-hidden="true">↻</div>
+            <span class="card-kicker">Auto Update</span>
+            <h3>いつでも最新版に</h3>
+            <p>起動時と 6 時間おきに更新を自動チェック。ダイアログからダウンロード・適用・再起動まで完結し、スキップも選べます。</p>
           </article>
         </div>
       </div>
@@ -524,7 +558,7 @@
 
           <div class="principles reveal" style="--delay: 100ms">
             <div class="principle"><span class="number">01</span><div><b>Windows と共存する</b><p>標準 API とシェル機能を使い、Explorer との行き来を分断しません。</p></div></div>
-            <div class="principle"><span class="number">02</span><div><b>状態はタブごとに保つ</b><p>履歴、検索、並べ替え、表示モードは開いている場所ごとに独立します。</p></div></div>
+            <div class="principle"><span class="number">02</span><div><b>状態はタブごとに保つ</b><p>履歴、検索、並べ替え、表示モードは開いている場所ごとに独立し、フォルダーごとに記憶されます。</p></div></div>
             <div class="principle"><span class="number">03</span><div><b>作業は次回へつなぐ</b><p>ウィンドウ位置、タブ、固定タブ、起動フォルダーを復元できます。</p></div></div>
           </div>
         </div>
@@ -540,7 +574,7 @@
         </div>
         <div class="req-grid reveal">
           <div class="req"><div class="key">OS</div><div class="value">Windows 10 / 11<small>64-bit エディション</small></div></div>
-          <div class="req"><div class="key">Architecture</div><div class="value">x64<small>Intel / AMD 64-bit</small></div></div>
+          <div class="req"><div class="key">Architecture</div><div class="value">x64 / ARM64<small>Intel / AMD / Arm 64-bit</small></div></div>
           <div class="req"><div class="key">Runtime</div><div class="value">不要 / None<small>.NET 10 Native AOT</small></div></div>
           <div class="req"><div class="key">License</div><div class="value">MIT<small>Free &amp; open source</small></div></div>
         </div>
@@ -560,13 +594,23 @@
               <span><b>Windows x64 インストーラー</b><small>Intel / AMD 64-bit · Setup.exe</small></span>
               <span class="go" aria-hidden="true">↓</span>
             </a>
-            <a class="download-card" href="https://github.com/1llum1n4t1s/Kiriha" target="_blank" rel="noopener noreferrer">
-              <span class="download-icon" aria-hidden="true">&lt;/&gt;</span>
-              <span><b>ソースコード</b><small>GitHub repository</small></span>
-              <span class="go" aria-hidden="true">↗</span>
+            <a class="download-card" href="https://kiriha.nephilim.jp/Kiriha-win-arm64-Setup.exe" download>
+              <span class="download-icon" aria-hidden="true">⊞</span>
+              <span><b>Windows ARM64 インストーラー</b><small>Snapdragon など Arm 64-bit · Setup.exe</small></span>
+              <span class="go" aria-hidden="true">↓</span>
+            </a>
+            <a class="download-card" href="https://kiriha.nephilim.jp/Kiriha-win-Portable.zip" download>
+              <span class="download-icon" aria-hidden="true">🗜</span>
+              <span><b>ポータブル版 (x64)</b><small>インストール不要 · ZIP</small></span>
+              <span class="go" aria-hidden="true">↓</span>
+            </a>
+            <a class="download-card" href="https://kiriha.nephilim.jp/Kiriha-win-arm64-Portable.zip" download>
+              <span class="download-icon" aria-hidden="true">🗜</span>
+              <span><b>ポータブル版 (ARM64)</b><small>インストール不要 · ZIP</small></span>
+              <span class="go" aria-hidden="true">↓</span>
             </a>
           </div>
-          <div class="notes"><span>Velopack による自動更新</span><span>広告・課金・トラッキングなし</span><span>GitHub で全ソースを公開</span></div>
+          <div class="notes"><span>Velopack による自動更新</span><span>広告・課金・トラッキングなし</span><span>コード署名済みバイナリ</span><span><a href="https://github.com/1llum1n4t1s/Kiriha" target="_blank" rel="noopener noreferrer" style="text-decoration: underline;">GitHub で全ソースを公開</a></span></div>
         </div>
       </div>
     </section>
