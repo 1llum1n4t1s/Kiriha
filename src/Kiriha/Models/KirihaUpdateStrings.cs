@@ -19,7 +19,7 @@ public sealed class KirihaUpdateStrings : IUpdateDialogStrings, INotifyPropertyC
     public void NotifyLocaleChanged()
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
 
-    public string Title => "Kiriha の更新";
+    public string Title => "ソフトウェアの更新";
 
     public string AvailableHeader => "新しいバージョンが利用可能です";
 

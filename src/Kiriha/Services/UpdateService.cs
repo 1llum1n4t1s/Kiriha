@@ -134,7 +134,7 @@ public static class UpdateService
         };
         var dialog = new ThemedDialogWindow(useAcrylic)
         {
-            Title = "Kiriha の更新",
+            Title = KirihaUpdateStrings.Instance.Title,
             SizeToContent = SizeToContent.WidthAndHeight,
             WindowStartupLocation = WindowStartupLocation.CenterOwner,
             CanResize = false,
