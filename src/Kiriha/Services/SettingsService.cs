@@ -37,6 +37,12 @@ public sealed class AppSettings
     /// <summary>最後に使ったアイコンサイズ（マウスホイールで連続変更、新規タブの既定）。</summary>
     public double DefaultIconSize { get; set; } = 28;
 
+    /// <summary>最後に使った並べ替え列（新規タブの既定）。</summary>
+    public string DefaultSortKey { get; set; } = "Name";
+
+    /// <summary>最後に使った並べ替え方向（新規タブの既定）。</summary>
+    public bool DefaultSortAscending { get; set; } = true;
+
     /// <summary>前回のウィンドウサイズ（0 以下なら既定値を使う）。</summary>
     public double WindowWidth { get; set; }
 

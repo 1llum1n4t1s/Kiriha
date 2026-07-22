@@ -11,6 +11,7 @@ namespace Kiriha.ViewModels;
 public partial class MainWindowViewModel : ObservableObject
 {
     private readonly AppSettings _settings;
+    private readonly FolderViewSettingsService _folderViewSettings;
 
     /// <summary>共有アプリ設定（UpdateService が IgnoreUpdateTag を読み書きする）。</summary>
     public AppSettings Settings => _settings;
@@ -291,7 +292,7 @@ public partial class MainWindowViewModel : ObservableObject
         SearchBoxWidth = 200;
         ShowPreviewPane = false;
 
-        // 詳細表示の列幅・列の表示/非表示・既定の表示モード/アイコンサイズも既定へ戻す
+        // 詳細表示の列幅・列の表示/非表示・既定の表示モード/アイコンサイズ/並べ替えも既定へ戻す
         // （AppSettings の初期値と一致させる。新規タブに反映され、Save は末尾でまとめて行う）。
         _settings.ColNameWidth = 300;
         _settings.ColModifiedWidth = 160;
@@ -304,6 +305,10 @@ public partial class MainWindowViewModel : ObservableObject
         _settings.ShowColSize = true;
         _settings.DefaultViewMode = "Details";
         _settings.DefaultIconSize = 28;
+        _settings.DefaultSortKey = "Name";
+        _settings.DefaultSortAscending = true;
+        _folderViewSettings.Clear();
+        _folderViewSettings.Flush();
         SettingsService.Save(_settings);
     }
 
@@ -404,6 +409,7 @@ public partial class MainWindowViewModel : ObservableObject
     public MainWindowViewModel()
     {
         _settings = SettingsService.Load();
+        _folderViewSettings = new FolderViewSettingsService();
         Options = new ShellOptions
         {
             ShowHidden = _settings.ShowHidden,
@@ -523,7 +529,11 @@ public partial class MainWindowViewModel : ObservableObject
 
     private TabViewModel AddTab(string path, bool pinned)
     {
-        var tab = new TabViewModel(path, Options)
+        var initialViewSettings = _folderViewSettings.TryGet(path, out var savedViewSettings)
+            ? savedViewSettings
+            : CreateDefaultFolderViewSettings(path);
+        var tab = new TabViewModel(
+            path, Options, _folderViewSettings, initialViewSettings, CreateDefaultFolderViewSettings)
         {
             ColNameWidth = _settings.ColNameWidth,
             ColModifiedWidth = _settings.ColModifiedWidth,
@@ -535,15 +545,6 @@ public partial class MainWindowViewModel : ObservableObject
             ShowColType = _settings.ShowColType,
             ShowColSize = _settings.ShowColSize,
         };
-        if (Enum.TryParse<ViewMode>(_settings.DefaultViewMode, out var mode))
-        {
-            tab.ViewMode = mode;
-        }
-
-        if (_settings.DefaultIconSize is >= 24 and <= 160)
-        {
-            tab.IconSize = _settings.DefaultIconSize;
-        }
 
         Tabs.Add(tab);
         tab.CloseRequested += (_, _) => CloseTab(tab);
@@ -553,6 +554,16 @@ public partial class MainWindowViewModel : ObservableObject
         tab.SetPreviewEnabled(ShowPreviewPane);
         return tab;
     }
+
+    private FolderViewSettings CreateDefaultFolderViewSettings(string path)
+        => new()
+        {
+            Path = path,
+            ViewMode = _settings.DefaultViewMode,
+            IconSize = _settings.DefaultIconSize,
+            SortKey = _settings.DefaultSortKey,
+            SortAscending = _settings.DefaultSortAscending,
+        };
 
     private TabViewModel AddSettingsTab(bool pinned)
     {
@@ -585,14 +596,22 @@ public partial class MainWindowViewModel : ObservableObject
         }
         else if (e.PropertyName == nameof(TabViewModel.ViewMode))
         {
+            if (tab.IsApplyingFolderViewSettings) return;
             // 最後に使った表示モードを新規タブの既定にする
             _settings.DefaultViewMode = tab.ViewMode.ToString();
-            SettingsService.Save(_settings);
         }
         else if (e.PropertyName == nameof(TabViewModel.IconSize))
         {
+            if (tab.IsApplyingFolderViewSettings) return;
             // マウスホイールで連続発火するため、Col*Width と同様に即時保存はせず終了時にまとめて保存する
             _settings.DefaultIconSize = tab.IconSize;
+        }
+        else if (e.PropertyName is nameof(TabViewModel.SortKey) or nameof(TabViewModel.SortAscendingFlag))
+        {
+            if (tab.IsApplyingFolderViewSettings) return;
+            // 最後に使った並べ替えを新規タブの既定にする
+            _settings.DefaultSortKey = tab.SortKey;
+            _settings.DefaultSortAscending = tab.SortAscendingFlag;
         }
         else if (e.PropertyName is nameof(TabViewModel.ColNameWidth) or nameof(TabViewModel.ColModifiedWidth)
                  or nameof(TabViewModel.ColCreatedWidth) or nameof(TabViewModel.ColTypeWidth) or nameof(TabViewModel.ColSizeWidth))
@@ -831,6 +850,7 @@ public partial class MainWindowViewModel : ObservableObject
         _settings.LastSelectedTabIsSettings = SelectedTab?.IsSettingsTab ?? false;
         _settings.LastSelectedTabPath = SelectedTab is { IsSettingsTab: false } selected ? selected.CurrentPath : "";
 
+        _folderViewSettings.Flush();
         SettingsService.Save(_settings);
     }
 

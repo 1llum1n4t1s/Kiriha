@@ -16,12 +16,17 @@ public partial class TabViewModel : ObservableObject
     private readonly Stack<string> _back = new();
     private readonly Stack<string> _forward = new();
     private readonly ShellOptions _options;
+    private readonly FolderViewSettingsService? _folderViewSettings;
+    private readonly Func<string, FolderViewSettings>? _defaultFolderViewSettings;
     private readonly CancellationTokenSource _lifetimeCts = new();
     private CancellationTokenSource? _filterDebounceCts;
     private bool _isDetached;
+    private bool _isApplyingFolderViewSettings;
     private bool _suppressSearchFilter;
     private long _searchGeneration;
     private long _navigationGeneration;
+
+    internal bool IsApplyingFolderViewSettings => _isApplyingFolderViewSettings;
 
     [ObservableProperty]
     private string _title = "PC";
@@ -471,7 +476,18 @@ public partial class TabViewModel : ObservableObject
         {
             _thumbnailCts?.Cancel();
         }
+
+        SaveFolderViewSettings();
     }
+
+    partial void OnIconSizeChanged(double value)
+        => SaveFolderViewSettings();
+
+    partial void OnSortKeyChanged(string value)
+        => SaveFolderViewSettings();
+
+    partial void OnSortAscendingFlagChanged(bool value)
+        => SaveFolderViewSettings();
 
     public async Task EnsureThumbnailAsync(FileSystemEntry entry)
     {
@@ -641,8 +657,22 @@ public partial class TabViewModel : ObservableObject
     }
 
     public TabViewModel(string initialPath, ShellOptions options, bool isSettingsTab = false)
+        : this(initialPath, options, folderViewSettings: null, initialViewSettings: null,
+            defaultFolderViewSettings: null, isSettingsTab)
+    {
+    }
+
+    internal TabViewModel(
+        string initialPath,
+        ShellOptions options,
+        FolderViewSettingsService? folderViewSettings,
+        FolderViewSettings? initialViewSettings,
+        Func<string, FolderViewSettings>? defaultFolderViewSettings,
+        bool isSettingsTab = false)
     {
         _options = options;
+        _folderViewSettings = folderViewSettings;
+        _defaultFolderViewSettings = defaultFolderViewSettings;
         DetailColumns =
         [
             new(this, "Name", "名前"),
@@ -652,6 +682,11 @@ public partial class TabViewModel : ObservableObject
             new(this, "Size", "サイズ"),
         ];
         IsSettingsTab = isSettingsTab;
+        if (!isSettingsTab && initialViewSettings is not null)
+        {
+            ApplyFolderViewSettings(initialViewSettings);
+        }
+
         _options.Changed += OnOptionsChanged;
         ClipboardFileService.CutStateChanged += OnCutStateChanged;
 
@@ -835,6 +870,7 @@ public partial class TabViewModel : ObservableObject
         }
 
         CurrentPath = path;
+        ApplySavedFolderViewSettings(path);
         IsEditingPath = false;
         PathText = path == FileSystemService.ComputerPath ? "PC" : path;
         Title = path == FileSystemService.ComputerPath
@@ -872,6 +908,62 @@ public partial class TabViewModel : ObservableObject
 
         if (IsIconsView && _thumbnailCts is null)
             _thumbnailCts = CancellationTokenSource.CreateLinkedTokenSource(_lifetimeCts.Token);
+    }
+
+    private void ApplySavedFolderViewSettings(string path)
+    {
+        if (_folderViewSettings?.TryGet(path, out var settings) == true)
+        {
+            ApplyFolderViewSettings(settings);
+        }
+        else if (_defaultFolderViewSettings is not null)
+        {
+            ApplyFolderViewSettings(_defaultFolderViewSettings(path));
+        }
+    }
+
+    private void ApplyFolderViewSettings(FolderViewSettings settings)
+    {
+        _isApplyingFolderViewSettings = true;
+        try
+        {
+            if (Enum.TryParse<ViewMode>(settings.ViewMode, out var mode))
+            {
+                ViewMode = mode;
+            }
+
+            if (settings.IconSize is >= 24 and <= 160)
+            {
+                IconSize = settings.IconSize;
+            }
+
+            if (settings.SortKey is "Name" or "Modified" or "Created" or "Type" or "Size")
+            {
+                SortKey = settings.SortKey;
+                SortAscendingFlag = settings.SortAscending;
+            }
+        }
+        finally
+        {
+            _isApplyingFolderViewSettings = false;
+        }
+    }
+
+    private void SaveFolderViewSettings()
+    {
+        if (_isApplyingFolderViewSettings || _isDetached || IsSettingsTab
+            || _folderViewSettings is null || CurrentPath.Length == 0)
+        {
+            return;
+        }
+
+        _folderViewSettings.Set(CurrentPath, new FolderViewSettings
+        {
+            ViewMode = ViewMode.ToString(),
+            IconSize = IconSize,
+            SortKey = SortKey,
+            SortAscending = SortAscendingFlag,
+        });
     }
 
     partial void OnSearchTextChanged(string value)

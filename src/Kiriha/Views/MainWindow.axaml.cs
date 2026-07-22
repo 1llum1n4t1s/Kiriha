@@ -81,6 +81,8 @@ public partial class MainWindow : Window
         // サイドバーのドラッグ開始は Window のトンネル経路で先に記録する。
         AddHandler(PointerPressedEvent, DragSource_PointerPressed,
             RoutingStrategies.Tunnel, handledEventsToo: true);
+        AddHandler(PointerPressedEvent, DismissPathEditing_PointerPressed,
+            RoutingStrategies.Tunnel, handledEventsToo: true);
         AddHandler(PointerMovedEvent, DragSource_PointerMoved,
             RoutingStrategies.Tunnel, handledEventsToo: true);
         AddHandler(PointerReleasedEvent, DragSource_PointerReleased,
@@ -520,7 +522,7 @@ public partial class MainWindow : Window
         await Clipboard.SetTextAsync(text);
     }
 
-    private void FocusPathBox(TabViewModel? tab)
+    private async void FocusPathBox(TabViewModel? tab)
     {
         if (tab is null)
         {
@@ -528,6 +530,7 @@ public partial class MainWindow : Window
         }
 
         tab.IsEditingPath = true;
+        var copyTask = CopyCurrentPathToClipboardAsync(tab);
         Dispatcher.UIThread.Post(() =>
         {
             var box = this.GetVisualDescendants().OfType<TextBox>()
@@ -535,6 +538,7 @@ public partial class MainWindow : Window
             box?.Focus();
             box?.SelectAll();
         });
+        await copyTask;
     }
 
     private void FocusSearchBox()
@@ -1440,7 +1444,7 @@ public partial class MainWindow : Window
 
     // ===== アドレスバー（パンくず / 直接入力） =====
 
-    private void BreadcrumbBar_PointerPressed(object? sender, PointerPressedEventArgs e)
+    private async void BreadcrumbBar_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (e.Source is Visual visual && visual.FindAncestorOfType<Button>() is not null)
         {
@@ -1451,6 +1455,7 @@ public partial class MainWindow : Window
         {
             tab.IsEditingPath = true;
             e.Handled = true;
+            var copyTask = CopyCurrentPathToClipboardAsync(tab);
             Dispatcher.UIThread.Post(() =>
             {
                 var box = border.GetVisualDescendants().OfType<TextBox>().FirstOrDefault();
@@ -1460,6 +1465,7 @@ public partial class MainWindow : Window
                     box.SelectAll();
                 }
             });
+            await copyTask;
         }
     }
 
@@ -2108,6 +2114,31 @@ public partial class MainWindow : Window
         if (!_dragInProgress)
         {
             ResetDragSource();
+        }
+    }
+
+    private void DismissPathEditing_PointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (ViewModel?.SelectedTab is not { IsEditingPath: true } tab)
+        {
+            return;
+        }
+
+        if (e.Source is Visual visual
+            && (visual is TextBox || visual.FindAncestorOfType<TextBox>() is not null))
+        {
+            return;
+        }
+
+        tab.IsEditingPath = false;
+    }
+
+    private async Task CopyCurrentPathToClipboardAsync(TabViewModel tab)
+    {
+        if (Clipboard is not null)
+        {
+            await Clipboard.SetTextAsync(
+                tab.CurrentPath == FileSystemService.ComputerPath ? "PC" : tab.CurrentPath);
         }
     }
 
