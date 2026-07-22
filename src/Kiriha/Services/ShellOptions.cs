@@ -1,6 +1,7 @@
 namespace Kiriha.Services;
 
-public enum ShellOptionKind { ShowHidden, ShowExtensions, ShowCheckBoxes, UseMaterialIcons }
+public enum FileIconSet { Original, Material, Windows }
+public enum ShellOptionKind { ShowHidden, ShowExtensions, ShowCheckBoxes, IconSet }
 public sealed class ShellOptionChangedEventArgs(ShellOptionKind kind) : EventArgs
 {
     public ShellOptionKind Kind { get; } = kind;
@@ -12,7 +13,7 @@ public sealed class ShellOptions
     private bool _showHidden;
     private bool _showExtensions;
     private bool _showCheckBoxes;
-    private bool _useMaterialIcons;
+    private FileIconSet _iconSet;
 
     public event EventHandler<ShellOptionChangedEventArgs>? Changed;
 
@@ -50,15 +51,15 @@ public sealed class ShellOptions
         }
     }
 
-    /// <summary>絵文字アイコンの代わりに Material Icon Theme のアイコンを使う。</summary>
-    public bool UseMaterialIcons
+    /// <summary>ファイル一覧で使うアイコンセット。</summary>
+    public FileIconSet IconSet
     {
-        get => _useMaterialIcons;
+        get => _iconSet;
         set
         {
-            if (_useMaterialIcons == value) return;
-            _useMaterialIcons = value;
-            Changed?.Invoke(this, new ShellOptionChangedEventArgs(ShellOptionKind.UseMaterialIcons));
+            if (_iconSet == value) return;
+            _iconSet = value;
+            Changed?.Invoke(this, new ShellOptionChangedEventArgs(ShellOptionKind.IconSet));
         }
     }
 }

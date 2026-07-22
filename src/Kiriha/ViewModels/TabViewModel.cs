@@ -382,7 +382,7 @@ public partial class TabViewModel : ObservableObject
         var root = CurrentPath;
         var showExt = _options.ShowExtensions;
         var showHidden = _options.ShowHidden;
-        var useMaterialIcons = _options.UseMaterialIcons;
+        var useMaterialIcons = _options.IconSet == FileIconSet.Material;
         var preferLight = useMaterialIcons && MaterialIconService.IsLightTheme();
         var results = await Task.Run(() =>
         {
@@ -455,6 +455,9 @@ public partial class TabViewModel : ObservableObject
     private const int ThumbnailPixelSize = 320;
     private readonly SemaphoreSlim _thumbnailGate = new(4, 4);
     private readonly ConcurrentDictionary<string, byte> _loadingThumbnails = new(StringComparer.OrdinalIgnoreCase);
+    private const int WindowsIconPixelSize = 256;
+    private readonly SemaphoreSlim _windowsIconGate = new(4, 4);
+    private readonly ConcurrentDictionary<string, byte> _loadingWindowsIcons = new(StringComparer.OrdinalIgnoreCase);
 
     partial void OnViewModeChanged(ViewMode value)
     {
@@ -662,6 +665,53 @@ public partial class TabViewModel : ObservableObject
     {
     }
 
+    /// <summary>表示範囲に入った項目の Windows Shell アイコンをバックグラウンドで取得する。</summary>
+    public async Task EnsureWindowsIconAsync(FileSystemEntry entry)
+    {
+        if (_options.IconSet != FileIconSet.Windows || _isDetached || entry.WindowsIcon is not null
+            || !_allEntries.Contains(entry) || !_loadingWindowsIcons.TryAdd(entry.FullPath, 0))
+        {
+            return;
+        }
+
+        var token = _lifetimeCts.Token;
+        try
+        {
+            await _windowsIconGate.WaitAsync(token);
+            try
+            {
+                var bitmap = await Task.Run(() =>
+                {
+                    token.ThrowIfCancellationRequested();
+                    return ShellThumbnailService.TryGetIcon(entry.FullPath, WindowsIconPixelSize);
+                }, token);
+
+                if (bitmap is not null && !token.IsCancellationRequested
+                    && _options.IconSet == FileIconSet.Windows && _allEntries.Contains(entry))
+                {
+                    entry.WindowsIcon = bitmap;
+                }
+                else
+                {
+                    bitmap?.Dispose();
+                }
+            }
+            finally
+            {
+                _windowsIconGate.Release();
+            }
+        }
+        catch (OperationCanceledException) { }
+        catch (Exception ex)
+        {
+            Logger.LogException($"Windows標準アイコンを読み込めませんでした: {entry.FullPath}", ex);
+        }
+        finally
+        {
+            _loadingWindowsIcons.TryRemove(entry.FullPath, out _);
+        }
+    }
+
     internal TabViewModel(
         string initialPath,
         ShellOptions options,
@@ -719,23 +769,28 @@ public partial class TabViewModel : ObservableObject
         _searchCts?.Cancel();
         _thumbnailCts?.Cancel();
         foreach (var column in DetailColumns) column.Detach();
-        DisposeEntryThumbnails(_allEntries);
+        DisposeEntryImages(_allEntries);
         ClearPreview();
     }
 
     private void OnOptionsChanged(object? sender, ShellOptionChangedEventArgs e)
     {
-        if (e.Kind == ShellOptionKind.UseMaterialIcons)
+        if (e.Kind == ShellOptionKind.IconSet)
         {
-            var enabled = _options.UseMaterialIcons;
+            var enabled = _options.IconSet == FileIconSet.Material;
             var preferLight = enabled && MaterialIconService.IsLightTheme();
             foreach (var entry in _allEntries.Concat(Entries).Distinct())
             {
                 entry.UpdateMaterialIconKey(enabled, preferLight);
+                if (_options.IconSet != FileIconSet.Windows)
+                {
+                    entry.DisposeWindowsIcon();
+                }
             }
 
             OnPropertyChanged(nameof(ShowMaterialIcons));
-            OnPropertyChanged(nameof(UseEmojiIcons));
+            OnPropertyChanged(nameof(ShowWindowsIcons));
+            OnPropertyChanged(nameof(ShowOriginalIcons));
             return;
         }
 
@@ -743,7 +798,8 @@ public partial class TabViewModel : ObservableObject
         OnPropertyChanged(nameof(ShowExtensions));
         OnPropertyChanged(nameof(ShowCheckBoxes));
         OnPropertyChanged(nameof(ShowMaterialIcons));
-        OnPropertyChanged(nameof(UseEmojiIcons));
+        OnPropertyChanged(nameof(ShowWindowsIcons));
+        OnPropertyChanged(nameof(ShowOriginalIcons));
         if (e.Kind != ShellOptionKind.ShowCheckBoxes)
         {
             Refresh();
@@ -761,11 +817,11 @@ public partial class TabViewModel : ObservableObject
 
     public bool ShowCheckBoxes => _options.ShowCheckBoxes;
 
-    /// <summary>絵文字の代わりに Material Icon Theme のアイコンを表示するか。</summary>
-    public bool ShowMaterialIcons => _options.UseMaterialIcons;
+    public bool ShowMaterialIcons => _options.IconSet == FileIconSet.Material;
 
-    /// <summary>ShowMaterialIcons の反転（XAML の IsVisible バインディング用）。</summary>
-    public bool UseEmojiIcons => !ShowMaterialIcons;
+    public bool ShowWindowsIcons => _options.IconSet == FileIconSet.Windows;
+
+    public bool ShowOriginalIcons => _options.IconSet == FileIconSet.Original;
 
     /// <summary>指定パスへ移動する。失敗時は現状維持でステータスにエラーを出す。</summary>
     public void NavigateTo(string path, bool record = true)
@@ -859,7 +915,7 @@ public partial class TabViewModel : ObservableObject
 
         if (_isDetached || generation != _navigationGeneration)
         {
-            DisposeEntryThumbnails(entries);
+            DisposeEntryImages(entries);
             return;
         }
 
@@ -879,7 +935,7 @@ public partial class TabViewModel : ObservableObject
                 ? name
                 : path;
 
-        DisposeEntryThumbnails(_allEntries);
+        DisposeEntryImages(_allEntries);
         _allEntries = ApplySort(entries).ToList();
         // 移動で検索と種別フィルターをリセット（エクスプローラーと同じ）。プロパティ経由だと OnSearchTextChanged
         // → ApplyFilter が二重に走るだけで害はないため素直にプロパティへ代入する。
@@ -994,11 +1050,12 @@ public partial class TabViewModel : ObservableObject
         }
     }
 
-    private static void DisposeEntryThumbnails(IEnumerable<FileSystemEntry> entries)
+    private static void DisposeEntryImages(IEnumerable<FileSystemEntry> entries)
     {
         foreach (var entry in entries)
         {
             entry.DisposeThumbnail();
+            entry.DisposeWindowsIcon();
         }
     }
 
@@ -1373,9 +1430,11 @@ public partial class TabViewModel : ObservableObject
                 return;
             }
 
-            // Shell の貼り付けは非同期で完了することがある。初回更新を補助し、以後は
-            // DirectoryObservationService の変更通知で一覧を追従させる。
+            // Shell の貼り付けは非同期で完了することがある。時間差で複数回更新して完了タイミングの
+            // 揺れを吸収し、以後は DirectoryObservationService の変更通知で一覧を追従させる。
             await Task.Delay(500);
+            Refresh();
+            await Task.Delay(2000);
             Refresh();
             return;
         }

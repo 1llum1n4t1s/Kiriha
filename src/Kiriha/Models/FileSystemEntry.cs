@@ -64,6 +64,16 @@ public partial class FileSystemEntry : ObservableObject
     public Avalonia.Media.IImage? MaterialIcon
         => IsDrive || MaterialIconKey.Length == 0 ? null : Services.MaterialIconService.GetImage(MaterialIconKey);
 
+    /// <summary>Windows Shell が項目へ割り当てた標準アイコン。</summary>
+    [ObservableProperty]
+    private Avalonia.Media.Imaging.Bitmap? _windowsIcon;
+
+    public void DisposeWindowsIcon()
+    {
+        WindowsIcon?.Dispose();
+        WindowsIcon = null;
+    }
+
     /// <summary>設定切替時に、フォルダーを再列挙せず Material アイコンキーだけを更新する。</summary>
     public void UpdateMaterialIconKey(bool enabled, bool preferLight)
         => MaterialIconKey = enabled && !IsDrive

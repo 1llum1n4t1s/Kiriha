@@ -15,6 +15,14 @@ public sealed class SidebarLink
 
     public required string Icon { get; init; }
 
+    /// <summary>アイコンセット設定に応じた画像アイコン（Material / Windows Shell）。null なら絵文字で描画する。</summary>
+    public Avalonia.Media.IImage? IconImage { get; init; }
+
+    /// <summary>IconImage をこの項目が所有するか（Windows Shell アイコンは所有、Material はキャッシュ共有で解放禁止）。</summary>
+    public bool OwnsIconImage { get; init; }
+
+    public bool HasIconImage => IconImage is not null;
+
     /// <summary>クイックアクセス項目かどうか（ピン留め解除メニューの表示可否）。</summary>
     public bool IsQuickAccess { get; init; }
 

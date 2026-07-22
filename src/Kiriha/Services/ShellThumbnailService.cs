@@ -9,6 +9,7 @@ namespace Kiriha.Services;
 /// <summary>Windows Shell のサムネイルハンドラーから動画・RAW画像などのプレビュー画像を取得する。</summary>
 internal static partial class ShellThumbnailService
 {
+    private const uint SiigbfIconOnly = 0x00000004;
     private const uint SiigbfThumbnailOnly = 0x00000008;
     private const uint DibRgbColors = 0;
     private const uint BiRgb = 0;
@@ -23,6 +24,17 @@ internal static partial class ShellThumbnailService
     /// サムネイルハンドラーやコーデックがない場合は null を返す。
     /// </summary>
     public static Bitmap? TryGetThumbnail(string path, int requestedSize)
+        => TryGetShellImage(path, requestedSize, SiigbfThumbnailOnly, AlphaFormat.Opaque);
+
+    /// <summary>Shell が項目に割り当てた Windows 標準アイコンを取得する。</summary>
+    public static Bitmap? TryGetIcon(string path, int requestedSize)
+        => TryGetShellImage(path, requestedSize, SiigbfIconOnly, AlphaFormat.Premul);
+
+    private static Bitmap? TryGetShellImage(
+        string path,
+        int requestedSize,
+        uint flags,
+        AlphaFormat alphaFormat)
     {
         var initializeResult = CoInitializeEx(0, 0);
         var shouldUninitialize = initializeResult >= 0;
@@ -57,7 +69,7 @@ internal static partial class ShellThumbnailService
 
             if (factory.GetImage(
                     new NativeSize(requestedSize, requestedSize),
-                    SiigbfThumbnailOnly,
+                    flags,
                     out var hBitmap) < 0
                 || hBitmap == 0)
             {
@@ -66,7 +78,7 @@ internal static partial class ShellThumbnailService
 
             try
             {
-                return CopyBitmap(hBitmap);
+                return CopyBitmap(hBitmap, alphaFormat);
             }
             finally
             {
@@ -82,7 +94,7 @@ internal static partial class ShellThumbnailService
         }
     }
 
-    private static Bitmap? CopyBitmap(nint hBitmap)
+    private static Bitmap? CopyBitmap(nint hBitmap, AlphaFormat alphaFormat)
     {
         if (GetObject(hBitmap, Marshal.SizeOf<NativeBitmap>(), out var source) == 0
             || source.Width <= 0
@@ -97,7 +109,7 @@ internal static partial class ShellThumbnailService
             new PixelSize(width, height),
             new Vector(96, 96),
             PixelFormat.Bgra8888,
-            AlphaFormat.Opaque);
+            alphaFormat);
 
         var copied = false;
         using (var framebuffer = bitmap.Lock())

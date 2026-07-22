@@ -772,10 +772,13 @@
 
                                         <HeaderedContentControl Classes="settingscard" Header="アイコン">
                                             <StackPanel Classes="settingsfields">
-                                                <CheckBox Content="Material Icon Theme のアイコンを使う（拡張子ごとに色分け表示）"
-                                                          IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptUseMaterialIcons}" />
-                                                <TextBlock Classes="settingscaption"
-                                                           Text="material-icon-theme (MIT License, © Material Extensions) のアイコンを使用しています。" />
+                                                <ComboBox Classes="settingsfield"
+                                                          ItemsSource="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IconSetOptions}"
+                                                          SelectedItem="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptIconSet, Mode=TwoWay}"
+                                                          MinWidth="240" HorizontalAlignment="Left" />
+                                                <TextBlock Classes="settingscaption" Margin="0,6,0,0"
+                                                           TextWrapping="Wrap"
+                                                           Text="マテリアルアイコンテーマでは material-icon-theme（MIT License, © Material Extensions）を使用します。Windows標準では、エクスプローラーと同じShellアイコンを表示します。" />
                                             </StackPanel>
                                         </HeaderedContentControl>
 
@@ -1400,7 +1403,11 @@
                                             <StackPanel Orientation="Horizontal" Spacing="10"
                                                         Background="Transparent"
                                                         ToolTip.Tip="{Binding Tooltip}">
+                                                <Image Source="{Binding IconImage}" Width="16" Height="16"
+                                                       IsVisible="{Binding HasIconImage}"
+                                                       VerticalAlignment="Center" />
                                                 <TextBlock Text="{Binding Icon}" FontSize="13"
+                                                           IsVisible="{Binding !HasIconImage}"
                                                            VerticalAlignment="Center" />
                                                 <TextBlock Text="{Binding Name}" FontSize="13"
                                                            Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center"
@@ -1469,6 +1476,8 @@
                                                 <ItemsControl Margin="8,0,0,0"
                                                             ItemsSource="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).DetailColumns}"
                                                             Background="Transparent"
+                                                            EffectiveViewportChanged="FileItem_EffectiveViewportChanged"
+                                                            DataContextChanged="FileItem_DataContextChanged"
                                                             Height="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).RowHeight}"
                                                             Opacity="{Binding RowOpacity}"
                                                             ToolTip.Tip="{Binding RowTooltip}">
@@ -1485,8 +1494,11 @@
                                                                     <Image Grid.Column="1" Source="{Binding $parent[ItemsControl].((m:FileSystemEntry)DataContext).MaterialIcon}"
                                                                            IsVisible="{Binding Owner.ShowMaterialIcons}"
                                                                            Width="16" Height="16" Margin="0,0,10,0" VerticalAlignment="Center" />
+                                                                    <Image Grid.Column="1" Source="{Binding $parent[ItemsControl].((m:FileSystemEntry)DataContext).WindowsIcon}"
+                                                                           IsVisible="{Binding Owner.ShowWindowsIcons}"
+                                                                           Width="16" Height="16" Margin="0,0,10,0" VerticalAlignment="Center" />
                                                                     <TextBlock Grid.Column="1" Text="{Binding $parent[ItemsControl].((m:FileSystemEntry)DataContext).Icon}" FontSize="14"
-                                                                               IsVisible="{Binding Owner.UseEmojiIcons}"
+                                                                               IsVisible="{Binding Owner.ShowOriginalIcons}"
                                                                                Margin="0,0,10,0" VerticalAlignment="Center" />
                                                                     <TextBlock Grid.Column="2" Text="{Binding $parent[ItemsControl].((m:FileSystemEntry)DataContext).DisplayName}" FontSize="13"
                                                                                Foreground="{DynamicResource TextPrimary}"
@@ -1552,6 +1564,8 @@
                                             <DataTemplate x:DataType="m:FileSystemEntry">
                                                 <StackPanel Orientation="Horizontal" Spacing="6" Margin="8,0"
                                                             Background="Transparent"
+                                                            EffectiveViewportChanged="FileItem_EffectiveViewportChanged"
+                                                            DataContextChanged="FileItem_DataContextChanged"
                                                             Height="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).ListRowHeight}"
                                                             Opacity="{Binding RowOpacity}">
                                                     <CheckBox MinWidth="0" Padding="0" Margin="0,0,-4,0"
@@ -1560,8 +1574,11 @@
                                                     <Image Source="{Binding MaterialIcon}"
                                                            IsVisible="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).ShowMaterialIcons}"
                                                            Width="16" Height="16" VerticalAlignment="Center" />
+                                                    <Image Source="{Binding WindowsIcon}"
+                                                           IsVisible="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).ShowWindowsIcons}"
+                                                           Width="16" Height="16" VerticalAlignment="Center" />
                                                     <TextBlock Text="{Binding Icon}" FontSize="14"
-                                                               IsVisible="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).UseEmojiIcons}"
+                                                               IsVisible="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).ShowOriginalIcons}"
                                                                VerticalAlignment="Center" />
                                                     <TextBlock Text="{Binding DisplayName}" FontSize="13" Foreground="{DynamicResource TextPrimary}"
                                                                VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
@@ -1592,11 +1609,12 @@
                                         <ListBox.ItemTemplate>
                                             <DataTemplate x:DataType="m:FileSystemEntry">
                                                 <StackPanel Width="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).IconItemWidth}"
-                                                            EffectiveViewportChanged="IconItem_EffectiveViewportChanged"
+                                                            EffectiveViewportChanged="FileItem_EffectiveViewportChanged"
+                                                            DataContextChanged="FileItem_DataContextChanged"
                                                             Background="Transparent"
                                                             Opacity="{Binding RowOpacity}"
                                                             ToolTip.Tip="{Binding RowTooltip}">
-                                                    <!-- 優先順位: 実サムネイル > Material アイコン > 絵文字 -->
+                                                    <!-- 優先順位: 実サムネイル > 選択中のアイコンセット -->
                                                     <Image Source="{Binding Thumbnail}"
                                                            IsVisible="{Binding HasThumbnail}"
                                                            Height="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).IconFontSize}"
@@ -1608,7 +1626,12 @@
                                                                Width="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).IconFontSize}"
                                                                Height="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).IconFontSize}"
                                                                Stretch="Uniform" />
-                                                        <Viewbox IsVisible="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).UseEmojiIcons}"
+                                                        <Image Source="{Binding WindowsIcon}"
+                                                               IsVisible="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).ShowWindowsIcons}"
+                                                               Width="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).IconFontSize}"
+                                                               Height="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).IconFontSize}"
+                                                               Stretch="Uniform" />
+                                                        <Viewbox IsVisible="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).ShowOriginalIcons}"
                                                                  Width="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).IconFontSize}"
                                                                  Height="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).IconFontSize}"
                                                                  Stretch="Uniform"

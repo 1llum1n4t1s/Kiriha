@@ -51,7 +51,7 @@ public static class FileSystemService
         }
 
         // テーマ判定は列挙全体で 1 回だけ（行ごとに問い合わせない）
-        var useMaterialIcons = options.UseMaterialIcons;
+        var useMaterialIcons = options.IconSet == FileIconSet.Material;
         var preferLight = useMaterialIcons && MaterialIconService.IsLightTheme();
 
         var info = new DirectoryInfo(path);

@@ -273,7 +273,7 @@ public partial class MainWindowViewModel : ObservableObject
         OptShowHidden = false;
         OptShowExtensions = false;
         OptShowCheckBoxes = false;
-        OptUseMaterialIcons = false;
+        OptIconSet = IconSetChoices[0].Label;
         OptCheckUpdatesOnStartup = true;
         OptRestoreAllTabs = false;
         OptStartupPath = "";
@@ -353,11 +353,27 @@ public partial class MainWindowViewModel : ObservableObject
         set { Options.ShowCheckBoxes = value; OnPropertyChanged(); }
     }
 
-    /// <summary>設定タブ: アイコンセット（絵文字 / Material Icon Theme）。</summary>
-    public bool OptUseMaterialIcons
+    /// <summary>設定タブのアイコンセット選択肢（表示ラベルと設定値の対応の唯一の定義）。</summary>
+    private static readonly (string Label, FileIconSet Value)[] IconSetChoices =
+    [
+        ("現在のオリジナルアイコン", FileIconSet.Original),
+        ("マテリアルアイコンテーマ", FileIconSet.Material),
+        ("Windows標準のアイコン", FileIconSet.Windows),
+    ];
+
+    public IReadOnlyList<string> IconSetOptions { get; } = [.. IconSetChoices.Select(c => c.Label)];
+
+    public string? OptIconSet
     {
-        get => Options.UseMaterialIcons;
-        set { Options.UseMaterialIcons = value; OnPropertyChanged(); }
+        get => (IconSetChoices.FirstOrDefault(c => c.Value == Options.IconSet).Label
+                ?? IconSetChoices[0].Label);
+        set
+        {
+            var selected = IconSetChoices.FirstOrDefault(c => c.Label == value);
+            if (selected.Label is null || Options.IconSet == selected.Value) return;
+            Options.IconSet = selected.Value;
+            OnPropertyChanged();
+        }
     }
 
     public bool OptCheckUpdatesOnStartup
@@ -416,14 +432,22 @@ public partial class MainWindowViewModel : ObservableObject
             ShowExtensions = _settings.ShowExtensions,
         };
         Options.ShowCheckBoxes = _settings.ShowCheckBoxes;
-        Options.UseMaterialIcons = _settings.UseMaterialIcons;
-        Options.Changed += (_, _) =>
+        // Enum.TryParse は "5" のような数値文字列も成功扱いにするため IsDefined で未定義値を弾く
+        Options.IconSet = Enum.TryParse<FileIconSet>(_settings.IconSet, out var iconSet) && Enum.IsDefined(iconSet)
+            ? iconSet
+            : _settings.UseMaterialIcons ? FileIconSet.Material : FileIconSet.Original;
+        _settings.IconSet = Options.IconSet.ToString();
+        _settings.UseMaterialIcons = false;
+        Options.Changed += (_, e) =>
         {
             _settings.ShowHidden = Options.ShowHidden;
             _settings.ShowExtensions = Options.ShowExtensions;
             _settings.ShowCheckBoxes = Options.ShowCheckBoxes;
-            _settings.UseMaterialIcons = Options.UseMaterialIcons;
+            _settings.IconSet = Options.IconSet.ToString();
+            _settings.UseMaterialIcons = false;
             SettingsService.Save(_settings);
+            // サイドバー（クイックアクセス等）のアイコンもセット設定に追従させる
+            if (e.Kind == ShellOptionKind.IconSet) RefreshSidebar();
         };
 
         _showBookmarksBar = _settings.ShowBookmarksBar;
@@ -438,8 +462,8 @@ public partial class MainWindowViewModel : ObservableObject
         ApplyTheme(_settings.ThemePreference);
         RefreshBookmarks();
         // 起動時はドライブ列挙（ブロックしうる I/O）をせず、フォールバックのクイックアクセスだけで即描画する。
-        // ドライブはウィンドウ表示直後の RefreshSidebarAsync（バックグラウンド）で埋まる。
-        BuildSidebar(QuickAccessService.GetFallbackSnapshot(), []);
+        // ドライブと画像アイコンはウィンドウ表示直後の RefreshSidebarAsync（バックグラウンド）で埋まる。
+        BuildSidebar(QuickAccessService.GetFallbackSnapshot(), [], [], ownsIcons: false);
 
         // 終了時に選択していたタブを次回も選択状態で復元するため、これから作るタブの中から該当するものを
         // 追いかける。NavigateToAsync は非同期のため、作成直後は CurrentPath がまだ反映されていない
@@ -1110,9 +1134,72 @@ public partial class MainWindowViewModel : ObservableObject
     {
         // クイックアクセス列挙とドライブ列挙（DriveInfo.IsReady / 空き容量は切断中の
         // ネットワークドライブでブロックしうる）をまとめてバックグラウンドで取得してから再構築する。
-        var (snapshot, drives) = await Task.Run(() => (QuickAccessService.GetSnapshot(), GetDriveDisplays()));
+        var iconSet = Options.IconSet;
+        var preferLight = iconSet == FileIconSet.Material && MaterialIconService.IsLightTheme();
+        var (snapshot, drives, icons) = await Task.Run(() =>
+        {
+            var snap = QuickAccessService.GetSnapshot();
+            var driveList = GetDriveDisplays();
+            return (snap, driveList, BuildSidebarIconImages(snap, driveList, iconSet, preferLight));
+        });
+
+        // Windows Shell アイコンはこちらが所有しているため、旧項目の分を解放してから差し替える
+        foreach (var link in SidebarItems.OfType<SidebarLink>())
+        {
+            if (link is { OwnsIconImage: true, IconImage: Avalonia.Media.Imaging.Bitmap bitmap }) bitmap.Dispose();
+        }
+
         SidebarItems.Clear();
-        BuildSidebar(snapshot, drives);
+        BuildSidebar(snapshot, drives, icons, ownsIcons: iconSet == FileIconSet.Windows);
+    }
+
+    /// <summary>サイドバー項目のパス→画像アイコン対応表を、現在のアイコンセット設定で構築する。</summary>
+    private static Dictionary<string, Avalonia.Media.IImage> BuildSidebarIconImages(
+        QuickAccessService.Snapshot quickAccess,
+        IReadOnlyList<DriveDisplay> drives,
+        FileIconSet iconSet,
+        bool preferLight)
+    {
+        var icons = new Dictionary<string, Avalonia.Media.IImage>(WindowsPathIdentity.Instance);
+        if (iconSet == FileIconSet.Original)
+        {
+            return icons;
+        }
+
+        void Add(string path, string name, bool isDirectory)
+        {
+            if (path.Length == 0 || icons.ContainsKey(path))
+            {
+                return;
+            }
+
+            Avalonia.Media.IImage? image;
+            if (iconSet == FileIconSet.Windows)
+            {
+                image = ShellThumbnailService.TryGetIcon(path, 32);
+            }
+            else
+            {
+                var key = MaterialIconService.ResolveIconKey(name, isDirectory, preferLight);
+                image = key.Length > 0 ? MaterialIconService.GetImage(key) : null;
+            }
+
+            if (image is not null)
+            {
+                icons[path] = image;
+            }
+        }
+
+        foreach (var (name, path) in quickAccess.Folders) Add(path, name, isDirectory: true);
+        foreach (var (name, path) in quickAccess.RecentFiles) Add(path, name, isDirectory: false);
+        if (iconSet == FileIconSet.Windows)
+        {
+            // ドライブとごみ箱の Shell アイコンはエクスプローラー同等。Material には対応アイコンが無いため絵文字のまま
+            foreach (var drive in drives) Add(drive.Path, drive.Name, isDirectory: true);
+            Add("shell:RecycleBinFolder", "ごみ箱", isDirectory: true);
+        }
+
+        return icons;
     }
 
     /// <summary>左ペインに並べるドライブ情報。DriveInfo へのアクセスは UI スレッドをブロックしうるため
@@ -1133,7 +1220,11 @@ public partial class MainWindowViewModel : ObservableObject
         return result;
     }
 
-    private void BuildSidebar(QuickAccessService.Snapshot quickAccess, IReadOnlyList<DriveDisplay> drives)
+    private void BuildSidebar(
+        QuickAccessService.Snapshot quickAccess,
+        IReadOnlyList<DriveDisplay> drives,
+        Dictionary<string, Avalonia.Media.IImage> icons,
+        bool ownsIcons)
     {
         SidebarItems.Add(new SidebarHeader { Title = "クイックアクセス" });
         foreach (var (name, path) in quickAccess.Folders)
@@ -1143,6 +1234,8 @@ public partial class MainWindowViewModel : ObservableObject
                 Name = name,
                 Path = path,
                 Icon = IconFor(path),
+                IconImage = icons.GetValueOrDefault(path),
+                OwnsIconImage = ownsIcons,
                 IsQuickAccess = true,
                 Tooltip = path,
             });
@@ -1157,6 +1250,8 @@ public partial class MainWindowViewModel : ObservableObject
                 Name = drive.Name,
                 Path = drive.Path,
                 Icon = "💾",
+                IconImage = icons.GetValueOrDefault(drive.Path),
+                OwnsIconImage = ownsIcons,
                 Tooltip = drive.Tooltip,
             });
         }
@@ -1166,6 +1261,8 @@ public partial class MainWindowViewModel : ObservableObject
             Name = "ごみ箱",
             Path = "shell:RecycleBinFolder",
             Icon = "🗑",
+            IconImage = icons.GetValueOrDefault("shell:RecycleBinFolder"),
+            OwnsIconImage = ownsIcons,
             IsShellCommand = true,
             Tooltip = "ごみ箱をエクスプローラーで開く",
         });
@@ -1182,6 +1279,8 @@ public partial class MainWindowViewModel : ObservableObject
                     Name = name,
                     Path = path,
                     Icon = "🕒",
+                    IconImage = icons.GetValueOrDefault(path),
+                    OwnsIconImage = ownsIcons,
                     IsFile = true,
                     Tooltip = path,
                 });

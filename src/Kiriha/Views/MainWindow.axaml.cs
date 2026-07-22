@@ -109,6 +109,12 @@ public partial class MainWindow : Window
                     {
                         ApplyAcrylicTransparency(vm.OptUseAcrylicBackground);
                     }
+                    else if (args.PropertyName == nameof(MainWindowViewModel.SelectedTab))
+                    {
+                        // 設定タブでアイコンセットを切り替えた後にタブへ戻った場合など、
+                        // 表示済みの行へ Windows アイコンを確実に読み込む（レイアウト確定後に実行）
+                        Dispatcher.UIThread.Post(() => LoadRealizedWindowsIcons(vm), DispatcherPriority.Background);
+                    }
                 };
             }
         };
@@ -1956,7 +1962,7 @@ public partial class MainWindow : Window
                     var invoked = ShellContextMenuService.Show(handle.Handle, sel.FullPath, pt.X, pt.Y);
                     if (invoked)
                     {
-                        DispatcherTimer.RunOnce(() => tab.NavigateTo(tab.CurrentPath, record: false), TimeSpan.FromMilliseconds(700));
+                        RefreshAfterShellOperation(tab);
                     }
 
                     e.Handled = true;
@@ -2714,7 +2720,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private async void IconItem_EffectiveViewportChanged(object? sender, EffectiveViewportChangedEventArgs e)
+    private async void FileItem_EffectiveViewportChanged(object? sender, EffectiveViewportChangedEventArgs e)
     {
         if (e.EffectiveViewport.Width <= 0 || e.EffectiveViewport.Height <= 0
             || sender is not Control { DataContext: FileSystemEntry entry } control
@@ -2723,10 +2729,23 @@ public partial class MainWindow : Window
             return;
         }
 
-        await tab.EnsureThumbnailAsync(entry);
+        await Task.WhenAll(
+            tab.EnsureWindowsIconAsync(entry),
+            tab.EnsureThumbnailAsync(entry));
     }
 
-    /// <summary>追加機能はWindows標準コンテキストメニューを置き換えず、コマンドバーから提供する。</summary>
+    private async void FileItem_DataContextChanged(object? sender, EventArgs e)
+    {
+        if (sender is not Control { DataContext: FileSystemEntry entry } control
+            || control.FindAncestorOfType<ListBox>()?.DataContext is not TabViewModel tab)
+        {
+            return;
+        }
+
+        await tab.EnsureWindowsIconAsync(entry);
+    }
+
+/// <summary>追加機能はWindows標準コンテキストメニューを置き換えず、コマンドバーから提供する。</summary>
     private void AdvancedToolsButton_Click(object? sender, RoutedEventArgs e)
     {
         if (sender is not Button { DataContext: TabViewModel tab } button) return;
@@ -3074,8 +3093,19 @@ public partial class MainWindow : Window
         var invoked = ShellContextMenuService.Show(handle.Handle, path, screen.X, screen.Y);
         if (invoked)
         {
-            // 削除・貼り付けなどシェル側の処理完了を少し待ってから一覧を更新する
-            DispatcherTimer.RunOnce(() => tab.NavigateTo(tab.CurrentPath, record: false), TimeSpan.FromMilliseconds(700));
+            RefreshAfterShellOperation(tab);
+        }
+    }
+
+    /// <summary>
+    /// シェル verb（削除・貼り付け・圧縮など）は InvokeCommand 復帰後に非同期で完了することがあるため、
+    /// 完了タイミングの揺れを吸収できるよう時間差で複数回一覧を再読み込みする。
+    /// </summary>
+    internal static void RefreshAfterShellOperation(TabViewModel tab)
+    {
+        foreach (var delay in (int[])[700, 2500])
+        {
+            DispatcherTimer.RunOnce(() => tab.NavigateTo(tab.CurrentPath, record: false), TimeSpan.FromMilliseconds(delay));
         }
     }
 
@@ -3108,4 +3138,20 @@ public partial class MainWindow : Window
             .OfType<ListBox>()
             .FirstOrDefault(l => l.IsEffectivelyVisible
                                  && (l.Classes.Contains("files") || l.Classes.Contains("icons")));
+
+    /// <summary>アクティブなファイル一覧の実体化済みの行へ Windows Shell アイコンを読み込む。</summary>
+    private void LoadRealizedWindowsIcons(MainWindowViewModel viewModel)
+    {
+        if (viewModel.Options.IconSet != FileIconSet.Windows
+            || viewModel.SelectedTab is not { IsSettingsTab: false } tab
+            || FindActiveFileList() is not { } list)
+        {
+            return;
+        }
+
+        foreach (var entry in list.GetRealizedContainers().Select(c => c.DataContext).OfType<FileSystemEntry>())
+        {
+            _ = tab.EnsureWindowsIconAsync(entry);
+        }
+    }
 }

@@ -125,7 +125,10 @@ public sealed class AppSettings
     /// <summary>検索ボックスの幅（境界の Thumb ドラッグで変更）。</summary>
     public double SearchBoxWidth { get; set; } = 200;
 
-    /// <summary>絵文字の代わりに Material Icon Theme のアイコンを使う（設定画面で切替）。</summary>
+    /// <summary>ファイル一覧で使うアイコンセット。未設定なら旧 UseMaterialIcons から移行する。</summary>
+    public string? IconSet { get; set; }
+
+    /// <summary>v1.0.17 以前の設定から移行するために保持する旧フラグ。</summary>
     public bool UseMaterialIcons { get; set; }
 
     /// <summary>ウィンドウにアクリル（半透明ぼかし）効果を使う（Lhamiel / RealTimeTranslator と同等、設定画面で切替）。</summary>
