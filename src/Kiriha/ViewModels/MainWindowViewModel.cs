@@ -556,8 +556,7 @@ public partial class MainWindowViewModel : ObservableObject
         var initialViewSettings = _folderViewSettings.TryGet(path, out var savedViewSettings)
             ? savedViewSettings
             : CreateDefaultFolderViewSettings(path);
-        var tab = new TabViewModel(
-            path, Options, _folderViewSettings, initialViewSettings, CreateDefaultFolderViewSettings)
+        var tab = new TabViewModel(path, Options, _folderViewSettings, initialViewSettings)
         {
             ColNameWidth = _settings.ColNameWidth,
             ColModifiedWidth = _settings.ColModifiedWidth,

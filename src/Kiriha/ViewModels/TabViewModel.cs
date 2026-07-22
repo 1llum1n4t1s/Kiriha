@@ -17,7 +17,6 @@ public partial class TabViewModel : ObservableObject
     private readonly Stack<string> _forward = new();
     private readonly ShellOptions _options;
     private readonly FolderViewSettingsService? _folderViewSettings;
-    private readonly Func<string, FolderViewSettings>? _defaultFolderViewSettings;
     private readonly CancellationTokenSource _lifetimeCts = new();
     private CancellationTokenSource? _filterDebounceCts;
     private bool _isDetached;
@@ -660,8 +659,7 @@ public partial class TabViewModel : ObservableObject
     }
 
     public TabViewModel(string initialPath, ShellOptions options, bool isSettingsTab = false)
-        : this(initialPath, options, folderViewSettings: null, initialViewSettings: null,
-            defaultFolderViewSettings: null, isSettingsTab)
+        : this(initialPath, options, folderViewSettings: null, initialViewSettings: null, isSettingsTab)
     {
     }
 
@@ -717,12 +715,10 @@ public partial class TabViewModel : ObservableObject
         ShellOptions options,
         FolderViewSettingsService? folderViewSettings,
         FolderViewSettings? initialViewSettings,
-        Func<string, FolderViewSettings>? defaultFolderViewSettings,
         bool isSettingsTab = false)
     {
         _options = options;
         _folderViewSettings = folderViewSettings;
-        _defaultFolderViewSettings = defaultFolderViewSettings;
         DetailColumns =
         [
             new(this, "Name", "名前"),
@@ -966,15 +962,41 @@ public partial class TabViewModel : ObservableObject
             _thumbnailCts = CancellationTokenSource.CreateLinkedTokenSource(_lifetimeCts.Token);
     }
 
+    /// <summary>直近でフォルダー別設定を適用したパス。初回ナビゲーション判定に使う。</summary>
+    private string? _lastViewSettingsPath;
+
     private void ApplySavedFolderViewSettings(string path)
     {
+        var isInitialNavigation = _lastViewSettingsPath is null;
+        var pathChanged = !isInitialNavigation
+            && !WindowsPathIdentity.Instance.Equals(_lastViewSettingsPath, path);
+        _lastViewSettingsPath = path;
+
         if (_folderViewSettings?.TryGet(path, out var settings) == true)
         {
             ApplyFolderViewSettings(settings);
+            return;
         }
-        else if (_defaultFolderViewSettings is not null)
+
+        // 「最後に使った表示・並べ替え」(_defaultFolderViewSettings) は新規タブの既定専用。
+        // タブ内の移動で未保存フォルダーへ適用すると直前フォルダーの並べ替えが伝染するため、
+        // 移動時は既定の並べ替え（名前・昇順）へ戻す。表示モードとアイコンサイズは
+        // タブの連続性としてそのまま維持する。初回ナビゲーション（新規タブ / 復元）では
+        // コンストラクターで適用済みの新規タブ既定を保つ。
+        if (!pathChanged)
         {
-            ApplyFolderViewSettings(_defaultFolderViewSettings(path));
+            return;
+        }
+
+        _isApplyingFolderViewSettings = true;
+        try
+        {
+            SortKey = "Name";
+            SortAscendingFlag = true;
+        }
+        finally
+        {
+            _isApplyingFolderViewSettings = false;
         }
     }
 
