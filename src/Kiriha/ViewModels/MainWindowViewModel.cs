@@ -438,10 +438,21 @@ public partial class MainWindowViewModel : ObservableObject
         OptStartMinimizedToTray = false;
         ShowBookmarksBar = false;
         ShowSidebar = true;
+        ShowSidebarTree = false;
         SidebarWidth = 230;
         VerticalTabWidth = 240;
         SearchBoxWidth = 200;
         ShowPreviewPane = false;
+        PreviewWidth = 280;
+        ShowStatusBar = true;
+
+        // コンパクトビューは開いているタブへも反映する（タブ側の変更通知が _settings.CompactView も既定へ戻す）
+        foreach (var tab in Tabs.Where(t => !t.IsSettingsTab))
+        {
+            tab.IsCompactView = false;
+        }
+
+        _settings.CompactView = false;
 
         // 詳細表示の列幅・列の表示/非表示・既定の表示モード/アイコンサイズ/並べ替えも既定へ戻す
         // （AppSettings の初期値と一致させる。新規タブに反映され、Save は末尾でまとめて行う）。

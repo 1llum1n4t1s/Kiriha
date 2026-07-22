@@ -1150,6 +1150,7 @@ public partial class TabViewModel : ObservableObject
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
         _extensionFilterName = displayName;
         ApplyFilter();
+        RefreshRecursiveSearchIfActive();
     }
 
     public void ClearExtensionFilter()
@@ -1157,6 +1158,17 @@ public partial class TabViewModel : ObservableObject
         _extensionFilter = null;
         _extensionFilterName = "";
         ApplyFilter();
+        RefreshRecursiveSearchIfActive();
+    }
+
+    /// <summary>サブフォルダーを含む検索結果を表示中に種類フィルターが変わった場合、
+    /// ApplyFilter（現在のフォルダーの母集合のみ）で上書きされた一覧を再帰検索で復元する。</summary>
+    private void RefreshRecursiveSearchIfActive()
+    {
+        if (SearchText.Trim().Length > 0)
+        {
+            _ = SearchRecursiveAsync();
+        }
     }
 
     /// <summary>検索テキストで現在のフォルダー内容を絞り込む。</summary>
