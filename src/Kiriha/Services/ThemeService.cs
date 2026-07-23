@@ -30,6 +30,17 @@ public static class ThemeService
         {
             platformSettings.ColorValuesChanged += (_, _) => Dispatcher.UIThread.Post(() => Apply(app));
         }
+
+        // Win32 クラシックメニュー（シェルコンテキストメニュー等）もアプリの実効テーマへ追従させる。
+        // システム設定時は ActualThemeVariant が OS 設定に解決されるため、その結果に合わせる。
+        ApplyClassicMenuTheme(app);
+        app.ActualThemeVariantChanged += (_, _) => ApplyClassicMenuTheme(app);
+    }
+
+    private static void ApplyClassicMenuTheme(Application app)
+    {
+        var variant = app.ActualThemeVariant;
+        ClassicMenuThemeService.SetDark(variant == ThemeVariant.Dark || variant == OneDark);
     }
 
     /// <summary>設定画面のトグルからアクリル効果の有効/無効を切り替える。</summary>

@@ -729,14 +729,13 @@
                                                                 <!-- 名前列だけを行の反応領域にする: 背景 Transparent で列幅全体をヒット対象にし、
                                                                      ホバー / 選択色もこの Border（namecell）にだけ乗せる -->
                                                                 <Border Classes="namecell" IsVisible="{Binding IsName}"
-                                                                        Background="Transparent" CornerRadius="6">
+                                                                        Background="Transparent" CornerRadius="4">
                                                                     <Panel>
-                                                                        <!-- 選択ハイライト（一覧表示の選択スタイルと同じ配色）。ListBoxItem 既定の
-                                                                             全行ハイライトは無効化してあるため、名前列にだけこの層で描く -->
+                                                                        <!-- 選択ハイライト（一覧・アイコン表示の既定選択と同じアクセント青の塗り）。
+                                                                             ListBoxItem 既定の全行ハイライトは無効化してあるため、名前列にだけこの層で描く -->
                                                                         <Border IsVisible="{Binding $parent[ListBoxItem].IsSelected}"
-                                                                                Background="{DynamicResource HoverBg}"
-                                                                                BorderBrush="{DynamicResource SystemAccentColor}"
-                                                                                BorderThickness="1" CornerRadius="6" />
+                                                                                Background="{DynamicResource SystemControlHighlightListAccentLowBrush}"
+                                                                                CornerRadius="4" />
                                                                         <Grid ColumnDefinitions="Auto,Auto,*" Margin="4,0">
                                                                             <CheckBox Grid.Column="0" MinWidth="0" Padding="0" Margin="0,0,6,0"
                                                                                       IsVisible="{Binding Owner.ShowCheckBoxes}"

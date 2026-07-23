@@ -12,6 +12,7 @@ internal static partial class ShellContextMenuService
 {
     private static readonly Guid IidIShellFolder = new("000214E6-0000-0000-C000-000000000046");
     private static readonly Guid IidIContextMenu = new("000214E4-0000-0000-C000-000000000046");
+    private static readonly Guid IidIDataObject = new("0000010E-0000-0000-C000-000000000046");
 
     private const uint TpmReturnCmd = 0x0100;
     private const uint TpmRightButton = 0x0002;
@@ -217,28 +218,43 @@ internal static partial class ShellContextMenuService
 
     /// <summary>指定パスのシェルコンテキストメニューをスクリーン座標 (x, y) に表示する。コマンド実行時 true。</summary>
     public static bool Show(nint hwnd, string path, int x, int y)
-    {
-        if (SHParseDisplayName(path, 0, out var pidl, 0, out _) < 0 || pidl == 0)
-        {
-            return false;
-        }
+        => Show(hwnd, [path], x, y);
 
+    /// <summary>
+    /// 複数パス（同一フォルダー内の複数選択）のシェルコンテキストメニューを表示する。
+    /// Explorer と同じく、削除・コピー・送る等の verb は選択全体に対して実行される。
+    /// </summary>
+    public static bool Show(nint hwnd, IReadOnlyList<string> paths, int x, int y)
+    {
+        var pidls = new List<nint>(paths.Count);
         try
         {
-            return ShowForPidl(hwnd, pidl, x, y);
+            foreach (var path in paths)
+            {
+                if (SHParseDisplayName(path, 0, out var pidl, 0, out _) >= 0 && pidl != 0)
+                {
+                    pidls.Add(pidl);
+                }
+            }
+
+            return pidls.Count > 0 && ShowForPidls(hwnd, pidls, x, y);
         }
         finally
         {
-            Marshal.FreeCoTaskMem(pidl);
+            foreach (var pidl in pidls)
+            {
+                Marshal.FreeCoTaskMem(pidl);
+            }
         }
     }
 
-    private static bool ShowForPidl(nint hwnd, nint pidl, int x, int y)
+    private static bool ShowForPidls(nint hwnd, IReadOnlyList<nint> pidls, int x, int y)
     {
         // シェル拡張（クラウドストレージ・AV 等）の不調で QueryContextMenu が数十秒ブロックすることが
         // あるため、所要時間を計測して遅延時だけ記録する（犯人特定の手掛かりを残す）。
         var sw = System.Diagnostics.Stopwatch.StartNew();
-        if (SHBindToParent(pidl, IidIShellFolder, out var folderPtr, out var childPidl) < 0 || folderPtr == 0)
+        // 親フォルダーは先頭項目から取得する（ファイル一覧の複数選択は常に同一フォルダー内）
+        if (SHBindToParent(pidls[0], IidIShellFolder, out var folderPtr, out var firstChild) < 0 || folderPtr == 0)
         {
             return false;
         }
@@ -247,14 +263,30 @@ internal static partial class ShellContextMenuService
         var folder = (IShellFolder)wrappers.GetOrCreateObjectForComInstance(folderPtr, CreateObjectFlags.None);
         Marshal.Release(folderPtr);
 
+        // 各絶対 pidl の末尾（子 pidl）を集める。子 pidl は元 pidl 内を指すため個別解放は不要。
+        var children = new nint[pidls.Count];
+        children[0] = firstChild;
+        for (var i = 1; i < pidls.Count; i++)
+        {
+            if (SHBindToParent(pidls[i], IidIShellFolder, out var parentPtr, out var child) < 0 || parentPtr == 0)
+            {
+                return false;
+            }
+
+            Marshal.Release(parentPtr);
+            children[i] = child;
+        }
+
         nint ctxPtr;
         unsafe
         {
-            // childPidl は pidl 内を指すため個別解放は不要
-            var child = childPidl;
-            if (folder.GetUIObjectOf(hwnd, 1, (nint)(&child), IidIContextMenu, 0, out ctxPtr) < 0 || ctxPtr == 0)
+            fixed (nint* pChildren = children)
             {
-                return false;
+                if (folder.GetUIObjectOf(hwnd, (uint)children.Length, (nint)pChildren, IidIContextMenu, 0, out ctxPtr) < 0
+                    || ctxPtr == 0)
+                {
+                    return false;
+                }
             }
         }
 
@@ -293,6 +325,28 @@ internal static partial class ShellContextMenuService
 
             unsafe
             {
+                // 複数選択のプロパティは IContextMenu.InvokeCommand だと、特殊フォルダー
+                // （Contacts 等のカスタムプロパティシート持ち）が混ざったときに S_OK のまま
+                // 何も表示されないことがある。Explorer 自身が使う公開 API の
+                // SHMultiFileProperties へ切り替えて確実に表示する。
+                if (pidls.Count > 1 && IsVerb(menu, cmd, "properties"))
+                {
+                    fixed (nint* pChildren2 = children)
+                    {
+                        if (folder.GetUIObjectOf(hwnd, (uint)children.Length, (nint)pChildren2, IidIDataObject, 0, out var dataPtr) >= 0
+                            && dataPtr != 0)
+                        {
+                            var mfHr = SHMultiFileProperties(dataPtr, 0);
+                            Marshal.Release(dataPtr);
+                            if (mfHr < 0)
+                            {
+                                Logger.Log($"複数選択のプロパティ表示に失敗: HRESULT=0x{mfHr:X8}", LogLevel.Warning);
+                            }
+                            return mfHr >= 0;
+                        }
+                    }
+                }
+
                 var info = new CmInvokeCommandInfo
                 {
                     Size = (uint)sizeof(CmInvokeCommandInfo),
@@ -321,6 +375,25 @@ internal static partial class ShellContextMenuService
             DestroyMenu(hmenu);
         }
     }
+
+    /// <summary>メニュー項目 cmd の正規 verb 名が指定の名前と一致するかを調べる。</summary>
+    private static bool IsVerb(IContextMenu menu, int cmd, string verb)
+    {
+        unsafe
+        {
+            const uint GcsVerbW = 4;
+            var buffer = stackalloc char[260];
+            if (menu.GetCommandString((nuint)(cmd - 1), GcsVerbW, 0, (nint)buffer, 260) < 0)
+            {
+                return false;
+            }
+
+            return string.Equals(new string(buffer), verb, StringComparison.OrdinalIgnoreCase);
+        }
+    }
+
+    [LibraryImport("shell32.dll")]
+    private static partial int SHMultiFileProperties(nint pdtobj, uint flags);
 
     [StructLayout(LayoutKind.Sequential)]
     private struct CmInvokeCommandInfo

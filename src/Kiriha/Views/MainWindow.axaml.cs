@@ -78,6 +78,9 @@ public partial class MainWindow : Window
             RoutingStrategies.Tunnel, handledEventsToo: true);
         AddHandler(PointerCaptureLostEvent, MarqueeSelection_PointerCaptureLost, handledEventsToo: true);
 
+        // 同一パス再読み込み（F5・シェル verb 後の保険リフレッシュ等）後の複数選択復元
+        TabViewModel.SelectionRestoreRequested += OnTabSelectionRestoreRequested;
+
         // ListBoxItem が選択処理で PointerPressed を Handled 済みにするため、
         // 通常のバブル購読（XAML の PointerPressed="..."）ではタブの並べ替え開始を検知できない。
         // handledEventsToo: true で Handled 後も確実に拾う。
@@ -311,6 +314,15 @@ public partial class MainWindow : Window
                 break;
             case Key.V when ctrl:
                 if (tab is { IsSettingsTab: false } && tab.PasteCommand.CanExecute(null)) tab.PasteCommand.Execute(null);
+                break;
+            case Key.A when ctrl:
+                // ファイル一覧の外（背景クリック後やツールバー操作後など）にフォーカスがあっても
+                // 全選択できるようにするフォールバック。テキストボックス内は各自の Ctrl+A が先に消費する。
+                if (tab is { IsSettingsTab: false })
+                {
+                    FindActiveFileList()?.SelectAll();
+                }
+
                 break;
             case Key.Delete when shift:
                 if (tab is { IsSettingsTab: false } && tab.DeletePermanentCommand.CanExecute(null)) tab.DeletePermanentCommand.Execute(null);
@@ -1956,19 +1968,37 @@ public partial class MainWindow : Window
             return;
         }
 
-        if (listBox is not null && isFileList && item?.DataContext is FileSystemEntry)
+        if (listBox is not null && isFileList && item?.DataContext is FileSystemEntry pressedEntry)
         {
             _dragPressArgs = e;
             _dragListBox = listBox;
             _dragSidebarLink = null;
             // 複数選択済みの項目を押すとListBox既定処理が選択を1件へ縮めるため、
             // トンネル段階の選択状態を保持してExplorer同様にまとめてドラッグする。
-            _dragSelectionSnapshot = item.IsSelected
+            // Ctrl/Shift 併用時はトグル・範囲選択の既定動作を尊重して保持しない。
+            var noSelectionModifiers = !e.KeyModifiers.HasFlag(KeyModifiers.Control)
+                                       && !e.KeyModifiers.HasFlag(KeyModifiers.Shift);
+            _dragSelectionSnapshot = noSelectionModifiers && item.IsSelected
                 && listBox.SelectedItems?.OfType<FileSystemEntry>().ToList() is { Count: > 1 } selected
                     ? selected
                     : null;
             _dragStartPoint = e.GetPosition(this);
             _dragInProgress = false;
+
+            if (_dragSelectionSnapshot is { } snapshot)
+            {
+                // Explorer と同じく、押下では複数選択を崩さない（クリック確定＝リリース時に1件へ縮める）。
+                // ListBox 既定処理がこの後のバブルで選択を1件へ縮めるため、イベント処理後に復元する。
+                _dragPressCollapseEntry = pressedEntry;
+                Dispatcher.UIThread.Post(() =>
+                {
+                    if (ReferenceEquals(_dragListBox, listBox) && _dragSelectionSnapshot is { } current)
+                    {
+                        ApplyBulkSelection(listBox, current);
+                    }
+                });
+            }
+
             return;
         }
 
@@ -2102,9 +2132,23 @@ public partial class MainWindow : Window
 
         if (!_dragInProgress)
         {
+            // 複数選択中の項目を（ドラッグせず）単にクリックした場合、Explorer と同じく
+            // リリース時点でその1件だけの選択へ縮める。対象は押下時に確定済み
+            // （ポインタキャプチャにより e.Source が押下要素と一致しない環境があるため再判定しない）。
+            if (_dragPressCollapseEntry is { } collapseTo
+                && _dragListBox is { } pressList
+                && e.InitialPressMouseButton == MouseButton.Left)
+            {
+                // SelectedItem への同値代入は no-op になり複数選択が残るため、選択集合ごと差し替える
+                ApplyBulkSelection(pressList, [collapseTo]);
+            }
+
             ResetDragSource();
         }
     }
+
+    /// <summary>複数選択中の項目を押下したとき、クリック確定（リリース）で選択をこの1件へ縮める対象。</summary>
+    private FileSystemEntry? _dragPressCollapseEntry;
 
     private void DismissPathEditing_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
@@ -2126,8 +2170,9 @@ public partial class MainWindow : Window
     {
         if (Clipboard is not null)
         {
-            await Clipboard.SetTextAsync(
-                tab.CurrentPath == FileSystemService.ComputerPath ? "PC" : tab.CurrentPath);
+            var text = tab.CurrentPath == FileSystemService.ComputerPath ? "PC" : tab.CurrentPath;
+            await Clipboard.SetTextAsync(text);
+            tab.StatusText = $"パスをコピーしました: {text}";
         }
     }
 
@@ -2162,9 +2207,8 @@ public partial class MainWindow : Window
             var effect = await DragDrop.DoDragDropAsync(pressArgs, transfer, DragDropEffects.Copy | DragDropEffects.Move);
             if (refreshTab is not null && effect.HasFlag(DragDropEffects.Move))
             {
-                DispatcherTimer.RunOnce(
-                    () => refreshTab.NavigateTo(refreshTab.CurrentPath, record: false),
-                    TimeSpan.FromMilliseconds(700));
+                // 移動元フォルダーの反映はフォルダー監視が正本。監視が使えないタブだけ保険の時限再読み込み
+                RefreshAfterShellOperation(refreshTab);
             }
         }
         finally
@@ -2192,6 +2236,7 @@ public partial class MainWindow : Window
         _dragSidebarLink = null;
         _dragTreeNodePath = null;
         _dragSelectionSnapshot = null;
+        _dragPressCollapseEntry = null;
         _dragInProgress = false;
     }
 
@@ -2789,8 +2834,18 @@ public partial class MainWindow : Window
             : (e.Source as Visual)?.FindAncestorOfType<ListBoxItem>();
         if (item?.DataContext is FileSystemEntry entry)
         {
-            listBox.SelectedItem = entry;
-            ShowShellContextMenu(tab, entry.FullPath, e);
+            // Explorer と同じく、複数選択中の項目を右クリックした場合は選択を維持し、
+            // メニューの verb（削除・コピー・送る等）を選択全体に対して実行する。
+            var selected = listBox.SelectedItems?.OfType<FileSystemEntry>().ToList();
+            if (selected is { Count: > 1 } && selected.Contains(entry))
+            {
+                ShowShellContextMenu(tab, selected.Select(s => s.FullPath).ToList(), e);
+            }
+            else
+            {
+                listBox.SelectedItem = entry;
+                ShowShellContextMenu(tab, entry.FullPath, e);
+            }
         }
         else if (tab.CurrentPath != FileSystemService.ComputerPath)
         {
@@ -2879,11 +2934,32 @@ public partial class MainWindow : Window
         }
     }
 
+    /// <summary>再読み込み後の複数選択復元（選択の実体は ListBox が持つため View 側で適用する）。</summary>
+    private void OnTabSelectionRestoreRequested(TabViewModel tab, IReadOnlyList<FileSystemEntry> entries)
+    {
+        if (!ReferenceEquals(ViewModel?.SelectedTab, tab))
+        {
+            return;
+        }
+
+        if (FindActiveFileList() is { } listBox)
+        {
+            ApplyBulkSelection(listBox, entries);
+        }
+    }
+
     /// <summary>指定パスに対する Windows 標準のシェルコンテキストメニューを表示する。</summary>
     private void ShowShellContextMenu(TabViewModel tab, string path, PointerReleasedEventArgs e)
-        => ShowShellContextMenu(tab, path, this.PointToScreen(e.GetPosition(this)));
+        => ShowShellContextMenu(tab, [path], this.PointToScreen(e.GetPosition(this)));
+
+    /// <summary>複数選択に対するシェルコンテキストメニュー（削除・コピー等は選択全体が対象）。</summary>
+    private void ShowShellContextMenu(TabViewModel tab, IReadOnlyList<string> paths, PointerReleasedEventArgs e)
+        => ShowShellContextMenu(tab, paths, this.PointToScreen(e.GetPosition(this)));
 
     private void ShowShellContextMenu(TabViewModel tab, string path, PixelPoint screen)
+        => ShowShellContextMenu(tab, [path], screen);
+
+    private void ShowShellContextMenu(TabViewModel tab, IReadOnlyList<string> paths, PixelPoint screen)
     {
         var handle = TryGetPlatformHandle();
         if (handle is null)
@@ -2891,7 +2967,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        var invoked = ShellContextMenuService.Show(handle.Handle, path, screen.X, screen.Y);
+        var invoked = ShellContextMenuService.Show(handle.Handle, paths, screen.X, screen.Y);
         if (invoked)
         {
             RefreshAfterShellOperation(tab);
@@ -2899,19 +2975,25 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// シェル verb（削除・貼り付け・圧縮など）は InvokeCommand 復帰後に非同期で完了することがあるため、
-    /// 完了タイミングの揺れを吸収できるよう時間差の再読み込みを仕掛ける。
-    /// 通常はフォルダー監視（DirectoryObservationService）が先に変更を拾って一覧を更新するので、
-    /// 各時限発火は「verb 実行以降にまだ一度も再読み込みされていない場合」だけ動く監視の保険とする。
+    /// シェル verb（削除・貼り付け・圧縮など）は InvokeCommand 復帰後に非同期で完了することがある。
+    /// 変更の反映はフォルダー監視（DirectoryObservationService）が正本なので、監視が使えている間は
+    /// ここでは何もしない（プロパティ・開く等の無変更 verb で不要な再読み込みをしないため）。
+    /// 監視を開始できていないタブ（PC ビュー・監視失敗）だけ、時間差の再読み込みを保険として仕掛ける。
+    /// 各時限発火は「verb 実行以降にまだ一度も再読み込みされていない場合」だけ動く。
     /// </summary>
     internal static void RefreshAfterShellOperation(TabViewModel tab)
     {
+        if (!tab.NeedsShellRefreshBackup)
+        {
+            return;
+        }
+
         var invokedAtUtc = DateTime.UtcNow;
         foreach (var delay in (int[])[700, 2500])
         {
             DispatcherTimer.RunOnce(() =>
             {
-                if (tab.LastListLoadStartUtc <= invokedAtUtc)
+                if (tab.NeedsShellRefreshBackup && tab.LastListLoadStartUtc <= invokedAtUtc)
                 {
                     tab.NavigateTo(tab.CurrentPath, record: false);
                 }

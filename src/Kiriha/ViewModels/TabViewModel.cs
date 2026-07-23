@@ -82,6 +82,11 @@ public partial class TabViewModel : ObservableObject
     /// <summary>名前の変更 UI の表示要求（View 側でダイアログを出す）。</summary>
     public event EventHandler<FileSystemEntry>? RenameRequested;
 
+    /// <summary>同一パス再読み込み後に複数選択の復元を View（ListBox 所有側）へ依頼する。
+    /// タブは動的に生成・破棄されるため、購読管理が単純な static イベントにしている
+    /// （ClipboardFileService.CutStateChanged と同じ方式。購読者は MainWindow 1 つ）。</summary>
+    public static event Action<TabViewModel, IReadOnlyList<FileSystemEntry>>? SelectionRestoreRequested;
+
     private List<FileSystemEntry> _selection = new();
     private readonly HashSet<string> _pendingNewFolderPaths = new(StringComparer.OrdinalIgnoreCase);
 
@@ -397,6 +402,15 @@ public partial class TabViewModel : ObservableObject
 
     /// <summary>現在パスの一覧列挙を最後に開始した UTC 時刻。多重リフレッシュ抑止の判定に使う。</summary>
     internal DateTime LastListLoadStartUtc { get; private set; }
+
+    /// <summary>
+    /// シェル verb / ドラッグ移動後の「時限の保険リフレッシュ」が必要かどうか。
+    /// フォルダー監視が生きていれば変更はイベント経由で反映されるため保険は不要。
+    /// 監視を開始できなかった場合（PC ビュー・監視失敗）だけ true。
+    /// 検索結果の表示中は NavigateTo が検索を打ち切ってしまうため常に false（F5 は別経路）。
+    /// </summary>
+    internal bool NeedsShellRefreshBackup
+        => _watcherSubscription is null && SearchText.Length == 0;
 
     private void OnObservedDirectoryChanged(DateTime lastEventUtc)
     {
@@ -1012,7 +1026,9 @@ public partial class TabViewModel : ObservableObject
         }
 
         var generation = Interlocked.Increment(ref _navigationGeneration);
-        // 同一パスの再読み込み（更新）ではスクロール / 選択を維持する
+        // 同一パスの再読み込み（更新）ではスクロール / 選択を維持する。
+        // 選択の保持・復元自体は ReplaceEntries が全経路共通で行うため、ここでは
+        // SelectedEntry（アンカー）だけを追加で復元する。
         var preserveSelection = WindowsPathIdentity.Instance.Equals(path, CurrentPath) ? SelectedEntry?.FullPath : null;
 
         List<FileSystemEntry> entries;
@@ -1253,9 +1269,16 @@ public partial class TabViewModel : ObservableObject
             : $"{filtered.Count} 個の項目 (検索: {query})";
     }
 
-    /// <summary>一覧をスナップショット単位で置換し、3 つの ListBox へ各 1 回だけ通知する。</summary>
+    /// <summary>一覧をスナップショット単位で置換し、3 つの ListBox へ各 1 回だけ通知する。
+    /// どの経路（更新・並べ替え・絞り込み・監視による自動更新）でも選択が飛ばないよう、
+    /// 置換前の選択をパスで記憶し、置換後の新インスタンスへ復元する。別フォルダーへの移動では
+    /// パスが一致しないため自然に復元なしとなる。</summary>
     private void ReplaceEntries(IEnumerable<FileSystemEntry> entries)
     {
+        var previousSelection = _selection.Count > 0
+            ? new HashSet<string>(_selection.Select(e => e.FullPath), WindowsPathIdentity.Instance)
+            : null;
+
         SelectedEntry = null;
         if (_selection.Count > 0)
         {
@@ -1265,6 +1288,31 @@ public partial class TabViewModel : ObservableObject
         _entries = entries as List<FileSystemEntry> ?? entries.ToList();
         OnPropertyChanged(nameof(Entries));
         OnPropertyChanged(nameof(HasNoEntries));
+
+        if (previousSelection is null)
+        {
+            return;
+        }
+
+        var restored = _entries.Where(e => previousSelection.Contains(e.FullPath)).ToList();
+        if (restored.Count == 1)
+        {
+            SelectedEntry = restored[0];
+        }
+        else if (restored.Count > 1)
+        {
+            // 複数選択の適用は ListBox（View 側）が持つためイベントで依頼する。
+            // ItemsSource バインディングの再構築が選択適用を上書きしないよう、
+            // 反映後（次のディスパッチャフレーム）に実行する。
+            var replacedEntries = _entries;
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (!_isDetached && ReferenceEquals(_entries, replacedEntries))
+                {
+                    SelectionRestoreRequested?.Invoke(this, restored);
+                }
+            });
+        }
     }
 
     private void UpdateFreeSpace(string path)
@@ -1627,12 +1675,12 @@ public partial class TabViewModel : ObservableObject
                 return;
             }
 
-            // Shell の貼り付けは非同期で完了することがある。通常はフォルダー監視が先に一覧を
-            // 更新するため、時限の再読み込みは「まだ一度も更新されていない場合」だけの保険とする。
+            // Shell の貼り付けは非同期で完了することがあるが、反映はフォルダー監視が正本。
+            // 監視が使えないタブだけ、時限の再読み込みを保険として行う。
             foreach (var delayMs in (int[])[500, 2000])
             {
                 await Task.Delay(delayMs);
-                if (LastListLoadStartUtc <= pasteInvokedAtUtc)
+                if (NeedsShellRefreshBackup && LastListLoadStartUtc <= pasteInvokedAtUtc)
                 {
                     Refresh();
                 }
