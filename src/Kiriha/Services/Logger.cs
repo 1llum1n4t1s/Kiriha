@@ -56,42 +56,58 @@ public static class Logger
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"ログ基盤を初期化できませんでした: {ex}");
+                // Debug.WriteLine は Release で消滅するため、配布版でも残る Trace へ出す
+                System.Diagnostics.Trace.WriteLine($"ログ基盤を初期化できませんでした: {ex}");
             }
         }
     }
 
     public static void Log(string message, LogLevel level = LogLevel.Info)
     {
-        if (_logger is null)
+        // ログ出力自体の失敗（ディスクフル等）を呼び出し元へ伝播させない
+        try
         {
-            System.Diagnostics.Debug.WriteLine($"[{level}] {message}");
-            return;
+            if (_logger is null)
+            {
+                System.Diagnostics.Trace.WriteLine($"[{level}] {message}");
+                return;
+            }
+            switch (level)
+            {
+                case LogLevel.Debug:
+                    _logger?.Debug(message);
+                    break;
+                case LogLevel.Info:
+                    _logger?.Info(message);
+                    break;
+                case LogLevel.Warning:
+                    _logger?.Warn(message);
+                    break;
+                case LogLevel.Error:
+                    _logger?.Error(message);
+                    break;
+            }
         }
-        switch (level)
+        catch
         {
-            case LogLevel.Debug:
-                _logger?.Debug(message);
-                break;
-            case LogLevel.Info:
-                _logger?.Info(message);
-                break;
-            case LogLevel.Warning:
-                _logger?.Warn(message);
-                break;
-            case LogLevel.Error:
-                _logger?.Error(message);
-                break;
+            // ログ基盤の不調は握りつぶす（catch 内の最終文として呼ばれる契約のため）
         }
     }
 
     public static void LogException(string message, Exception ex)
     {
-        if (_logger is null)
+        try
         {
-            System.Diagnostics.Debug.WriteLine($"[Error] {message}: {ex}");
-            return;
+            if (_logger is null)
+            {
+                System.Diagnostics.Trace.WriteLine($"[Error] {message}: {ex}");
+                return;
+            }
+            _logger.Error($"{message}: {ex}");
         }
-        _logger.Error($"{message}: {ex}");
+        catch
+        {
+            // ログ基盤の不調は握りつぶす（catch 内の最終文として呼ばれる契約のため）
+        }
     }
 }

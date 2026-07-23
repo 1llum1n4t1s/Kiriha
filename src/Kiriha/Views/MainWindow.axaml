@@ -102,6 +102,7 @@
                                 <Grid Height="34" ColumnDefinitions="36,*,Auto"
                                       AutomationProperties.Name="{Binding Title}"
                                       Opacity="{Binding TabRowOpacity}"
+                                      DoubleTapped="TabRow_DoubleTapped"
                                       Background="Transparent" ToolTip.Tip="{Binding PathText}">
                                     <Grid.ContextMenu>
                                         <ContextMenu Opened="TabMenu_Opened">
@@ -595,6 +596,7 @@
 
                                 <!-- XP 風フォルダーツリー（デスクトップ > マイ ドキュメント / マイ コンピュータ） -->
                                 <TreeView Grid.Row="1" Margin="4,2,0,0"
+                                          DragDrop.AllowDrop="True"
                                           IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ShowSidebarTree}"
                                           ItemsSource="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SidebarTreeRoots}"
                                           SelectedItem="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SidebarTreeSelectedItem, Mode=TwoWay}"
@@ -713,7 +715,6 @@
                                             <DataTemplate x:DataType="m:FileSystemEntry">
                                                 <ItemsControl Margin="8,0,0,0"
                                                             ItemsSource="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).DetailColumns}"
-                                                            Background="Transparent"
                                                             EffectiveViewportChanged="FileItem_EffectiveViewportChanged"
                                                             DataContextChanged="FileItem_DataContextChanged"
                                                             Height="{Binding $parent[ListBox].((vm:TabViewModel)DataContext).RowHeight}"
@@ -725,18 +726,31 @@
                                                     <ItemsControl.ItemTemplate>
                                                         <DataTemplate x:DataType="vm:DetailColumnViewModel">
                                                             <Panel Width="{Binding Width}" IsVisible="{Binding IsVisible}">
-                                                                <Grid IsVisible="{Binding IsName}" ColumnDefinitions="Auto,Auto,*">
-                                                                    <CheckBox Grid.Column="0" MinWidth="0" Padding="0" Margin="0,0,6,0"
-                                                                              IsVisible="{Binding Owner.ShowCheckBoxes}"
-                                                                              IsChecked="{Binding $parent[ListBoxItem].IsSelected, Mode=TwoWay}" />
-                                                                    <c:FileIconPresenter Grid.Column="1" Margin="0,0,10,0" VerticalAlignment="Center"
-                                                                                         Entry="{Binding $parent[ItemsControl].((m:FileSystemEntry)DataContext)}"
-                                                                                         Owner="{Binding Owner}" />
-                                                                    <TextBlock Grid.Column="2" Text="{Binding $parent[ItemsControl].((m:FileSystemEntry)DataContext).DisplayName}" FontSize="13"
-                                                                               Foreground="{DynamicResource TextPrimary}"
-                                                                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
-                                                                </Grid>
-                                                                <Grid IsVisible="{Binding IsModified}" ClipToBounds="True">
+                                                                <!-- 名前列だけを行の反応領域にする: 背景 Transparent で列幅全体をヒット対象にし、
+                                                                     ホバー / 選択色もこの Border（namecell）にだけ乗せる -->
+                                                                <Border Classes="namecell" IsVisible="{Binding IsName}"
+                                                                        Background="Transparent" CornerRadius="6">
+                                                                    <Panel>
+                                                                        <!-- 選択ハイライト（一覧表示の選択スタイルと同じ配色）。ListBoxItem 既定の
+                                                                             全行ハイライトは無効化してあるため、名前列にだけこの層で描く -->
+                                                                        <Border IsVisible="{Binding $parent[ListBoxItem].IsSelected}"
+                                                                                Background="{DynamicResource HoverBg}"
+                                                                                BorderBrush="{DynamicResource SystemAccentColor}"
+                                                                                BorderThickness="1" CornerRadius="6" />
+                                                                        <Grid ColumnDefinitions="Auto,Auto,*" Margin="4,0">
+                                                                            <CheckBox Grid.Column="0" MinWidth="0" Padding="0" Margin="0,0,6,0"
+                                                                                      IsVisible="{Binding Owner.ShowCheckBoxes}"
+                                                                                      IsChecked="{Binding $parent[ListBoxItem].IsSelected, Mode=TwoWay}" />
+                                                                            <c:FileIconPresenter Grid.Column="1" Margin="0,0,10,0" VerticalAlignment="Center"
+                                                                                                 Entry="{Binding $parent[ItemsControl].((m:FileSystemEntry)DataContext)}"
+                                                                                                 Owner="{Binding Owner}" />
+                                                                            <TextBlock Grid.Column="2" Text="{Binding $parent[ItemsControl].((m:FileSystemEntry)DataContext).DisplayName}" FontSize="13"
+                                                                                       Foreground="{DynamicResource TextPrimary}"
+                                                                                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                                                        </Grid>
+                                                                    </Panel>
+                                                                </Border>
+                                                                <Grid IsVisible="{Binding IsModified}" IsHitTestVisible="False" ClipToBounds="True">
                                                                     <TextBlock Text="{Binding $parent[ItemsControl].((m:FileSystemEntry)DataContext).ModifiedText}" FontSize="12.5" Padding="6,0,0,0"
                                                                                IsVisible="{Binding !$parent[ItemsControl].((m:FileSystemEntry)DataContext).IsDrive}"
                                                                                Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" />
@@ -746,13 +760,13 @@
                                                                                  MinWidth="0" HorizontalAlignment="Stretch"
                                                                                  Height="10" Margin="6,0,12,0" VerticalAlignment="Center" />
                                                                 </Grid>
-                                                                <TextBlock IsVisible="{Binding IsCreated}"
+                                                                <TextBlock IsVisible="{Binding IsCreated}" IsHitTestVisible="False"
                                                                            Text="{Binding $parent[ItemsControl].((m:FileSystemEntry)DataContext).CreatedText}" FontSize="12.5" Padding="6,0,0,0"
                                                                            Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" />
-                                                                <TextBlock IsVisible="{Binding IsType}"
+                                                                <TextBlock IsVisible="{Binding IsType}" IsHitTestVisible="False"
                                                                            Text="{Binding $parent[ItemsControl].((m:FileSystemEntry)DataContext).TypeText}" FontSize="12.5" Padding="6,0,0,0"
                                                                            Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
-                                                                <TextBlock IsVisible="{Binding IsSize}"
+                                                                <TextBlock IsVisible="{Binding IsSize}" IsHitTestVisible="False"
                                                                            Text="{Binding $parent[ItemsControl].((m:FileSystemEntry)DataContext).SizeText}" FontSize="12.5" Padding="6,0,6,0"
                                                                            Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center"
                                                                            TextAlignment="Right" TextTrimming="CharacterEllipsis" />

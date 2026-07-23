@@ -46,6 +46,53 @@
                                             </StackPanel>
                                         </HeaderedContentControl>
 
+                                        <HeaderedContentControl Classes="settingscard" Header="フォルダーツリー">
+                                            <StackPanel Classes="settingsfields">
+                                                <CheckBox Content="ツリーからのドラッグを禁止する"
+                                                          IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptSidebarTreeDragDisabled}" />
+                                                <CheckBox Content="ツリーへのドロップを禁止する"
+                                                          IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptSidebarTreeDropDisabled}" />
+                                            </StackPanel>
+                                        </HeaderedContentControl>
+
+                                        <HeaderedContentControl Classes="settingscard" Header="マウス操作">
+                                            <StackPanel Spacing="10">
+                                                <!-- 表示は日本語、内部値（settings.json）は英語（テーマ設定と同じ Tag 方式） -->
+                                                <TextBlock Text="タブをダブルクリックしたとき" FontSize="13" />
+                                                <ComboBox Classes="settingsfield" MinWidth="240" HorizontalAlignment="Left"
+                                                          SelectedValue="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptTabDoubleClickAction}"
+                                                          SelectedValueBinding="{Binding Tag, x:DataType=ComboBoxItem}">
+                                                    <ComboBoxItem Tag="None">何もしない</ComboBoxItem>
+                                                    <ComboBoxItem Tag="Pin">タブをピン留め</ComboBoxItem>
+                                                    <ComboBoxItem Tag="Close">タブを閉じる</ComboBoxItem>
+                                                </ComboBox>
+                                                <TextBlock Text="タブをマウスホイールクリックしたとき" FontSize="13" Margin="0,6,0,0" />
+                                                <ComboBox Classes="settingsfield" MinWidth="240" HorizontalAlignment="Left"
+                                                          SelectedValue="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptTabMiddleClickAction}"
+                                                          SelectedValueBinding="{Binding Tag, x:DataType=ComboBoxItem}">
+                                                    <ComboBoxItem Tag="None">何もしない</ComboBoxItem>
+                                                    <ComboBoxItem Tag="Pin">タブをピン留め</ComboBoxItem>
+                                                    <ComboBoxItem Tag="Close">タブを閉じる</ComboBoxItem>
+                                                </ComboBox>
+                                                <TextBlock Text="フォルダーの背景をダブルクリックしたとき" FontSize="13" Margin="0,6,0,0" />
+                                                <ComboBox Classes="settingsfield" MinWidth="240" HorizontalAlignment="Left"
+                                                          SelectedValue="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptBackgroundDoubleClickAction}"
+                                                          SelectedValueBinding="{Binding Tag, x:DataType=ComboBoxItem}">
+                                                    <ComboBoxItem Tag="None">何もしない</ComboBoxItem>
+                                                    <ComboBoxItem Tag="Up">上の階層に移動</ComboBoxItem>
+                                                    <ComboBoxItem Tag="Refresh">最新の情報に更新</ComboBoxItem>
+                                                </ComboBox>
+                                                <TextBlock Text="フォルダーの背景をマウスホイールクリックしたとき" FontSize="13" Margin="0,6,0,0" />
+                                                <ComboBox Classes="settingsfield" MinWidth="240" HorizontalAlignment="Left"
+                                                          SelectedValue="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptBackgroundMiddleClickAction}"
+                                                          SelectedValueBinding="{Binding Tag, x:DataType=ComboBoxItem}">
+                                                    <ComboBoxItem Tag="None">何もしない</ComboBoxItem>
+                                                    <ComboBoxItem Tag="Up">上の階層に移動</ComboBoxItem>
+                                                    <ComboBoxItem Tag="Refresh">最新の情報に更新</ComboBoxItem>
+                                                </ComboBox>
+                                            </StackPanel>
+                                        </HeaderedContentControl>
+
                                         <HeaderedContentControl Classes="settingscard" Header="アイコン">
                                             <StackPanel Classes="settingsfields">
                                                 <ComboBox Classes="settingsfield"

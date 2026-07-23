@@ -47,6 +47,11 @@ internal static class TrustedProcessLauncher
             "notepad.exe" => Path.Combine(systemDirectory, "notepad.exe"),
             "powershell.exe" => Path.Combine(systemDirectory, "WindowsPowerShell", "v1.0", "powershell.exe"),
             "explorer.exe" => Path.Combine(windowsDirectory, "explorer.exe"),
+            // Windows Terminal はストアアプリのため、ユーザーごとの実行エイリアス置き場を正とする
+            // （PATH 走査より先に解決し、PATH 先頭に置かれた同名の偽実行ファイルを避ける）
+            "wt.exe" => Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "Microsoft", "WindowsApps", "wt.exe"),
             _ => null,
         };
         if (trustedSystemPath is not null && File.Exists(trustedSystemPath))

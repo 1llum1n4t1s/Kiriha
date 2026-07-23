@@ -82,6 +82,30 @@ internal static partial class FileOperationService
     private static string JoinPaths(IReadOnlyList<string> paths)
         => string.Join('\0', paths) + "\0\0";
 
+    private static string FuncName(uint func) => func switch
+    {
+        FoMove => "移動",
+        FoCopy => "コピー",
+        FoDelete => "削除",
+        FoRename => "名前の変更",
+        _ => func.ToString(),
+    };
+
+    /// <summary>SHFileOperationW の主要なエラーコードを利用者向けの日本語説明へ変換する。
+    /// 未知のコードは空文字を返し、呼び出し元は生コード表示のままにする。</summary>
+    public static string DescribeError(int code) => code switch
+    {
+        2 or 3 => "パスが見つかりません",           // ERROR_FILE_NOT_FOUND / ERROR_PATH_NOT_FOUND
+        5 => "アクセスが拒否されました",             // ERROR_ACCESS_DENIED
+        19 => "書き込み禁止です",                    // ERROR_WRITE_PROTECT
+        32 => "他のプロセスが使用中です",            // ERROR_SHARING_VIOLATION
+        112 => "ディスクの空き領域が不足しています", // ERROR_DISK_FULL
+        206 => "パスが長すぎます",                   // ERROR_FILENAME_EXCED_RANGE
+        0x71 => "同じファイルが既に存在します",      // DE_SAMEFILE
+        0x7C => "パスが無効です",                    // DE_INVALIDFILES
+        _ => string.Empty,
+    };
+
     private static FileOperationResult Execute(uint func, string from, string? to, ushort flags)
     {
         // 0 タイムアウトで即座に試すだけ（待たない）。取得できなければ呼び出し元に「busy」を返し、
@@ -107,6 +131,10 @@ internal static partial class FileOperationService
                 var error = SHFileOperationW(ref op);
                 if (error != 0)
                 {
+                    // StatusText は次の操作で消えるため、事後調査用にログへも必ず残す
+                    Logger.Log(
+                        $"SHFileOperationW 失敗: func={FuncName(func)}, error={error}（{DescribeError(error)}）, from={from.TrimEnd('\0').Replace('\0', '|')}, to={to?.TrimEnd('\0')}",
+                        LogLevel.Warning);
                     return new FileOperationResult(FileOperationOutcome.Failed, error);
                 }
 

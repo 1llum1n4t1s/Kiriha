@@ -24,6 +24,7 @@ internal static partial class ShellContextMenuService
     {
         if (SHParseDisplayName(path, 0, out var pidl, 0, out _) < 0 || pidl == 0)
         {
+            LogVerbFailure(verb, path, "SHParseDisplayName");
             return false;
         }
 
@@ -31,12 +32,14 @@ internal static partial class ShellContextMenuService
         {
             if (GetContextMenu(hwnd, pidl) is not { } menu)
             {
+                LogVerbFailure(verb, path, "GetUIObjectOf(IContextMenu)");
                 return false;
             }
 
             var hmenu = CreatePopupMenu();
             if (hmenu == 0)
             {
+                LogVerbFailure(verb, path, "CreatePopupMenu");
                 return false;
             }
 
@@ -45,6 +48,7 @@ internal static partial class ShellContextMenuService
             {
                 if (menu.QueryContextMenu(hmenu, 0, 1, 0x7FFF, 0) < 0)
                 {
+                    LogVerbFailure(verb, path, "QueryContextMenu");
                     return false;
                 }
 
@@ -57,7 +61,12 @@ internal static partial class ShellContextMenuService
                         Verb = verbPtr,
                         Show = 1,
                     };
-                    return menu.InvokeCommand((nint)(&info)) >= 0;
+                    var hr = menu.InvokeCommand((nint)(&info));
+                    if (hr < 0)
+                    {
+                        LogVerbFailure(verb, path, $"InvokeCommand (hr=0x{hr:X8})");
+                    }
+                    return hr >= 0;
                 }
             }
             finally
@@ -176,6 +185,9 @@ internal static partial class ShellContextMenuService
         return false;
     }
 
+    private static void LogVerbFailure(string verb, string path, string step)
+        => Logger.Log($"Shell verb \"{verb}\" の実行失敗: {step}, path={path}", LogLevel.Warning);
+
     /// <summary>pidl の親フォルダー経由で IContextMenu を取得する。</summary>
     private static IContextMenu? GetContextMenu(nint hwnd, nint pidl)
     {
@@ -288,7 +300,20 @@ internal static partial class ShellContextMenuService
                     Verb = cmd - 1,
                     Show = 1, // SW_SHOWNORMAL
                 };
-                return menu.InvokeCommand((nint)(&info)) >= 0;
+                // InvokeCommand ではサードパーティ拡張のコードが動く。フリーズ・クラッシュ時に
+                // 「どの項目を実行した直後か」をログから追えるよう、実行前に記録し遅延も計測する
+                Logger.Log($"シェルメニュー項目を実行: cmd={cmd}", LogLevel.Debug);
+                var invokeStart = sw.ElapsedMilliseconds;
+                var hr = menu.InvokeCommand((nint)(&info));
+                var invokeMs = sw.ElapsedMilliseconds - invokeStart;
+                if (invokeMs > 1000 || hr < 0)
+                {
+                    Logger.Log(
+                        $"シェルメニュー項目の実行結果: cmd={cmd}, HRESULT=0x{hr:X8}, 所要 {invokeMs}ms"
+                        + (invokeMs > 1000 ? " (シェル拡張の不調の可能性)" : string.Empty),
+                        LogLevel.Warning);
+                }
+                return hr >= 0;
             }
         }
         finally

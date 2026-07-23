@@ -16,3 +16,7 @@ bucket_name = "kiriha-updates"
 type = "Text"
 globs = ["**/*.html"]
 fallthrough = false
+
+# 配信障害（R2 不調等）を事後調査できるよう Workers Logs を有効化する
+[observability]
+enabled = true

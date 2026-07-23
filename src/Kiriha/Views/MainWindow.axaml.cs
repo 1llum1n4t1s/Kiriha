@@ -33,6 +33,9 @@ public partial class MainWindow : Window
     private Visual? _marqueeSurface;
     private IPointer? _marqueePointer;
     private HashSet<FileSystemEntry> _marqueeSelectionBaseline = [];
+
+    /// <summary>直前の PointerMoved で適用したマーキー選択集合。同一なら全件走査と選択適用を省略する。</summary>
+    private HashSet<FileSystemEntry>? _lastMarqueeSelected;
     private Point _marqueeStartPoint;
     private KeyModifiers _marqueeModifiers;
     private bool _marqueeActive;
@@ -652,10 +655,10 @@ public partial class MainWindow : Window
 
         (string Header, string Key, bool Checked)[] columns =
         [
-            ("更新日時", "Modified", tab.ShowColModified),
-            ("作成日時", "Created", tab.ShowColCreated),
-            ("種類", "Type", tab.ShowColType),
-            ("サイズ", "Size", tab.ShowColSize),
+            ("更新日時", SortKeys.Modified, tab.ShowColModified),
+            ("作成日時", SortKeys.Created, tab.ShowColCreated),
+            ("種類", SortKeys.Type, tab.ShowColType),
+            ("サイズ", SortKeys.Size, tab.ShowColSize),
         ];
         foreach (var (header, key, isChecked) in columns)
         {
@@ -1019,11 +1022,8 @@ public partial class MainWindow : Window
         {
             if (TabUnderPointer(e) is { } tab)
             {
-                // Chrome と同じく中クリックでタブを閉じる（固定タブは閉じない）
-                if (!tab.IsPinned)
-                {
-                    ViewModel?.CloseTabCommand.Execute(tab);
-                }
+                // 既定は Chrome と同じく閉じる。設定でピン留め / 何もしないへ変更できる。
+                ExecuteTabClickAction(tab, ViewModel?.OptTabMiddleClickAction);
             }
             else
             {
@@ -1776,9 +1776,67 @@ public partial class MainWindow : Window
 
     private void FileList_DoubleTapped(object? sender, TappedEventArgs e)
     {
-        if (sender is ListBox { DataContext: TabViewModel tab, SelectedItem: FileSystemEntry entry })
+        if (sender is not ListBox { DataContext: TabViewModel tab })
+        {
+            return;
+        }
+
+        if (sender is ListBox senderList
+            && !IsDetailsBackgroundColumnHit(senderList, e.Source)
+            && (e.Source as Visual)?.FindAncestorOfType<ListBoxItem>()?.DataContext is FileSystemEntry entry)
         {
             tab.Open(entry);
+            return;
+        }
+
+        // 背景のダブルクリック（設定で動作を選択）。スクロールバー連打では発火させない。
+        if ((e.Source as Visual)?.FindAncestorOfType<ScrollBar>() is null)
+        {
+            ExecuteBackgroundClickAction(tab, ViewModel?.OptBackgroundDoubleClickAction);
+        }
+    }
+
+    /// <summary>フォルダー背景のダブル / ホイールクリックに割り当てられた動作を実行する。</summary>
+    private static void ExecuteBackgroundClickAction(TabViewModel tab, string? action)
+    {
+        switch (action)
+        {
+            case "Up":
+                tab.GoUpCommand.Execute(null);
+                break;
+            case "Refresh":
+                tab.RefreshCommand.Execute(null);
+                break;
+        }
+    }
+
+    /// <summary>タブのダブル / ホイールクリックに割り当てられた動作を実行する。</summary>
+    private void ExecuteTabClickAction(TabViewModel tab, string? action)
+    {
+        switch (action)
+        {
+            case "Pin":
+                tab.TogglePinCommand.Execute(null);
+                break;
+            case "Close":
+                // Chrome と同じく固定タブは閉じない
+                if (!tab.IsPinned)
+                {
+                    ViewModel?.CloseTabCommand.Execute(tab);
+                }
+
+                break;
+        }
+    }
+
+    /// <summary>タブ行のダブルクリック（設定で動作を選択）。閉じるボタン等の連打では発火させない。</summary>
+    private void TabRow_DoubleTapped(object? sender, TappedEventArgs e)
+    {
+        if (sender is Grid { DataContext: TabViewModel tab }
+            && (e.Source as Visual)?.FindAncestorOfType<Button>() is null)
+        {
+            ExecuteTabClickAction(tab, ViewModel?.OptTabDoubleClickAction);
+            e.Handled = true;
         }
     }
 
@@ -1885,6 +1943,19 @@ public partial class MainWindow : Window
         var item = source?.FindAncestorOfType<ListBoxItem>();
         var isFileList = listBox?.Classes.Contains("files") == true
                          || listBox?.Classes.Contains("icons") == true;
+
+        // 詳細表示の「名前」列より右は行として扱わず、背景と同じく範囲選択を開始する
+        if (listBox is not null && isFileList && item is not null
+            && IsDetailsBackgroundColumnHit(listBox, e.Source))
+        {
+            if (!TryStartMarqueeSelection(listBox, e))
+            {
+                ResetDragSource();
+            }
+
+            return;
+        }
+
         if (listBox is not null && isFileList && item?.DataContext is FileSystemEntry)
         {
             _dragPressArgs = e;
@@ -1930,8 +2001,27 @@ public partial class MainWindow : Window
             return;
         }
 
+        // フォルダーツリーのノード（実パスを持つものだけ）。設定で禁止できる。
+        if (ViewModel?.OptSidebarTreeDragDisabled != true
+            && source?.FindAncestorOfType<TreeViewItem>()?.DataContext
+                is FolderTreeNode { Path.Length: > 0 } treeNode
+            && treeNode.Path != FileSystemService.ComputerPath)
+        {
+            _dragPressArgs = e;
+            _dragListBox = null;
+            _dragSidebarLink = null;
+            _dragTreeNodePath = treeNode.Path;
+            _dragSelectionSnapshot = null;
+            _dragStartPoint = e.GetPosition(this);
+            _dragInProgress = false;
+            return;
+        }
+
         ResetDragSource();
     }
+
+    /// <summary>フォルダーツリーからドラッグ開始する対象パス（押下時に記録、閾値超過で発火）。</summary>
+    private string? _dragTreeNodePath;
 
     private void DragSource_PointerMoved(object? sender, PointerEventArgs e)
     {
@@ -1941,7 +2031,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        if (_dragPressArgs is null || _dragInProgress || _dragListBox is null)
+        if (_dragPressArgs is null || _dragInProgress || (_dragListBox is null && _dragTreeNodePath is null))
         {
             return;
         }
@@ -1968,7 +2058,14 @@ public partial class MainWindow : Window
             return;
         }
 
-        if (_dragListBox.DataContext is not TabViewModel tab)
+        if (_dragTreeNodePath is { } treePath)
+        {
+            _dragInProgress = true;
+            _ = StartDragAsync(refreshTab: null, [(treePath, true)], _dragPressArgs);
+            return;
+        }
+
+        if (_dragListBox!.DataContext is not TabViewModel tab)
         {
             ResetDragSource();
             return;
@@ -2093,11 +2190,30 @@ public partial class MainWindow : Window
         _dragPressArgs = null;
         _dragListBox = null;
         _dragSidebarLink = null;
+        _dragTreeNodePath = null;
         _dragSelectionSnapshot = null;
         _dragInProgress = false;
     }
 
     // ===== 背景ドラッグによる範囲選択 =====
+
+    /// <summary>
+    /// 詳細表示で「名前」列より右（更新日時〜サイズ）のセルを指しているか。
+    /// この領域は行の選択判定に含めず、背景と同じ扱い（範囲選択の開始・背景メニュー等）にする。
+    /// </summary>
+    private static bool IsDetailsBackgroundColumnHit(ListBox listBox, object? eventSource)
+    {
+        if (!listBox.Classes.Contains("details")
+            || eventSource is not Visual source
+            || source.FindAncestorOfType<ListBoxItem>() is null)
+        {
+            return false;
+        }
+
+        var columnHost = source.GetSelfAndVisualAncestors().OfType<Control>()
+            .FirstOrDefault(c => c.DataContext is DetailColumnViewModel);
+        return columnHost?.DataContext is not DetailColumnViewModel { IsName: true };
+    }
 
     private bool TryStartMarqueeSelection(ListBox? listBox, PointerPressedEventArgs e)
     {
@@ -2106,6 +2222,7 @@ public partial class MainWindow : Window
             || !e.GetCurrentPoint(this).Properties.IsLeftButtonPressed
             || e.Source is Visual source
             && (source.FindAncestorOfType<ListBoxItem>() is not null
+                    && !IsDetailsBackgroundColumnHit(listBox, e.Source)
                 || source.FindAncestorOfType<ScrollBar>() is not null))
         {
             return false;
@@ -2198,6 +2315,15 @@ public partial class MainWindow : Window
             selected = intersecting;
         }
 
+        // 選択集合が前回と同一なら、順序復元の全件走査と選択の再適用を省略する
+        // （PointerMoved は高頻度で、大量ファイルのフォルダーでは毎回の全走査が応答性に響く）
+        if (_lastMarqueeSelected is not null && _lastMarqueeSelected.SetEquals(selected))
+        {
+            e.Handled = true;
+            return;
+        }
+        _lastMarqueeSelected = selected;
+
         var ordered = listBox.DataContext is TabViewModel tab
             ? tab.Entries.Where(selected.Contains)
             : selected;
@@ -2247,6 +2373,7 @@ public partial class MainWindow : Window
         _marqueeSurface = null;
         _marqueePointer = null;
         _marqueeSelectionBaseline = [];
+        _lastMarqueeSelected = null;
         _marqueeModifiers = KeyModifiers.None;
         _marqueeActive = false;
         FileSelectionRectangle.IsVisible = false;
@@ -2344,6 +2471,21 @@ public partial class MainWindow : Window
     {
         refreshTab = null;
         var listBox = (e.Source as Visual)?.FindAncestorOfType<ListBox>();
+
+        // フォルダーツリーのノードへのドロップ = そのフォルダーへ（設定で禁止できる）
+        if (listBox is null
+            && (e.Source as Visual)?.FindAncestorOfType<TreeViewItem>()?.DataContext
+                is FolderTreeNode { Path.Length: > 0 } treeNode
+            && treeNode.Path != FileSystemService.ComputerPath)
+        {
+            if (ViewModel?.OptSidebarTreeDropDisabled == true)
+            {
+                return null;
+            }
+
+            refreshTab = ViewModel?.SelectedTab;
+            return treeNode.Path;
+        }
 
         // タブバーへのドロップ = そのタブのフォルダーへ
         // サイドバーのフォルダー項目へのドロップ。
@@ -2544,6 +2686,13 @@ public partial class MainWindow : Window
         }
 
         var item = source as ListBoxItem ?? source?.FindAncestorOfType<ListBoxItem>();
+        if (item is null
+            && source?.FindAncestorOfType<TreeViewItem>() is { DataContext: FolderTreeNode { Path.Length: > 0 } node } treeItem
+            && node.Path != FileSystemService.ComputerPath)
+        {
+            return treeItem;
+        }
+
         return item?.DataContext switch
         {
             FileSystemEntry { IsDirectory: true } => item,
@@ -2611,10 +2760,19 @@ public partial class MainWindow : Window
         // 中クリックでフォルダーを新しいタブで開く（Chrome のリンク中クリック相当）
         if (e.InitialPressMouseButton == MouseButton.Middle)
         {
-            if ((e.Source as Visual)?.FindAncestorOfType<ListBoxItem>()?.DataContext
-                is FileSystemEntry { IsDirectory: true } folder)
+            var middleItem = IsDetailsBackgroundColumnHit(listBox, e.Source)
+                ? null
+                : (e.Source as Visual)?.FindAncestorOfType<ListBoxItem>();
+            if (middleItem?.DataContext is FileSystemEntry { IsDirectory: true } folder)
             {
                 ViewModel?.OpenInNewTab(folder.FullPath);
+                e.Handled = true;
+            }
+            else if (middleItem is null
+                     && (e.Source as Visual)?.FindAncestorOfType<ScrollBar>() is null)
+            {
+                // 背景のホイールクリック（設定で動作を選択）
+                ExecuteBackgroundClickAction(tab, ViewModel?.OptBackgroundMiddleClickAction);
                 e.Handled = true;
             }
 
@@ -2626,7 +2784,9 @@ public partial class MainWindow : Window
             return;
         }
 
-        var item = (e.Source as Visual)?.FindAncestorOfType<ListBoxItem>();
+        var item = IsDetailsBackgroundColumnHit(listBox, e.Source)
+            ? null
+            : (e.Source as Visual)?.FindAncestorOfType<ListBoxItem>();
         if (item?.DataContext is FileSystemEntry entry)
         {
             listBox.SelectedItem = entry;

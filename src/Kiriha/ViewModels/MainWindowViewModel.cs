@@ -322,6 +322,78 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
+    /// <summary>設定タブ: タブのダブルクリック動作（None / Pin / Close）。</summary>
+    public string OptTabDoubleClickAction
+    {
+        get => _settings.TabDoubleClickAction;
+        set
+        {
+            _settings.TabDoubleClickAction = value;
+            SettingsService.Save(_settings);
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>設定タブ: タブのホイールクリック動作（None / Pin / Close）。</summary>
+    public string OptTabMiddleClickAction
+    {
+        get => _settings.TabMiddleClickAction;
+        set
+        {
+            _settings.TabMiddleClickAction = value;
+            SettingsService.Save(_settings);
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>設定タブ: フォルダー背景のダブルクリック動作（None / Up / Refresh）。</summary>
+    public string OptBackgroundDoubleClickAction
+    {
+        get => _settings.BackgroundDoubleClickAction;
+        set
+        {
+            _settings.BackgroundDoubleClickAction = value;
+            SettingsService.Save(_settings);
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>設定タブ: フォルダー背景のホイールクリック動作（None / Up / Refresh）。</summary>
+    public string OptBackgroundMiddleClickAction
+    {
+        get => _settings.BackgroundMiddleClickAction;
+        set
+        {
+            _settings.BackgroundMiddleClickAction = value;
+            SettingsService.Save(_settings);
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>設定タブ: フォルダーツリーからのドラッグを禁止。</summary>
+    public bool OptSidebarTreeDragDisabled
+    {
+        get => _settings.SidebarTreeDragDisabled;
+        set
+        {
+            _settings.SidebarTreeDragDisabled = value;
+            SettingsService.Save(_settings);
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>設定タブ: フォルダーツリーへのドロップを禁止。</summary>
+    public bool OptSidebarTreeDropDisabled
+    {
+        get => _settings.SidebarTreeDropDisabled;
+        set
+        {
+            _settings.SidebarTreeDropDisabled = value;
+            SettingsService.Save(_settings);
+            OnPropertyChanged();
+        }
+    }
+
     /// <summary>設定タブ: 起動フォルダー。</summary>
     public string OptStartupPath
     {
@@ -442,6 +514,12 @@ public partial class MainWindowViewModel : ObservableObject
         ShowBookmarksBar = false;
         ShowSidebar = true;
         ShowSidebarTree = false;
+        OptSidebarTreeDragDisabled = false;
+        OptSidebarTreeDropDisabled = false;
+        OptTabDoubleClickAction = "None";
+        OptTabMiddleClickAction = "Close";
+        OptBackgroundDoubleClickAction = "None";
+        OptBackgroundMiddleClickAction = "None";
         SidebarWidth = 230;
         VerticalTabWidth = 240;
         SearchBoxWidth = 200;
@@ -1348,10 +1426,14 @@ public partial class MainWindowViewModel : ObservableObject
     public void RefreshSidebar()
         => _ = RefreshSidebarAsync();
 
+    /// <summary>連続呼び出し時に古い結果が新しい結果を上書きしないための世代番号。</summary>
+    private int _sidebarRefreshGeneration;
+
     public async Task RefreshSidebarAsync()
     {
         // クイックアクセス列挙とドライブ列挙（DriveInfo.IsReady / 空き容量は切断中の
         // ネットワークドライブでブロックしうる）をまとめてバックグラウンドで取得してから再構築する。
+        var generation = ++_sidebarRefreshGeneration;
         var iconSet = Options.IconSet;
         var preferLight = iconSet == FileIconSet.Material && MaterialIconService.IsLightTheme();
         var (snapshot, drives, icons) = await Task.Run(() =>
@@ -1360,6 +1442,16 @@ public partial class MainWindowViewModel : ObservableObject
             var driveList = GetDriveDisplays();
             return (snap, driveList, BuildSidebarIconImages(snap, driveList, iconSet, preferLight));
         });
+
+        // 並走した新しい呼び出しがある場合、こちらの（古い）結果は適用せず破棄する
+        if (generation != _sidebarRefreshGeneration)
+        {
+            foreach (var image in icons.Values)
+            {
+                if (iconSet == FileIconSet.Windows && image is Avalonia.Media.Imaging.Bitmap stale) stale.Dispose();
+            }
+            return;
+        }
 
         // Windows Shell アイコンはこちらが所有しているため、旧項目の分を解放してから差し替える
         foreach (var link in SidebarItems.OfType<SidebarLink>())

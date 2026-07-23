@@ -93,6 +93,24 @@ public sealed class AppSettings
     /// <summary>コンパクトビュー（行の高さを詰める。表示メニューで切替、新規タブの既定）。</summary>
     public bool CompactView { get; set; }
 
+    /// <summary>タブのダブルクリック動作（None / Pin / Close）。</summary>
+    public string TabDoubleClickAction { get; set; } = "None";
+
+    /// <summary>タブのホイールクリック動作（None / Pin / Close）。既定はこれまで通り閉じる。</summary>
+    public string TabMiddleClickAction { get; set; } = "Close";
+
+    /// <summary>フォルダー背景のダブルクリック動作（None / Up / Refresh）。</summary>
+    public string BackgroundDoubleClickAction { get; set; } = "None";
+
+    /// <summary>フォルダー背景のホイールクリック動作（None / Up / Refresh）。</summary>
+    public string BackgroundMiddleClickAction { get; set; } = "None";
+
+    /// <summary>フォルダーツリーからのドラッグ開始を禁止する。</summary>
+    public bool SidebarTreeDragDisabled { get; set; }
+
+    /// <summary>フォルダーツリーへのドロップ受け入れを禁止する。</summary>
+    public bool SidebarTreeDropDisabled { get; set; }
+
     /// <summary>テーマ（System / Light / Dark）。</summary>
     public string ThemePreference { get; set; } = "System";
 

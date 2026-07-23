@@ -48,23 +48,66 @@ internal static class DirectoryObservationService
 
     private sealed class Observation : IDisposable
     {
-        private readonly FileSystemWatcher _watcher;
+        private readonly string _path;
+        private FileSystemWatcher _watcher;
         private CancellationTokenSource? _debounce;
         private long _lastEventTicksUtc;
+        private bool _disposed;
         public List<Action<DateTime>> Callbacks { get; } = [];
 
         public Observation(string path)
         {
-            _watcher = new FileSystemWatcher(path)
+            _path = path;
+            _watcher = CreateWatcher();
+        }
+
+        private FileSystemWatcher CreateWatcher()
+        {
+            var watcher = new FileSystemWatcher(_path)
             {
                 NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite | NotifyFilters.Size,
                 EnableRaisingEvents = true,
             };
-            _watcher.Created += Changed;
-            _watcher.Deleted += Changed;
-            _watcher.Renamed += Changed;
-            _watcher.Changed += Changed;
-            _watcher.Error += (_, e) => Logger.LogException($"フォルダー監視でエラーが発生しました: {path}", e.GetException());
+            watcher.Created += Changed;
+            watcher.Deleted += Changed;
+            watcher.Renamed += Changed;
+            watcher.Changed += Changed;
+            watcher.Error += OnWatcherError;
+            return watcher;
+        }
+
+        private void OnWatcherError(object sender, ErrorEventArgs e)
+        {
+            Logger.LogException($"フォルダー監視でエラーが発生しました: {_path}", e.GetException());
+            // FileSystemWatcher は Error 後にイベントを出さなくなることがある（ネットワーク瞬断・
+            // バッファ溢れ等）。共有中の全タブが監視を失ったままにならないよう作り直して復旧する。
+            _ = RestartWatcherAsync();
+        }
+
+        private async Task RestartWatcherAsync()
+        {
+            await Task.Delay(2000);
+            var restarted = false;
+            lock (Gate)
+            {
+                if (_disposed) return;
+                try
+                {
+                    _watcher.Dispose();
+                    _watcher = CreateWatcher();
+                    restarted = true;
+                }
+                catch (Exception ex)
+                {
+                    // パス消失（アンマウント等）なら復旧不能。購読解除に任せる。
+                    Logger.LogException($"フォルダー監視を再開できませんでした: {_path}", ex);
+                }
+            }
+            if (restarted)
+            {
+                // 停止中に見逃した変更を取りこぼさないよう、購読側へ一度通知して再読込を促す
+                Changed(this, new FileSystemEventArgs(WatcherChangeTypes.Changed, _path, null));
+            }
         }
 
         private void Changed(object sender, FileSystemEventArgs e)
@@ -93,6 +136,8 @@ internal static class DirectoryObservationService
 
         public void Dispose()
         {
+            // Unsubscribe から Gate ロック下で呼ばれる。再起動処理との競合は _disposed で防ぐ。
+            _disposed = true;
             _debounce?.Cancel();
             _debounce?.Dispose();
             _watcher.Dispose();

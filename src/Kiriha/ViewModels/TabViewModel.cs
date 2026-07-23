@@ -10,6 +10,18 @@ using Kiriha.Services;
 
 namespace Kiriha.ViewModels;
 
+/// <summary>並べ替え・列を識別するキーの単一情報源。settings.json にこの名前のまま永続化されるため変更しないこと。
+/// XAML の CommandParameter（MainWindow.axaml の並べ替えメニュー等）は文字列リテラルのままなので、
+/// 追加時は両方を揃える。</summary>
+public static class SortKeys
+{
+    public const string Name = "Name";
+    public const string Modified = "Modified";
+    public const string Created = "Created";
+    public const string Type = "Type";
+    public const string Size = "Size";
+}
+
 /// <summary>1 タブ分の状態（現在パス・エントリ一覧・履歴・表示モード・固定状態）を持つ ViewModel。</summary>
 public partial class TabViewModel : ObservableObject
 {
@@ -82,7 +94,7 @@ public partial class TabViewModel : ObservableObject
     [NotifyPropertyChangedFor(
         nameof(IsSortByName), nameof(IsSortByModified), nameof(IsSortByCreated), nameof(IsSortByType), nameof(IsSortBySize),
         nameof(NameSortGlyph), nameof(ModifiedSortGlyph), nameof(TypeSortGlyph), nameof(SizeSortGlyph), nameof(CreatedSortGlyph))]
-    private string _sortKey = "Name";
+    private string _sortKey = SortKeys.Name;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(
@@ -306,9 +318,13 @@ public partial class TabViewModel : ObservableObject
                 return;
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // プレビュー失敗は情報表示のみにフォールバック
+            // プレビュー失敗は情報表示のみにフォールバック（キャンセルは正常系なのでログ不要）
+            if (ex is not OperationCanceledException)
+            {
+                Logger.LogException($"プレビューを生成できませんでした: {entry.FullPath}", ex);
+            }
         }
 
         // このコールが既に新しい選択に置き換わっている（stale）なら、末尾のリセットで
@@ -353,9 +369,13 @@ public partial class TabViewModel : ObservableObject
                 PreviewInfo = $"{entry.Name}\nファイル フォルダー\n{count}{(capped ? "+" : "")} 個のファイル  {FileSystemEntry.FormatSize(size)}{(capped ? " 以上" : "")}";
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // 計算失敗時は基本情報のまま
+            // 計算失敗時は基本情報のまま（キャンセルは正常系なのでログ不要）
+            if (ex is not OperationCanceledException)
+            {
+                Logger.LogException($"フォルダー情報を計算できませんでした: {entry.FullPath}", ex);
+            }
         }
     }
 
@@ -408,6 +428,7 @@ public partial class TabViewModel : ObservableObject
         // 検索結果を上書きしないようにキャンセルしておく（デバウンス経由の呼び出しでは無害）。
         _filterDebounceCts?.Cancel();
         _searchCts?.Cancel();
+        _searchCts?.Dispose();
         var cts = CancellationTokenSource.CreateLinkedTokenSource(_lifetimeCts.Token);
         _searchCts = cts;
         var generation = Interlocked.Increment(ref _searchGeneration);
@@ -537,7 +558,9 @@ public partial class TabViewModel : ObservableObject
 
         if (IsIconsView)
         {
+            // linked CTS は _lifetimeCts へコールバック登録が残るため、置き換え時に必ず破棄する
             _thumbnailCts?.Cancel();
+            _thumbnailCts?.Dispose();
             _thumbnailCts = CancellationTokenSource.CreateLinkedTokenSource(_lifetimeCts.Token);
         }
         else
@@ -598,9 +621,7 @@ public partial class TabViewModel : ObservableObject
                 // アイコンと同様、リフレッシュで entry が置き換わっていたら同一パスの現行 entry へ引き渡す
                 var target = bmp is null || token.IsCancellationRequested || !IsIconsView
                     ? null
-                    : _allEntries.Contains(entry)
-                        ? entry
-                        : _allEntries.FirstOrDefault(x => WindowsPathIdentity.Instance.Equals(x.FullPath, entry.FullPath));
+                    : _entryByPath.GetValueOrDefault(entry.FullPath);
                 if (bmp is not null && target is { Thumbnail: null })
                 {
                     target.Thumbnail = bmp;
@@ -632,22 +653,38 @@ public partial class TabViewModel : ObservableObject
     /// <summary>フィルタ前の全エントリ（検索の母集合）。</summary>
     private List<FileSystemEntry> _allEntries = new();
 
+    /// <summary>パス→現行エントリの対応表。アイコン/サムネイル読込完了時の線形探索を避ける
+    /// （数万件フォルダーでは全件スクロールで累積 O(n²) になるため）。</summary>
+    private Dictionary<string, FileSystemEntry> _entryByPath = new(WindowsPathIdentity.Instance);
+
+    /// <summary>_allEntries と _entryByPath を常に同時に差し替える。</summary>
+    private void SetAllEntries(List<FileSystemEntry> entries)
+    {
+        _allEntries = entries;
+        var map = new Dictionary<string, FileSystemEntry>(entries.Count, WindowsPathIdentity.Instance);
+        foreach (var entry in entries)
+        {
+            map[entry.FullPath] = entry;
+        }
+        _entryByPath = map;
+    }
+
     public bool HasNoEntries => Entries.Count == 0;
 
     private string SortGlyph(string key)
         => SortKey == key ? (SortAscendingFlag ? "\uE70E" : "\uE70D") : "";
 
-    public string NameSortGlyph => SortGlyph("Name");
-    public string ModifiedSortGlyph => SortGlyph("Modified");
-    public string TypeSortGlyph => SortGlyph("Type");
-    public string SizeSortGlyph => SortGlyph("Size");
-    public string CreatedSortGlyph => SortGlyph("Created");
+    public string NameSortGlyph => SortGlyph(SortKeys.Name);
+    public string ModifiedSortGlyph => SortGlyph(SortKeys.Modified);
+    public string TypeSortGlyph => SortGlyph(SortKeys.Type);
+    public string SizeSortGlyph => SortGlyph(SortKeys.Size);
+    public string CreatedSortGlyph => SortGlyph(SortKeys.Created);
 
-    public bool IsSortByName => SortKey == "Name";
-    public bool IsSortByModified => SortKey == "Modified";
-    public bool IsSortByCreated => SortKey == "Created";
-    public bool IsSortByType => SortKey == "Type";
-    public bool IsSortBySize => SortKey == "Size";
+    public bool IsSortByName => SortKey == SortKeys.Name;
+    public bool IsSortByModified => SortKey == SortKeys.Modified;
+    public bool IsSortByCreated => SortKey == SortKeys.Created;
+    public bool IsSortByType => SortKey == SortKeys.Type;
+    public bool IsSortBySize => SortKey == SortKeys.Size;
     public bool IsSortAscending => SortAscendingFlag;
     public bool IsSortDescending => !SortAscendingFlag;
 
@@ -744,7 +781,8 @@ public partial class TabViewModel : ObservableObject
     public async Task EnsureWindowsIconAsync(FileSystemEntry entry)
     {
         if (_options.IconSet != FileIconSet.Windows || _isDetached || entry.WindowsIcon is not null
-            || !_allEntries.Contains(entry) || !_loadingWindowsIcons.TryAdd(entry.FullPath, 0))
+            || !ReferenceEquals(_entryByPath.GetValueOrDefault(entry.FullPath), entry)
+            || !_loadingWindowsIcons.TryAdd(entry.FullPath, 0))
         {
             return;
         }
@@ -766,9 +804,7 @@ public partial class TabViewModel : ObservableObject
                 // 持てなくなる。同一パスの現行 entry を探して引き渡す。
                 var target = bitmap is null || token.IsCancellationRequested || _options.IconSet != FileIconSet.Windows
                     ? null
-                    : _allEntries.Contains(entry)
-                        ? entry
-                        : _allEntries.FirstOrDefault(x => WindowsPathIdentity.Instance.Equals(x.FullPath, entry.FullPath));
+                    : _entryByPath.GetValueOrDefault(entry.FullPath);
                 if (bitmap is not null && target is { WindowsIcon: null })
                 {
                     target.WindowsIcon = bitmap;
@@ -817,11 +853,11 @@ public partial class TabViewModel : ObservableObject
         _folderViewSettings = folderViewSettings;
         DetailColumns =
         [
-            new(this, "Name", "名前"),
-            new(this, "Modified", "更新日時"),
-            new(this, "Created", "作成日時"),
-            new(this, "Type", "種類"),
-            new(this, "Size", "サイズ"),
+            new(this, SortKeys.Name, "名前"),
+            new(this, SortKeys.Modified, "更新日時"),
+            new(this, SortKeys.Created, "作成日時"),
+            new(this, SortKeys.Type, "種類"),
+            new(this, SortKeys.Size, "サイズ"),
         ];
         IsSettingsTab = isSettingsTab;
         IsDropPreview = isDropPreview;
@@ -868,8 +904,12 @@ public partial class TabViewModel : ObservableObject
         _watcherSubscription?.Dispose();
         _watcherSubscription = null;
         _filterDebounceCts?.Cancel();
+        _filterDebounceCts?.Dispose();
         _searchCts?.Cancel();
+        _searchCts?.Dispose();
         _thumbnailCts?.Cancel();
+        _thumbnailCts?.Dispose();
+        _thumbnailCts = null;
         foreach (var column in DetailColumns) column.Detach();
         DisposeEntryImages(_allEntries);
         ClearPreview();
@@ -1039,7 +1079,7 @@ public partial class TabViewModel : ObservableObject
                 : path;
 
         DisposeEntryImages(_allEntries);
-        _allEntries = ApplySort(entries).ToList();
+        SetAllEntries(ApplySort(entries).ToList());
         // 移動で検索をリセット（エクスプローラーと同じ）。プロパティ経由だと OnSearchTextChanged
         // → ApplyFilter が二重に走るだけで害はないため素直にプロパティへ代入する。
         _suppressSearchFilter = true;
@@ -1096,7 +1136,7 @@ public partial class TabViewModel : ObservableObject
         _isApplyingFolderViewSettings = true;
         try
         {
-            SortKey = "Name";
+            SortKey = SortKeys.Name;
             SortAscendingFlag = true;
         }
         finally
@@ -1120,7 +1160,7 @@ public partial class TabViewModel : ObservableObject
                 IconSize = settings.IconSize;
             }
 
-            if (settings.SortKey is "Name" or "Modified" or "Created" or "Type" or "Size")
+            if (settings.SortKey is SortKeys.Name or SortKeys.Modified or SortKeys.Created or SortKeys.Type or SortKeys.Size)
             {
                 SortKey = settings.SortKey;
                 SortAscendingFlag = settings.SortAscending;
@@ -1156,6 +1196,7 @@ public partial class TabViewModel : ObservableObject
         if (_suppressSearchFilter || _isDetached) return;
 
         _filterDebounceCts?.Cancel();
+        _filterDebounceCts?.Dispose();
         var cts = CancellationTokenSource.CreateLinkedTokenSource(_lifetimeCts.Token);
         _filterDebounceCts = cts;
         _ = ApplyFilterDebouncedAsync(cts.Token);
@@ -1281,8 +1322,11 @@ public partial class TabViewModel : ObservableObject
     public void ResortEntries()
     {
         var selectedPath = SelectedEntry?.FullPath;
-        _allEntries = ApplySort(_allEntries).ToList();
-        var sortedVisibleEntries = ApplySort(Entries.ToList()).ToList();
+        SetAllEntries(ApplySort(_allEntries).ToList());
+        // 検索・フィルターが効いていない通常表示は母集合と同一集合のため、2 回目のソートを省略する
+        var sortedVisibleEntries = string.IsNullOrEmpty(SearchText) && Entries.Count == _allEntries.Count
+            ? _allEntries
+            : (IReadOnlyList<FileSystemEntry>)ApplySort(Entries.ToList()).ToList();
         ReplaceEntries(sortedVisibleEntries);
 
         if (selectedPath is not null)
@@ -1434,16 +1478,16 @@ public partial class TabViewModel : ObservableObject
         var grouped = entries.OrderByDescending(e => e.IsDirectory);
         IOrderedEnumerable<FileSystemEntry> sorted = SortKey switch
         {
-            "Modified" => SortAscendingFlag
+            SortKeys.Modified => SortAscendingFlag
                 ? grouped.ThenBy(e => e.Modified)
                 : grouped.ThenByDescending(e => e.Modified),
-            "Created" => SortAscendingFlag
+            SortKeys.Created => SortAscendingFlag
                 ? grouped.ThenBy(e => e.Created)
                 : grouped.ThenByDescending(e => e.Created),
-            "Type" => SortAscendingFlag
+            SortKeys.Type => SortAscendingFlag
                 ? grouped.ThenBy(e => e.TypeText, StringComparer.CurrentCultureIgnoreCase)
                 : grouped.ThenByDescending(e => e.TypeText, StringComparer.CurrentCultureIgnoreCase),
-            "Size" => SortAscendingFlag
+            SortKeys.Size => SortAscendingFlag
                 ? grouped.ThenBy(e => e.Size ?? -1)
                 : grouped.ThenByDescending(e => e.Size ?? -1),
             _ => SortAscendingFlag
@@ -1490,16 +1534,16 @@ public partial class TabViewModel : ObservableObject
     {
         switch (key)
         {
-            case "Modified":
+            case SortKeys.Modified:
                 ShowColModified = !ShowColModified;
                 break;
-            case "Type":
+            case SortKeys.Type:
                 ShowColType = !ShowColType;
                 break;
-            case "Size":
+            case SortKeys.Size:
                 ShowColSize = !ShowColSize;
                 break;
-            case "Created":
+            case SortKeys.Created:
                 ShowColCreated = !ShowColCreated;
                 break;
         }
@@ -1606,7 +1650,7 @@ public partial class TabViewModel : ObservableObject
         if (result.IsBusy) { StatusText = "別のファイル操作が完了するまでお待ちください"; return; }
         if (result.IsSuccess && isCut) ClipboardFileService.Clear();
         if (result.IsSuccess) Refresh();
-        else if (!result.IsCancelled) StatusText = $"貼り付けに失敗しました（エラー {result.NativeErrorCode}）";
+        else if (!result.IsCancelled) StatusText = $"貼り付けに失敗しました（{FormatOpError(result.NativeErrorCode)}）";
     }
 
     [RelayCommand(CanExecute = nameof(HasSelection))]
@@ -1615,6 +1659,13 @@ public partial class TabViewModel : ObservableObject
     /// <summary>Shift+Delete の完全削除（ごみ箱を経由しない、システム確認あり）。</summary>
     [RelayCommand(CanExecute = nameof(HasSelection))]
     private Task DeletePermanent() => DeleteCoreAsync(permanent: true);
+
+    /// <summary>ファイル操作エラーを「エラー 206: パスが長すぎます」の形式に整形する（説明が無いコードは生数値のみ）。</summary>
+    private static string FormatOpError(int code)
+    {
+        var desc = FileOperationService.DescribeError(code);
+        return desc.Length > 0 ? $"エラー {code}: {desc}" : $"エラー {code}";
+    }
 
     private async Task DeleteCoreAsync(bool permanent)
     {
@@ -1626,7 +1677,7 @@ public partial class TabViewModel : ObservableObject
         if (!result.IsSuccess)
         {
             if (result.IsBusy) StatusText = "別のファイル操作が完了するまでお待ちください";
-            else if (!result.IsCancelled) StatusText = $"削除に失敗しました（エラー {result.NativeErrorCode}）";
+            else if (!result.IsCancelled) StatusText = $"削除に失敗しました（{FormatOpError(result.NativeErrorCode)}）";
             return;
         }
         await NavigateToAsync(CurrentPath, record: false);
@@ -1687,7 +1738,7 @@ public partial class TabViewModel : ObservableObject
             if (!first.IsSuccess)
             {
                 if (first.IsBusy) StatusText = "別のファイル操作が完了するまでお待ちください";
-                else if (!first.IsCancelled) StatusText = $"名前を変更できませんでした（エラー {first.NativeErrorCode}）";
+                else if (!first.IsCancelled) StatusText = $"名前を変更できませんでした（{FormatOpError(first.NativeErrorCode)}）";
                 return;
             }
 
@@ -1719,7 +1770,7 @@ public partial class TabViewModel : ObservableObject
             if (!result.IsSuccess)
             {
                 if (result.IsBusy) StatusText = "別のファイル操作が完了するまでお待ちください";
-                else if (!result.IsCancelled) StatusText = $"名前を変更できませんでした（エラー {result.NativeErrorCode}）";
+                else if (!result.IsCancelled) StatusText = $"名前を変更できませんでした（{FormatOpError(result.NativeErrorCode)}）";
                 return;
             }
         }
@@ -1807,7 +1858,7 @@ public partial class TabViewModel : ObservableObject
         }
         else if (!result.IsCancelled)
         {
-            StatusText = $"ファイル操作に失敗しました（エラー {result.NativeErrorCode}）";
+            StatusText = $"ファイル操作に失敗しました（{FormatOpError(result.NativeErrorCode)}）";
         }
     }
 

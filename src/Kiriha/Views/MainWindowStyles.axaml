@@ -319,6 +319,22 @@
             <Setter Property="Padding" Value="0,2" />
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         </Style>
+        <!-- 詳細表示: 行全体の既定ハイライトを消し、ホバー / 選択色は「名前」列（namecell）だけに乗せる -->
+        <Style Selector="ListBox.files.details ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{x:Null}" />
+        </Style>
+        <Style Selector="ListBox.files.details ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{x:Null}" />
+        </Style>
+        <Style Selector="ListBox.files.details ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{x:Null}" />
+        </Style>
+        <Style Selector="ListBox.files.details ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{x:Null}" />
+        </Style>
+        <Style Selector="Border.namecell:pointerover">
+            <Setter Property="Background" Value="{DynamicResource HoverBg}" />
+        </Style>
         <Style Selector="ListBox.files.list ListBoxItem">
             <Setter Property="Padding" Value="0" />
             <Setter Property="Margin" Value="0" />
@@ -376,6 +392,12 @@
             <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
             <Setter Property="BorderThickness" Value="3" />
             <Setter Property="CornerRadius" Value="8" />
+        </Style>
+        <Style Selector="TreeViewItem.filedroptarget /template/ Border#PART_LayoutRoot">
+            <Setter Property="Background" Value="{DynamicResource AccentSelectionBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="CornerRadius" Value="6" />
         </Style>
         <Style Selector="Border.bookmarkbar.filedroptarget">
             <Setter Property="Background" Value="{DynamicResource AccentSelectionBrush}" />

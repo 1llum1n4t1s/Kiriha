@@ -104,7 +104,14 @@ public static class MaterialIconService
             return cached;
         }
 
-        var image = ImageCache.GetOrAdd(iconKey, LoadImage);
+        // GetOrAdd の valueFactory は競合時に複数回実行されうる（ConcurrentDictionary の仕様）。
+        // 敗者側が生成した Bitmap が未解放のまま捨てられないよう、生成→追加→敗者破棄を明示する。
+        var created = LoadImage(iconKey);
+        var image = ImageCache.GetOrAdd(iconKey, created);
+        if (!ReferenceEquals(image, created) && created is Bitmap loser)
+        {
+            loser.Dispose();
+        }
         ImageCacheOrder.Enqueue(iconKey);
         while (ImageCache.Count > ImageCacheLimit && ImageCacheOrder.TryDequeue(out var oldest))
         {

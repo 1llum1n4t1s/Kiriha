@@ -114,14 +114,17 @@ internal static partial class Program
                     ActivationPipeName, PipeDirection.In, 1,
                     PipeTransmissionMode.Byte, PipeOptions.Asynchronous | PipeOptions.CurrentUserOnly);
                 await server.WaitForConnectionAsync();
+                // 接続後に書き込まないクライアントが待受を占有しないよう、読み取り全体に上限時間を設ける
+                // （正規クライアントは接続直後に AutoFlush で一括送信するため通常は瞬時に完了する）
+                using var readTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
                 using var reader = new StreamReader(server, leaveOpen: true);
-                var count = int.TryParse(await reader.ReadLineAsync(), out var parsed)
+                var count = int.TryParse(await reader.ReadLineAsync(readTimeout.Token), out var parsed)
                     ? Math.Clamp(parsed, 0, 32)
                     : 0;
                 var args = new string[count];
                 for (var i = 0; i < count; i++)
                 {
-                    args[i] = await reader.ReadLineAsync() ?? string.Empty;
+                    args[i] = await reader.ReadLineAsync(readTimeout.Token) ?? string.Empty;
                 }
 
                 Action<string[]>? handler;

@@ -44,7 +44,11 @@ export default {
     try {
       object = await env.UPDATES.get(key, requestedRange ? { range: requestedRange } : undefined);
     } catch (error) {
-      if (!requestedRange) throw error;
+      if (!requestedRange) {
+        // R2 の一時的な不調を事後調査できるよう記録した上で、既定のエラーページではなく 500 を返す
+        console.error(`R2 の取得に失敗: key=${key}`, error);
+        return new Response("一時的なエラーが発生しました。しばらくしてから再試行してください。", { status: 500 });
+      }
       const metadata = await env.UPDATES.head(key);
       if (metadata === null) return notFound();
       const headers = buildHeaders(metadata, key);
