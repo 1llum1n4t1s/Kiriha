@@ -7,7 +7,7 @@
     <PlatformTarget Condition="'$(PlatformTarget)' == ''">x64</PlatformTarget>
     <Platforms>x64;ARM64</Platforms>
     <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
-    <Version>1.0.24</Version>
+    <Version>1.0.25</Version>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AssemblyTitle>Kiriha</AssemblyTitle>
     <AssemblyDescription>Chrome ライクなタブ型ファイラー</AssemblyDescription>

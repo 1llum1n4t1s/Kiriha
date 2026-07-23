@@ -221,7 +221,8 @@
                          浮遊カード状サイドバー TabControl + HeaderedContentControl 積みの数値を実測値どおりに再現。 -->
                     <v:SettingsView IsVisible="{Binding IsSettingsTab}" />
 
-                    <Grid RowDefinitions="48,Auto,40,*,28" Background="{DynamicResource ContentBg}"
+                    <!-- コマンドバー行は Auto（高さは Border 側の 40px）。ギャラリー表示で隠したとき行ごと畳むため -->
+                    <Grid RowDefinitions="48,Auto,Auto,*,28" Background="{DynamicResource ContentBg}"
                           IsVisible="{Binding IsNormalTab}">
 
                         <!-- ナビゲーション + アドレスバー（パンくず） + 検索 -->
@@ -365,13 +366,18 @@
                             </Border>
                         </Grid>
 
-                        <!-- お気に入りバー（Ctrl+Shift+B で表示切替 / DnD 登録 / Chrome 互換右クリック） -->
+                        <!-- お気に入りバー（Ctrl+Shift+B で表示切替 / DnD 登録 / Chrome 互換右クリック）。ギャラリー表示中は隠す -->
                         <Border Grid.Row="1" Classes="bookmarkbar" Height="32"
                                 Background="{DynamicResource TabActiveBg}"
                                 BorderBrush="{DynamicResource Divider}" BorderThickness="0,0,0,1"
-                                IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ShowBookmarksBar}"
                                 DragDrop.AllowDrop="True"
                                 PointerReleased="BookmarkBar_PointerReleased">
+                            <Border.IsVisible>
+                                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                    <Binding Path="$parent[Window].((vm:MainWindowViewModel)DataContext).ShowBookmarksBar" />
+                                    <Binding Path="!IsGalleryView" />
+                                </MultiBinding>
+                            </Border.IsVisible>
                             <Panel>
                             <TextBlock Text="ここにフォルダーをドラッグするとお気に入りに追加されます"
                                        FontSize="11.5" Foreground="{DynamicResource TextSecondary}"
@@ -408,9 +414,10 @@
                             </Panel>
                         </Border>
 
-                        <!-- コマンドバー（エクスプローラー同等） -->
-                        <Border Grid.Row="2" Background="{DynamicResource ContentBg}"
-                                BorderBrush="{DynamicResource Divider}" BorderThickness="0,0,0,1">
+                        <!-- コマンドバー（エクスプローラー同等）。ギャラリー表示中は隠す -->
+                        <Border Grid.Row="2" Height="40" Background="{DynamicResource ContentBg}"
+                                BorderBrush="{DynamicResource Divider}" BorderThickness="0,0,0,1"
+                                IsVisible="{Binding !IsGalleryView}">
                             <StackPanel Orientation="Horizontal" Margin="10,0" Spacing="2">
                                 <Button Classes="cmd cmdicon" Content="&#xE8A0;"
                                         ToolTip.Tip="サイドバーの表示/非表示（クイックアクセス / ツリー）"
@@ -578,8 +585,13 @@
                             <!-- 左ペイン: Windows のクイックアクセス + PC -->
                             <!-- 右の仕切り線は隣の Thumb (colsplit) が描くため Border 側には引かない -->
                             <Border Grid.Column="0" Background="{DynamicResource SidebarBg}"
-                                    Width="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SidebarWidth}"
-                                    IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ShowSidebar}">
+                                    Width="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SidebarWidth}">
+                                <Border.IsVisible>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="$parent[Window].((vm:MainWindowViewModel)DataContext).ShowSidebar" />
+                                        <Binding Path="!IsGalleryView" />
+                                    </MultiBinding>
+                                </Border.IsVisible>
                                 <Grid RowDefinitions="Auto,*">
                                 <!-- クイックアクセス / XP 風ツリーの切り替えトグル -->
                                 <ToggleButton Grid.Row="0" Margin="8,8,8,2" Padding="8,4"
@@ -660,8 +672,14 @@
 
                             <!-- 左ペイン幅の変更 -->
                             <Thumb Grid.Column="1" Classes="colsplit panesplit"
-                                   IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ShowSidebar}"
-                                   DragDelta="SidebarThumb_DragDelta" />
+                                   DragDelta="SidebarThumb_DragDelta">
+                                <Thumb.IsVisible>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="$parent[Window].((vm:MainWindowViewModel)DataContext).ShowSidebar" />
+                                        <Binding Path="!IsGalleryView" />
+                                    </MultiBinding>
+                                </Thumb.IsVisible>
+                            </Thumb>
 
                             <Grid Grid.Column="2" RowDefinitions="Auto,*">
                                 <!-- 詳細表示のカラムヘッダー（クリックでソート / Thumb で幅変更） -->
@@ -826,9 +844,8 @@
                                         </ListBox.ItemTemplate>
                                     </ListBox>
 
-                                    <!-- アイコン表示（特大 / 大 / 中） -->
+                                    <!-- アイコン表示（特大 / 大 / 中）。スライダー最大時はギャラリー表示に譲る -->
                                     <ListBox Classes="icons"
-                                             IsVisible="{Binding IsIconsView}"
                                              ItemsSource="{Binding Entries}"
                                              SelectedItem="{Binding SelectedEntry}"
                                              SelectionMode="Multiple"
@@ -838,6 +855,12 @@
                                              SelectionChanged="FileList_SelectionChanged"
                                              PointerReleased="FileList_PointerReleased"
                                              KeyDown="FileList_KeyDown">
+                                        <ListBox.IsVisible>
+                                            <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                                <Binding Path="IsIconsView" />
+                                                <Binding Path="!IsGalleryView" />
+                                            </MultiBinding>
+                                        </ListBox.IsVisible>
                                         <ListBox.ItemsPanel>
                                             <ItemsPanelTemplate>
                                                 <c:VirtualizingWrapPanel ItemWidth="{Binding IconCellWidth}"
@@ -872,6 +895,72 @@
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>
                                     </ListBox>
+                                    <!-- ギャラリー表示（アイコンサイズスライダー最大時の特別モード）:
+                                         1 枚を大きく表示し、下部フィルムストリップで送る。Esc / スライダーで復帰 -->
+                                    <Grid IsVisible="{Binding IsGalleryView}" RowDefinitions="*,116" Background="#FF121212">
+                                        <Panel Grid.Row="0" Margin="18,18,18,6">
+                                            <Image Source="{Binding PreviewBitmap}" Stretch="Uniform" StretchDirection="DownOnly"
+                                                   RenderOptions.BitmapInterpolationMode="HighQuality" />
+                                            <!-- 画像プレビューが無いファイルはアイコン + 名前で表示する -->
+                                            <StackPanel IsVisible="{Binding PreviewBitmap, Converter={x:Static ObjectConverters.IsNull}}"
+                                                        HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
+                                                <c:FileIconPresenter Entry="{Binding SelectedEntry}" Owner="{Binding}"
+                                                                     IconSize="96" ScaleEmoji="True"
+                                                                     HorizontalAlignment="Center" />
+                                                <TextBlock Text="{Binding SelectedEntry.DisplayName}" FontSize="14"
+                                                           Foreground="#DDDDDD" HorizontalAlignment="Center"
+                                                           TextTrimming="CharacterEllipsis" MaxWidth="520" />
+                                            </StackPanel>
+                                            <!-- ギャラリー終了（Esc / スライダーでも戻れる） -->
+                                            <Button HorizontalAlignment="Right" VerticalAlignment="Top"
+                                                    Width="32" Height="32" CornerRadius="16" Padding="0"
+                                                    Background="#66000000" Click="GalleryClose_Click"
+                                                    ToolTip.Tip="ギャラリーを終了 (Esc)">
+                                                <TextBlock Classes="fico" Text="&#xE711;" FontSize="13"
+                                                           Foreground="#DDDDDD"
+                                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Button>
+                                        </Panel>
+                                        <ListBox Grid.Row="1" Classes="files gallerystrip"
+                                                 ItemsSource="{Binding Entries}"
+                                                 SelectedItem="{Binding SelectedEntry}"
+                                                 SelectionMode="Multiple"
+                                                 Background="Transparent"
+                                                 DragDrop.AllowDrop="True"
+                                                 DoubleTapped="FileList_DoubleTapped"
+                                                 SelectionChanged="FileList_SelectionChanged"
+                                                 PointerReleased="FileList_PointerReleased"
+                                                 KeyDown="FileList_KeyDown"
+                                                 ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                                                 ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                                            <ListBox.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <VirtualizingStackPanel Orientation="Horizontal" />
+                                                </ItemsPanelTemplate>
+                                            </ListBox.ItemsPanel>
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate x:DataType="m:FileSystemEntry">
+                                                    <Panel Width="80" Height="80"
+                                                           EffectiveViewportChanged="FileItem_EffectiveViewportChanged"
+                                                           DataContextChanged="FileItem_DataContextChanged"
+                                                           Background="Transparent"
+                                                           Opacity="{Binding RowOpacity}"
+                                                           ToolTip.Tip="{Binding RowTooltip}">
+                                                        <Border CornerRadius="8" ClipToBounds="True" IsVisible="{Binding HasThumbnail}">
+                                                            <Image Source="{Binding Thumbnail}" Stretch="UniformToFill"
+                                                                   RenderOptions.BitmapInterpolationMode="HighQuality" />
+                                                        </Border>
+                                                        <c:FileIconPresenter IsVisible="{Binding HasNoThumbnail}"
+                                                                             Entry="{Binding}"
+                                                                             Owner="{Binding $parent[ListBox].((vm:TabViewModel)DataContext)}"
+                                                                             IconSize="42" ScaleEmoji="True"
+                                                                             HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                    </Panel>
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
+                                        </ListBox>
+                                    </Grid>
+
                                     <!-- 空フォルダー表示 -->
                                     <TextBlock Text="このフォルダーは空です。"
                                                IsVisible="{Binding HasNoEntries}"
@@ -884,15 +973,26 @@
 
                             <!-- プレビューペイン幅の変更 -->
                             <Thumb Grid.Column="3" Classes="colsplit" Width="4"
-                                   IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ShowPreviewPane}"
-                                   DragDelta="PreviewThumb_DragDelta" />
+                                   DragDelta="PreviewThumb_DragDelta">
+                                <Thumb.IsVisible>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="$parent[Window].((vm:MainWindowViewModel)DataContext).ShowPreviewPane" />
+                                        <Binding Path="!IsGalleryView" />
+                                    </MultiBinding>
+                                </Thumb.IsVisible>
+                            </Thumb>
 
                             <!-- プレビューペイン (Alt+P) -->
                             <!-- 左の仕切り線は隣の Thumb (colsplit) が描くため Border 側には引かない -->
                             <Border Grid.Column="4"
                                     Width="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).PreviewWidth}"
-                                    IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ShowPreviewPane}"
                                     Background="{DynamicResource SidebarBg}">
+                                <Border.IsVisible>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="$parent[Window].((vm:MainWindowViewModel)DataContext).ShowPreviewPane" />
+                                        <Binding Path="!IsGalleryView" />
+                                    </MultiBinding>
+                                </Border.IsVisible>
                                 <Grid RowDefinitions="*,Auto" Margin="10">
                                     <Panel Grid.Row="0">
                                         <Image Source="{Binding PreviewBitmap}"
@@ -962,5 +1062,29 @@
         </Canvas>
 
     </Grid>
+
+    <!-- パスコピー等の一時通知トースト（ドラッグ中プレビューと同じ視覚言語で、アドレスバー直下に出す）。 -->
+    <Border x:Name="PathCopyToast" IsVisible="False" Opacity="0" ZIndex="900"
+            HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,92,0,0"
+            Padding="11,8" CornerRadius="13"
+            Background="{DynamicResource ContentBg}"
+            BorderBrush="{DynamicResource SystemAccentColor}" BorderThickness="2"
+            BoxShadow="0 9 24 0 #62000000" IsHitTestVisible="False">
+        <Border.Transitions>
+            <Transitions>
+                <DoubleTransition Property="Opacity" Duration="0:0:0.15" />
+            </Transitions>
+        </Border.Transitions>
+        <StackPanel Orientation="Horizontal" Spacing="9">
+            <Border MinWidth="52" Padding="8,4" CornerRadius="9"
+                    Background="{DynamicResource AccentBrush}" VerticalAlignment="Center">
+                <TextBlock Text="コピー" FontSize="10.5" FontWeight="SemiBold" Foreground="White"
+                           HorizontalAlignment="Center" />
+            </Border>
+            <TextBlock x:Name="PathCopyToastText" FontSize="12.5" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center"
+                       MaxWidth="520" TextTrimming="CharacterEllipsis" />
+        </StackPanel>
+    </Border>
     </Panel>
 </Window>

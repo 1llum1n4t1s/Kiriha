@@ -2,6 +2,7 @@
 //
 // トップページは Worker、更新ファイルは R2 バケットから返す。
 import landingHtml from "./index.html";
+import tokushohoHtml from "./tokushoho.html";
 
 export default {
   async fetch(request, env) {
@@ -9,6 +10,16 @@ export default {
 
     if (pathname === "/" || pathname === "/index.html") {
       return new Response(landingHtml, {
+        headers: {
+          "content-type": "text/html; charset=utf-8",
+          "cache-control": "public, max-age=300",
+        },
+      });
+    }
+
+    // 特定商取引法に基づく表記
+    if (pathname === "/tokushoho" || pathname === "/tokushoho.html") {
+      return new Response(tokushohoHtml, {
         headers: {
           "content-type": "text/html; charset=utf-8",
           "cache-control": "public, max-age=300",

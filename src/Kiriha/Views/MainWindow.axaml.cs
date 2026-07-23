@@ -81,6 +81,10 @@ public partial class MainWindow : Window
         // 同一パス再読み込み（F5・シェル verb 後の保険リフレッシュ等）後の複数選択復元
         TabViewModel.SelectionRestoreRequested += OnTabSelectionRestoreRequested;
 
+        // ギャラリー表示からの Esc 復帰。ListBox が Escape を内部処理（選択解除）で消費するため、
+        // トンネル段階で先に拾う。テキスト入力中（検索・パス編集）は各自の Esc 処理を優先する。
+        AddHandler(KeyDownEvent, GalleryEscape_KeyDown, RoutingStrategies.Tunnel);
+
         // ListBoxItem が選択処理で PointerPressed を Handled 済みにするため、
         // 通常のバブル購読（XAML の PointerPressed="..."）ではタブの並べ替え開始を検知できない。
         // handledEventsToo: true で Handled 後も確実に拾う。
@@ -1861,6 +1865,27 @@ public partial class MainWindow : Window
         }
     }
 
+    /// <summary>ギャラリー表示中の Esc をトンネル段階で拾い、特大アイコン表示へ復帰する。</summary>
+    private void GalleryEscape_KeyDown(object? sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Escape
+            && ViewModel?.SelectedTab is { IsGalleryView: true, IsEditingPath: false } tab
+            && FocusManager?.GetFocusedElement() is not TextBox)
+        {
+            tab.IconSize = 96;
+            e.Handled = true;
+        }
+    }
+
+    /// <summary>ギャラリー右上の ✕ ボタンでギャラリー表示を終了する。</summary>
+    private void GalleryClose_Click(object? sender, RoutedEventArgs e)
+    {
+        if ((sender as Control)?.DataContext is TabViewModel tab)
+        {
+            tab.IconSize = 96;
+        }
+    }
+
     private void FileList_KeyDown(object? sender, KeyEventArgs e)
     {
         if (sender is not ListBox { DataContext: TabViewModel tab } listBox)
@@ -1906,7 +1931,16 @@ public partial class MainWindow : Window
                 e.Handled = true;
                 break;
             case Key.Escape:
-                listBox.UnselectAll();
+                if (listBox.Classes.Contains("gallerystrip"))
+                {
+                    // ギャラリー表示からの復帰（スライダーを特大アイコン相当まで戻す）
+                    tab.IconSize = 96;
+                }
+                else
+                {
+                    listBox.UnselectAll();
+                }
+
                 e.Handled = true;
                 break;
             case Key.Apps:
@@ -2172,8 +2206,36 @@ public partial class MainWindow : Window
         {
             var text = tab.CurrentPath == FileSystemService.ComputerPath ? "PC" : tab.CurrentPath;
             await Clipboard.SetTextAsync(text);
-            tab.StatusText = $"パスをコピーしました: {text}";
+            ShowPathCopyToast($"パスをコピーしました: {text}");
         }
+    }
+
+    /// <summary>連続表示時に古い非表示タイマーが新しいトーストを消さないための世代番号。</summary>
+    private int _pathCopyToastRevision;
+
+    /// <summary>アドレスバー直下に一時通知トーストを表示する（約1.8秒でフェードアウト）。</summary>
+    private void ShowPathCopyToast(string message)
+    {
+        var revision = ++_pathCopyToastRevision;
+        PathCopyToastText.Text = message;
+        PathCopyToast.IsVisible = true;
+        PathCopyToast.Opacity = 1;
+        DispatcherTimer.RunOnce(() =>
+        {
+            if (revision != _pathCopyToastRevision)
+            {
+                return;
+            }
+
+            PathCopyToast.Opacity = 0;
+            DispatcherTimer.RunOnce(() =>
+            {
+                if (revision == _pathCopyToastRevision)
+                {
+                    PathCopyToast.IsVisible = false;
+                }
+            }, TimeSpan.FromMilliseconds(200));
+        }, TimeSpan.FromMilliseconds(1800));
     }
 
     private async Task StartDragAsync(

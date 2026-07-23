@@ -68,7 +68,7 @@ public partial class TabViewModel : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(
         nameof(IsDetailsView), nameof(IsListView), nameof(IsIconsView), nameof(IconFontSize),
-        nameof(ListOrientation),
+        nameof(ListOrientation), nameof(IsGalleryView),
         nameof(IsViewExtraLarge), nameof(IsViewLarge), nameof(IsViewMedium),
         nameof(IsViewSmall), nameof(IsViewList), nameof(IsViewDetails))]
     private ViewMode _viewMode = ViewMode.Details;
@@ -215,7 +215,7 @@ public partial class TabViewModel : ObservableObject
 
     partial void OnSelectedEntryChanged(FileSystemEntry? value)
     {
-        if (_previewEnabled)
+        if (_previewEnabled || IsGalleryView)
         {
             UpdatePreview();
         }
@@ -262,12 +262,14 @@ public partial class TabViewModel : ObservableObject
 
         try
         {
+            // ギャラリー表示中は画面いっぱいに出すため高解像度でデコードする
+            var decodeWidth = IsGalleryView ? 1920 : 480;
             if (ImageExtensions.Contains(ext) && entry.Size is < 64 * 1024 * 1024)
             {
                 var bmp = await Task.Run(() =>
                 {
                     using var stream = File.OpenRead(entry.FullPath);
-                    return Bitmap.DecodeToWidth(stream, 480);
+                    return Bitmap.DecodeToWidth(stream, decodeWidth);
                 }, cts.Token);
                 if (!cts.IsCancellationRequested)
                 {
@@ -288,7 +290,7 @@ public partial class TabViewModel : ObservableObject
             if (ShellImageThumbnailExtensions.Contains(ext))
             {
                 var bmp = await Task.Run(
-                    () => ShellThumbnailService.TryGetThumbnail(entry.FullPath, 480), cts.Token);
+                    () => ShellThumbnailService.TryGetThumbnail(entry.FullPath, IsGalleryView ? 1024 : 480), cts.Token);
                 if (!cts.IsCancellationRequested && bmp is not null)
                 {
                     PreviewBitmap?.Dispose();
@@ -582,11 +584,50 @@ public partial class TabViewModel : ObservableObject
             _thumbnailCts?.Cancel();
         }
 
+        HandleGalleryTransition();
         SaveFolderViewSettings();
     }
 
     partial void OnIconSizeChanged(double value)
-        => SaveFolderViewSettings();
+    {
+        HandleGalleryTransition();
+        SaveFolderViewSettings();
+    }
+
+    /// <summary>直前のギャラリー状態。遷移（入る / 出る）を 1 回だけ処理するために保持する。</summary>
+    private bool _wasGalleryView;
+
+    private void HandleGalleryTransition()
+    {
+        if (IsGalleryView == _wasGalleryView)
+        {
+            return;
+        }
+
+        // 試用期限切れの間はギャラリー表示をロックする（特大アイコンへ戻す）
+        if (IsGalleryView && LicenseService.State == LicenseState.TrialExpired)
+        {
+            StatusText = "ギャラリー表示はライセンス認証後に利用できます";
+            IconSize = 96;
+            return;
+        }
+
+        _wasGalleryView = IsGalleryView;
+        if (IsGalleryView)
+        {
+            // 選択がなければ先頭から閲覧を始め、ギャラリー解像度で読み直す
+            SelectedEntry ??= Entries.FirstOrDefault();
+            UpdatePreview();
+        }
+        else if (_previewEnabled)
+        {
+            UpdatePreview(); // プレビューペイン解像度に戻す
+        }
+        else
+        {
+            ClearPreview();
+        }
+    }
 
     partial void OnSortKeyChanged(string value)
         => SaveFolderViewSettings();
@@ -735,10 +776,16 @@ public partial class TabViewModel : ObservableObject
     /// 表示メニューの 特大 / 大 / 中 はこの値のプリセット。
     /// </summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IconFontSize), nameof(IconItemWidth), nameof(IconCellWidth), nameof(IconCellHeight))]
+    [NotifyPropertyChangedFor(
+        nameof(IconFontSize), nameof(IconItemWidth), nameof(IconCellWidth), nameof(IconCellHeight),
+        nameof(IsGalleryView))]
     private double _iconSize = 28;
 
     public double IconFontSize => IconSize;
+
+    /// <summary>アイコンサイズスライダーを最大（160）まで上げると入る特別モード。
+    /// ナビゲーション / プレビューを隠し、1 枚を大きく表示 + 下部フィルムストリップで送る。</summary>
+    public bool IsGalleryView => IsIconsView && IconSize >= 159.5;
 
     /// <summary>アイコンビューのセル幅（アイコンサイズに追従）。</summary>
     public double IconItemWidth => Math.Max(96, IconSize * 1.7);
@@ -1121,6 +1168,12 @@ public partial class TabViewModel : ObservableObject
 
         if (IsIconsView && _thumbnailCts is null)
             _thumbnailCts = CancellationTokenSource.CreateLinkedTokenSource(_lifetimeCts.Token);
+
+        // ギャラリー表示（フォルダー別ビュー記憶で復元された場合を含む）は常に 1 枚を表示する
+        if (IsGalleryView && SelectedEntry is null)
+        {
+            SelectedEntry = Entries.FirstOrDefault();
+        }
     }
 
     /// <summary>直近でフォルダー別設定を適用したパス。初回ナビゲーション判定に使う。</summary>
