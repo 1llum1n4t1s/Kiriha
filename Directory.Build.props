@@ -1,12 +1,13 @@
 <Project>
   <PropertyGroup>
-    <TargetFramework>net10.0-windows8.0</TargetFramework>
+    <!-- 共有シート等の WinRT API（公式プロジェクション）を使うため windows10 系 TFM。最小 OS は下の SupportedOSPlatformVersion。 -->
+    <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PlatformTarget Condition="'$(PlatformTarget)' == ''">x64</PlatformTarget>
     <Platforms>x64;ARM64</Platforms>
-    <SupportedOSPlatformVersion>8.0</SupportedOSPlatformVersion>
-    <Version>1.0.21</Version>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+    <Version>1.0.22</Version>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AssemblyTitle>Kiriha</AssemblyTitle>
     <AssemblyDescription>Chrome ライクなタブ型ファイラー</AssemblyDescription>

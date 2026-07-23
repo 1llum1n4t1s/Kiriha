@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kiriha — タブで軽やかに使える Windows ファイルマネージャー</title>
-  <meta name="description" content="Kiriha（キリハ）は Chrome のような垂直タブと Windows Explorer の使い勝手を組み合わせた、無料・オープンソースの Windows ファイルマネージャーです。標準シェルメニュー、Explorer 互換のコピー＆ペーストと DnD、フォルダーツリー、コマンドパレットに対応。x64 / ARM64 両対応で軽快に動作します。" />
+  <meta name="description" content="Kiriha（キリハ）は Chrome のような垂直タブと Windows Explorer の使い勝手を組み合わせた、無料・オープンソースの Windows ファイルマネージャーです。標準シェルメニュー、Explorer 互換のコピー＆ペーストと DnD、フォルダーツリー、サブフォルダー検索に対応。x64 / ARM64 両対応で軽快に動作します。" />
   <meta name="keywords" content="Kiriha, キリハ, ファイルマネージャー, ファイラー, Windows, タブ, Explorer, Avalonia, Native AOT, オープンソース" />
   <meta name="author" content="1llum1n4t1s" />
   <meta name="robots" content="index, follow" />
@@ -407,7 +407,7 @@
                 <div class="omnibox"><span class="crumb">PC</span><span class="sep">›</span><span class="crumb">Windows (C:)</span><span class="sep">›</span><span class="crumb">Users</span><span class="sep">›</span><span class="crumb">IMT</span></div>
                 <div class="searchbox">⌕&nbsp; IMT の検索</div>
               </div>
-              <div class="commandbar"><span class="primary">＋ 新規フォルダ作成</span><span>切り取り</span><span>コピー</span><span>貼り付け</span><span>並べ替え⌄</span><span>表示⌄</span><span>種類⌄</span><span>ツール⌄</span></div>
+              <div class="commandbar"><span class="primary">＋ 新規フォルダ作成</span><span>切り取り</span><span>コピー</span><span>貼り付け</span><span>並べ替え⌄</span><span>表示⌄</span></div>
               <div class="file-body">
                 <aside class="side" aria-hidden="true">
                   <div class="side-toggle">🌲 ツリー表示</div>
@@ -443,7 +443,6 @@
         <span class="chip">Shell context menu</span>
         <span class="chip">Quick Access &amp; Tree</span>
         <span class="chip">Clipboard &amp; DnD</span>
-        <span class="chip">Command palette</span>
         <span class="chip">Auto update</span>
       </div>
     </section>
@@ -480,18 +479,12 @@
             <p>Explorer と Kiriha の間で切り取り・コピー・貼り付け、ドラッグ＆ドロップが自然につながります。削除はごみ箱へ、進捗も Windows 標準ダイアログで表示。</p>
           </article>
 
-          <article class="card reveal" style="--delay: 80ms">
+          <article class="card wide reveal" style="--delay: 80ms">
             <div class="card-icon" aria-hidden="true">⌕</div>
-            <span class="card-kicker">Search &amp; Filter</span>
+            <span class="card-kicker">Search</span>
             <h3>探す操作をすぐ近くに</h3>
-            <p>検索ボックスに入力するだけでサブフォルダーを含めて検索。メディア・文書・開発ファイルなどの種別フィルターや、条件を指定した一括選択も使えます。</p>
-          </article>
-
-          <article class="card reveal" style="--delay: 130ms">
-            <div class="card-icon" aria-hidden="true">⌘</div>
-            <span class="card-kicker">Command Palette</span>
-            <h3>機能を横断検索</h3>
-            <p><strong>Ctrl+Shift+P</strong> でコマンドパレットを開き、タブ、表示、選択、ファイル操作を名前から実行。ターミナルで開く、ハッシュ計算などのツール群も揃っています。</p>
+            <p>検索ボックスに入力するだけで、現在のフォルダーの絞り込みからサブフォルダーを含む検索までシームレスにつながります。<strong>Ctrl+F</strong> でフォーカス、Esc でクリア。</p>
+            <div class="tags"><span>Ctrl+F</span><span>Incremental</span><span>Recursive</span></div>
           </article>
 
           <article class="card wide reveal" style="--delay: 30ms">

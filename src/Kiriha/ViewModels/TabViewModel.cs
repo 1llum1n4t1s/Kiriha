@@ -166,6 +166,11 @@ public partial class TabViewModel : ObservableObject
     private static readonly string[] VideoThumbnailExtensions =
         [".mp4", ".m4v", ".mkv", ".avi", ".mov", ".wmv", ".webm", ".mpg", ".mpeg", ".mts", ".m2ts"];
 
+    // Skia（Bitmap.DecodeToWidth）が対応しない新世代画像は、Explorer と同じく
+    // シェルの WIC コーデック経由でサムネイル・プレビューを生成する（コーデック未導入なら従来どおりアイコン表示）。
+    private static readonly string[] ShellImageThumbnailExtensions =
+        [".jxl", ".avif", ".heic", ".heif"];
+
     private static readonly string[] RawThumbnailExtensions =
     [
         ".3fr", ".ari", ".arw", ".bay", ".cap", ".cr2", ".cr3", ".crw", ".dcr", ".dcs",
@@ -261,6 +266,27 @@ public partial class TabViewModel : ObservableObject
                 }
 
                 return;
+            }
+
+            if (ShellImageThumbnailExtensions.Contains(ext))
+            {
+                var bmp = await Task.Run(
+                    () => ShellThumbnailService.TryGetThumbnail(entry.FullPath, 480), cts.Token);
+                if (!cts.IsCancellationRequested && bmp is not null)
+                {
+                    PreviewBitmap?.Dispose();
+                    PreviewBitmap = bmp;
+                    PreviewText = "";
+                    PreviewInfo = $"{entry.Name}\n{entry.TypeText}  {entry.SizeText}  {bmp.PixelSize.Width}×{bmp.PixelSize.Height}\n更新日時: {entry.ModifiedText}";
+                    return;
+                }
+
+                bmp?.Dispose();
+                if (cts.IsCancellationRequested)
+                {
+                    return;
+                }
+                // コーデック未導入で取得できなければ情報表示のみへフォールスルー
             }
 
             if (TextExtensions.Contains(ext) && entry.Size is < 512 * 1024)
@@ -388,7 +414,6 @@ public partial class TabViewModel : ObservableObject
         StatusText = "検索中... (サブフォルダーを含む)";
 
         var root = CurrentPath;
-        var extensionFilter = _extensionFilter;
         var showExt = _options.ShowExtensions;
         var showHidden = _options.ShowHidden;
         var useMaterialIcons = _options.IconSet == FileIconSet.Material;
@@ -429,12 +454,6 @@ public partial class TabViewModel : ObservableObject
                     }
 
                     var isDir = item is DirectoryInfo;
-                    // 種類フィルター（コマンドパレットの拡張子絞り込み）併用時は通常の絞り込みと同じ条件を適用する
-                    if (extensionFilter is not null && (isDir || !extensionFilter.Contains(Path.GetExtension(name))))
-                    {
-                        continue;
-                    }
-
                     long? size = null;
                     DateTime? modified = null;
                     try
@@ -544,7 +563,8 @@ public partial class TabViewModel : ObservableObject
         var isImage = ImageExtensions.Contains(extension);
         var isPdf = extension == ".pdf";
         var useShellThumbnail = VideoThumbnailExtensions.Contains(extension)
-            || RawThumbnailExtensions.Contains(extension);
+            || RawThumbnailExtensions.Contains(extension)
+            || ShellImageThumbnailExtensions.Contains(extension);
         if (!IsIconsView || _isDetached || entry.IsDirectory || entry.Thumbnail is not null
             || (!isImage && !isPdf && !useShellThumbnail)
             || (isImage && entry.Size is null or > 32 * 1024 * 1024)
@@ -575,12 +595,15 @@ public partial class TabViewModel : ObservableObject
                     using var stream = File.OpenRead(entry.FullPath);
                     return Bitmap.DecodeToWidth(stream, ThumbnailPixelSize);
                 }, token);
-                if (bmp is not null
-                    && !token.IsCancellationRequested
-                    && IsIconsView
-                    && _allEntries.Contains(entry))
+                // アイコンと同様、リフレッシュで entry が置き換わっていたら同一パスの現行 entry へ引き渡す
+                var target = bmp is null || token.IsCancellationRequested || !IsIconsView
+                    ? null
+                    : _allEntries.Contains(entry)
+                        ? entry
+                        : _allEntries.FirstOrDefault(x => WindowsPathIdentity.Instance.Equals(x.FullPath, entry.FullPath));
+                if (bmp is not null && target is { Thumbnail: null })
                 {
-                    entry.Thumbnail = bmp;
+                    target.Thumbnail = bmp;
                 }
                 else
                 {
@@ -738,10 +761,17 @@ public partial class TabViewModel : ObservableObject
                     return ShellThumbnailService.TryGetIcon(entry.FullPath, WindowsIconPixelSize);
                 }, token);
 
-                if (bitmap is not null && !token.IsCancellationRequested
-                    && _options.IconSet == FileIconSet.Windows && _allEntries.Contains(entry))
+                // 一覧のリフレッシュで entry インスタンスが置き換わっていた場合、旧 entry ごと捨てると
+                // 新 entry 側の読み込みは _loadingWindowsIcons の重複ガードで弾かれた後なので誰もアイコンを
+                // 持てなくなる。同一パスの現行 entry を探して引き渡す。
+                var target = bitmap is null || token.IsCancellationRequested || _options.IconSet != FileIconSet.Windows
+                    ? null
+                    : _allEntries.Contains(entry)
+                        ? entry
+                        : _allEntries.FirstOrDefault(x => WindowsPathIdentity.Instance.Equals(x.FullPath, entry.FullPath));
+                if (bitmap is not null && target is { WindowsIcon: null })
                 {
-                    entry.WindowsIcon = bitmap;
+                    target.WindowsIcon = bitmap;
                 }
                 else
                 {
@@ -1010,10 +1040,8 @@ public partial class TabViewModel : ObservableObject
 
         DisposeEntryImages(_allEntries);
         _allEntries = ApplySort(entries).ToList();
-        // 移動で検索と種別フィルターをリセット（エクスプローラーと同じ）。プロパティ経由だと OnSearchTextChanged
+        // 移動で検索をリセット（エクスプローラーと同じ）。プロパティ経由だと OnSearchTextChanged
         // → ApplyFilter が二重に走るだけで害はないため素直にプロパティへ代入する。
-        _extensionFilter = null;
-        _extensionFilterName = "";
         _suppressSearchFilter = true;
         SearchText = "";
         _suppressSearchFilter = false;
@@ -1166,46 +1194,11 @@ public partial class TabViewModel : ObservableObject
         }
     }
 
-    private HashSet<string>? _extensionFilter;
-    private string _extensionFilterName = "";
-
-    /// <summary>コマンドパレットから複数拡張子をまとめて絞り込む。</summary>
-    public void ApplyExtensionFilter(string extensions, string displayName)
-    {
-        _extensionFilter = extensions.Split(';', StringSplitOptions.RemoveEmptyEntries)
-            .ToHashSet(StringComparer.OrdinalIgnoreCase);
-        _extensionFilterName = displayName;
-        ApplyFilter();
-        RefreshRecursiveSearchIfActive();
-    }
-
-    public void ClearExtensionFilter()
-    {
-        _extensionFilter = null;
-        _extensionFilterName = "";
-        ApplyFilter();
-        RefreshRecursiveSearchIfActive();
-    }
-
-    /// <summary>サブフォルダーを含む検索結果を表示中に種類フィルターが変わった場合、
-    /// ApplyFilter（現在のフォルダーの母集合のみ）で上書きされた一覧を再帰検索で復元する。</summary>
-    private void RefreshRecursiveSearchIfActive()
-    {
-        if (SearchText.Trim().Length > 0)
-        {
-            _ = SearchRecursiveAsync();
-        }
-    }
-
     /// <summary>検索テキストで現在のフォルダー内容を絞り込む。</summary>
     private void ApplyFilter()
     {
         var query = SearchText.Trim();
         IEnumerable<FileSystemEntry> filteredQuery = _allEntries;
-        if (_extensionFilter is not null)
-        {
-            filteredQuery = filteredQuery.Where(e => !e.IsDirectory && _extensionFilter.Contains(Path.GetExtension(e.Name)));
-        }
         if (query.Length > 0)
         {
             filteredQuery = filteredQuery.Where(e => e.Name.Contains(query, StringComparison.OrdinalIgnoreCase));
@@ -1214,12 +1207,9 @@ public partial class TabViewModel : ObservableObject
 
         ReplaceEntries(filtered);
 
-        var conditions = new List<string>();
-        if (_extensionFilter is not null) conditions.Add($"種類: {_extensionFilterName}");
-        if (query.Length > 0) conditions.Add($"検索: {query}");
-        StatusText = conditions.Count == 0
+        StatusText = query.Length == 0
             ? $"{filtered.Count} 個の項目"
-            : $"{filtered.Count} 個の項目 ({string.Join(" / ", conditions)})";
+            : $"{filtered.Count} 個の項目 (検索: {query})";
     }
 
     /// <summary>一覧をスナップショット単位で置換し、3 つの ListBox へ各 1 回だけ通知する。</summary>
@@ -1756,8 +1746,24 @@ public partial class TabViewModel : ObservableObject
     [RelayCommand]
     private void Share()
     {
-        // Windows の共有シート起動 API (IDataTransferManagerInterop) は WinRT 依存のため未対応
-        StatusText = "共有は現在サポートされていません";
+        // Explorer の「共有」と同じ ModernSharing ハンドラー（Windows.ModernShare verb）で
+        // Windows 標準の共有シートを開く（WinRT プロジェクションに依存しない）。
+        var targets = _selection.Where(e => !e.IsDirectory).Select(e => e.FullPath).ToList();
+        if (targets.Count == 0)
+        {
+            StatusText = _selection.Count > 0
+                ? "フォルダーは共有できません（ファイルを選択してください）"
+                : "共有するファイルを選択してください";
+            return;
+        }
+
+        var hwnd = (Avalonia.Application.Current?.ApplicationLifetime
+                as Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime)?
+            .MainWindow?.TryGetPlatformHandle()?.Handle ?? 0;
+        if (!ShareService.Show(hwnd, targets))
+        {
+            StatusText = "共有シートを開けませんでした";
+        }
     }
 
     [RelayCommand]

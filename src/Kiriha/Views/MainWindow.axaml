@@ -423,7 +423,7 @@
                                 <Button Classes="cmd" VerticalAlignment="Center" Click="NewFolderButton_Click"
                                         IsEnabled="{Binding CanCreateNew}">
                                     <StackPanel Orientation="Horizontal" Spacing="6">
-                                        <TextBlock Classes="fico" Text="&#xE710;" FontSize="14" VerticalAlignment="Center" />
+                                        <TextBlock Classes="fico" Text="&#xE8F4;" FontSize="14" VerticalAlignment="Center" />
                                         <TextBlock Text="新規フォルダ作成" VerticalAlignment="Center" />
                                     </StackPanel>
                                 </Button>
@@ -536,21 +536,9 @@
                                     </Button.Flyout>
                                 </Button>
 
-                                <Button Classes="cmd" VerticalAlignment="Center" Click="FileTypeFilterButton_Click">
-                                    <StackPanel Orientation="Horizontal" Spacing="6">
-                                        <TextBlock Classes="fico" Text="&#xE71C;" FontSize="14" VerticalAlignment="Center" />
-                                        <TextBlock Text="種類" VerticalAlignment="Center" />
-                                        <TextBlock Classes="fico" Text="&#xE70D;" FontSize="9" VerticalAlignment="Center" />
-                                    </StackPanel>
-                                </Button>
-
-                                <Button Classes="cmd" VerticalAlignment="Center" Click="AdvancedToolsButton_Click">
-                                    <StackPanel Orientation="Horizontal" Spacing="6">
-                                        <TextBlock Classes="fico" Text="&#xE90F;" FontSize="14" VerticalAlignment="Center" />
-                                        <TextBlock Text="ツール" VerticalAlignment="Center" />
-                                        <TextBlock Classes="fico" Text="&#xE70D;" FontSize="9" VerticalAlignment="Center" />
-                                    </StackPanel>
-                                </Button>
+                                <Button Classes="cmd cmdicon" Content="&#xE713;" ToolTip.Tip="オプション" AutomationProperties.Name="オプション"
+                                        VerticalAlignment="Center"
+                                        Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OpenSettingsCommand}" />
 
                                 <Button Classes="cmd cmdicon" Content="&#xE712;" ToolTip.Tip="もっと見る" AutomationProperties.Name="もっと見る"
                                         VerticalAlignment="Center">
@@ -561,8 +549,6 @@
                                             <MenuItem Header="選択の切り替え" Click="SelectInvert_Click" />
                                             <MenuItem Header="フォルダーだけ選択" Click="SelectFolders_Click" />
                                             <MenuItem Header="ファイルだけ選択" Click="SelectFiles_Click" />
-                                            <Separator />
-                                            <MenuItem Header="コマンドパレット" Click="CommandPalette_Click" InputGesture="Ctrl+Shift+P" />
                                             <Separator />
                                             <MenuItem Header="ターミナルで開く" Command="{Binding OpenTerminalCommand}" />
                                             <MenuItem Header="エクスプローラーで開く" Command="{Binding OpenInExplorerCommand}" />
@@ -576,8 +562,6 @@
                                                       Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ToggleBookmarksBarCommand}" />
                                             <Separator />
                                             <MenuItem Header="新しいウィンドウ" Click="NewWindow_Click" InputGesture="Ctrl+N" />
-                                            <MenuItem Header="オプション"
-                                                      Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OpenSettingsCommand}" />
                                             <MenuItem Header="更新の確認" Click="CheckUpdate_Click" />
                                             <MenuItem Header="Kiriha について"
                                                       Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OpenSettingsCommand}" />

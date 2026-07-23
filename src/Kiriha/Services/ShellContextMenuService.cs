@@ -223,6 +223,9 @@ internal static partial class ShellContextMenuService
 
     private static bool ShowForPidl(nint hwnd, nint pidl, int x, int y)
     {
+        // シェル拡張（クラウドストレージ・AV 等）の不調で QueryContextMenu が数十秒ブロックすることが
+        // あるため、所要時間を計測して遅延時だけ記録する（犯人特定の手掛かりを残す）。
+        var sw = System.Diagnostics.Stopwatch.StartNew();
         if (SHBindToParent(pidl, IidIShellFolder, out var folderPtr, out var childPidl) < 0 || folderPtr == 0)
         {
             return false;
@@ -245,6 +248,7 @@ internal static partial class ShellContextMenuService
 
         var menu = (IContextMenu)wrappers.GetOrCreateObjectForComInstance(ctxPtr, CreateObjectFlags.None);
         Marshal.Release(ctxPtr);
+        var uiObjectMs = sw.ElapsedMilliseconds;
 
         var hmenu = CreatePopupMenu();
         if (hmenu == 0)
@@ -257,6 +261,14 @@ internal static partial class ShellContextMenuService
             if (menu.QueryContextMenu(hmenu, 0, 1, 0x7FFF, 0) < 0)
             {
                 return false;
+            }
+
+            if (sw.ElapsedMilliseconds > 1000)
+            {
+                Logger.Log(
+                    $"シェルメニューの構築が遅延: GetUIObjectOf まで {uiObjectMs}ms, QueryContextMenu まで {sw.ElapsedMilliseconds}ms"
+                    + " (シェル拡張の不調の可能性。クラウドストレージや AV の常駐プロセス再起動で直ることがあります)",
+                    LogLevel.Warning);
             }
 
             // 前面でないウィンドウからだとメニュー外クリックで閉じなくなるため前面化する
@@ -304,6 +316,7 @@ internal static partial class ShellContextMenuService
 
     [LibraryImport("shell32.dll")]
     private static partial int SHBindToParent(nint pidl, in Guid riid, out nint ppv, out nint ppidlLast);
+
 
     [LibraryImport("user32.dll")]
     private static partial nint CreatePopupMenu();

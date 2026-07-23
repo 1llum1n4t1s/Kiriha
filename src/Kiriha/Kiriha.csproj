@@ -9,6 +9,8 @@
     <DebugType>portable</DebugType>
     <!-- ネイティブAOT -->
     <PublishAot>true</PublishAot>
+    <!-- WinRT (共有シート) のジェネリック境界 (IIterable<IStorageItem> 等) を AOT 安全にマーシャリングするための CsWinRT 生成を有効化 -->
+    <CsWinRTAotOptimizerEnabled>true</CsWinRTAotOptimizerEnabled>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <!--
       IL3053 = "Assembly produced AOT analysis warnings"。Velopack 内部の
@@ -40,6 +42,7 @@
     <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.0" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.0" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="Microsoft.Windows.CsWinRT" Version="2.3.1" />
     <PackageReference Include="PDFtoImage" Version="5.2.1" />
     <PackageReference Include="SuperLightLogger" Version="1.0.9" />
     <PackageReference Include="VelopackUpdateDialog.Avalonia" Version="1.0.11" />
