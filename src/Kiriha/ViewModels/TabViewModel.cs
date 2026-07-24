@@ -634,14 +634,53 @@ public partial class TabViewModel : ObservableObject
 
     // ===== アイコンビューの画像・動画・PDFサムネイル =====
 
-    private CancellationTokenSource? _thumbnailCts;
+    private ThumbnailScope? _thumbnailScope;
     // 最大160論理pxを200% DPIでも等倍表示できる解像度。画質と一覧のメモリ使用量を両立する。
     private const int ThumbnailPixelSize = 320;
-    private readonly SemaphoreSlim _thumbnailGate = new(4, 4);
-    private readonly ConcurrentDictionary<string, byte> _loadingThumbnails = new(StringComparer.OrdinalIgnoreCase);
+    // 1段目に出す低解像度。Exif 埋め込みサムネイルや Windows のサムネイルキャッシュがそのまま返る大きさ。
+    private const int ThumbnailPreviewPixelSize = 96;
     private const int WindowsIconPixelSize = 256;
     private readonly SemaphoreSlim _windowsIconGate = new(4, 4);
     private readonly ConcurrentDictionary<string, byte> _loadingWindowsIcons = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>サムネイル読み込みの世代。フォルダー移動のたびに作り直して旧フォルダー分を打ち切る。
+    /// 同時実行枠と読み込み中セットも世代ごとに分けることで、応答の遅い項目（クラウド同期フォルダー等）が
+    /// 移動先フォルダーの読み込みを塞がないようにする。</summary>
+    private sealed class ThumbnailScope
+    {
+        private readonly CancellationTokenSource _cts;
+
+        public ThumbnailScope(CancellationToken lifetime)
+            => _cts = CancellationTokenSource.CreateLinkedTokenSource(lifetime);
+
+        public CancellationToken Token => _cts.Token;
+
+        public SemaphoreSlim Gate { get; } = new(4, 4);
+
+        public ConcurrentDictionary<string, byte> Loading { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>この世代を打ち切る。linked CTS は _lifetimeCts へコールバック登録が残るため必ず破棄し、
+        /// Gate は実行中のタスクが Release するので破棄せず GC に任せる。</summary>
+        public void Cancel()
+        {
+            _cts.Cancel();
+            _cts.Dispose();
+        }
+    }
+
+    /// <summary>サムネイル読み込みを新しい世代へ切り替える（旧世代は即座に打ち切る）。</summary>
+    private void ResetThumbnailScope()
+    {
+        var previous = _thumbnailScope;
+        _thumbnailScope = new ThumbnailScope(_lifetimeCts.Token);
+        previous?.Cancel();
+    }
+
+    private void CancelThumbnailScope()
+    {
+        _thumbnailScope?.Cancel();
+        _thumbnailScope = null;
+    }
 
     partial void OnViewModeChanged(ViewMode value)
     {
@@ -656,14 +695,11 @@ public partial class TabViewModel : ObservableObject
 
         if (IsIconsView)
         {
-            // linked CTS は _lifetimeCts へコールバック登録が残るため、置き換え時に必ず破棄する
-            _thumbnailCts?.Cancel();
-            _thumbnailCts?.Dispose();
-            _thumbnailCts = CancellationTokenSource.CreateLinkedTokenSource(_lifetimeCts.Token);
+            ResetThumbnailScope();
         }
         else
         {
-            _thumbnailCts?.Cancel();
+            CancelThumbnailScope();
         }
 
         HandleGalleryTransition();
@@ -720,62 +756,113 @@ public partial class TabViewModel : ObservableObject
         var useShellThumbnail = VideoThumbnailExtensions.Contains(extension)
             || RawThumbnailExtensions.Contains(extension)
             || ShellImageThumbnailExtensions.Contains(extension);
-        if (!IsIconsView || _isDetached || entry.IsDirectory || entry.Thumbnail is not null
+        if (!IsIconsView || _isDetached || entry.IsDirectory || entry.IsThumbnailFinal
             || (!isImage && !isPdf && !useShellThumbnail)
             || (isImage && entry.Size is null or > 32 * 1024 * 1024)
-            || !_loadingThumbnails.TryAdd(entry.FullPath, 0))
+            || _thumbnailScope is not { } scope
+            || !scope.Loading.TryAdd(entry.FullPath, 0))
         {
             return;
         }
 
-        var token = _thumbnailCts?.Token ?? _lifetimeCts.Token;
+        var token = scope.Token;
         try
         {
-            await _thumbnailGate.WaitAsync(token);
-            try
+            // 1段目: ファイルが持つ低解像度サムネイル（Exif 埋め込み / Windows のサムネイルキャッシュ）。
+            // 2段目よりずっと速く返るので、まず絵を出して体感速度を上げる。
+            // PDF は Shell からサムネイルを取れないため飛ばす。
+            if (!isPdf && entry.Thumbnail is null)
             {
-                var bmp = await Task.Run(() =>
-                {
-                    token.ThrowIfCancellationRequested();
-                    if (isPdf)
-                    {
-                        return PdfThumbnailService.TryGetThumbnail(entry.FullPath, ThumbnailPixelSize);
-                    }
-
-                    if (useShellThumbnail)
-                    {
-                        return ShellThumbnailService.TryGetThumbnail(entry.FullPath, ThumbnailPixelSize);
-                    }
-
-                    using var stream = File.OpenRead(entry.FullPath);
-                    return Bitmap.DecodeToWidth(stream, ThumbnailPixelSize);
-                }, token);
-                // アイコンと同様、リフレッシュで entry が置き換わっていたら同一パスの現行 entry へ引き渡す
-                var target = bmp is null || token.IsCancellationRequested || !IsIconsView
-                    ? null
-                    : _entryByPath.GetValueOrDefault(entry.FullPath);
-                if (bmp is not null && target is { Thumbnail: null })
-                {
-                    target.Thumbnail = bmp;
-                }
-                else
-                {
-                    bmp?.Dispose();
-                }
+                var preview = await LoadThumbnailAsync(
+                    scope,
+                    token,
+                    () => ShellThumbnailService.TryGetThumbnail(entry.FullPath, ThumbnailPreviewPixelSize))
+                    .ConfigureAwait(false);
+                PostThumbnail(entry, preview, token, isFinal: false);
             }
-            finally
+
+            // 2段目: 表示解像度。同時実行枠を握り直すため、画面内の各項目へ1段目が行き渡ってから走る。
+            var full = await LoadThumbnailAsync(scope, token, () =>
             {
-                _thumbnailGate.Release();
-            }
+                if (isPdf)
+                {
+                    return PdfThumbnailService.TryGetThumbnail(entry.FullPath, ThumbnailPixelSize);
+                }
+
+                if (useShellThumbnail)
+                {
+                    return ShellThumbnailService.TryGetThumbnail(entry.FullPath, ThumbnailPixelSize);
+                }
+
+                using var stream = File.OpenRead(entry.FullPath);
+                return Bitmap.DecodeToWidth(stream, ThumbnailPixelSize);
+            }).ConfigureAwait(false);
+            PostThumbnail(entry, full, token, isFinal: true);
         }
         catch (OperationCanceledException) { }
+        // 世代交代で linked CTS を破棄した直後に待機へ入った場合。打ち切りと同じ扱いにする。
+        catch (ObjectDisposedException) { }
         catch (Exception ex)
         {
             Logger.LogException($"サムネイルを読み込めませんでした: {entry.FullPath}", ex);
         }
         finally
         {
-            _loadingThumbnails.TryRemove(entry.FullPath, out _);
+            scope.Loading.TryRemove(entry.FullPath, out _);
+        }
+    }
+
+    /// <summary>同時実行枠を確保してサムネイル生成を1段だけ実行する。
+    /// 枠は段ごとに解放し、高解像度読み込みが他項目の低解像度読み込みを追い越さないようにする。</summary>
+    private static async Task<Bitmap?> LoadThumbnailAsync(
+        ThumbnailScope scope,
+        CancellationToken token,
+        Func<Bitmap?> load)
+    {
+        await scope.Gate.WaitAsync(token).ConfigureAwait(false);
+        try
+        {
+            return await Task.Run(() =>
+            {
+                token.ThrowIfCancellationRequested();
+                return load();
+            }, token).ConfigureAwait(false);
+        }
+        finally
+        {
+            scope.Gate.Release();
+        }
+    }
+
+    /// <summary>読み込み済みサムネイルを UI スレッドへ渡す。読み込み自体は ConfigureAwait(false) で
+    /// UI スレッドを経由させず、反映だけを入力より低い優先度で流すことで、画像が大量にあるフォルダーでも
+    /// ダブルクリックやスクロールがサムネイル処理に待たされないようにする。</summary>
+    private void PostThumbnail(FileSystemEntry entry, Bitmap? bitmap, CancellationToken token, bool isFinal)
+        => Dispatcher.UIThread.Post(
+            () => PublishThumbnail(entry, bitmap, token, isFinal),
+            DispatcherPriority.Background);
+
+    /// <summary>読み込んだサムネイルを現行 entry へ渡す。アイコンと同様、リフレッシュで entry が
+    /// 置き換わっていたら同一パスの現行 entry を探して引き渡す。</summary>
+    private void PublishThumbnail(FileSystemEntry entry, Bitmap? bitmap, CancellationToken token, bool isFinal)
+    {
+        var target = token.IsCancellationRequested || !IsIconsView
+            ? null
+            : _entryByPath.GetValueOrDefault(entry.FullPath);
+        if (target is null || target.IsThumbnailFinal)
+        {
+            bitmap?.Dispose();
+            return;
+        }
+
+        if (bitmap is not null)
+        {
+            target.SetThumbnail(bitmap, isFinal);
+        }
+        else if (isFinal)
+        {
+            // 高解像度が得られなかった項目は、スクロールのたびに再試行しないよう完了扱いにする。
+            target.MarkThumbnailFinal();
         }
     }
 
@@ -928,29 +1015,19 @@ public partial class TabViewModel : ObservableObject
         var token = _lifetimeCts.Token;
         try
         {
-            await _windowsIconGate.WaitAsync(token);
+            await _windowsIconGate.WaitAsync(token).ConfigureAwait(false);
             try
             {
                 var bitmap = await Task.Run(() =>
                 {
                     token.ThrowIfCancellationRequested();
                     return ShellThumbnailService.TryGetIcon(entry.FullPath, WindowsIconPixelSize);
-                }, token);
+                }, token).ConfigureAwait(false);
 
-                // 一覧のリフレッシュで entry インスタンスが置き換わっていた場合、旧 entry ごと捨てると
-                // 新 entry 側の読み込みは _loadingWindowsIcons の重複ガードで弾かれた後なので誰もアイコンを
-                // 持てなくなる。同一パスの現行 entry を探して引き渡す。
-                var target = bitmap is null || token.IsCancellationRequested || _options.IconSet != FileIconSet.Windows
-                    ? null
-                    : _entryByPath.GetValueOrDefault(entry.FullPath);
-                if (bitmap is not null && target is { WindowsIcon: null })
-                {
-                    target.WindowsIcon = bitmap;
-                }
-                else
-                {
-                    bitmap?.Dispose();
-                }
+                // 反映だけを UI スレッドへ、入力より低い優先度で流す（サムネイルと同じ理由）。
+                Dispatcher.UIThread.Post(
+                    () => PublishWindowsIcon(entry, bitmap, token),
+                    DispatcherPriority.Background);
             }
             finally
             {
@@ -965,6 +1042,25 @@ public partial class TabViewModel : ObservableObject
         finally
         {
             _loadingWindowsIcons.TryRemove(entry.FullPath, out _);
+        }
+    }
+
+    /// <summary>取得した Windows 標準アイコンを現行 entry へ渡す（UI スレッド）。
+    /// 一覧のリフレッシュで entry インスタンスが置き換わっていた場合、旧 entry ごと捨てると
+    /// 新 entry 側の読み込みは _loadingWindowsIcons の重複ガードで弾かれた後なので誰もアイコンを
+    /// 持てなくなる。同一パスの現行 entry を探して引き渡す。</summary>
+    private void PublishWindowsIcon(FileSystemEntry entry, Bitmap? bitmap, CancellationToken token)
+    {
+        var target = bitmap is null || token.IsCancellationRequested || _options.IconSet != FileIconSet.Windows
+            ? null
+            : _entryByPath.GetValueOrDefault(entry.FullPath);
+        if (bitmap is not null && target is { WindowsIcon: null })
+        {
+            target.WindowsIcon = bitmap;
+        }
+        else
+        {
+            bitmap?.Dispose();
         }
     }
 
@@ -1045,9 +1141,7 @@ public partial class TabViewModel : ObservableObject
         _filterDebounceCts?.Dispose();
         _searchCts?.Cancel();
         _searchCts?.Dispose();
-        _thumbnailCts?.Cancel();
-        _thumbnailCts?.Dispose();
-        _thumbnailCts = null;
+        CancelThumbnailScope();
         foreach (var column in DetailColumns) column.Detach();
         DisposeEntryImages(_allEntries);
         ClearPreview();
@@ -1243,8 +1337,17 @@ public partial class TabViewModel : ObservableObject
                 string.Equals(e.FullPath, preserveSelection, StringComparison.OrdinalIgnoreCase));
         }
 
-        if (IsIconsView && _thumbnailCts is null)
-            _thumbnailCts = CancellationTokenSource.CreateLinkedTokenSource(_lifetimeCts.Token);
+        // 移動したら前フォルダーのサムネイル読み込みはその場で打ち切る。クラウド同期フォルダー
+        // （Google ドライブ等）は1件に数秒かかることがあり、打ち切らないと移動先のサムネイルが
+        // 旧フォルダーの待ち行列の後ろに並んでいつまでも表示されない。
+        if (IsIconsView)
+        {
+            ResetThumbnailScope();
+        }
+        else
+        {
+            CancelThumbnailScope();
+        }
 
         // ギャラリー表示（フォルダー別ビュー記憶で復元された場合を含む）は常に 1 枚を表示する
         if (IsGalleryView && SelectedEntry is null)

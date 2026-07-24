@@ -48,11 +48,31 @@ public partial class FileSystemEntry : ObservableObject
 
     public bool HasNoThumbnail => Thumbnail is null;
 
+    /// <summary>表示解像度のサムネイルまで読み込み済みか。false の間は未読み込みか、
+    /// ファイル内蔵の低解像度サムネイルを先読み表示している状態。</summary>
+    public bool IsThumbnailFinal { get; private set; }
+
+    /// <summary>サムネイルを差し替える（低画質→高画質の2段階表示）。旧ビットマップは解放する。</summary>
+    public void SetThumbnail(Avalonia.Media.Imaging.Bitmap bitmap, bool isFinal)
+    {
+        var previous = Thumbnail;
+        Thumbnail = bitmap;
+        IsThumbnailFinal = isFinal;
+        if (!ReferenceEquals(previous, bitmap))
+        {
+            previous?.Dispose();
+        }
+    }
+
+    /// <summary>高解像度サムネイルが得られなかった項目を完了扱いにして、スクロールのたびの再試行を止める。</summary>
+    public void MarkThumbnailFinal() => IsThumbnailFinal = true;
+
     /// <summary>この項目が所有するサムネイルを解放する。</summary>
     public void DisposeThumbnail()
     {
         Thumbnail?.Dispose();
         Thumbnail = null;
+        IsThumbnailFinal = false;
     }
 
     /// <summary>Material Icon Theme のアイコンキー（拡張子/ファイル名/フォルダー名から解決済み）。</summary>

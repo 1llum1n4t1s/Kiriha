@@ -940,7 +940,10 @@
                                     <Grid IsVisible="{Binding IsGalleryView}" RowDefinitions="*,Auto,Auto" Background="#FF121212">
                                         <!-- メイン画像。クリックでフォーカスを受け（Del / F2 等が効く）、
                                              右クリックで通常のファイルと同じ Windows シェルメニューを出す。 -->
+                                        <!-- Background を敷かないと画像の外（レターボックス）がヒットテスト対象外になり、
+                                             背景上ではホイール送り・クリック・右クリックが効かなくなる -->
                                         <Panel x:Name="GalleryImageArea" Grid.Row="0" Margin="18,18,18,6"
+                                               Background="Transparent"
                                                Focusable="True"
                                                PointerPressed="GalleryImage_PointerPressed"
                                                PointerReleased="GalleryImage_PointerReleased"
@@ -1086,10 +1089,14 @@
                                     <TextBlock Text="{Binding FreeSpaceText}" FontSize="11.5"
                                                Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" />
                                     <!-- Finder 風のアイコンサイズスライダー（アイコン表示時のみ） -->
-                                    <Slider Width="110" Minimum="24" Maximum="160"
+                                    <!-- Focusable=False: フォーカスが入ると左右キーが IconSize を動かし、
+                                         しきい値をまたいでギャラリー表示が切り替わってしまうため。
+                                         上下中央への配置は statuszoom クラス（MainWindowStyles.axaml）で行う。 -->
+                                    <Slider Classes="statuszoom" Width="110" Minimum="24" Maximum="160"
                                             Value="{Binding IconSize}"
                                             IsVisible="{Binding IsIconsView}"
-                                            VerticalAlignment="Center" Margin="0,-8"
+                                            Focusable="False"
+                                            VerticalAlignment="Center"
                                             ToolTip.Tip="アイコンのサイズ" />
                                     <!-- エクスプローラー右下と同じ表示切替ボタン -->
                                     <Button Classes="cmd cmdicon" Width="26" Height="22" FontSize="12"

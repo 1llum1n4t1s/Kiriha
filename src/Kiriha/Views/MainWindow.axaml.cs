@@ -503,7 +503,9 @@ public partial class MainWindow : Window
             && e.Source is Visual gallerySource
             && ViewModel?.SelectedTab is { IsSettingsTab: false, IsGalleryView: true } galleryTab)
         {
-            var strip = gallerySource.GetVisualAncestors().OfType<ListBox>()
+            // 画像やサムネイルの「外側」（レターボックス等の余白）にカーソルがあるときは
+            // e.Source がその入れ物自身になるため、祖先だけでなく自分自身も判定に含める。
+            var strip = gallerySource.GetSelfAndVisualAncestors().OfType<ListBox>()
                 .FirstOrDefault(l => l.Classes.Contains("gallerystrip"));
             if (strip is not null)
             {
@@ -515,7 +517,7 @@ public partial class MainWindow : Window
                     return;
                 }
             }
-            else if (gallerySource.GetVisualAncestors().OfType<Panel>()
+            else if (gallerySource.GetSelfAndVisualAncestors().OfType<Panel>()
                      .Any(p => p.Name == "GalleryImageArea"))
             {
                 // ホイール上で前の画像、下で次の画像へ
@@ -3053,7 +3055,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private async void FileItem_EffectiveViewportChanged(object? sender, EffectiveViewportChangedEventArgs e)
+    private void FileItem_EffectiveViewportChanged(object? sender, EffectiveViewportChangedEventArgs e)
     {
         if (e.EffectiveViewport.Width <= 0 || e.EffectiveViewport.Height <= 0
             || sender is not Control { DataContext: FileSystemEntry entry } control
@@ -3062,12 +3064,13 @@ public partial class MainWindow : Window
             return;
         }
 
-        await Task.WhenAll(
-            tab.EnsureWindowsIconAsync(entry),
-            tab.EnsureThumbnailAsync(entry));
+        // このイベントはレイアウト中に1項目あたり何度も発火する。await すると継続が UI スレッドの
+        // キューに積み上がって入力が待たされるため、投げっぱなしにする（例外は各メソッド内で処理済み）。
+        _ = tab.EnsureWindowsIconAsync(entry);
+        _ = tab.EnsureThumbnailAsync(entry);
     }
 
-    private async void FileItem_DataContextChanged(object? sender, EventArgs e)
+    private void FileItem_DataContextChanged(object? sender, EventArgs e)
     {
         if (sender is not Control { DataContext: FileSystemEntry entry } control
             || control.FindAncestorOfType<ListBox>()?.DataContext is not TabViewModel tab)
@@ -3075,7 +3078,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        await tab.EnsureWindowsIconAsync(entry);
+        _ = tab.EnsureWindowsIconAsync(entry);
     }
 
     private void ApplyBulkSelection(ListBox? list, IEnumerable<FileSystemEntry> entries)

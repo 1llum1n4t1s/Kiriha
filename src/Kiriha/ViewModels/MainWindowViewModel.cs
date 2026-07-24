@@ -1072,7 +1072,21 @@ public partial class MainWindowViewModel : ObservableObject
         var target = Tabs.Count(t => t != tab && t.IsPinned);
         if (index != target)
         {
-            Tabs.Move(index, target);
+            MoveTabPreservingSelection(index, target);
+        }
+    }
+
+    /// <summary>ObservableCollection.Move の通知を ListBox の SelectedItem 双方向バインディングが
+    /// 正しく維持しないことがあり、並べ替えで SelectedTab が null になる。null になると
+    /// SelectedTab を参照する IsVisible バインディングが軒並み既定値（表示）へ戻り、
+    /// タブ一覧とギャラリーの Exif パネルが同時に出るなど表示が壊れるため、移動後に明示的に復元する。</summary>
+    private void MoveTabPreservingSelection(int from, int to)
+    {
+        var previousSelection = SelectedTab;
+        Tabs.Move(from, to);
+        if (!ReferenceEquals(SelectedTab, previousSelection))
+        {
+            SelectedTab = previousSelection;
         }
     }
 
@@ -1436,14 +1450,7 @@ public partial class MainWindowViewModel : ObservableObject
 
         if (from != targetIndex)
         {
-            // ObservableCollection.Move の通知を ListBox の SelectedItem 双方向バインディングが
-            // 正しく維持しないことがあり、並べ替え中に選択が外れることがあるため明示的に復元する。
-            var previousSelection = SelectedTab;
-            Tabs.Move(from, targetIndex);
-            if (!ReferenceEquals(SelectedTab, previousSelection))
-            {
-                SelectedTab = previousSelection;
-            }
+            MoveTabPreservingSelection(from, targetIndex);
 
             if (tab.IsPinned)
             {
@@ -1541,7 +1548,7 @@ public partial class MainWindowViewModel : ObservableObject
         for (var i = 0; i < target.Count; i++)
         {
             var current = Tabs.IndexOf(target[i]);
-            if (current != i) Tabs.Move(current, i);
+            if (current != i) MoveTabPreservingSelection(current, i);
         }
         SavePinned();
     }

@@ -277,6 +277,16 @@
                 </ControlTemplate>
             </Setter>
         </Style>
+        <!-- ステータスバー右下のアイコンサイズスライダー。
+             既定 Fluent テンプレートは内側 Grid#HorizontalTemplate の上端から 15.2px の位置に
+             高さ 20px の PART_Track を固定で置く（グリッドの高さを変えてもこの 15.2px は動かない）。
+             ステータスバーの内側 27.2px にそのまま収めるとつまみが下へ 5px はみ出して欠けるため、
+             グリッド自身を上へずらしてトラック中心を箱の中心 13.6px に合わせる:
+             -11.6 + 15.2 + 20/2 = 13.6。Slider 本体に負マージンを付けると箱ごと外へ出て
+             今度は上側が欠けるので、必ずテンプレート内側だけを動かす。 -->
+        <Style Selector="Slider.statuszoom:horizontal /template/ Grid#HorizontalTemplate">
+            <Setter Property="Margin" Value="0,-11.6,0,0" />
+        </Style>
         <!-- ギャラリーの終了ボタン: 普段は透明で、右上のホバーゾーンに入ったときだけフェード表示する -->
         <Style Selector="Border.galleryclosezone Button">
             <Setter Property="Opacity" Value="0" />
