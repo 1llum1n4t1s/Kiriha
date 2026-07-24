@@ -49,12 +49,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Sekisho ライセンス基盤クライアント（OTP 認証 / JWT オフライン検証）。
-         NuGet 公開までは隣接リポジトリをプロジェクト参照する（NuGet 化は Sekisho 側の残タスク） -->
-    <ProjectReference Include="..\..\..\Sekisho\libs\Sekisho.Client\Sekisho.Client.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <!-- VelopackUpdateDialog: ViewModel / DefaultStrings / DefaultIcons などが XAML compiled binding 経由でしか参照されないため、AOT trim で削られないよう root 化する -->
     <TrimmerRootAssembly Include="VelopackUpdateDialog" />
     <TrimmerRootAssembly Include="Velopack" />

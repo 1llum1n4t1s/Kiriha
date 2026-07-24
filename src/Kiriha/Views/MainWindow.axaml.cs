@@ -278,6 +278,13 @@ public partial class MainWindow : Window
             return;
         }
 
+        // ライセンスロック中はアプリ操作のショートカットを無効化する（ロック画面の入力だけ通す）
+        if (vm.IsLicenseLocked)
+        {
+            base.OnKeyDown(e);
+            return;
+        }
+
         var tab = vm.SelectedTab;
         var ctrl = e.KeyModifiers.HasFlag(KeyModifiers.Control);
         var shift = e.KeyModifiers.HasFlag(KeyModifiers.Shift);

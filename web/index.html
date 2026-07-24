@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kiriha — タブで軽やかに使える Windows ファイルマネージャー</title>
-  <meta name="description" content="Kiriha（キリハ）は Chrome のような垂直タブと Windows Explorer の使い勝手を組み合わせた、オープンソースの Windows ファイルマネージャーです。基本機能は無料、プロ機能は買い切り ¥980。標準シェルメニュー、Explorer 互換のコピー＆ペーストと DnD、フォルダーツリー、サブフォルダー検索に対応。x64 / ARM64 両対応で軽快に動作します。" />
+  <meta name="description" content="Kiriha（キリハ）は Chrome のような垂直タブと Windows Explorer の使い勝手を組み合わせた、オープンソースの Windows ファイルマネージャーです。14 日間の無料試用つき、買い切り ¥980。標準シェルメニュー、Explorer 互換のコピー＆ペーストと DnD、フォルダーツリー、サブフォルダー検索に対応。x64 / ARM64 両対応で軽快に動作します。" />
   <meta name="keywords" content="Kiriha, キリハ, ファイルマネージャー, ファイラー, Windows, タブ, Explorer, Avalonia, Native AOT, オープンソース" />
   <meta name="author" content="1llum1n4t1s" />
   <meta name="robots" content="index, follow" />
@@ -14,18 +14,18 @@
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Kiriha" />
   <meta property="og:title" content="Kiriha — タブで軽やかに使える Windows ファイルマネージャー" />
-  <meta property="og:description" content="Chrome のようなタブ操作と Windows Explorer の使い勝手をひとつに。オープンソースの Windows ファイルマネージャー。基本機能は無料。" />
+  <meta property="og:description" content="Chrome のようなタブ操作と Windows Explorer の使い勝手をひとつに。オープンソースの Windows ファイルマネージャー。14 日間無料試用・買い切り ¥980。" />
   <meta property="og:url" content="https://kiriha.nephilim.jp/" />
   <meta property="og:locale" content="ja_JP" />
   <meta property="og:locale:alternate" content="en_US" />
 
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="Kiriha — Tabbed file manager for Windows" />
-  <meta name="twitter:description" content="Chrome-like tabs meet Windows Explorer familiarity. Free and open source." />
+  <meta name="twitter:description" content="Chrome-like tabs meet Windows Explorer familiarity. 14-day free trial, ¥980 one-time purchase." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700;900&amp;display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+JP:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
   <script>document.documentElement.classList.add('js');</script>
 
   <style>
@@ -54,7 +54,7 @@
       --radius: 14px;
       --radius-lg: 22px;
       --max: 1140px;
-      --font: "Inter", "Zen Kaku Gothic New", system-ui, sans-serif;
+      --font: "IBM Plex Sans JP", system-ui, sans-serif;
     }
 
     *, *::before, *::after { box-sizing: border-box; }
@@ -92,7 +92,7 @@
       border-bottom: 1px solid var(--border-soft);
     }
     .nav-inner { display: flex; align-items: center; gap: 26px; height: 64px; }
-    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 17px; letter-spacing: .02em; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 17px; letter-spacing: .02em; }
     .brand-mark {
       width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center;
       background: linear-gradient(135deg, #ffc844, #f39a0b);
@@ -104,12 +104,12 @@
       transition: background .15s, color .15s;
     }
     .nav-links a:hover { background: #f4f4f5; color: var(--fg); }
-    .nav-cta {
+    .nav-links a.nav-cta, .nav-cta {
       margin-left: 6px; padding: 8px 18px; border-radius: 999px; font-size: 13.5px; font-weight: 600;
       color: #fff; background: var(--primary); box-shadow: 0 6px 16px rgba(0, 111, 238, .35);
       transition: transform .15s, box-shadow .15s;
     }
-    .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 10px 22px rgba(0, 111, 238, .4); }
+    .nav-links a.nav-cta:hover, .nav-cta:hover { color: #fff; background: var(--primary); transform: translateY(-1px); box-shadow: 0 10px 22px rgba(0, 111, 238, .4); }
     @media (max-width: 760px) { .nav-links a:not(.nav-cta) { display: none; } }
 
     /* ===== ヒーロー ===== */
@@ -122,7 +122,7 @@
     .chip .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
     .hero h1 {
       margin: 22px auto 0; max-width: 21em;
-      font-size: clamp(30px, 5.4vw, 54px); font-weight: 900; line-height: 1.25; letter-spacing: .01em;
+      font-size: clamp(30px, 5.4vw, 54px); font-weight: 700; line-height: 1.25; letter-spacing: .01em;
     }
     .grad {
       background: linear-gradient(91deg, #006fee 10%, #7828c8 55%, #ff4ecd 95%);
@@ -144,44 +144,19 @@
     .btn-ghost:hover { background: #fafafa; transform: translateY(-2px); }
     .hero-meta { margin-top: 16px; font-size: 12.5px; color: var(--muted-2); }
 
-    /* ===== アプリのモック（ライトテーマの Kiriha ウィンドウ） ===== */
+    /* ===== アプリの実スクリーンショット ===== */
     .mock {
-      margin: 54px auto 0; max-width: 900px; text-align: left;
+      margin: 54px auto 0; max-width: 900px;
       border-radius: var(--radius-lg); border: 1px solid var(--border);
-      background: #fbfbfc; box-shadow: var(--shadow-lg); overflow: hidden;
-      font-size: 12px; color: #3f3f46;
+      box-shadow: var(--shadow-lg); overflow: hidden; line-height: 0;
     }
-    .mock-title { display: flex; align-items: center; gap: 8px; height: 38px; padding: 0 14px; background: #f4f4f5; border-bottom: 1px solid var(--border-soft); }
-    .mock-title .dots { display: flex; gap: 6px; }
-    .mock-title .dots i { width: 10px; height: 10px; border-radius: 50%; background: #e4e4e7; }
-    .mock-title b { font-size: 12px; color: #52525b; font-weight: 600; }
-    .mock-body { display: grid; grid-template-columns: 168px 1fr; min-height: 330px; }
-    .mock-tabs { background: #f4f4f5; border-right: 1px solid var(--border-soft); padding: 10px 8px; display: flex; flex-direction: column; gap: 4px; }
-    .mock-tab { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 9px; color: #52525b; }
-    .mock-tab.active { background: #fff; box-shadow: var(--shadow-sm); color: var(--fg); font-weight: 600; }
-    .mock-tab .ic { width: 16px; text-align: center; }
-    .mock-main { display: flex; flex-direction: column; background: #fff; }
-    .mock-bar { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-bottom: 1px solid var(--border-soft); color: #71717a; }
-    .mock-crumb { display: flex; gap: 6px; align-items: center; background: #f4f4f5; border-radius: 8px; padding: 5px 11px; flex: 1; }
-    .mock-crumb span::after { content: "›"; margin-left: 6px; color: #d4d4d8; }
-    .mock-crumb span:last-child::after { content: ""; }
-    .mock-search { background: #f4f4f5; border-radius: 8px; padding: 5px 11px; color: #a1a1aa; }
-    .mock-files { flex: 1; display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; align-content: start; padding: 14px; }
-    .mock-file { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 10px 4px 8px; border-radius: 10px; text-align: center; color: #52525b; }
-    .mock-file .glyph { font-size: 26px; line-height: 1; }
-    .mock-file.sel { background: var(--primary-soft); outline: 1px solid #bcdafd; color: #0b3f80; font-weight: 600; }
-    .mock-status { display: flex; justify-content: space-between; padding: 7px 14px; border-top: 1px solid var(--border-soft); color: #a1a1aa; font-size: 11px; }
-    @media (max-width: 680px) {
-      .mock-body { grid-template-columns: 1fr; }
-      .mock-tabs { flex-direction: row; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--border-soft); }
-      .mock-files { grid-template-columns: repeat(4, 1fr); }
-    }
+    .mock img { width: 100%; height: auto; display: block; }
 
     /* ===== セクション共通 ===== */
     section { position: relative; padding: 84px 0; }
     .sec-head { text-align: center; max-width: 640px; margin: 0 auto 48px; }
     .sec-head .kicker { font-size: 12.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--primary); }
-    .sec-head h2 { margin: 10px 0 0; font-size: clamp(24px, 3.6vw, 34px); font-weight: 800; line-height: 1.35; }
+    .sec-head h2 { margin: 10px 0 0; font-size: clamp(24px, 3.6vw, 34px); font-weight: 700; line-height: 1.35; }
     .sec-head p { margin: 12px 0 0; color: var(--muted); font-size: 14.5px; }
 
     /* ===== 機能カード ===== */
@@ -225,10 +200,10 @@
       box-shadow: var(--shadow-md);
     }
     .price-card .plan { font-size: 14px; font-weight: 700; color: var(--muted); }
-    .price-card .price { margin-top: 8px; font-size: 38px; font-weight: 900; letter-spacing: .01em; }
+    .price-card .price { margin-top: 8px; font-size: 38px; font-weight: 700; letter-spacing: .01em; }
     .price-card .price small { font-size: 13px; font-weight: 600; color: var(--muted-2); margin-left: 6px; }
     .price-card ul { list-style: none; margin: 18px 0 24px; padding: 0; display: grid; gap: 10px; font-size: 13.5px; color: var(--muted); }
-    .price-card li::before { content: "✓"; font-weight: 800; color: var(--green); margin-right: 9px; }
+    .price-card li::before { content: "✓"; font-weight: 700; color: var(--green); margin-right: 9px; }
     .price-card .cta { margin-top: auto; text-align: center; }
     .badge-popular {
       position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
@@ -309,46 +284,16 @@
         </p>
         <div class="hero-ctas reveal" style="--delay: 240ms">
           <a class="btn btn-primary" href="https://kiriha.nephilim.jp/Kiriha-win-Setup.exe" download>
-            ⬇ 無料でダウンロード<small>Windows x64 · Setup.exe</small>
+            ⬇ 無料で試す<small>Windows x64 · Setup.exe</small>
           </a>
           <a class="btn btn-ghost" href="https://github.com/1llum1n4t1s/Kiriha" target="_blank" rel="noopener noreferrer">GitHub で見る ↗</a>
         </div>
-        <p class="hero-meta reveal" style="--delay: 300ms">基本機能は無料 · プロ機能は 14 日間無料試用つき ¥980 買い切り</p>
+        <p class="hero-meta reveal" style="--delay: 300ms">14 日間の無料試用 · その後は ¥980 買い切り（サブスクなし）</p>
 
-        <!-- アプリのモックアップ（ライト表示の Kiriha） -->
-        <div class="mock reveal" style="--delay: 380ms" role="img" aria-label="Kiriha のスクリーンショット風モックアップ">
-          <div class="mock-title"><span class="dots"><i></i><i></i><i></i></span><b>Kiriha — ピクチャ</b></div>
-          <div class="mock-body">
-            <div class="mock-tabs">
-              <div class="mock-tab"><span class="ic">⚙️</span>設定</div>
-              <div class="mock-tab active"><span class="ic">🖼️</span>ピクチャ</div>
-              <div class="mock-tab"><span class="ic">📁</span>dev</div>
-              <div class="mock-tab"><span class="ic">📄</span>ドキュメント</div>
-              <div class="mock-tab"><span class="ic">⬇️</span>ダウンロード</div>
-            </div>
-            <div class="mock-main">
-              <div class="mock-bar">
-                <span>←</span><span>→</span><span>↻</span>
-                <div class="mock-crumb"><span>PC</span><span>ピクチャ</span><span>2026</span></div>
-                <div class="mock-search">🔍 検索</div>
-              </div>
-              <div class="mock-files">
-                <div class="mock-file sel"><span class="glyph">🖼️</span>旅行.jpg</div>
-                <div class="mock-file sel"><span class="glyph">🖼️</span>猫.png</div>
-                <div class="mock-file"><span class="glyph">🖼️</span>空.heic</div>
-                <div class="mock-file"><span class="glyph">🎬</span>花火.mp4</div>
-                <div class="mock-file"><span class="glyph">📁</span>スクショ</div>
-                <div class="mock-file"><span class="glyph">📁</span>壁紙</div>
-                <div class="mock-file"><span class="glyph">🖼️</span>紅葉.jxl</div>
-                <div class="mock-file"><span class="glyph">📄</span>メモ.md</div>
-                <div class="mock-file"><span class="glyph">🖼️</span>海.avif</div>
-                <div class="mock-file"><span class="glyph">📦</span>素材.zip</div>
-                <div class="mock-file"><span class="glyph">📁</span>RAW</div>
-                <div class="mock-file"><span class="glyph">📑</span>台本.pdf</div>
-              </div>
-              <div class="mock-status"><span>24 個の項目 · 2 個を選択</span><span>空き領域: 1.05 TB</span></div>
-            </div>
-          </div>
+        <!-- アプリの実スクリーンショット -->
+        <div class="mock reveal" style="--delay: 380ms">
+          <img src="/hero-app.png" width="1340" height="728" loading="eager" fetchpriority="high"
+               alt="Kiriha のスクリーンショット: 垂直タブとフォルダーツリー、詳細表示のファイル一覧" />
         </div>
       </div>
     </section>
@@ -419,38 +364,36 @@
       <div class="wrap">
         <div class="sec-head">
           <span class="kicker">Pricing</span>
-          <h2 id="pricing-title">基本機能は無料。プロ機能は買い切り。</h2>
-          <p>サブスクリプションはありません。アカウント登録も不要で、メール認証だけでライセンスが有効になります。</p>
+          <h2 id="pricing-title">14 日間無料で試して、気に入ったら ¥980 買い切り。</h2>
+          <p>サブスクリプションはありません。アカウント登録も不要で、購入後に表示されるライセンスキーを貼るだけで有効になります。</p>
         </div>
         <div class="pricing">
           <div class="price-card reveal">
-            <span class="plan">Free</span>
-            <div class="price">¥0</div>
+            <span class="plan">無料試用</span>
+            <div class="price">14 日間</div>
             <ul>
-              <li>Explorer 互換のファイル操作すべて</li>
-              <li>標準シェルメニュー / 共有 / ごみ箱</li>
-              <li>詳細・一覧・アイコン表示とサムネイル</li>
-              <li>検索（絞り込み / サブフォルダー）</li>
-              <li>テーマ / アイコンセット / 自動更新</li>
+              <li>すべての機能を制限なく試用</li>
+              <li>インストール後すぐ利用開始</li>
+              <li>アカウント登録不要</li>
+              <li>クレジットカード登録も不要</li>
             </ul>
-            <div class="cta"><a class="btn btn-ghost" href="#download">無料で始める</a></div>
+            <div class="cta"><a class="btn btn-ghost" href="#download">無料で試す</a></div>
           </div>
           <div class="price-card featured reveal" style="--delay: 80ms">
-            <span class="badge-popular">14 日間 無料試用つき</span>
-            <span class="plan">Pro（買い切り）</span>
+            <span class="badge-popular">買い切り · サブスクなし</span>
+            <span class="plan">ライセンス</span>
             <div class="price">¥980<small>税込 / 一度きり</small></div>
             <ul>
-              <li>Free のすべて</li>
-              <li>複数タブ・タブの固定と復元</li>
-              <li>お気に入りバーへの追加</li>
-              <li>ギャラリーモード（写真の全画面閲覧）</li>
-              <li>今後追加されるプロ機能もそのまま</li>
+              <li>すべての機能をずっと利用</li>
+              <li>複数タブ・お気に入り・ギャラリーモード</li>
+              <li>キーを貼るだけの簡単ライセンス認証</li>
+              <li>今後のアップデートも追加料金なし</li>
             </ul>
             <div class="cta"><a class="btn btn-primary" href="#download">アプリ内から購入</a></div>
           </div>
         </div>
         <p class="price-note">
-          購入とライセンス認証はアプリ内（設定 &gt; 更新と情報 &gt; ライセンス）からメールアドレスだけで完結します。
+          購入すると決済完了ページにライセンスキーが表示され、アプリ内（設定 &gt; 更新と情報 &gt; ライセンス）に貼り付けるだけで完了します。
           決済は Stripe。<a href="/tokushoho">特定商取引法に基づく表記</a>
         </p>
       </div>
@@ -502,9 +445,8 @@
           </a>
         </div>
         <p class="price-note">
-          基本機能はすべて無料。複数タブ・お気に入り追加・ギャラリー表示などのプロ機能は
-          <b>14 日間の無料試用</b>つきで、買い切りライセンス <b>¥980（税込）</b> を
-          アプリ内（設定 &gt; 更新と情報 &gt; ライセンス）からメール認証で購入できます。
+          すべての機能を <b>14 日間無料</b>で試せます。継続利用には買い切りライセンス <b>¥980（税込）</b> が必要で、
+          購入後に表示されるライセンスキーをアプリ内（設定 &gt; 更新と情報 &gt; ライセンス）へ貼り付けるだけで有効になります。
           <a href="/tokushoho">特定商取引法に基づく表記</a>
         </p>
       </div>

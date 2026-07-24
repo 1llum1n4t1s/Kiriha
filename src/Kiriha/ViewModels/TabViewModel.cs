@@ -604,14 +604,6 @@ public partial class TabViewModel : ObservableObject
             return;
         }
 
-        // 試用期限切れの間はギャラリー表示をロックする（特大アイコンへ戻す）
-        if (IsGalleryView && LicenseService.State == LicenseState.TrialExpired)
-        {
-            StatusText = "ギャラリー表示はライセンス認証後に利用できます";
-            IconSize = 96;
-            return;
-        }
-
         _wasGalleryView = IsGalleryView;
         if (IsGalleryView)
         {

@@ -255,22 +255,12 @@
                                                            Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).LicenseStatusText}" />
                                                 <TextBlock FontSize="12" TextWrapping="Wrap"
                                                            Foreground="{DynamicResource TextSecondary}"
-                                                           Text="購入時のメールアドレスを入力すると認証コードが届きます。アカウント登録やパスワードは不要です。" />
+                                                           Text="購入すると決済完了ページにライセンスキーが表示されます。アカウント登録やパスワードは不要です。" />
                                                 <StackPanel Orientation="Horizontal" Spacing="8">
-                                                    <TextBox Width="260" PlaceholderText="購入時のメールアドレス"
-                                                             Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).LicenseEmailInput}" />
-                                                    <Button Classes="cmd" Content="認証コードを送信"
-                                                            Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SendLicenseOtpCommand}"
-                                                            IsEnabled="{Binding !$parent[Window].((vm:MainWindowViewModel)DataContext).IsLicenseBusy}"
-                                                            BorderBrush="{DynamicResource Divider}" BorderThickness="1" />
-                                                </StackPanel>
-                                                <StackPanel Orientation="Horizontal" Spacing="8"
-                                                            IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsLicenseCodeSent}">
-                                                    <TextBox Width="140" PlaceholderText="6 桁コード" MaxLength="6"
-                                                             Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).LicenseCodeInput}" />
+                                                    <TextBox Width="330" PlaceholderText="KIRIHA- で始まるライセンスキー"
+                                                             Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).LicenseKeyInput}" />
                                                     <Button Classes="cmd" Content="認証する"
-                                                            Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).VerifyLicenseOtpCommand}"
-                                                            IsEnabled="{Binding !$parent[Window].((vm:MainWindowViewModel)DataContext).IsLicenseBusy}"
+                                                            Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ActivateLicenseCommand}"
                                                             BorderBrush="{DynamicResource Divider}" BorderThickness="1" />
                                                 </StackPanel>
                                                 <TextBlock FontSize="12" TextWrapping="Wrap"
@@ -279,7 +269,6 @@
                                                            Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).LicenseMessage}" />
                                                 <Button Classes="cmd" Content="購入ページを開く（¥980 買い切り）"
                                                         Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OpenLicensePurchasePageCommand}"
-                                                        IsEnabled="{Binding !$parent[Window].((vm:MainWindowViewModel)DataContext).IsLicenseBusy}"
                                                         HorizontalAlignment="Left"
                                                         BorderBrush="{DynamicResource Divider}" BorderThickness="1" />
                                             </StackPanel>

@@ -1086,5 +1086,55 @@
                        MaxWidth="520" TextTrimming="CharacterEllipsis" />
         </StackPanel>
     </Border>
+
+    <!-- 試用期間終了ロック: 認証が完了するまで半透明の暗幕で操作をブロックするモーダル（買い切り一律の建付け）。 -->
+    <Border ZIndex="1000" IsVisible="{Binding IsLicenseLocked}"
+            Background="#A6000000">
+        <Border MaxWidth="520" HorizontalAlignment="Center" VerticalAlignment="Center"
+                Padding="32,28" CornerRadius="16"
+                Background="{DynamicResource TabStripBg}"
+                BorderBrush="{DynamicResource Divider}" BorderThickness="1"
+                BoxShadow="0 12 40 0 #55000000">
+            <StackPanel Spacing="14">
+                <StackPanel Orientation="Horizontal" Spacing="14">
+                    <Image Width="44" Height="44" Source="avares://Kiriha/icon/app_icon.png"
+                           RenderOptions.BitmapInterpolationMode="HighQuality" VerticalAlignment="Center" />
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="{Binding LicenseLockTitle}" FontSize="17" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimary}" />
+                        <TextBlock Text="{Binding LicenseLockDescription}"
+                                   Margin="0,4,0,0" FontSize="12.5" TextWrapping="Wrap"
+                                   Foreground="{DynamicResource TextSecondary}" />
+                    </StackPanel>
+                </StackPanel>
+                <TextBlock FontSize="12" TextWrapping="Wrap"
+                           Foreground="{DynamicResource TextSecondary}"
+                           Text="購入すると決済完了ページにライセンスキーが表示されます。アカウント登録やパスワードは不要です。" />
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBox Width="330" PlaceholderText="KIRIHA- で始まるライセンスキー"
+                             Text="{Binding LicenseKeyInput}" />
+                    <Button Classes="cmd" Content="認証する"
+                            Command="{Binding ActivateLicenseCommand}"
+                            BorderBrush="{DynamicResource Divider}" BorderThickness="1" />
+                </StackPanel>
+                <Button Classes="cmd" Content="オンラインで再確認する"
+                        IsVisible="{Binding IsOnlineCheckRequired}"
+                        Command="{Binding RecheckLicenseCommand}"
+                        HorizontalAlignment="Left"
+                        BorderBrush="{DynamicResource Divider}" BorderThickness="1" />
+                <TextBlock FontSize="12" TextWrapping="Wrap"
+                           Foreground="{DynamicResource TextSecondary}"
+                           IsVisible="{Binding LicenseMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                           Text="{Binding LicenseMessage}" />
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <Button Grid.Column="0" Classes="cmd" Content="購入ページを開く（¥980 買い切り）"
+                            Command="{Binding OpenLicensePurchasePageCommand}"
+                            BorderBrush="{DynamicResource Divider}" BorderThickness="1" />
+                    <Button Grid.Column="2" Classes="cmd" Content="終了する" Click="Close_Click"
+                            BorderBrush="{DynamicResource Divider}" BorderThickness="1" />
+                </Grid>
+            </StackPanel>
+        </Border>
+    </Border>
     </Panel>
 </Window>

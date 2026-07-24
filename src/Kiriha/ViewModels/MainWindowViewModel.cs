@@ -792,144 +792,101 @@ public partial class MainWindowViewModel : ObservableObject
             SelectedTab = lastSelectedCandidate;
         }
 
-        // 試用期間が終了している場合は、起動時に設定タブ（ライセンス欄）で購入・認証を案内する
-        if (LicenseService.State == LicenseState.TrialExpired)
-        {
-            LicenseMessage = "試用期間が終了しました。ご購入のうえ、メールアドレスでライセンス認証をお願いします。";
-            OpenSettings();
-        }
     }
 
-    // ===== ライセンス（Sekisho: メール OTP + 買い切り） =====
+    // ===== ライセンス（署名付きキー + 買い切り） =====
 
     [ObservableProperty]
-    private string _licenseEmailInput = "";
-
-    [ObservableProperty]
-    private string _licenseCodeInput = "";
+    private string _licenseKeyInput = "";
 
     /// <summary>ライセンス欄に表示する案内・エラーメッセージ。</summary>
     [ObservableProperty]
     private string _licenseMessage = "";
 
-    [ObservableProperty]
-    private bool _isLicenseBusy;
-
-    /// <summary>OTP 送信済みでコード入力待ちの状態。</summary>
-    [ObservableProperty]
-    private bool _isLicenseCodeSent;
-
     public string LicenseStatusText => LicenseService.State switch
     {
         LicenseState.Licensed => $"ライセンス認証済み: {LicenseService.Email}",
         LicenseState.Trial => $"試用期間中（残り {LicenseService.TrialDaysLeft} 日）",
-        _ => "試用期間終了（主要機能はライセンス認証後に利用できます）",
+        LicenseState.OnlineCheckRequired => "ライセンスのオンライン確認が必要です（インターネットに接続してください）",
+        _ => "試用期間終了（ライセンス認証が必要です）",
     };
 
-    private void OnLicenseStateChanged() => OnPropertyChanged(nameof(LicenseStatusText));
+    /// <summary>ロック画面に出す見出し（状態により文言を変える）。</summary>
+    public string LicenseLockTitle => LicenseService.State == LicenseState.OnlineCheckRequired
+        ? "ライセンスのオンライン確認が必要です"
+        : "試用期間が終了しました";
 
-    /// <summary>試用期限切れ時の機能ゲート。ロック中は設定タブを開いて案内し false を返す。</summary>
-    private bool EnsureLicensedFeature(string feature)
+    public string LicenseLockDescription => LicenseService.State == LicenseState.OnlineCheckRequired
+        ? "30 日以上オンライン確認ができていません。インターネットに接続して「再確認」を押してください。"
+        : "Kiriha のご利用にはライセンス認証（¥980 買い切り）が必要です。";
+
+    /// <summary>オンライン再確認ボタンの表示（猶予超過ロック時のみ）。</summary>
+    public bool IsOnlineCheckRequired => LicenseService.State == LicenseState.OnlineCheckRequired;
+
+    /// <summary>試用期限切れ・猶予超過による全画面ロック（認証 / 再確認で即解除）。</summary>
+    public bool IsLicenseLocked
+        => LicenseService.State is LicenseState.TrialExpired or LicenseState.OnlineCheckRequired;
+
+    private void OnLicenseStateChanged()
     {
-        if (LicenseService.State != LicenseState.TrialExpired)
-        {
-            return true;
-        }
-
-        // 最初の 1 タブは常に許可する（アプリとして起動不能にはしない）
-        if (feature == "複数タブ" && !Tabs.Any(t => !t.IsSettingsTab))
-        {
-            return true;
-        }
-
-        LicenseMessage = $"試用期間が終了しています。「{feature}」はライセンス認証後に利用できます。";
-        OpenSettings();
-        return false;
+        OnPropertyChanged(nameof(LicenseStatusText));
+        OnPropertyChanged(nameof(LicenseLockTitle));
+        OnPropertyChanged(nameof(LicenseLockDescription));
+        OnPropertyChanged(nameof(IsOnlineCheckRequired));
+        OnPropertyChanged(nameof(IsLicenseLocked));
     }
 
+    /// <summary>入力されたライセンスキーを検証して有効化する（オフラインで完結）。</summary>
     [RelayCommand]
-    private async Task SendLicenseOtpAsync()
+    private void ActivateLicense()
     {
-        var email = LicenseEmailInput.Trim();
-        if (!email.Contains('@'))
+        if (LicenseKeyInput.Trim().Length == 0)
         {
-            LicenseMessage = "メールアドレスを入力してください。";
+            LicenseMessage = "購入時に発行されたライセンスキーを入力してください。";
             return;
         }
 
-        IsLicenseBusy = true;
-        try
+        if (LicenseService.ActivateKey(LicenseKeyInput))
         {
-            await LicenseService.RequestOtpAsync(email);
-            IsLicenseCodeSent = true;
-            LicenseMessage = "認証コードを送信しました。メールに届いた 6 桁のコードを入力してください。";
+            LicenseKeyInput = "";
+            LicenseMessage = "ライセンス認証が完了しました 🎉 ありがとうございます！";
         }
-        catch (Exception ex)
+        else
         {
-            Logger.LogException("認証コードの送信に失敗しました", ex);
-            LicenseMessage = "認証コードを送信できませんでした。時間をおいてもう一度お試しください。";
+            LicenseMessage = "ライセンスキーが正しくありません。コピーの際に欠けや余分な空白がないかご確認ください。";
         }
-        finally
+
+        OnLicenseStateChanged();
+    }
+
+    /// <summary>オフライン猶予超過時のオンライン再確認。</summary>
+    [RelayCommand]
+    private async Task RecheckLicenseAsync()
+    {
+        LicenseMessage = "オンラインで確認しています…";
+        var ok = await LicenseService.CheckRevocationAsync();
+        LicenseMessage = LicenseService.State switch
         {
-            IsLicenseBusy = false;
-        }
+            LicenseState.Licensed => "確認が完了しました。ご利用ありがとうございます！",
+            _ when !ok => "ライセンスが無効になっています（返金済み等）。再度ご購入ください。",
+            _ => "サーバーに接続できませんでした。ネットワーク接続を確認してもう一度お試しください。",
+        };
+        OnLicenseStateChanged();
     }
 
     [RelayCommand]
-    private async Task VerifyLicenseOtpAsync()
+    private void OpenLicensePurchasePage()
     {
-        if (LicenseCodeInput.Trim().Length == 0)
-        {
-            LicenseMessage = "メールに届いた認証コードを入力してください。";
-            return;
-        }
-
-        IsLicenseBusy = true;
         try
         {
-            var licensed = await LicenseService.VerifyOtpAsync(LicenseEmailInput, LicenseCodeInput);
-            LicenseCodeInput = "";
-            IsLicenseCodeSent = false;
-            LicenseMessage = licensed
-                ? "ライセンス認証が完了しました 🎉 ありがとうございます！"
-                : "サインインしましたが、このメールアドレスでの購入が確認できませんでした。「購入ページを開く」からご購入いただけます。";
-            OnPropertyChanged(nameof(LicenseStatusText));
-        }
-        catch (Exception ex)
-        {
-            Logger.LogException("ライセンス認証に失敗しました", ex);
-            LicenseMessage = "認証コードが正しくないか、有効期限が切れています。";
-        }
-        finally
-        {
-            IsLicenseBusy = false;
-        }
-    }
-
-    [RelayCommand]
-    private async Task OpenLicensePurchasePageAsync()
-    {
-        IsLicenseBusy = true;
-        try
-        {
-            var url = await LicenseService.CreateCheckoutUrlAsync();
-            if (url is null)
-            {
-                LicenseMessage = "先に上のメール認証（サインイン）を済ませると、購入ページを開けます。";
-                return;
-            }
-
-            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(url) { UseShellExecute = true })?.Dispose();
-            LicenseMessage = "ブラウザーで購入ページを開きました。購入後、もう一度メール認証すると反映されます。";
+            System.Diagnostics.Process.Start(
+                new System.Diagnostics.ProcessStartInfo(LicenseService.PurchaseUrl) { UseShellExecute = true })?.Dispose();
+            LicenseMessage = "ブラウザーで購入ページを開きました。決済完了ページに表示されるライセンスキーを上の欄に貼り付けてください。";
         }
         catch (Exception ex)
         {
             Logger.LogException("購入ページを開けませんでした", ex);
             LicenseMessage = "購入ページを開けませんでした。時間をおいてもう一度お試しください。";
-        }
-        finally
-        {
-            IsLicenseBusy = false;
         }
     }
 
@@ -942,11 +899,6 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private void NewTab()
     {
-        if (!EnsureLicensedFeature("複数タブ"))
-        {
-            return;
-        }
-
         var tab = AddTab(NewTabPath, pinned: false);
         SelectedTab = tab;
     }
@@ -1173,11 +1125,6 @@ public partial class MainWindowViewModel : ObservableObject
     /// <summary>お気に入りバーへ追加（parent が null ならルート）。</summary>
     public void AddBookmark(string path, BookmarkNode? parent = null)
     {
-        if (!EnsureLicensedFeature("お気に入りの追加"))
-        {
-            return;
-        }
-
         var name = path == FileSystemService.ComputerPath
             ? "PC"
             : Path.GetFileName(path.TrimEnd(Path.DirectorySeparatorChar)) is { Length: > 0 } n ? n : path;
@@ -1343,11 +1290,6 @@ public partial class MainWindowViewModel : ObservableObject
     /// <summary>指定パスを新しいタブで開く（サイドバー / お気に入りの中クリックなど）。</summary>
     public void OpenInNewTab(string path)
     {
-        if (!EnsureLicensedFeature("複数タブ"))
-        {
-            return;
-        }
-
         var tab = AddTab(path, pinned: false);
         SelectedTab = tab;
     }

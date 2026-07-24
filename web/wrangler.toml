@@ -12,9 +12,24 @@ custom_domain = true
 binding = "UPDATES"
 bucket_name = "kiriha-updates"
 
+# ライセンス失効リスト（返金された購入 ID を登録。/license/check が参照）
+[[kv_namespaces]]
+binding = "REVOKED"
+id = "f1caf52a477a42a5a80f0a0982b0d387"
+
+[vars]
+# Stripe Payment Link（/buy のリダイレクト先）
+PAYMENT_LINK_URL = "https://buy.stripe.com/8x25kF3yt29Zcul6B65kk00"
+
 [[rules]]
 type = "Text"
 globs = ["**/*.html"]
+fallthrough = true
+
+# ヒーロー画像等のバイナリ資産を Worker バンドルへ同梱する
+[[rules]]
+type = "Data"
+globs = ["**/*.png"]
 fallthrough = false
 
 # 配信障害（R2 不調等）を事後調査できるよう Workers Logs を有効化する
