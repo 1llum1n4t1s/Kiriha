@@ -7,10 +7,14 @@
     <PlatformTarget Condition="'$(PlatformTarget)' == ''">x64</PlatformTarget>
     <Platforms>x64;ARM64</Platforms>
     <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
-    <Version>1.0.29</Version>
+    <Version>1.0.30</Version>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <!-- 依存解決の再現性と改ざん検知のため packages.lock.json を使う（更新は dotnet restore が自動で行う） -->
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <!-- restore 時に両 RID 分のセクションを lock file へ書かせる。publish する RID（csproj の
+         RuntimeIdentifier、既定 win-x64 / CLI で win-arm64）だけを restore すると、リリースのたびに
+         x64 と arm64 のセクションが入れ替わって lock file が毎回 dirty になるため。 -->
+    <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
     <AssemblyTitle>Kiriha</AssemblyTitle>
     <AssemblyDescription>Chrome ライクなタブ型ファイラー</AssemblyDescription>
     <AssemblyCompany>1llum1n4t1s</AssemblyCompany>

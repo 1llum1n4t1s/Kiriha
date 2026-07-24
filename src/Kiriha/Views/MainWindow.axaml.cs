@@ -1949,8 +1949,18 @@ public partial class MainWindow : Window
         }
 
         var ctrl = e.KeyModifiers.HasFlag(KeyModifiers.Control);
+        var alt = e.KeyModifiers.HasFlag(KeyModifiers.Alt);
         switch (e.Key)
         {
+            // 左右キーでの画像送り。フォーカスがストリップにあるときは ListBox 標準のキーナビが
+            // 担うが、メイン画像をクリックしてこちらにフォーカスが来ると届かなくなるため補う。
+            // Alt+← / Alt+→ は履歴の戻る / 進むなので、ここでは消費せず Window.OnKeyDown へ通す。
+            case Key.Left when !alt:
+                tab.MoveGallerySelection(-1);
+                break;
+            case Key.Right when !alt:
+                tab.MoveGallerySelection(1);
+                break;
             case Key.Delete when e.KeyModifiers.HasFlag(KeyModifiers.Shift):
                 if (tab.DeletePermanentCommand.CanExecute(null)) tab.DeletePermanentCommand.Execute(null);
                 break;
