@@ -219,6 +219,88 @@ public partial class TabViewModel : ObservableObject
         {
             UpdatePreview();
         }
+
+        if (IsGalleryView)
+        {
+            UpdateGalleryMetadata();
+        }
+    }
+
+    /// <summary>ギャラリー表示の左側に出す、選択中画像のメタ情報（Exif 等）。</summary>
+    public ObservableCollection<GalleryMetadataItem> GalleryMetadata { get; } = new();
+
+    /// <summary>ギャラリー表示中で、選択中画像のメタ情報が 1 件も取れなかったとき true（「情報なし」表示用）。</summary>
+    [ObservableProperty]
+    private bool _galleryMetadataEmpty;
+
+    private CancellationTokenSource? _metadataCts;
+
+    /// <summary>選択中画像のメタ情報を読み直してパネルへ反映する（ギャラリー表示時のみ）。</summary>
+    private async void UpdateGalleryMetadata()
+    {
+        _metadataCts?.Cancel();
+        var cts = new CancellationTokenSource();
+        _metadataCts = cts;
+
+        GalleryMetadata.Clear();
+        GalleryMetadataEmpty = false;
+
+        var entry = SelectedEntry;
+        if (!IsGalleryView || entry is null || entry.IsDirectory)
+        {
+            return;
+        }
+
+        var path = entry.FullPath;
+        List<(string Label, string Value)> items;
+        try
+        {
+            items = await Task.Run(() => ImageMetadataService.Read(path), cts.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+        catch (Exception ex)
+        {
+            Logger.Log($"画像メタ情報の取得に失敗: {ex.Message}", LogLevel.Debug);
+            return;
+        }
+
+        // 取得中に選択が変わった / ギャラリーを抜けた場合は破棄する
+        if (cts.Token.IsCancellationRequested || SelectedEntry != entry || !IsGalleryView)
+        {
+            return;
+        }
+
+        foreach (var (label, value) in items)
+        {
+            GalleryMetadata.Add(new GalleryMetadataItem(label, value));
+        }
+
+        GalleryMetadataEmpty = GalleryMetadata.Count == 0;
+    }
+
+    private void ClearGalleryMetadata()
+    {
+        _metadataCts?.Cancel();
+        GalleryMetadata.Clear();
+        GalleryMetadataEmpty = false;
+    }
+
+    /// <summary>ギャラリー表示で選択を前後に送る（メイン画像上のホイールでの切り替え用）。delta 正=次, 負=前。</summary>
+    public void MoveGallerySelection(int delta)
+    {
+        if (_entries.Count == 0)
+        {
+            return;
+        }
+
+        var current = SelectedEntry is { } sel ? _entries.IndexOf(sel) : -1;
+        var next = current < 0
+            ? (delta > 0 ? 0 : _entries.Count - 1)
+            : Math.Clamp(current + delta, 0, _entries.Count - 1);
+        SelectedEntry = _entries[next];
     }
 
     private void ClearPreview()
@@ -610,14 +692,17 @@ public partial class TabViewModel : ObservableObject
             // 選択がなければ先頭から閲覧を始め、ギャラリー解像度で読み直す
             SelectedEntry ??= Entries.FirstOrDefault();
             UpdatePreview();
+            UpdateGalleryMetadata();
         }
         else if (_previewEnabled)
         {
             UpdatePreview(); // プレビューペイン解像度に戻す
+            ClearGalleryMetadata();
         }
         else
         {
             ClearPreview();
+            ClearGalleryMetadata();
         }
     }
 

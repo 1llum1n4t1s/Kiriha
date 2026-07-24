@@ -94,6 +94,7 @@
                 <Border Background="{DynamicResource VerticalTabsSurfaceBg}">
                     <Grid RowDefinitions="*,Auto,Auto">
                     <ListBox x:Name="VerticalTabsListBox" Grid.Row="0" Classes="verticaltabs"
+                             IsVisible="{Binding !SelectedTab.IsGalleryView}"
                              AutomationProperties.Name="垂直タブ"
                              ItemsSource="{Binding Tabs}"
                              SelectedItem="{Binding SelectedTab}"
@@ -166,6 +167,37 @@
                         </ListBox.ItemTemplate>
                     </ListBox>
 
+                    <!-- ギャラリー表示中はタブ一覧の場所に、選択中画像の Exif・メタ情報を出す。
+                         新しいタブ / 設定のフッター（下 2 行）はそのまま残す。 -->
+                    <Border Grid.Row="0" Padding="12,10,10,8"
+                            IsVisible="{Binding SelectedTab.IsGalleryView}">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="画像情報" FontSize="11" FontWeight="SemiBold"
+                                           Margin="0,0,0,8"
+                                           Foreground="{DynamicResource TextSecondary}" />
+                                <ItemsControl ItemsSource="{Binding SelectedTab.GalleryMetadata}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="m:GalleryMetadataItem">
+                                            <StackPanel Margin="0,0,0,9">
+                                                <TextBlock Text="{Binding Label}" FontSize="10.5"
+                                                           Foreground="{DynamicResource TextSecondary}" />
+                                                <TextBlock Text="{Binding Value}" FontSize="12.5"
+                                                           Foreground="{DynamicResource TextPrimary}"
+                                                           TextWrapping="Wrap" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <TextBlock Text="この画像の情報はありません。" FontSize="11.5"
+                                           TextWrapping="Wrap"
+                                           Foreground="{DynamicResource TextSecondary}"
+                                           IsVisible="{Binding SelectedTab.GalleryMetadataEmpty}" />
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Border>
+
                     <Button x:Name="VerticalNewTabButton" Grid.Row="1"
                             Classes="verticaltabaction verticalnewtab"
                             Margin="8,4,8,2"
@@ -226,13 +258,15 @@
                          浮遊カード状サイドバー TabControl + HeaderedContentControl 積みの数値を実測値どおりに再現。 -->
                     <v:SettingsView IsVisible="{Binding IsSettingsTab}" />
 
-                    <!-- コマンドバー行は Auto（高さは Border 側の 40px）。ギャラリー表示で隠したとき行ごと畳むため -->
-                    <Grid RowDefinitions="48,Auto,Auto,*,28" Background="{DynamicResource ContentBg}"
+                    <!-- アドレスバー・コマンドバー行はいずれも Auto（高さは各要素側で指定）。
+                         ギャラリー表示で隠したとき行ごと畳むため -->
+                    <Grid RowDefinitions="Auto,Auto,Auto,*,28" Background="{DynamicResource ContentBg}"
                           IsVisible="{Binding IsNormalTab}">
 
-                        <!-- ナビゲーション + アドレスバー（パンくず） + 検索 -->
-                        <Grid Grid.Row="0" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto,Auto"
-                              Background="{DynamicResource TabActiveBg}">
+                        <!-- ナビゲーション + アドレスバー（パンくず） + 検索。ギャラリー表示では畳む -->
+                        <Grid Grid.Row="0" Height="48" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto,Auto"
+                              Background="{DynamicResource TabActiveBg}"
+                              IsVisible="{Binding !IsGalleryView}">
                             <Button Grid.Column="0" Classes="nav" Content="&#xE72B;" Margin="8,0,0,0"
                                     Command="{Binding GoBackCommand}" ToolTip.Tip="戻る (右クリックで履歴)"
                                     AutomationProperties.Name="戻る"
@@ -901,9 +935,16 @@
                                         </ListBox.ItemTemplate>
                                     </ListBox>
                                     <!-- ギャラリー表示（アイコンサイズスライダー最大時の特別モード）:
-                                         1 枚を大きく表示し、下部フィルムストリップで送る。Esc / スライダーで復帰 -->
-                                    <Grid IsVisible="{Binding IsGalleryView}" RowDefinitions="*,116" Background="#FF121212">
-                                        <Panel Grid.Row="0" Margin="18,18,18,6">
+                                         1 枚を大きく表示し、下部フィルムストリップで送る。Esc / スライダーで復帰。
+                                         ストリップの高さは境界 Thumb で変更でき、全タブ共通で永続化する。 -->
+                                    <Grid IsVisible="{Binding IsGalleryView}" RowDefinitions="*,Auto,Auto" Background="#FF121212">
+                                        <!-- メイン画像。クリックでフォーカスを受け（Del / F2 等が効く）、
+                                             右クリックで通常のファイルと同じ Windows シェルメニューを出す。 -->
+                                        <Panel x:Name="GalleryImageArea" Grid.Row="0" Margin="18,18,18,6"
+                                               Focusable="True"
+                                               PointerPressed="GalleryImage_PointerPressed"
+                                               PointerReleased="GalleryImage_PointerReleased"
+                                               KeyDown="GalleryImage_KeyDown">
                                             <Image Source="{Binding PreviewBitmap}" Stretch="Uniform" StretchDirection="DownOnly"
                                                    RenderOptions.BitmapInterpolationMode="HighQuality" />
                                             <!-- 画像プレビューが無いファイルはアイコン + 名前で表示する -->
@@ -916,17 +957,26 @@
                                                            Foreground="#DDDDDD" HorizontalAlignment="Center"
                                                            TextTrimming="CharacterEllipsis" MaxWidth="520" />
                                             </StackPanel>
-                                            <!-- ギャラリー終了（Esc / スライダーでも戻れる） -->
-                                            <Button HorizontalAlignment="Right" VerticalAlignment="Top"
-                                                    Width="32" Height="32" CornerRadius="16" Padding="0"
-                                                    Background="#66000000" Click="GalleryClose_Click"
-                                                    ToolTip.Tip="ギャラリーを終了 (Esc)">
-                                                <TextBlock Classes="fico" Text="&#xE711;" FontSize="13"
-                                                           Foreground="#DDDDDD"
-                                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                            </Button>
+                                            <!-- ギャラリー終了（Esc / スライダーでも戻れる）。
+                                                 普段は隠し、右上のこのゾーンへマウスを近づけたときだけフェード表示する -->
+                                            <Border Classes="galleryclosezone" Width="96" Height="96"
+                                                    HorizontalAlignment="Right" VerticalAlignment="Top"
+                                                    Background="Transparent">
+                                                <Button HorizontalAlignment="Right" VerticalAlignment="Top"
+                                                        Width="32" Height="32" CornerRadius="16" Padding="0"
+                                                        Background="#66000000" Click="GalleryClose_Click"
+                                                        ToolTip.Tip="ギャラリーを終了 (Esc)">
+                                                    <TextBlock Classes="fico" Text="&#xE711;" FontSize="13"
+                                                               Foreground="#DDDDDD"
+                                                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Button>
+                                            </Border>
                                         </Panel>
-                                        <ListBox Grid.Row="1" Classes="files gallerystrip"
+                                        <!-- ストリップとプレビューの境界。上下ドラッグでストリップの高さを変える -->
+                                        <Thumb Grid.Row="1" Classes="rowsplit"
+                                               DragDelta="GalleryStripThumb_DragDelta" />
+                                        <ListBox Grid.Row="2" Classes="files gallerystrip"
+                                                 Height="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).GalleryStripHeight}"
                                                  ItemsSource="{Binding Entries}"
                                                  SelectedItem="{Binding SelectedEntry}"
                                                  SelectionMode="Multiple"
@@ -945,7 +995,8 @@
                                             </ListBox.ItemsPanel>
                                             <ListBox.ItemTemplate>
                                                 <DataTemplate x:DataType="m:FileSystemEntry">
-                                                    <Panel Width="80" Height="80"
+                                                    <Panel Width="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).GalleryThumbSize}"
+                                                           Height="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).GalleryThumbSize}"
                                                            EffectiveViewportChanged="FileItem_EffectiveViewportChanged"
                                                            DataContextChanged="FileItem_DataContextChanged"
                                                            Background="Transparent"

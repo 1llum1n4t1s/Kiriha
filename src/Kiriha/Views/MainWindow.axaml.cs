@@ -496,6 +496,35 @@ public partial class MainWindow : Window
             }
         }
 
+        // ギャラリー表示中の非 Ctrl ホイール:
+        //   下部サムネイルストリップ上 → 縦ホイールを横スクロールに変換
+        //   メイン画像上             → 前後の画像へ切り替え
+        if (!e.KeyModifiers.HasFlag(KeyModifiers.Control)
+            && e.Source is Visual gallerySource
+            && ViewModel?.SelectedTab is { IsSettingsTab: false, IsGalleryView: true } galleryTab)
+        {
+            var strip = gallerySource.GetVisualAncestors().OfType<ListBox>()
+                .FirstOrDefault(l => l.Classes.Contains("gallerystrip"));
+            if (strip is not null)
+            {
+                var scroller = strip.GetVisualDescendants().OfType<ScrollViewer>().FirstOrDefault();
+                if (scroller is not null)
+                {
+                    scroller.Offset = scroller.Offset.WithX(scroller.Offset.X - e.Delta.Y * 80);
+                    e.Handled = true;
+                    return;
+                }
+            }
+            else if (gallerySource.GetVisualAncestors().OfType<Panel>()
+                     .Any(p => p.Name == "GalleryImageArea"))
+            {
+                // ホイール上で前の画像、下で次の画像へ
+                galleryTab.MoveGallerySelection(e.Delta.Y > 0 ? -1 : 1);
+                e.Handled = true;
+                return;
+            }
+        }
+
         // Ctrl+ホイールで表示ズーム（アイコン表示中は Finder 同様の無段階、他は表示モードを段階切替）
         if (e.KeyModifiers.HasFlag(KeyModifiers.Control)
             && ViewModel?.SelectedTab is { IsSettingsTab: false } tab
@@ -634,6 +663,15 @@ public partial class MainWindow : Window
         {
             // プレビューは右側なので左ドラッグで拡大
             vm.PreviewWidth = Math.Clamp(vm.PreviewWidth - e.Vector.X, 180, 600);
+        }
+    }
+
+    private void GalleryStripThumb_DragDelta(object? sender, VectorEventArgs e)
+    {
+        if (ViewModel is { } vm)
+        {
+            // ストリップは下側なので上ドラッグ（Y マイナス）で拡大
+            vm.GalleryStripHeight = Math.Round(Math.Clamp(vm.GalleryStripHeight - e.Vector.Y, 90, 460));
         }
     }
 
@@ -1895,6 +1933,63 @@ public partial class MainWindow : Window
         }
     }
 
+    private void GalleryImage_PointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        // メイン画像へフォーカスを移す。以降のキー操作は GalleryImage_KeyDown が直接処理するため、
+        // フォーカスさえこのパネルに乗れば、ファイル一覧の外でも Del / F2 などが確実に効く。
+        (sender as Control)?.Focus();
+    }
+
+    /// <summary>ギャラリーのメイン画像にフォーカスがあるときの一覧向けキー操作（Del / F2 / 切り取り等）。</summary>
+    private void GalleryImage_KeyDown(object? sender, KeyEventArgs e)
+    {
+        if (ViewModel?.SelectedTab is not { IsSettingsTab: false } tab)
+        {
+            return;
+        }
+
+        var ctrl = e.KeyModifiers.HasFlag(KeyModifiers.Control);
+        switch (e.Key)
+        {
+            case Key.Delete when e.KeyModifiers.HasFlag(KeyModifiers.Shift):
+                if (tab.DeletePermanentCommand.CanExecute(null)) tab.DeletePermanentCommand.Execute(null);
+                break;
+            case Key.Delete:
+                if (tab.DeleteCommand.CanExecute(null)) tab.DeleteCommand.Execute(null);
+                break;
+            case Key.F2:
+                if (tab.RenameCommand.CanExecute(null)) tab.RenameCommand.Execute(null);
+                break;
+            case Key.X when ctrl:
+                if (tab.CutCommand.CanExecute(null)) tab.CutCommand.Execute(null);
+                break;
+            case Key.C when ctrl:
+                if (tab.CopyCommand.CanExecute(null)) tab.CopyCommand.Execute(null);
+                break;
+            case Key.V when ctrl:
+                if (tab.PasteCommand.CanExecute(null)) tab.PasteCommand.Execute(null);
+                break;
+            default:
+                return;
+        }
+
+        e.Handled = true;
+    }
+
+    private void GalleryImage_PointerReleased(object? sender, PointerReleasedEventArgs e)
+    {
+        // 表示中の画像の右クリックは、通常のファイル右クリックと同じ Windows シェルメニューを出す。
+        if (e.InitialPressMouseButton != MouseButton.Right
+            || ViewModel?.SelectedTab is not { IsSettingsTab: false } tab
+            || tab.SelectedEntry is not { } entry)
+        {
+            return;
+        }
+
+        ShowShellContextMenu(tab, entry.FullPath, e);
+        e.Handled = true;
+    }
+
     private void FileList_KeyDown(object? sender, KeyEventArgs e)
     {
         if (sender is not ListBox { DataContext: TabViewModel tab } listBox)
@@ -2333,6 +2428,14 @@ public partial class MainWindow : Window
 
     private bool TryStartMarqueeSelection(ListBox? listBox, PointerPressedEventArgs e)
     {
+        // ギャラリー表示中はメイン画像やストリップの余白クリックで選択が外れ、
+        // プレビューが消えて「閉じた」ように見えてしまう。ギャラリーの終了は
+        // 右上の閉じるボタン / Esc / スライダーに任せ、ここでは矩形選択を始めない。
+        if (ViewModel?.SelectedTab is { IsGalleryView: true })
+        {
+            return false;
+        }
+
         if (listBox is null
             || !listBox.IsEffectivelyVisible
             || !e.GetCurrentPoint(this).Properties.IsLeftButtonPressed

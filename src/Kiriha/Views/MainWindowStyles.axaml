@@ -263,6 +263,32 @@
         <Style Selector="Thumb.panesplit">
             <Setter Property="Width" Value="5" />
         </Style>
+        <!-- 行の高さ変更用の Thumb（ギャラリーのサムネイルストリップ境界など） -->
+        <Style Selector="Thumb.rowsplit">
+            <Setter Property="Height" Value="6" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Cursor" Value="SizeNorthSouth" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="Transparent">
+                        <Border Height="1" Background="{DynamicResource Divider}" VerticalAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <!-- ギャラリーの終了ボタン: 普段は透明で、右上のホバーゾーンに入ったときだけフェード表示する -->
+        <Style Selector="Border.galleryclosezone Button">
+            <Setter Property="Opacity" Value="0" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.15" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Border.galleryclosezone:pointerover Button">
+            <Setter Property="Opacity" Value="1" />
+        </Style>
         <!-- アドレスバーと検索ボックスの間は、リサイズ領域だけを残して区切り線を描かない -->
         <Style Selector="Thumb.searchsplit">
             <Setter Property="Width" Value="4" />

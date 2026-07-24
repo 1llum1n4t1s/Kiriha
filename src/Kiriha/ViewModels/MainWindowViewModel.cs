@@ -55,6 +55,14 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private double _previewWidth = 280;
 
+    /// <summary>ギャラリー表示の下部サムネイルストリップの高さ（Thumb ドラッグで変更、全タブ共通で永続化）。</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(GalleryThumbSize))]
+    private double _galleryStripHeight = 116;
+
+    /// <summary>ストリップ高さに追従するサムネイル一辺のサイズ（枠・余白・スクロールバー分を差し引く）。</summary>
+    public double GalleryThumbSize => Math.Clamp(GalleryStripHeight - 36, 54, 424);
+
     /// <summary>お気に入りバーの表示状態（Ctrl+Shift+B で切替、永続化）。</summary>
     [ObservableProperty]
     private bool _showBookmarksBar;
@@ -242,6 +250,11 @@ public partial class MainWindowViewModel : ObservableObject
     partial void OnPreviewWidthChanged(double value)
     {
         _settings.PreviewWidth = value; // 保存自体は終了時の SaveWindowBounds でまとめて行う
+    }
+
+    partial void OnGalleryStripHeightChanged(double value)
+    {
+        _settings.GalleryStripHeight = value; // 保存自体は終了時の SaveWindowBounds でまとめて行う
     }
 
     partial void OnSidebarWidthChanged(double value)
@@ -525,6 +538,7 @@ public partial class MainWindowViewModel : ObservableObject
         SearchBoxWidth = 200;
         ShowPreviewPane = false;
         PreviewWidth = 280;
+        GalleryStripHeight = 116;
         ShowStatusBar = true;
 
         // コンパクトビューは開いているタブへも反映する（タブ側の変更通知が _settings.CompactView も既定へ戻す）
@@ -703,6 +717,7 @@ public partial class MainWindowViewModel : ObservableObject
         _searchBoxWidth = _settings.SearchBoxWidth is > 120 and < 500 ? _settings.SearchBoxWidth : 200;
         _showPreviewPane = _settings.ShowPreviewPane;
         _previewWidth = _settings.PreviewWidth is >= 180 and <= 600 ? _settings.PreviewWidth : 280;
+        _galleryStripHeight = _settings.GalleryStripHeight is >= 90 and <= 460 ? _settings.GalleryStripHeight : 116;
         _showStatusBar = _settings.ShowStatusBar;
         _showSidebarTree = _settings.SidebarShowTree;
         if (_showSidebarTree)
