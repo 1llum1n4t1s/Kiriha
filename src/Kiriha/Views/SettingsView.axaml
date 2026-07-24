@@ -253,10 +253,13 @@
                                                 <TextBlock FontSize="13.5" FontWeight="SemiBold"
                                                            Foreground="{DynamicResource TextPrimary}"
                                                            Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).LicenseStatusText}" />
+                                                <!-- 認証済みなら購入導線・キー入力欄は不要なので非表示にする -->
                                                 <TextBlock FontSize="12" TextWrapping="Wrap"
                                                            Foreground="{DynamicResource TextSecondary}"
+                                                           IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsNotLicensed}"
                                                            Text="購入すると決済完了ページにライセンスキーが表示されます。アカウント登録やパスワードは不要です。" />
-                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <StackPanel Orientation="Horizontal" Spacing="8"
+                                                            IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsNotLicensed}">
                                                     <TextBox Width="330" PlaceholderText="KIRIHA- で始まるライセンスキー"
                                                              Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).LicenseKeyInput}" />
                                                     <Button Classes="cmd" Content="認証する"
@@ -270,6 +273,7 @@
                                                 <Button Classes="cmd" Content="購入ページを開く（¥980 買い切り）"
                                                         Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OpenLicensePurchasePageCommand}"
                                                         HorizontalAlignment="Left"
+                                                        IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsNotLicensed}"
                                                         BorderBrush="{DynamicResource Divider}" BorderThickness="1" />
                                             </StackPanel>
                                         </HeaderedContentControl>

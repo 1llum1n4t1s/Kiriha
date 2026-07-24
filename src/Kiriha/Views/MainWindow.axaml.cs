@@ -1463,9 +1463,10 @@ public partial class MainWindow : Window
                 System.Diagnostics.Process.Start(
                     new System.Diagnostics.ProcessStartInfo(link.Path) { UseShellExecute = true })?.Dispose();
             }
-            catch
+            catch (Exception ex)
             {
-                // 起動失敗は無視
+                // 起動失敗はUIには出さないが、原因調査（パス消失/権限/関連付け欠如の切り分け）のためログには残す
+                Logger.LogException($"最近使用したファイルを開けませんでした: {link.Path}", ex);
             }
 
             return;
@@ -1479,9 +1480,10 @@ public partial class MainWindow : Window
                 TrustedProcessLauncher.Start("explorer.exe", [link.Path],
                     Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
             }
-            catch
+            catch (Exception ex)
             {
-                // 開けない場合は無視
+                // 開けない場合もUIには出さないが、同上の理由でログには残す
+                Logger.LogException($"シェル項目を開けませんでした: {link.Path}", ex);
             }
 
             return;

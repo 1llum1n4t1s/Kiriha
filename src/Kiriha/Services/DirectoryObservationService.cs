@@ -113,11 +113,19 @@ internal static class DirectoryObservationService
         private void Changed(object sender, FileSystemEventArgs e)
         {
             Interlocked.Exchange(ref _lastEventTicksUtc, DateTime.UtcNow.Ticks);
-            var previous = _debounce;
-            previous?.Cancel();
-            previous?.Dispose();
-            var cts = new CancellationTokenSource();
-            _debounce = cts;
+            // FileSystemWatcher のイベントは ThreadPool 上で並行に届く。_debounce の差し替えを
+            // ロックなしで行うと、2 スレッドが同じ旧 CTS に対して Cancel/Dispose を重複実行し、
+            // Dispose 済み CTS への Cancel が ObjectDisposedException（ThreadPool 上の未処理例外）
+            // になり得るため、Dispose との競合も含めて Gate で直列化する。
+            CancellationTokenSource cts;
+            lock (Gate)
+            {
+                if (_disposed) return;
+                _debounce?.Cancel();
+                _debounce?.Dispose();
+                cts = new CancellationTokenSource();
+                _debounce = cts;
+            }
             _ = NotifyAfterDelayAsync(cts.Token);
         }
 

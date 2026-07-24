@@ -31,7 +31,12 @@
             </ExperimentalAcrylicBorder.Material>
         </ExperimentalAcrylicBorder>
 
-    <Grid RowDefinitions="32,*" ColumnDefinitions="Auto,*">
+    <!-- ライセンスロック中は IsEnabled で操作領域全体を無効化する。ロック画面のオーバーレイは
+         ヒットテスト（マウス）しか塞げず、フォーカスが残った一覧への Delete / Ctrl+X/V 等の
+         コントロール直付け KeyDown ハンドラは Window.OnKeyDown のガードより先に発火するため、
+         キーボード経路まで塞ぐにはこの無効化が必要。 -->
+    <Grid RowDefinitions="32,*" ColumnDefinitions="Auto,*"
+          IsEnabled="{Binding !IsLicenseLocked}">
 
         <!-- タブのドラッグ中に、掴んだタブがカーソルへ追従して浮くゴースト表示のオーバーレイ。
              ヒットテストは無効（下の操作を邪魔しない）で、全面に最前面で重ねる。 -->
@@ -1090,9 +1095,11 @@
     <!-- 試用期間終了ロック: 認証が完了するまで半透明の暗幕で操作をブロックするモーダル（買い切り一律の建付け）。 -->
     <Border ZIndex="1000" IsVisible="{Binding IsLicenseLocked}"
             Background="#A6000000">
+        <!-- カード背景は不透明の DialogWindowBrush を使う。TabStripBg はアクリル有効時に
+             ThemeService が Colors.Transparent へ上書きするため、カードが透けてしまう。 -->
         <Border MaxWidth="520" HorizontalAlignment="Center" VerticalAlignment="Center"
                 Padding="32,28" CornerRadius="16"
-                Background="{DynamicResource TabStripBg}"
+                Background="{DynamicResource DialogWindowBrush}"
                 BorderBrush="{DynamicResource Divider}" BorderThickness="1"
                 BoxShadow="0 12 40 0 #55000000">
             <StackPanel Spacing="14">

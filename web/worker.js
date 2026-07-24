@@ -27,14 +27,23 @@ export default {
     }
 
     if (pathname === "/license/check") {
-      const upstream = await fetch(`${SEKISHO_BASE}/license/kiriha/check${search}`);
-      return new Response(upstream.body, {
-        status: upstream.status,
-        headers: {
-          "content-type": upstream.headers.get("content-type") ?? "application/json; charset=utf-8",
-          "cache-control": "no-store",
-        },
-      });
+      try {
+        const upstream = await fetch(`${SEKISHO_BASE}/license/kiriha/check${search}`);
+        return new Response(upstream.body, {
+          status: upstream.status,
+          headers: {
+            "content-type": upstream.headers.get("content-type") ?? "application/json; charset=utf-8",
+            "cache-control": "no-store",
+          },
+        });
+      } catch (error) {
+        // 事後調査用に照会条件を残す（アプリ側は非 2xx を一時異常として猶予期間で継続する）
+        console.error(`失効照会プロキシが hub へ到達できません: ${search}`, error);
+        return new Response(JSON.stringify({ error: "上流に到達できません" }), {
+          status: 502,
+          headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
+        });
+      }
     }
 
     if (pathname === "/" || pathname === "/index.html") {

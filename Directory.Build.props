@@ -7,8 +7,10 @@
     <PlatformTarget Condition="'$(PlatformTarget)' == ''">x64</PlatformTarget>
     <Platforms>x64;ARM64</Platforms>
     <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
-    <Version>1.0.27</Version>
+    <Version>1.0.28</Version>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- 依存解決の再現性と改ざん検知のため packages.lock.json を使う（更新は dotnet restore が自動で行う） -->
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <AssemblyTitle>Kiriha</AssemblyTitle>
     <AssemblyDescription>Chrome ライクなタブ型ファイラー</AssemblyDescription>
     <AssemblyCompany>1llum1n4t1s</AssemblyCompany>

@@ -827,6 +827,9 @@ public partial class MainWindowViewModel : ObservableObject
     public bool IsLicenseLocked
         => LicenseService.State is LicenseState.TrialExpired or LicenseState.OnlineCheckRequired;
 
+    /// <summary>認証済みでない（購入導線・キー入力欄を表示する状態）。</summary>
+    public bool IsNotLicensed => LicenseService.State != LicenseState.Licensed;
+
     private void OnLicenseStateChanged()
     {
         OnPropertyChanged(nameof(LicenseStatusText));
@@ -834,6 +837,7 @@ public partial class MainWindowViewModel : ObservableObject
         OnPropertyChanged(nameof(LicenseLockDescription));
         OnPropertyChanged(nameof(IsOnlineCheckRequired));
         OnPropertyChanged(nameof(IsLicenseLocked));
+        OnPropertyChanged(nameof(IsNotLicensed));
     }
 
     /// <summary>入力されたライセンスキーを検証して有効化する（オフラインで完結）。</summary>
@@ -1494,6 +1498,11 @@ public partial class MainWindowViewModel : ObservableObject
             case "tab.open-parent":
                 if (anchor.CurrentPath != FileSystemService.ComputerPath && Directory.GetParent(anchor.CurrentPath) is { } parent)
                     OpenInNewTab(parent.FullName);
+                break;
+            default:
+                // ContextActionCatalog の起動時検証はカタログ内部の整合性しか見ないため、
+                // カタログ→ハンドラーの対応漏れ（ID 追加・リネーム時の直し忘れ）はここで検出する
+                Logger.Log($"未対応のタブ操作 ID です: {actionId}", LogLevel.Warning);
                 break;
         }
     }

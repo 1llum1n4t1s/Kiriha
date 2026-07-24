@@ -38,9 +38,27 @@ public static class LicenseService
 {
     private const string BaseUrl = "https://sekisho.nephilim.jp";
 
-    /// <summary>署名検証用の公開鍵（ECDSA P-256, SubjectPublicKeyInfo）。秘密鍵は dev\Secret\kiriha-license。</summary>
-    private const string PublicKeySpki =
-        "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAELtl4i+aIcNlLv6NP5aT/PhiXae6kVUnPn6DhIb2cMI4x17AhLEr5pNtb2WSPTV5VTcnVUTR4j8naA2unoR9+jQ==";
+    /// <summary>
+    /// 失効照会の URL（優先順）。ライセンス基盤（Sekisho hub）へ直接照会し、
+    /// hub ドメインの移転・喪失時にも出荷済みクライアントが 30 日後に恒久ロックされないよう、
+    /// 自前ドメインの互換プロキシ（kiriha.nephilim.jp → hub へ転送）をフォールバックに持つ。
+    /// </summary>
+    private static readonly string[] CheckUrls =
+    [
+        $"{BaseUrl}/license/kiriha/check",
+        "https://kiriha.nephilim.jp/license/check",
+    ];
+
+    /// <summary>
+    /// 署名検証用の公開鍵（ECDSA P-256, SubjectPublicKeyInfo）。秘密鍵は dev\Secret\kiriha-license。
+    /// 鍵ローテーション（漏洩時の切り替え等）に備えて複数持てる配列にしてあり、
+    /// いずれかの鍵で検証が通れば有効。新鍵へ移行するときは先頭へ追加し、旧鍵は
+    /// 既発行キーの検証用に残す（キー形式自体は変えない）。
+    /// </summary>
+    private static readonly string[] PublicKeysSpki =
+    [
+        "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAELtl4i+aIcNlLv6NP5aT/PhiXae6kVUnPn6DhIb2cMI4x17AhLEr5pNtb2WSPTV5VTcnVUTR4j8naA2unoR9+jQ==",
+    ];
 
     private const string KeyPrefix = "KIRIHA-";
     private const int TrialDays = 14;
@@ -112,24 +130,30 @@ public static class LicenseService
 
     private static void RecomputeState()
     {
-        if (_persisted.Key is not null && TryParseAndVerify(_persisted.Key, out var payload))
+        // State / Email / TrialDaysLeft は組で意味を持つため、起動時の自動失効確認と
+        // UI からの再確認が並走しても不整合な組み合わせ（例: Licensed なのに Email 空）を
+        // 観測させないよう、3 つの代入を Gate で 1 かたまりにする。
+        lock (Gate)
         {
-            Email = payload.Email;
+            if (_persisted.Key is not null && TryParseAndVerify(_persisted.Key, out var payload))
+            {
+                Email = payload.Email;
 
-            // オンライン失効確認が猶予期間を超えて成功していなければ再確認を要求する
-            var lastCheck = ParseUtc(_persisted.LastOnlineCheckUtc) ?? ParseUtc(_persisted.ActivatedAtUtc);
-            State = lastCheck is { } t && (EffectiveUtcNow() - t).TotalDays <= OfflineGraceDays
-                ? LicenseState.Licensed
-                : LicenseState.OnlineCheckRequired;
-            TrialDaysLeft = 0;
-            return;
+                // オンライン失効確認が猶予期間を超えて成功していなければ再確認を要求する
+                var lastCheck = ParseUtc(_persisted.LastOnlineCheckUtc) ?? ParseUtc(_persisted.ActivatedAtUtc);
+                State = lastCheck is { } t && (EffectiveUtcNow() - t).TotalDays <= OfflineGraceDays
+                    ? LicenseState.Licensed
+                    : LicenseState.OnlineCheckRequired;
+                TrialDaysLeft = 0;
+                return;
+            }
+
+            Email = null;
+            var start = GetOrCreateTrialStartUtc();
+            var elapsed = (int)Math.Floor((EffectiveUtcNow() - start).TotalDays);
+            TrialDaysLeft = Math.Max(0, TrialDays - elapsed);
+            State = TrialDaysLeft > 0 ? LicenseState.Trial : LicenseState.TrialExpired;
         }
-
-        Email = null;
-        var start = GetOrCreateTrialStartUtc();
-        var elapsed = (int)Math.Floor((EffectiveUtcNow() - start).TotalDays);
-        TrialDaysLeft = Math.Max(0, TrialDays - elapsed);
-        State = TrialDaysLeft > 0 ? LicenseState.Trial : LicenseState.TrialExpired;
     }
 
     private static DateTime? ParseUtc(string? value)
@@ -248,9 +272,19 @@ public static class LicenseService
             var payloadBytes = FromBase64Url(parts[0]);
             var signature = FromBase64Url(parts[1]);
 
-            using var ecdsa = ECDsa.Create();
-            ecdsa.ImportSubjectPublicKeyInfo(Convert.FromBase64String(PublicKeySpki), out _);
-            if (!ecdsa.VerifyData(payloadBytes, signature, HashAlgorithmName.SHA256))
+            var verified = false;
+            foreach (var spki in PublicKeysSpki)
+            {
+                using var ecdsa = ECDsa.Create();
+                ecdsa.ImportSubjectPublicKeyInfo(Convert.FromBase64String(spki), out _);
+                if (ecdsa.VerifyData(payloadBytes, signature, HashAlgorithmName.SHA256))
+                {
+                    verified = true;
+                    break;
+                }
+            }
+
+            if (!verified)
             {
                 return false;
             }
@@ -293,16 +327,12 @@ public static class LicenseService
         try
         {
             using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
-            using var res = await http.GetAsync(
-                $"{BaseUrl}/license/kiriha/check?id={Uri.EscapeDataString(purchaseId)}", ct);
-            if (!res.IsSuccessStatusCode)
+            var check = await QueryRevocationAsync(http, purchaseId, ct);
+            if (check is null)
             {
                 // サーバー側の一時異常は失効と区別が付かないため猶予を消費するだけに留める
-                Logger.Log($"ライセンス失効確認が HTTP {(int)res.StatusCode}（猶予期間で継続）", LogLevel.Debug);
                 return true;
             }
-
-            var check = await res.Content.ReadFromJsonAsync(LicenseJsonContext.Default.LicenseCheckResponse, ct);
             if (check is { Valid: false })
             {
                 // 返金等で失効。ローカルのライセンスを破棄して試用状態へ戻す
@@ -339,6 +369,39 @@ public static class LicenseService
             Logger.Log($"ライセンス失効確認をスキップ: {ex.Message}", LogLevel.Debug);
             return true;
         }
+    }
+
+    /// <summary>
+    /// 失効照会を優先順の URL で試行する。応答を取得できたら結果を、
+    /// 全 URL が失敗（HTTP 異常・接続不可）なら null を返す（呼び出し側は猶予期間で継続）。
+    /// </summary>
+    private static async Task<LicenseCheckResponse?> QueryRevocationAsync(
+        HttpClient http, string purchaseId, CancellationToken ct)
+    {
+        foreach (var url in CheckUrls)
+        {
+            try
+            {
+                using var res = await http.GetAsync($"{url}?id={Uri.EscapeDataString(purchaseId)}", ct);
+                if (!res.IsSuccessStatusCode)
+                {
+                    Logger.Log($"ライセンス失効確認が HTTP {(int)res.StatusCode}: {url}（次の照会先へ）", LogLevel.Debug);
+                    continue;
+                }
+
+                return await res.Content.ReadFromJsonAsync(LicenseJsonContext.Default.LicenseCheckResponse, ct);
+            }
+            catch (OperationCanceledException) when (ct.IsCancellationRequested)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log($"ライセンス失効確認に到達できません: {url}（{ex.Message}）", LogLevel.Debug);
+            }
+        }
+
+        return null;
     }
 
     private static void Save()

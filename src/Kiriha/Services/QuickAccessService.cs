@@ -21,7 +21,6 @@ internal static partial class QuickAccessService
 
     private const int SigdnNormalDisplay = 0;
     private const int SigdnFilesysPath = unchecked((int)0x80058000);
-    private const int RpcEChangedMode = unchecked((int)0x80010106);
 
     /// <summary>
     /// クイックアクセスのフォルダー一覧（表示名, パス）を返す。
@@ -39,9 +38,10 @@ internal static partial class QuickAccessService
         {
             EnumerateQuickAccess(folders, recent);
         }
-        catch
+        catch (Exception ex)
         {
-            // COM 初期化不備などで失敗した場合はフォールバックに任せる
+            // 失敗した場合はフォールバックに任せる（原因調査のためログには残す）
+            Logger.LogException("クイックアクセスの列挙に失敗（フォールバック表示に切り替え）", ex);
         }
 
         if (folders.Count == 0)
@@ -67,27 +67,33 @@ internal static partial class QuickAccessService
         List<(string Name, string Path)> folders,
         List<(string Name, string Path)> recent)
     {
-        // source-generated COM（StrategyBasedComWrappers）は暗黙のアパートメント初期化をしないため、
-        // Task.Run の ThreadPool スレッド（未初期化なら MTA 扱い）で明示的に初期化しないと
-        // SHCreateItemFromParsingName が失敗し（別スレッドで既に初期化済みなら偶然成功する）、
-        // 「時々クイックアクセスがフォールバックになる」という再現しづらい不具合になる。
-        var initializeResult = CoInitializeEx(0, 0);
-        var shouldUninitialize = initializeResult >= 0;
-        if (initializeResult < 0 && initializeResult != RpcEChangedMode)
+        // クイックアクセスの namespace extension は列挙に STA を要求することがあり、
+        // Task.Run の ThreadPool（MTA）から呼ぶと SHCreateItemFromParsingName / BindToHandler が
+        // 環境・タイミング依存で失敗して「時々フォールバック 6 項目になる」という再現しづらい
+        // 不具合になる（MTA での CoInitializeEx だけでは不十分だった）。専用 STA スレッドで列挙する。
+        Exception? error = null;
+        var thread = new Thread(() =>
         {
-            return;
-        }
-
-        try
-        {
-            EnumerateQuickAccessCore(folders, recent);
-        }
-        finally
-        {
-            if (shouldUninitialize)
+            try
             {
-                CoUninitialize();
+                EnumerateQuickAccessCore(folders, recent);
             }
+            catch (Exception ex)
+            {
+                error = ex;
+            }
+        })
+        {
+            IsBackground = true,
+            Name = "Kiriha-QuickAccessEnum",
+        };
+        thread.SetApartmentState(ApartmentState.STA);
+        thread.Start();
+        thread.Join();
+
+        if (error is not null)
+        {
+            throw error;
         }
     }
 
@@ -95,8 +101,10 @@ internal static partial class QuickAccessService
         List<(string Name, string Path)> folders,
         List<(string Name, string Path)> recent)
     {
-        if (SHCreateItemFromParsingName(QuickAccessParsingName, 0, IidIShellItem, out var rootPtr) < 0 || rootPtr == 0)
+        var hr = SHCreateItemFromParsingName(QuickAccessParsingName, 0, IidIShellItem, out var rootPtr);
+        if (hr < 0 || rootPtr == 0)
         {
+            Logger.Log($"クイックアクセスの取得に失敗（SHCreateItemFromParsingName hr=0x{hr:X8}）。フォールバック表示に切り替えます", LogLevel.Warning);
             return;
         }
 
@@ -104,13 +112,19 @@ internal static partial class QuickAccessService
         var root = (IShellItem)wrappers.GetOrCreateObjectForComInstance(rootPtr, CreateObjectFlags.None);
         Marshal.Release(rootPtr);
 
-        if (root.BindToHandler(0, BhidEnumItems, IidIEnumShellItems, out var enumPtr) < 0 || enumPtr == 0)
+        hr = root.BindToHandler(0, BhidEnumItems, IidIEnumShellItems, out var enumPtr);
+        if (hr < 0 || enumPtr == 0)
         {
+            Logger.Log($"クイックアクセスの列挙に失敗（BindToHandler hr=0x{hr:X8}）。フォールバック表示に切り替えます", LogLevel.Warning);
             return;
         }
 
         var enumItems = (IEnumShellItems)wrappers.GetOrCreateObjectForComInstance(enumPtr, CreateObjectFlags.None);
         Marshal.Release(enumPtr);
+
+        // 重複排除はリスト線形照合だと O(m²) になるため HashSet で行う（フォルダーとファイルで別集合）
+        var seenFolders = new HashSet<string>(WindowsPathIdentity.Instance);
+        var seenRecent = new HashSet<string>(WindowsPathIdentity.Instance);
 
         while (enumItems.Next(1, out var itemPtr, out var fetched) == 0 && fetched == 1 && itemPtr != 0)
         {
@@ -124,10 +138,10 @@ internal static partial class QuickAccessService
                 continue;
             }
 
-            var target = Directory.Exists(path)
-                ? folders
-                : File.Exists(path) ? recent : null;
-            if (target is null || target.Any(r => WindowsPathIdentity.Instance.Equals(r.Path, path)))
+            var (target, seen) = Directory.Exists(path)
+                ? (folders, seenFolders)
+                : File.Exists(path) ? (recent, seenRecent) : (null, null);
+            if (target is null || seen is null || !seen.Add(path))
             {
                 continue;
             }
@@ -173,12 +187,6 @@ internal static partial class QuickAccessService
 
     [LibraryImport("shell32.dll", StringMarshalling = StringMarshalling.Utf16)]
     private static partial int SHCreateItemFromParsingName(string pszPath, nint pbc, in Guid riid, out nint ppv);
-
-    [LibraryImport("ole32.dll")]
-    private static partial int CoInitializeEx(nint reserved, uint coInit);
-
-    [LibraryImport("ole32.dll")]
-    private static partial void CoUninitialize();
 }
 
 [GeneratedComInterface]
