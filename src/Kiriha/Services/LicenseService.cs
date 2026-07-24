@@ -28,15 +28,15 @@ public enum LicenseState
 ///
 /// キー形式: KIRIHA-&lt;base64url(payload JSON)&gt;.&lt;base64url(ECDSA P-256 署名)&gt;
 ///   payload: {"e":"メールアドレス","p":"購入ID","d":"発行日時"}
-/// 署名はアプリ埋め込みの公開鍵でオフライン検証する（秘密鍵は配信 Worker 側のみが保持）。
+/// 署名はアプリ埋め込みの公開鍵でオフライン検証する（秘密鍵は Sekisho hub 側のみが保持）。
 ///
-/// 失効（返金）はベストエフォート: 起動時に配信 Worker の失効リストを照会し、
+/// 失効（返金）はベストエフォート: 起動時に Sekisho hub の失効リストを照会し、
 /// オンライン確認が 30 日間成功しなかった場合のみ再確認を要求する。
 /// 時計の巻き戻し対策として「観測した最大時刻」を保持し、現在時刻はその値を下回らない。
 /// </summary>
 public static class LicenseService
 {
-    private const string BaseUrl = "https://kiriha.nephilim.jp";
+    private const string BaseUrl = "https://sekisho.nephilim.jp";
 
     /// <summary>署名検証用の公開鍵（ECDSA P-256, SubjectPublicKeyInfo）。秘密鍵は dev\Secret\kiriha-license。</summary>
     private const string PublicKeySpki =
@@ -56,7 +56,7 @@ public static class LicenseService
     public static int TrialDaysLeft { get; private set; } = TrialDays;
 
     /// <summary>購入ページ（Stripe Payment Link）。決済完了ページでキーが即時発行される。</summary>
-    public static string PurchaseUrl => $"{BaseUrl}/buy";
+    public static string PurchaseUrl => $"{BaseUrl}/buy/kiriha";
 
     /// <summary>状態が変わったとき（UI 表示・ロック再評価用。UI スレッドで発火）。</summary>
     public static event Action? StateChanged;
@@ -294,7 +294,7 @@ public static class LicenseService
         {
             using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
             using var res = await http.GetAsync(
-                $"{BaseUrl}/license/check?id={Uri.EscapeDataString(purchaseId)}", ct);
+                $"{BaseUrl}/license/kiriha/check?id={Uri.EscapeDataString(purchaseId)}", ct);
             if (!res.IsSuccessStatusCode)
             {
                 // サーバー側の一時異常は失効と区別が付かないため猶予を消費するだけに留める

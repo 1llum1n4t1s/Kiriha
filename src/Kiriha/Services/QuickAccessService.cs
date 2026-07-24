@@ -21,6 +21,7 @@ internal static partial class QuickAccessService
 
     private const int SigdnNormalDisplay = 0;
     private const int SigdnFilesysPath = unchecked((int)0x80058000);
+    private const int RpcEChangedMode = unchecked((int)0x80010106);
 
     /// <summary>
     /// クイックアクセスのフォルダー一覧（表示名, パス）を返す。
@@ -63,6 +64,34 @@ internal static partial class QuickAccessService
         => GetSnapshot().RecentFiles;
 
     private static void EnumerateQuickAccess(
+        List<(string Name, string Path)> folders,
+        List<(string Name, string Path)> recent)
+    {
+        // source-generated COM（StrategyBasedComWrappers）は暗黙のアパートメント初期化をしないため、
+        // Task.Run の ThreadPool スレッド（未初期化なら MTA 扱い）で明示的に初期化しないと
+        // SHCreateItemFromParsingName が失敗し（別スレッドで既に初期化済みなら偶然成功する）、
+        // 「時々クイックアクセスがフォールバックになる」という再現しづらい不具合になる。
+        var initializeResult = CoInitializeEx(0, 0);
+        var shouldUninitialize = initializeResult >= 0;
+        if (initializeResult < 0 && initializeResult != RpcEChangedMode)
+        {
+            return;
+        }
+
+        try
+        {
+            EnumerateQuickAccessCore(folders, recent);
+        }
+        finally
+        {
+            if (shouldUninitialize)
+            {
+                CoUninitialize();
+            }
+        }
+    }
+
+    private static void EnumerateQuickAccessCore(
         List<(string Name, string Path)> folders,
         List<(string Name, string Path)> recent)
     {
@@ -144,6 +173,12 @@ internal static partial class QuickAccessService
 
     [LibraryImport("shell32.dll", StringMarshalling = StringMarshalling.Utf16)]
     private static partial int SHCreateItemFromParsingName(string pszPath, nint pbc, in Guid riid, out nint ppv);
+
+    [LibraryImport("ole32.dll")]
+    private static partial int CoInitializeEx(nint reserved, uint coInit);
+
+    [LibraryImport("ole32.dll")]
+    private static partial void CoUninitialize();
 }
 
 [GeneratedComInterface]

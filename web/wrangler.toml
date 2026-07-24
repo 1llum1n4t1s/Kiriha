@@ -12,14 +12,9 @@ custom_domain = true
 binding = "UPDATES"
 bucket_name = "kiriha-updates"
 
-# ライセンス失効リスト（返金された購入 ID を登録。/license/check が参照）
-[[kv_namespaces]]
-binding = "REVOKED"
-id = "f1caf52a477a42a5a80f0a0982b0d387"
-
-[vars]
-# Stripe Payment Link（/buy のリダイレクト先）
-PAYMENT_LINK_URL = "https://buy.stripe.com/8x25kF3yt29Zcul6B65kk00"
+# 購入・ライセンス発行/失効・管理 API は Sekisho hub（sekisho.nephilim.jp）へ移管済み。
+# 旧クライアント互換の /buy, /license/issue, /license/check は worker.js 内でハードコードした
+# hub の URL へリダイレクト/プロキシするだけなので、KV バインディングや Stripe 関連 vars は不要。
 
 [[rules]]
 type = "Text"

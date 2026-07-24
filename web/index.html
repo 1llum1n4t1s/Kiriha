@@ -144,13 +144,11 @@
     .btn-ghost:hover { background: #fafafa; transform: translateY(-2px); }
     .hero-meta { margin-top: 16px; font-size: 12.5px; color: var(--muted-2); }
 
-    /* ===== アプリの実スクリーンショット ===== */
-    .mock {
-      margin: 54px auto 0; max-width: 900px;
-      border-radius: var(--radius-lg); border: 1px solid var(--border);
-      box-shadow: var(--shadow-lg); overflow: hidden; line-height: 0;
-    }
-    .mock img { width: 100%; height: auto; display: block; }
+    /* ===== アプリの実スクリーンショット =====
+       画像自体が角丸ウィンドウの形で撮られているため、コンテナ側では
+       角丸・枠線・overflow による切り取りをしない（そのまま表示する）。 */
+    .mock { margin: 54px auto 0; max-width: 900px; line-height: 0; }
+    .mock img { width: 100%; height: auto; display: block; filter: drop-shadow(0 24px 50px rgba(0, 0, 0, .18)); }
 
     /* ===== セクション共通 ===== */
     section { position: relative; padding: 84px 0; }
@@ -292,7 +290,7 @@
 
         <!-- アプリの実スクリーンショット -->
         <div class="mock reveal" style="--delay: 380ms">
-          <img src="/hero-app.png" width="1340" height="728" loading="eager" fetchpriority="high"
+          <img src="/hero-app.png" width="1407" height="792" loading="eager" fetchpriority="high"
                alt="Kiriha のスクリーンショット: 垂直タブとフォルダーツリー、詳細表示のファイル一覧" />
         </div>
       </div>
