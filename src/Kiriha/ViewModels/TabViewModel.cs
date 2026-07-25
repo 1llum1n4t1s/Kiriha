@@ -1925,9 +1925,8 @@ public partial class TabViewModel : ObservableObject
         var sameDir = !isCut && files.Any(f => WindowsPathIdentity.Instance.Equals(
             Path.GetDirectoryName(f), dest));
 
-        // SHFileOperation は同期ブロッキングだが独自の進捗ダイアログを出すため背景スレッドで実行
+        // IFileOperation は同期ブロッキングだが独自の進捗ダイアログを出すため背景スレッドで実行
         var result = await Task.Run(() => FileOperationService.CopyOrMove(files, dest, move: isCut, renameOnCollision: sameDir));
-        if (result.IsBusy) { StatusText = "別のファイル操作が完了するまでお待ちください"; return; }
         if (result.IsSuccess && isCut) ClipboardFileService.Clear();
         if (result.IsSuccess) Refresh();
         else if (!result.IsCancelled) StatusText = $"貼り付けに失敗しました（{FormatOpError(result.NativeErrorCode)}）";
@@ -1956,8 +1955,7 @@ public partial class TabViewModel : ObservableObject
         var result = await Task.Run(() => FileOperationService.DeleteToRecycleBin(targets, permanent));
         if (!result.IsSuccess)
         {
-            if (result.IsBusy) StatusText = "別のファイル操作が完了するまでお待ちください";
-            else if (!result.IsCancelled) StatusText = $"削除に失敗しました（{FormatOpError(result.NativeErrorCode)}）";
+            if (!result.IsCancelled) StatusText = $"削除に失敗しました（{FormatOpError(result.NativeErrorCode)}）";
             return;
         }
         await NavigateToAsync(CurrentPath, record: false);
@@ -2017,31 +2015,20 @@ public partial class TabViewModel : ObservableObject
             var first = FileOperationService.Rename(entry.FullPath, temporary);
             if (!first.IsSuccess)
             {
-                if (first.IsBusy) StatusText = "別のファイル操作が完了するまでお待ちください";
-                else if (!first.IsCancelled) StatusText = $"名前を変更できませんでした（{FormatOpError(first.NativeErrorCode)}）";
+                if (!first.IsCancelled) StatusText = $"名前を変更できませんでした（{FormatOpError(first.NativeErrorCode)}）";
                 return;
             }
 
+            // 一時名への改名は既に成功しているため、ここで失敗したら一時名のまま残ってしまう。必ず元へ戻す。
             var second = FileOperationService.Rename(temporary, newPath);
             if (!second.IsSuccess)
             {
-                if (second.IsBusy)
-                {
-                    // 一時名への改名は既に成功しているため、ここで諦めると一時名のまま残ってしまう。
-                    // ゲートが空くまで少し待って retry する。
-                    await Task.Delay(300);
-                    second = FileOperationService.Rename(temporary, newPath);
-                }
-
-                if (!second.IsSuccess)
-                {
-                    var rollback = FileOperationService.Rename(temporary, entry.FullPath);
-                    StatusText = rollback.IsSuccess
-                        ? "名前を変更できなかったため、元の名前へ戻しました"
-                        : $"名前を変更できませんでした。一時名のまま残っています: {Path.GetFileName(temporary)}";
-                    await NavigateToAsync(CurrentPath, record: false);
-                    return;
-                }
+                var rollback = FileOperationService.Rename(temporary, entry.FullPath);
+                StatusText = rollback.IsSuccess
+                    ? "名前を変更できなかったため、元の名前へ戻しました"
+                    : $"名前を変更できませんでした。一時名のまま残っています: {Path.GetFileName(temporary)}";
+                await NavigateToAsync(CurrentPath, record: false);
+                return;
             }
         }
         else
@@ -2049,8 +2036,7 @@ public partial class TabViewModel : ObservableObject
             var result = FileOperationService.Rename(entry.FullPath, newPath);
             if (!result.IsSuccess)
             {
-                if (result.IsBusy) StatusText = "別のファイル操作が完了するまでお待ちください";
-                else if (!result.IsCancelled) StatusText = $"名前を変更できませんでした（{FormatOpError(result.NativeErrorCode)}）";
+                if (!result.IsCancelled) StatusText = $"名前を変更できませんでした（{FormatOpError(result.NativeErrorCode)}）";
                 return;
             }
         }
@@ -2131,10 +2117,6 @@ public partial class TabViewModel : ObservableObject
         {
             Refresh();
             StatusText = $"{effective.Count} 個の項目を{(move ? "移動" : "コピー")}しました";
-        }
-        else if (result.IsBusy)
-        {
-            StatusText = "別のファイル操作が完了するまでお待ちください";
         }
         else if (!result.IsCancelled)
         {
