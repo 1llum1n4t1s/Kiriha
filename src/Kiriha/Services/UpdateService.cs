@@ -19,7 +19,7 @@ public static class UpdateService
     /// <summary>
     /// 更新配信元のベース URL。改ざん防止のためハードコード固定（Lhamiel と同方針）。
     /// </summary>
-    public const string CanonicalUpdateBaseUrl = "https://kiriha.nephilim.jp";
+    public const string CanonicalUpdateBaseUrl = "https://kiriha.kagayoi.com";
 
     /// <summary>自動チェックのタイムアウト（半開き TCP / DNS 異常で長時間ロックされるのを防ぐ）。</summary>
     private static readonly TimeSpan AutomaticCheckTimeout = TimeSpan.FromSeconds(30);

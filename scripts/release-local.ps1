@@ -23,8 +23,8 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 $Bucket = 'kiriha-updates'
-$BaseUrl = 'https://kiriha.nephilim.jp'
-$ZoneName = 'nephilim.jp'
+$BaseUrl = 'https://kiriha.kagayoi.com'
+$ZoneName = 'kagayoi.com'
 $AccountId = '10901bfadbf1005164774a7350082985'
 $SecretsPath = 'C:\Users\IMT\dev\Secret\secrets.json'
 $CertSubjectName = 'Open Source Developer Yuichiro Shinozaki'

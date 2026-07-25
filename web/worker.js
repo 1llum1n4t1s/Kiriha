@@ -1,7 +1,7 @@
-// kiriha.nephilim.jp のランディングページ配信 + 自動更新配信 Worker。
+// kiriha.kagayoi.com のランディングページ配信 + 自動更新配信 Worker。
 //
 // トップページは Worker、更新ファイルは R2 バケットから返す。
-// 購入・ライセンス発行・失効照会・管理 API は Sekisho hub（sekisho.nephilim.jp）に移管済み。
+// 購入・ライセンス発行・失効照会・管理 API は Sekisho hub（sekisho.kagayoi.com）に移管済み。
 // 出荷済みクライアント（v1.0.26 以前）互換のため、旧パスは hub へリダイレクト/プロキシする:
 //   /buy             → hub の /buy/kiriha へ 302
 //   /license/issue   → hub の /license/kiriha/issue へ 302（session_id 等のクエリを引き継ぐ）
@@ -10,7 +10,7 @@ import landingHtml from "./index.html";
 import tokushohoHtml from "./tokushoho.html";
 import heroAppPng from "./hero-app.png";
 
-const SEKISHO_BASE = "https://sekisho.nephilim.jp";
+const SEKISHO_BASE = "https://sekisho.kagayoi.com";
 
 export default {
   async fetch(request, env) {

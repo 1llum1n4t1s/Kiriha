@@ -5,14 +5,14 @@ main = "worker.js"
 compatibility_date = "2026-05-01"
 
 [[routes]]
-pattern = "kiriha.nephilim.jp"
+pattern = "kiriha.kagayoi.com"
 custom_domain = true
 
 [[r2_buckets]]
 binding = "UPDATES"
 bucket_name = "kiriha-updates"
 
-# 購入・ライセンス発行/失効・管理 API は Sekisho hub（sekisho.nephilim.jp）へ移管済み。
+# 購入・ライセンス発行/失効・管理 API は Sekisho hub（sekisho.kagayoi.com）へ移管済み。
 # 旧クライアント互換の /buy, /license/issue, /license/check は worker.js 内でハードコードした
 # hub の URL へリダイレクト/プロキシするだけなので、KV バインディングや Stripe 関連 vars は不要。
 
@@ -30,3 +30,8 @@ fallthrough = false
 # 配信障害（R2 不調等）を事後調査できるよう Workers Logs を有効化する
 [observability]
 enabled = true
+
+# 旧ドメイン（2027/05/31 の nephilim.jp 廃止まで併走）
+[[routes]]
+pattern = "kiriha.nephilim.jp"
+custom_domain = true

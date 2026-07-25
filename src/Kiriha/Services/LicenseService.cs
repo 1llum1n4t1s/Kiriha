@@ -36,17 +36,17 @@ public enum LicenseState
 /// </summary>
 public static class LicenseService
 {
-    private const string BaseUrl = "https://sekisho.nephilim.jp";
+    private const string BaseUrl = "https://sekisho.kagayoi.com";
 
     /// <summary>
     /// 失効照会の URL（優先順）。ライセンス基盤（Sekisho hub）へ直接照会し、
     /// hub ドメインの移転・喪失時にも出荷済みクライアントが 30 日後に恒久ロックされないよう、
-    /// 自前ドメインの互換プロキシ（kiriha.nephilim.jp → hub へ転送）をフォールバックに持つ。
+    /// 自前ドメインの互換プロキシ（kiriha.kagayoi.com → hub へ転送）をフォールバックに持つ。
     /// </summary>
     private static readonly string[] CheckUrls =
     [
         $"{BaseUrl}/license/kiriha/check",
-        "https://kiriha.nephilim.jp/license/check",
+        "https://kiriha.kagayoi.com/license/check",
     ];
 
     /// <summary>
