@@ -164,14 +164,27 @@ public partial class FileSystemEntry : ObservableObject
         }
     }
 
+    /// <summary>サイズをエクスプローラー同様の単位付き表記にする。
+    /// 数値部分は現在のカルチャの書式（小数点記号・桁区切り）に従う。テラバイト級で GB 値が
+    /// 4 桁以上になるため、桁区切りを効かせる書式を使う。
+    ///
+    /// 端数はエクスプローラーと同じく切り捨てる。四捨五入すると 1048575 B（= 1023.999… KB）が
+    /// 「1,024 KB」と表示され、次の単位の 1 MB と区別できなくなるため。</summary>
     public static string FormatSize(long size)
     {
         return size switch
         {
-            < 1024 => $"{size} B",
-            < 1024 * 1024 => $"{size / 1024.0:0.#} KB",
-            < 1024L * 1024 * 1024 => $"{size / (1024.0 * 1024):0.#} MB",
-            _ => $"{size / (1024.0 * 1024 * 1024):0.##} GB",
+            < 1024 => $"{size:#,##0} B",
+            < 1024 * 1024 => $"{TruncateTo(size / 1024.0, 1):#,##0.#} KB",
+            < 1024L * 1024 * 1024 => $"{TruncateTo(size / (1024.0 * 1024), 1):#,##0.#} MB",
+            _ => $"{TruncateTo(size / (1024.0 * 1024 * 1024), 2):#,##0.##} GB",
         };
+    }
+
+    /// <summary>指定桁数で切り捨てる（表示用。丸めで上位単位の値に見えるのを防ぐ）。</summary>
+    private static double TruncateTo(double value, int decimals)
+    {
+        var scale = Math.Pow(10, decimals);
+        return Math.Truncate(value * scale) / scale;
     }
 }

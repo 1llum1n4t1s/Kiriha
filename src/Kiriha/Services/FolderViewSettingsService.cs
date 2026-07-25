@@ -31,20 +31,21 @@ internal sealed partial class FolderViewSettingsJsonContext : JsonSerializerCont
 /// <summary>
 /// フォルダー別表示設定をメモリ上の辞書で管理し、変更をまとめて JSON へ永続化する。
 /// </summary>
-internal sealed class FolderViewSettingsService
+internal sealed class FolderViewSettingsService : IDisposable
 {
     private const int MaxEntries = 4096;
     private static readonly TimeSpan SaveDelay = TimeSpan.FromMilliseconds(750);
-    private static readonly string SettingsDirectory = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Kiriha");
-    private static readonly string SettingsPath = Path.Combine(SettingsDirectory, "folder-views.json");
-    private static readonly string BackupPath = SettingsPath + ".bak";
+    // 置き場は AppStoragePaths が正本（テストが実ユーザーの設定を壊さないよう差し替え可能）。
+    private static string SettingsDirectory => AppStoragePaths.Directory;
+    private static string SettingsPath => Path.Combine(SettingsDirectory, "folder-views.json");
+    private static string BackupPath => SettingsPath + ".bak";
 
     private readonly Lock _gate = new();
     private readonly Lock _writeGate = new();
     private readonly Dictionary<string, FolderViewSettings> _settings = new(WindowsPathIdentity.Instance);
     private readonly Timer _saveTimer;
     private bool _dirty;
+    private bool _disposed;
 
     public FolderViewSettingsService()
     {
@@ -83,6 +84,13 @@ internal sealed class FolderViewSettingsService
 
         lock (_gate)
         {
+            // 破棄後は記憶を変更しない。Dispose で書き切った後に遅れて Set / Clear が届いても
+            // 保存済みの内容を上書きしないようにする（終了処理の順序に依存しないため）。
+            if (_disposed)
+            {
+                return;
+            }
+
             if (_settings.TryGetValue(normalizedPath, out var current)
                 && HasSameViewSettings(current, settings))
             {
@@ -99,7 +107,7 @@ internal sealed class FolderViewSettingsService
             stored.UpdatedUtcTicks = DateTime.UtcNow.Ticks;
             _settings[normalizedPath] = stored;
             _dirty = true;
-            _saveTimer.Change(SaveDelay, Timeout.InfiniteTimeSpan);
+            ScheduleSave();
         }
     }
 
@@ -107,15 +115,56 @@ internal sealed class FolderViewSettingsService
     {
         lock (_gate)
         {
+            // Set と同じ理由で、破棄後の全消去は保存済みの内容へ反映しない。
+            if (_disposed)
+            {
+                return;
+            }
+
             _settings.Clear();
             _dirty = true;
-            _saveTimer.Change(SaveDelay, Timeout.InfiniteTimeSpan);
+            ScheduleSave();
         }
+    }
+
+    /// <summary>遅延保存を予約する。呼び出し元は破棄済みを弾いているが、
+    /// タイマー操作の単一の出口として破棄済みガードもここに置く（_gate 内から呼ぶ）。</summary>
+    private void ScheduleSave()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _saveTimer.Change(SaveDelay, Timeout.InfiniteTimeSpan);
     }
 
     /// <summary>終了時などに保留中の変更を同期的に書き出す。</summary>
     public void Flush()
         => SavePending();
+
+    /// <summary>
+    /// 遅延保存タイマーを止め、保留中の変更を書き切る。多重呼び出しは安全。
+    /// 破棄後は Set / Clear を無視するため、書き切った内容が後から上書きされることはない。
+    /// 破棄後の Flush も（保留がないので）ファイルを変更しない。
+    /// </summary>
+    public void Dispose()
+    {
+        lock (_gate)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _disposed = true;
+            _saveTimer.Change(Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+        }
+
+        // タイマー停止後に保留分を書き切る（_gate の外で行い、SavePending 内の lock と競合させない）。
+        SavePending();
+        _saveTimer.Dispose();
+    }
 
     private void Load()
     {
@@ -133,8 +182,25 @@ internal sealed class FolderViewSettingsService
                 continue;
             }
 
+            // 正規化で複数エントリが同じキーへ畳まれることがある（区切り文字統一の強化以前に
+            // C:/work と C:\work の両方が記録されていた場合など）。保存は新しい順に並べるため
+            // 素朴に代入すると後から来る古いエントリが新しい設定を上書きしてしまう。
+            // 最も新しい更新日時のものを残す。
+            if (_settings.TryGetValue(normalizedPath, out var existing)
+                && existing.UpdatedUtcTicks >= entry.UpdatedUtcTicks)
+            {
+                // 重複を1件に畳んだ結果はファイルへ書き戻す必要がある。
+                _dirty = true;
+                continue;
+            }
+
             var stored = Clone(entry);
             stored.Path = normalizedPath;
+            if (_settings.ContainsKey(normalizedPath))
+            {
+                _dirty = true;
+            }
+
             _settings[normalizedPath] = stored;
         }
 
@@ -177,7 +243,15 @@ internal sealed class FolderViewSettingsService
                     return;
                 }
 
-                _saveTimer.Change(Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+                // 破棄済みなら Change は ObjectDisposedException を投げる。
+                // 終了処理は ShutdownRequested で Dispose → その後 MainWindow.OnClosing 経由で Flush が
+                // 走る順序になり得るため（保存が失敗して _dirty が戻った場合はここへ到達する）、
+                // 破棄済みではタイマー操作を飛ばして書き出しだけ行う。
+                if (!_disposed)
+                {
+                    _saveTimer.Change(Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+                }
+
                 store = new FolderViewSettingsStore
                 {
                     Folders = _settings.Values

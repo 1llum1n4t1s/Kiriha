@@ -5,4 +5,7 @@
   <Project Path="src/Kiriha/Kiriha.csproj">
     <Platform Project="x64" />
   </Project>
+  <Project Path="tests/Kiriha.Tests/Kiriha.Tests.csproj">
+    <Platform Project="x64" />
+  </Project>
 </Solution>

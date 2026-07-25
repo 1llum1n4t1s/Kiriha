@@ -181,42 +181,81 @@ internal sealed partial class SettingsJsonContext : JsonSerializerContext;
 
 public static class SettingsService
 {
-    private static readonly string SettingsPath = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "Kiriha", "settings.json");
-    private static readonly string BackupPath = SettingsPath + ".bak";
+    // 置き場は AppStoragePaths が正本（テストが実ユーザーの設定を壊さないよう差し替え可能）。
+    private static string SettingsPath => Path.Combine(AppStoragePaths.Directory, "settings.json");
+    private static string BackupPath => SettingsPath + ".bak";
+
+    /// <summary>ファイル共有違反で読めなかったときの再試行回数と間隔。
+    /// Save は一時ファイル + File.Replace で置き換えるため、その瞬間に読むと一時的に開けないことがある。</summary>
+    private const int ReadRetryCount = 3;
+    private const int ReadRetryDelayMilliseconds = 30;
 
     public static AppSettings Load()
     {
-        try
+        // 本体 → バックアップの順に試す。本体が「壊れている」場合だけでなく「存在しない」場合も
+        // バックアップを見る: Save の File.Replace は本体を .bak へ移してから一時ファイルを本体名へ
+        // 置き換えるため、その途中でプロセスが落ちると「本体なし + 正常な .bak」だけが残り、
+        // 以前はバックアップを無視して設定が既定値へ戻っていた。
+        if (TryLoadFrom(SettingsPath, isBackup: false) is { } primary)
         {
-            if (File.Exists(SettingsPath))
-            {
-                return JsonSerializer.Deserialize(File.ReadAllText(SettingsPath), SettingsJsonContext.Default.AppSettings)
-                       ?? new AppSettings();
-            }
+            return primary;
         }
-        catch (Exception ex)
+
+        if (TryLoadFrom(BackupPath, isBackup: true) is { } backup)
         {
-            Logger.LogException("設定ファイルを読み込めませんでした", ex);
-            PreserveCorruptSettings();
-            try
-            {
-                if (File.Exists(BackupPath))
-                {
-                    return JsonSerializer.Deserialize(
-                               File.ReadAllText(BackupPath),
-                               SettingsJsonContext.Default.AppSettings)
-                           ?? new AppSettings();
-                }
-            }
-            catch (Exception backupEx)
-            {
-                Logger.LogException("設定バックアップも読み込めませんでした", backupEx);
-            }
+            return backup;
         }
 
         return new AppSettings();
+    }
+
+    /// <summary>指定ファイルから設定を読む。読めない・壊れている場合は null。</summary>
+    private static AppSettings? TryLoadFrom(string path, bool isBackup)
+    {
+        var label = isBackup ? "設定バックアップ" : "設定ファイル";
+        for (var attempt = 0; ; attempt++)
+        {
+            if (!File.Exists(path))
+            {
+                return null;
+            }
+
+            string text;
+            try
+            {
+                text = File.ReadAllText(path);
+            }
+            catch (IOException ex) when (attempt < ReadRetryCount)
+            {
+                // 保存処理との競合による一時的な共有違反。壊れたと決めつけず読み直す。
+                Logger.Log($"{label}を読み込めませんでした（再試行します）: {ex.Message}", LogLevel.Debug);
+                Thread.Sleep(ReadRetryDelayMilliseconds);
+                continue;
+            }
+            catch (Exception ex)
+            {
+                // I/O 系の失敗はファイルの内容が壊れた証拠ではないため退避しない。
+                Logger.LogException($"{label}を読み込めませんでした", ex);
+                return null;
+            }
+
+            try
+            {
+                return JsonSerializer.Deserialize(text, SettingsJsonContext.Default.AppSettings)
+                       ?? new AppSettings();
+            }
+            catch (JsonException ex)
+            {
+                // 内容が本当に壊れているときだけ退避する（正常なファイルで *.corrupt.json を増やさない）。
+                Logger.LogException($"{label}の内容が壊れています", ex);
+                if (!isBackup)
+                {
+                    PreserveCorruptSettings();
+                }
+
+                return null;
+            }
+        }
     }
 
     public static void Save(AppSettings settings)

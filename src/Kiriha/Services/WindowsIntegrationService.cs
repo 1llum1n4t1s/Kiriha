@@ -11,18 +11,25 @@ namespace Kiriha.Services;
 public static partial class WindowsIntegrationService
 {
     private const string AppName = "Kiriha";
-    private const string RunKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Run";
     private const string MenuLabel = "Kiriha で開く";
-    private const string AssociationBackupPath = @"Software\Kiriha\ExplorerAssociationBackup";
     private const int ShcneAssocChanged = 0x08000000;
     private const uint ShcnfIdList = 0x0000;
 
+    // HKCU 配下のキーパスはすべて AppStoragePaths で解決する（テストが実ユーザーのスタートアップ登録・
+    // エクスプローラー関連付けを壊さず、退避先のキー配下だけで検証できるようにするため）。
+    private static string RunKeyPath => AppStoragePaths.RegistryPath(@"Software\Microsoft\Windows\CurrentVersion\Run");
+    private static string AssociationBackupPath => AppStoragePaths.RegistryPath(@"Software\Kiriha\ExplorerAssociationBackup");
+
     // フォルダー本体の右クリックと、フォルダー内の空白（背景）の右クリックの両方に登録する。
-    private static readonly string[] ShellRoots =
-    {
-        @"Software\Classes\Directory\shell",
-        @"Software\Classes\Directory\Background\shell",
-    };
+    private static string[] ShellRoots =>
+    [
+        AppStoragePaths.RegistryPath(@"Software\Classes\Directory\shell"),
+        AppStoragePaths.RegistryPath(@"Software\Classes\Directory\Background\shell"),
+    ];
+
+    /// <summary>シェルクラス（Directory / Drive）の shell キーパス。</summary>
+    private static string ShellClassPath(string className)
+        => AppStoragePaths.RegistryPath($@"Software\Classes\{className}\shell");
 
     // 実ファイルシステムのフォルダーとドライブだけを対象にする。
     // Folder クラスはコントロールパネル等の仮想シェル項目にも使われるため変更しない。
@@ -146,7 +153,7 @@ public static partial class WindowsIntegrationService
             using var currentUser = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64);
             return DefaultOpenClasses.All(className =>
             {
-                using var shell = currentUser.OpenSubKey($@"Software\Classes\{className}\shell");
+                using var shell = currentUser.OpenSubKey(ShellClassPath(className));
                 return string.Equals(shell?.GetValue(null) as string, AppName, StringComparison.OrdinalIgnoreCase);
             });
         }
@@ -173,7 +180,7 @@ public static partial class WindowsIntegrationService
 
             foreach (var className in DefaultOpenClasses)
             {
-                var shellPath = $@"Software\Classes\{className}\shell";
+                var shellPath = ShellClassPath(className);
                 using var shell = currentUser.CreateSubKey(shellPath);
                 if (shell is null)
                 {

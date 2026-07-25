@@ -1279,6 +1279,19 @@ public partial class MainWindowViewModel : ObservableObject
         _settings.WindowMonitorHeight = monitor.Height;
     }
 
+    /// <summary>プロセス終了時に呼ぶ。保留中の記憶を書き切って遅延保存タイマーを止める。</summary>
+    public void Shutdown()
+    {
+        try
+        {
+            _folderViewSettings.Dispose();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException("終了処理でフォルダー別表示設定を保存できませんでした", ex);
+        }
+    }
+
     private void SaveOpenTabsAndSettings()
     {
         _settings.OpenTabPaths = Tabs

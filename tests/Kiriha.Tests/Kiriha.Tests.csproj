@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- 参照先（Kiriha 本体）が Windows 専用 TFM のため合わせる。テストは AOT publish しない。 -->
+    <OutputType>Library</OutputType>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <!-- 本体は WinExe だが、テストからの参照自体は問題ない。AOT / trim 設定は継承しない。 -->
+    <PublishAot>false</PublishAot>
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">win-x64</RuntimeIdentifier>
+    <!-- source-generated COM を含むアセンブリを参照するため -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!--
+      xUnit1051 = 「CancellationToken を受け取るメソッドには TestContext.Current.CancellationToken を渡せ」。
+      並行性テストは Barrier / CountdownEvent で参加者数を固定しているため、一部のタスクだけが
+      途中でキャンセルされると「失敗」ではなく「バリアで待ち続けてハング」になる。
+      テストのキャンセル応答性より確定的な失敗を優先するため、この指摘は意図的に抑制する。
+    -->
+    <NoWarn>$(NoWarn);xUnit1051</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit.v3" Version="3.1.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Kiriha\Kiriha.csproj" />
+  </ItemGroup>
+
+</Project>
