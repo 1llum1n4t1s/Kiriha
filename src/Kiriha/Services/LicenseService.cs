@@ -63,7 +63,8 @@ public static class LicenseService
     private const string KeyPrefix = "KIRIHA-";
     private const int TrialDays = 14;
     private const int OfflineGraceDays = 30;
-    private const string TrialRegistryKey = @"Software\Kiriha";
+    // 置き場は AppStoragePaths が正本（テストが実ユーザーのライセンス状態を壊さないよう差し替え可能）。
+    private static string TrialRegistryKey => AppStoragePaths.RegistryPath(@"Software\Kiriha");
     private const string TrialRegistryValue = "TrialStart";
 
     private static readonly Lock Gate = new();
@@ -79,8 +80,10 @@ public static class LicenseService
     /// <summary>状態が変わったとき（UI 表示・ロック再評価用。UI スレッドで発火）。</summary>
     public static event Action? StateChanged;
 
-    private static string StatePath => Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Kiriha", "license.json");
+    private static string StatePath => Path.Combine(AppStoragePaths.Directory, "license.json");
+
+    /// <summary>試用開始日時の記録先ファイル（レジストリと二重に記録して古い方を採用する）。</summary>
+    private static string TrialFilePath => Path.Combine(AppStoragePaths.Directory, "trial.dat");
 
     /// <summary>起動時に呼ぶ。ローカルのキー検証で即時に状態を決め、裏で失効リストを照会する。</summary>
     public static void Initialize()
@@ -166,8 +169,7 @@ public static class LicenseService
     /// <summary>試用開始日時。ファイルとレジストリの両方に記録し、古い方を採用する（単純な再インストール対策）。</summary>
     private static DateTime GetOrCreateTrialStartUtc()
     {
-        var trialFile = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Kiriha", "trial.dat");
+        var trialFile = TrialFilePath;
         DateTime? fromFile = null, fromRegistry = null;
         try
         {

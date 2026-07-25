@@ -117,18 +117,26 @@ internal static partial class FileOperationService
         }
     }
 
-    /// <summary>ファイル操作の主要なエラーコードを利用者向けの日本語説明へ変換する。
-    /// 未知のコードは空文字を返し、呼び出し元は生コード表示のままにする。</summary>
+    /// <summary>
+    /// ファイル操作の主要なエラーコードを利用者向けの日本語説明へ変換する。
+    /// 未知のコードは空文字を返し、呼び出し元は生コード表示のままにする。
+    ///
+    /// ここで扱うのは <see cref="ToErrorCode"/> が HRESULT_FROM_WIN32 から取り出した Win32 エラー番号だけ。
+    /// 旧 SHFileOperationW 時代のコピーエンジン固有コード（DE_SAMEFILE=0x71 / DE_INVALIDFILES=0x7C）は
+    /// 意図的に載せない: IFileOperation はそれらを HRESULT で返すため素の 0x71 / 0x7C は届かず、
+    /// 逆に Win32 の 113 / 124 が同じ数値で届いて誤った説明を出してしまうため。
+    /// コピーエンジン固有の失敗は説明なしのコード表示になる（ログには hr がそのまま残る）。
+    /// </summary>
     public static string DescribeError(int code) => code switch
     {
         2 or 3 => "パスが見つかりません",           // ERROR_FILE_NOT_FOUND / ERROR_PATH_NOT_FOUND
         5 => "アクセスが拒否されました",             // ERROR_ACCESS_DENIED
         19 => "書き込み禁止です",                    // ERROR_WRITE_PROTECT
         32 => "他のプロセスが使用中です",            // ERROR_SHARING_VIOLATION
+        80 => "同じ名前のファイルが既に存在します",  // ERROR_FILE_EXISTS
         112 => "ディスクの空き領域が不足しています", // ERROR_DISK_FULL
+        123 => "ファイル名に使えない文字が含まれています", // ERROR_INVALID_NAME
         206 => "パスが長すぎます",                   // ERROR_FILENAME_EXCED_RANGE
-        0x71 => "同じファイルが既に存在します",      // DE_SAMEFILE
-        0x7C => "パスが無効です",                    // DE_INVALIDFILES
         _ => string.Empty,
     };
 

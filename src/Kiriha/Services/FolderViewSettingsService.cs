@@ -31,20 +31,21 @@ internal sealed partial class FolderViewSettingsJsonContext : JsonSerializerCont
 /// <summary>
 /// フォルダー別表示設定をメモリ上の辞書で管理し、変更をまとめて JSON へ永続化する。
 /// </summary>
-internal sealed class FolderViewSettingsService
+internal sealed class FolderViewSettingsService : IDisposable
 {
     private const int MaxEntries = 4096;
     private static readonly TimeSpan SaveDelay = TimeSpan.FromMilliseconds(750);
-    private static readonly string SettingsDirectory = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Kiriha");
-    private static readonly string SettingsPath = Path.Combine(SettingsDirectory, "folder-views.json");
-    private static readonly string BackupPath = SettingsPath + ".bak";
+    // 置き場は AppStoragePaths が正本（テストが実ユーザーの設定を壊さないよう差し替え可能）。
+    private static string SettingsDirectory => AppStoragePaths.Directory;
+    private static string SettingsPath => Path.Combine(SettingsDirectory, "folder-views.json");
+    private static string BackupPath => SettingsPath + ".bak";
 
     private readonly Lock _gate = new();
     private readonly Lock _writeGate = new();
     private readonly Dictionary<string, FolderViewSettings> _settings = new(WindowsPathIdentity.Instance);
     private readonly Timer _saveTimer;
     private bool _dirty;
+    private bool _disposed;
 
     public FolderViewSettingsService()
     {
@@ -99,7 +100,7 @@ internal sealed class FolderViewSettingsService
             stored.UpdatedUtcTicks = DateTime.UtcNow.Ticks;
             _settings[normalizedPath] = stored;
             _dirty = true;
-            _saveTimer.Change(SaveDelay, Timeout.InfiniteTimeSpan);
+            ScheduleSave();
         }
     }
 
@@ -109,13 +110,44 @@ internal sealed class FolderViewSettingsService
         {
             _settings.Clear();
             _dirty = true;
-            _saveTimer.Change(SaveDelay, Timeout.InfiniteTimeSpan);
+            ScheduleSave();
         }
+    }
+
+    /// <summary>遅延保存を予約する。破棄済みなら止めたタイマーを再開させない（_gate 内から呼ぶ）。</summary>
+    private void ScheduleSave()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _saveTimer.Change(SaveDelay, Timeout.InfiniteTimeSpan);
     }
 
     /// <summary>終了時などに保留中の変更を同期的に書き出す。</summary>
     public void Flush()
         => SavePending();
+
+    /// <summary>遅延保存タイマーを止め、保留中の変更を書き切る。
+    /// 破棄後に Set / Clear されても、止めたタイマーを再開させないようにする。</summary>
+    public void Dispose()
+    {
+        lock (_gate)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _disposed = true;
+            _saveTimer.Change(Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+        }
+
+        // タイマー停止後に保留分を書き切る（_gate の外で行い、SavePending 内の lock と競合させない）。
+        SavePending();
+        _saveTimer.Dispose();
+    }
 
     private void Load()
     {

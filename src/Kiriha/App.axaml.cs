@@ -48,6 +48,11 @@ public partial class App : Application
 
             SetupTrayIcon(mainWindow, viewModel, desktop);
 
+            // プロセス終了時にフォルダー別表示設定の遅延保存タイマーを止め、保留分を書き切る。
+            // ウィンドウの Closing ではなく Shutdown に繋ぐ: トレイ格納運用ではウィンドウが閉じても
+            // アプリは生き続けるため、Closing で破棄すると以降の記憶が保存されなくなる。
+            desktop.ShutdownRequested += (_, _) => viewModel.Shutdown();
+
             // Opened はトレイ格納からの Show() 復元でも再発火するため、起動時1回だけ行うべき
             // 更新チェック・トレイ格納開始は購読解除して多重実行を防ぐ（Lhamiel と同方式）。
             EventHandler? onFirstOpened = null;
