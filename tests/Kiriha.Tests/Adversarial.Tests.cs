@@ -1038,26 +1038,39 @@ public class FolderViewSettingsServiceConcurrencyTests
 
     /// @severity=high
     /// @description 終了処理は ShutdownRequested で Dispose → その後 MainWindow.OnClosing 経由で
-    /// Flush が走る順序になり得る。破棄後の Flush / Set / Clear で ObjectDisposedException を投げると
-    /// 終了処理が中断してウィンドウ位置などの保存が飛ぶため、投げずに済むこと。
+    /// Flush が走る順序になり得る。破棄後の Flush / Set / Clear が例外を投げると終了処理が中断して
+    /// ウィンドウ位置などの保存が飛ぶため投げないこと。さらに、破棄時点の保留分が確実に書き出され、
+    /// 破棄後の Set / Clear が「書き切った内容」を上書きしないこと（特に Clear による全消去）。
     [Fact]
-    public void 破棄後にFlushやSetを呼んでも例外を投げないこと()
+    public void 破棄後のFlushやSetが例外を投げず保存済みの内容を壊さないこと()
     {
         using var scope = new AppStorageScope();
+        const string beforeDispose = @"C:\Kiriha.Tests\after-dispose";
+        const string afterDispose = @"C:\Kiriha.Tests\after-dispose2";
+
         var service = new FolderViewSettingsService();
-        service.Set(@"C:\Kiriha.Tests\after-dispose", TestFolderView.Variant(0));
+        service.Set(beforeDispose, TestFolderView.Variant(0));
 
         service.Dispose();
         service.Dispose(); // 二重破棄も安全
 
+        // 破棄後の呼び出しはいずれも例外を投げず、保存内容も変えない
         service.Flush();
-        service.Set(@"C:\Kiriha.Tests\after-dispose2", TestFolderView.Variant(1));
+        service.Set(afterDispose, TestFolderView.Variant(1));
         service.Clear();
         service.Flush();
 
-        // 破棄時点の保留分は書き切られている
         var store = TestFolderView.ReadStore(scope.FolderViewsPath);
-        Assert.NotNull(store);
+
+        // 破棄時点の保留分は書き切られている（後続の Clear で消えていない）
+        var persisted = Assert.Single(store.Folders);
+        Assert.Equal(beforeDispose, persisted.Path, ignoreCase: true);
+        Assert.True(TestFolderView.IsConsistent(persisted));
+
+        // 破棄後に Set したエントリは永続化されない
+        Assert.DoesNotContain(
+            store.Folders,
+            folder => folder.Path.Equals(afterDispose, StringComparison.OrdinalIgnoreCase));
     }
 
     /// @severity=low

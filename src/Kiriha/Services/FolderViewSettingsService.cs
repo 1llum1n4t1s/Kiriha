@@ -84,6 +84,13 @@ internal sealed class FolderViewSettingsService : IDisposable
 
         lock (_gate)
         {
+            // 破棄後は記憶を変更しない。Dispose で書き切った後に遅れて Set / Clear が届いても
+            // 保存済みの内容を上書きしないようにする（終了処理の順序に依存しないため）。
+            if (_disposed)
+            {
+                return;
+            }
+
             if (_settings.TryGetValue(normalizedPath, out var current)
                 && HasSameViewSettings(current, settings))
             {
@@ -108,13 +115,20 @@ internal sealed class FolderViewSettingsService : IDisposable
     {
         lock (_gate)
         {
+            // Set と同じ理由で、破棄後の全消去は保存済みの内容へ反映しない。
+            if (_disposed)
+            {
+                return;
+            }
+
             _settings.Clear();
             _dirty = true;
             ScheduleSave();
         }
     }
 
-    /// <summary>遅延保存を予約する。破棄済みなら止めたタイマーを再開させない（_gate 内から呼ぶ）。</summary>
+    /// <summary>遅延保存を予約する。呼び出し元は破棄済みを弾いているが、
+    /// タイマー操作の単一の出口として破棄済みガードもここに置く（_gate 内から呼ぶ）。</summary>
     private void ScheduleSave()
     {
         if (_disposed)
@@ -129,8 +143,11 @@ internal sealed class FolderViewSettingsService : IDisposable
     public void Flush()
         => SavePending();
 
-    /// <summary>遅延保存タイマーを止め、保留中の変更を書き切る。
-    /// 破棄後に Set / Clear されても、止めたタイマーを再開させないようにする。</summary>
+    /// <summary>
+    /// 遅延保存タイマーを止め、保留中の変更を書き切る。多重呼び出しは安全。
+    /// 破棄後は Set / Clear を無視するため、書き切った内容が後から上書きされることはない。
+    /// 破棄後の Flush も（保留がないので）ファイルを変更しない。
+    /// </summary>
     public void Dispose()
     {
         lock (_gate)
