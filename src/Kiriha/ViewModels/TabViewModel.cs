@@ -348,25 +348,25 @@ public partial class TabViewModel : ObservableObject
             var decodeWidth = IsGalleryView ? 1920 : 480;
             if (ImageExtensions.Contains(ext) && entry.Size is < 64 * 1024 * 1024)
             {
-                var bmp = await Task.Run(() =>
+                var bmp = await Task.Run(
+                    () => ImageDecodeService.TryDecodeToWidth(entry.FullPath, decodeWidth, cts.Token), cts.Token);
+                if (cts.IsCancellationRequested)
                 {
-                    using var stream = File.OpenRead(entry.FullPath);
-                    return Bitmap.DecodeToWidth(stream, decodeWidth);
-                }, cts.Token);
-                if (!cts.IsCancellationRequested)
+                    bmp?.Dispose();
+                    return;
+                }
+
+                if (bmp is not null)
                 {
                     PreviewBitmap?.Dispose();
                     PreviewBitmap = bmp;
                     PreviewText = "";
                     // 画像は寸法も表示する
                     PreviewInfo = $"{entry.Name}\n{entry.TypeText}  {entry.SizeText}  {bmp.PixelSize.Width}×{bmp.PixelSize.Height}\n更新日時: {entry.ModifiedText}";
-                }
-                else
-                {
-                    bmp.Dispose();
+                    return;
                 }
 
-                return;
+                // 読み取り自体に失敗した場合（クラウドドライブの瞬断など）は情報表示のみへフォールスルー
             }
 
             if (ShellImageThumbnailExtensions.Contains(ext))
@@ -794,8 +794,7 @@ public partial class TabViewModel : ObservableObject
                     return ShellThumbnailService.TryGetThumbnail(entry.FullPath, ThumbnailPixelSize);
                 }
 
-                using var stream = File.OpenRead(entry.FullPath);
-                return Bitmap.DecodeToWidth(stream, ThumbnailPixelSize);
+                return ImageDecodeService.TryDecodeToWidth(entry.FullPath, ThumbnailPixelSize, token);
             }).ConfigureAwait(false);
             PostThumbnail(entry, full, token, isFinal: true);
         }

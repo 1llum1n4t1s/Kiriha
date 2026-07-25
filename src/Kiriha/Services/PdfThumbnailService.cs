@@ -11,7 +11,14 @@ internal static class PdfThumbnailService
     {
         try
         {
-            using var pdfStream = File.OpenRead(path);
+            // pdfium もネイティブ側から managed ストリームを読み返すため、
+            // 途中の I/O 例外でプロセスが落ちないようメモリへ読み切ってから渡す（ImageDecodeService 参照）。
+            if (ImageDecodeService.TryReadAllBytes(path) is not { } bytes)
+            {
+                return null;
+            }
+
+            using var pdfStream = new MemoryStream(bytes, writable: false);
             using var rendered = Conversion.ToImage(
                 pdfStream,
                 page: 0,
