@@ -165,8 +165,25 @@ internal sealed class FolderViewSettingsService : IDisposable
                 continue;
             }
 
+            // 正規化で複数エントリが同じキーへ畳まれることがある（区切り文字統一の強化以前に
+            // C:/work と C:\work の両方が記録されていた場合など）。保存は新しい順に並べるため
+            // 素朴に代入すると後から来る古いエントリが新しい設定を上書きしてしまう。
+            // 最も新しい更新日時のものを残す。
+            if (_settings.TryGetValue(normalizedPath, out var existing)
+                && existing.UpdatedUtcTicks >= entry.UpdatedUtcTicks)
+            {
+                // 重複を1件に畳んだ結果はファイルへ書き戻す必要がある。
+                _dirty = true;
+                continue;
+            }
+
             var stored = Clone(entry);
             stored.Path = normalizedPath;
+            if (_settings.ContainsKey(normalizedPath))
+            {
+                _dirty = true;
+            }
+
             _settings[normalizedPath] = stored;
         }
 
@@ -209,7 +226,15 @@ internal sealed class FolderViewSettingsService : IDisposable
                     return;
                 }
 
-                _saveTimer.Change(Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+                // 破棄済みなら Change は ObjectDisposedException を投げる。
+                // 終了処理は ShutdownRequested で Dispose → その後 MainWindow.OnClosing 経由で Flush が
+                // 走る順序になり得るため（保存が失敗して _dirty が戻った場合はここへ到達する）、
+                // 破棄済みではタイマー操作を飛ばして書き出しだけ行う。
+                if (!_disposed)
+                {
+                    _saveTimer.Change(Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+                }
+
                 store = new FolderViewSettingsStore
                 {
                     Folders = _settings.Values

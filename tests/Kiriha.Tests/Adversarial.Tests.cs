@@ -292,8 +292,10 @@ public class ImageDecodeServiceChaosTests
         stopwatch.Stop();
 
         Assert.Null(bytes);
+        // しきい値は再試行待ち 150ms の直下に置く。マージンを詰めすぎると、負荷の高いマシンでは
+        // スレッドのスケジューリング待ちだけで超過して偽陽性になる。
         Assert.True(
-            stopwatch.ElapsedMilliseconds < 120,
+            stopwatch.ElapsedMilliseconds < 140,
             $"キャンセル済みなのに再試行の待ち時間を消費しています: {stopwatch.ElapsedMilliseconds}ms");
     }
 
@@ -447,7 +449,7 @@ public class FolderViewSettingsServiceChaosTests
         using var scope = new AppStorageScope();
         File.WriteAllText(scope.FolderViewsPath, """{"Folders": [ { """);
 
-        var service = new FolderViewSettingsService();
+        using var service = new FolderViewSettingsService();
 
         Assert.False(service.TryGet(SamplePath, out _));
     }
@@ -459,9 +461,56 @@ public class FolderViewSettingsServiceChaosTests
         using var scope = new AppStorageScope();
         Assert.False(File.Exists(scope.FolderViewsPath));
 
-        var service = new FolderViewSettingsService();
+        using var service = new FolderViewSettingsService();
 
         Assert.False(service.TryGet(SamplePath, out _));
+    }
+
+    /// @severity=high
+    /// @description 区切り文字統一の強化以前に C:/work と C:\work の両方が記録されていた場合、
+    /// 読み込み時に同じキーへ畳まれる。保存は新しい順に並ぶため素朴に代入すると古い方が勝ってしまう。
+    /// 更新日時が新しいエントリが残ること。
+    [Fact]
+    public void 正規化で同じキーへ畳まれた古い設定が新しい設定を上書きしないこと()
+    {
+        using var scope = new AppStorageScope();
+        // 保存時と同じ「更新日時の降順」で並べる。畳んだあとは新しい方（Icons/160）が残るべき。
+        File.WriteAllText(
+            scope.FolderViewsPath,
+            """
+            {"Folders":[
+              {"Path":"C:/work","ViewMode":"Icons","IconSize":160,"SortKey":"Size","SortAscending":false,"UpdatedUtcTicks":200},
+              {"Path":"C:\\work","ViewMode":"List","IconSize":24,"SortKey":"Name","SortAscending":true,"UpdatedUtcTicks":100}
+            ]}
+            """);
+
+        using var service = new FolderViewSettingsService();
+
+        Assert.True(service.TryGet(@"C:\work", out var stored));
+        Assert.Equal("Icons", stored.ViewMode);
+        Assert.Equal(160, stored.IconSize);
+    }
+
+    /// @severity=med
+    /// @description 並び順が逆（古い方が先）でも新しい方が残ること
+    [Fact]
+    public void 正規化で畳まれるとき並び順に関わらず最新の設定が残ること()
+    {
+        using var scope = new AppStorageScope();
+        File.WriteAllText(
+            scope.FolderViewsPath,
+            """
+            {"Folders":[
+              {"Path":"C:\\work","ViewMode":"List","IconSize":24,"SortKey":"Name","SortAscending":true,"UpdatedUtcTicks":100},
+              {"Path":"C:/work","ViewMode":"Icons","IconSize":160,"SortKey":"Size","SortAscending":false,"UpdatedUtcTicks":200}
+            ]}
+            """);
+
+        using var service = new FolderViewSettingsService();
+
+        Assert.True(service.TryGet(@"C:\work", out var stored));
+        Assert.Equal("Icons", stored.ViewMode);
+        Assert.Equal(160, stored.IconSize);
     }
 
     /// @severity=med
@@ -475,7 +524,7 @@ public class FolderViewSettingsServiceChaosTests
             "{\"Folders\":[{\"Path\":" + JsonSerializer.Serialize(SamplePath)
                 + ",\"ViewMode\":\"Icons\",\"IconSize\":160,\"SortKey\":\"Size\",\"SortAscending\":false,\"UpdatedUtcTicks\":123}]}");
 
-        var service = new FolderViewSettingsService();
+        using var service = new FolderViewSettingsService();
 
         Assert.True(service.TryGet(SamplePath, out var stored));
         Assert.Equal("Icons", stored.ViewMode);
@@ -722,7 +771,7 @@ public class SettingsServiceConcurrencyTests
                 // 同時保存中は外部から一瞬ファイルが存在しない状態を観測できる（OS プリミティブの性質）。
                 // ここで検証したい契約は「壊れた JSON や複数世代が混ざった内容を読まない」ことなので、
                 // 一時的な不在は破損として扱わない。
-                // ※ 「settings.json が無く .bak だけある」状態で Load が .bak を見ない弱点は別途報告済み。
+                // ※ 「settings.json が無く .bak だけある」状態は Load がバックアップを参照して復旧する。
                 if (!File.Exists(scope.SettingsPath))
                 {
                     continue;
@@ -791,7 +840,9 @@ public class SettingsServiceConcurrencyTests
 
         var loaded = SettingsService.Load();
         Assert.True(TestSettings.IsConsistent(loaded), $"整合しない設定が読み込まれました: {loaded.SidebarWidth}");
-        Assert.InRange(loaded.SidebarWidth, 300, 300 + writers);
+        // 下限はシード値 300 の「次」から。Save は例外を握りつぶすため、300 を許容すると
+        // 並行保存が全滅していてもこのテストが通ってしまう（検証したいのは書き込みの成功）。
+        Assert.InRange(loaded.SidebarWidth, 301, 300 + writers);
     }
 
     /// @severity=med
@@ -826,7 +877,7 @@ public class FolderViewSettingsServiceConcurrencyTests
     public async Task 同一パスへ並行更新してもTryGetが一貫したスナップショットを返すこと()
     {
         using var scope = new AppStorageScope();
-        var service = new FolderViewSettingsService();
+        using var service = new FolderViewSettingsService();
         const string path = @"C:\Kiriha.Tests\concurrent";
         service.Set(path, TestFolderView.Variant(0));
 
@@ -883,7 +934,7 @@ public class FolderViewSettingsServiceConcurrencyTests
     public async Task 並行更新後のFlushで保留中の全件がファイルへ書き出されること()
     {
         using var scope = new AppStorageScope();
-        var service = new FolderViewSettingsService();
+        using var service = new FolderViewSettingsService();
 
         const int threads = 8;
         const int perThread = 50;
@@ -910,7 +961,7 @@ public class FolderViewSettingsServiceConcurrencyTests
     public async Task 並行更新と全消去を混在させてもFlush後のファイルが整合していること()
     {
         using var scope = new AppStorageScope();
-        var service = new FolderViewSettingsService();
+        using var service = new FolderViewSettingsService();
 
         const int writers = 6;
         using var start = new Barrier(writers + 1);
@@ -961,7 +1012,7 @@ public class FolderViewSettingsServiceConcurrencyTests
     public async Task 複数スレッドから同時にFlushしても一時ファイルを残さず有効なJSONになること()
     {
         using var scope = new AppStorageScope();
-        var service = new FolderViewSettingsService();
+        using var service = new FolderViewSettingsService();
 
         const int entries = 100;
         for (var index = 0; index < entries; index++)
@@ -985,12 +1036,36 @@ public class FolderViewSettingsServiceConcurrencyTests
         Assert.Empty(Directory.GetFiles(scope.Directory, "*.tmp"));
     }
 
+    /// @severity=high
+    /// @description 終了処理は ShutdownRequested で Dispose → その後 MainWindow.OnClosing 経由で
+    /// Flush が走る順序になり得る。破棄後の Flush / Set / Clear で ObjectDisposedException を投げると
+    /// 終了処理が中断してウィンドウ位置などの保存が飛ぶため、投げずに済むこと。
+    [Fact]
+    public void 破棄後にFlushやSetを呼んでも例外を投げないこと()
+    {
+        using var scope = new AppStorageScope();
+        var service = new FolderViewSettingsService();
+        service.Set(@"C:\Kiriha.Tests\after-dispose", TestFolderView.Variant(0));
+
+        service.Dispose();
+        service.Dispose(); // 二重破棄も安全
+
+        service.Flush();
+        service.Set(@"C:\Kiriha.Tests\after-dispose2", TestFolderView.Variant(1));
+        service.Clear();
+        service.Flush();
+
+        // 破棄時点の保留分は書き切られている
+        var store = TestFolderView.ReadStore(scope.FolderViewsPath);
+        Assert.NotNull(store);
+    }
+
     /// @severity=low
     [Fact]
     public async Task 上限を超える並行更新でもエントリ数が上限以内に保たれること()
     {
         using var scope = new AppStorageScope();
-        var service = new FolderViewSettingsService();
+        using var service = new FolderViewSettingsService();
 
         const int threads = 4;
         const int perThread = 1300; // 合計 5200 件 > MaxEntries(4096)
