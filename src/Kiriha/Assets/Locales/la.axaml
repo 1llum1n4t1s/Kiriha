@@ -113,6 +113,8 @@
   <x:String x:Key="Text.Launch.TerminalFailed" xml:space="preserve">Terminale incipi non potuit: {0}</x:String>
   <x:String x:Key="Text.License.Activate" xml:space="preserve">Activare</x:String>
   <x:String x:Key="Text.License.CodePlaceholder" xml:space="preserve">Codex sex digitorum</x:String>
+  <x:String x:Key="Text.License.Deactivate" xml:space="preserve">Hunc computatrum dissolvere</x:String>
+  <x:String x:Key="Text.License.DeactivateNote" xml:space="preserve">Solum hunc computatrum dissolvit. Emptio valida manet, itaque eadem inscriptione electronica quandocumque iterum licentiam confirmare potes. Tempus probationis non producitur.</x:String>
   <x:String x:Key="Text.License.EmailPlaceholder" xml:space="preserve">Inscriptio electronica in emptione adhibita</x:String>
   <x:String x:Key="Text.License.Exit" xml:space="preserve">Exire</x:String>
   <x:String x:Key="Text.License.KeyFallback" xml:space="preserve">Clavem licentiae directe inscribere</x:String>
@@ -126,6 +128,7 @@
   <x:String x:Key="Text.License.Msg.Checking" xml:space="preserve">In linea verificatur…</x:String>
   <x:String x:Key="Text.License.Msg.CodeSent" xml:space="preserve">Codicem confirmationis per epistulam misimus. Sex digitos acceptos insere.</x:String>
   <x:String x:Key="Text.License.Msg.CodeTooSoon" xml:space="preserve">Nimis crebro petitum est. Exspecta circiter XXX secunda et iterum tempta.</x:String>
+  <x:String x:Key="Text.License.Msg.Deactivated" xml:space="preserve">Licentia huius computatri dissoluta est. Eadem inscriptione electronica quandocumque iterum confirmare potes.</x:String>
   <x:String x:Key="Text.License.Msg.EnterCode" xml:space="preserve">Codicem sex digitorum ex epistula insere.</x:String>
   <x:String x:Key="Text.License.Msg.EnterEmail" xml:space="preserve">Inscriptionem electronicam in emptione adhibitam insere.</x:String>
   <x:String x:Key="Text.License.Msg.EnterKey" xml:space="preserve">Clavem licentiae in emptione datam insere.</x:String>

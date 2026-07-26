@@ -113,6 +113,8 @@
   <x:String x:Key="Text.Launch.TerminalFailed" xml:space="preserve">Tidak dapat menjalankan Terminal: {0}</x:String>
   <x:String x:Key="Text.License.Activate" xml:space="preserve">Aktifkan</x:String>
   <x:String x:Key="Text.License.CodePlaceholder" xml:space="preserve">Kode 6 digit</x:String>
+  <x:String x:Key="Text.License.Deactivate" xml:space="preserve">Nonaktifkan komputer ini</x:String>
+  <x:String x:Key="Text.License.DeactivateNote" xml:space="preserve">Menonaktifkan komputer ini saja. Pembelian Anda tetap berlaku, jadi Anda bisa mengaktifkan lagi kapan saja dengan email yang sama. Masa coba tidak diperpanjang.</x:String>
   <x:String x:Key="Text.License.EmailPlaceholder" xml:space="preserve">Email yang dipakai saat membeli</x:String>
   <x:String x:Key="Text.License.Exit" xml:space="preserve">Keluar</x:String>
   <x:String x:Key="Text.License.KeyFallback" xml:space="preserve">Masukkan kunci lisensi saja</x:String>
@@ -126,6 +128,7 @@
   <x:String x:Key="Text.License.Msg.Checking" xml:space="preserve">Memverifikasi secara daring…</x:String>
   <x:String x:Key="Text.License.Msg.CodeSent" xml:space="preserve">Kode konfirmasi telah dikirim lewat email. Masukkan 6 digit yang Anda terima.</x:String>
   <x:String x:Key="Text.License.Msg.CodeTooSoon" xml:space="preserve">Terlalu sering. Tunggu sekitar 30 detik lalu coba lagi.</x:String>
+  <x:String x:Key="Text.License.Msg.Deactivated" xml:space="preserve">Komputer ini telah dinonaktifkan. Anda bisa mengaktifkan lagi kapan saja dengan email yang sama.</x:String>
   <x:String x:Key="Text.License.Msg.EnterCode" xml:space="preserve">Masukkan kode 6 digit dari email.</x:String>
   <x:String x:Key="Text.License.Msg.EnterEmail" xml:space="preserve">Masukkan alamat email yang Anda pakai saat membeli.</x:String>
   <x:String x:Key="Text.License.Msg.EnterKey" xml:space="preserve">Masukkan kunci lisensi yang diterbitkan saat pembelian.</x:String>

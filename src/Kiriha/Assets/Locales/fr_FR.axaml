@@ -113,6 +113,8 @@
   <x:String x:Key="Text.Launch.TerminalFailed" xml:space="preserve">Impossible de démarrer le Terminal : {0}</x:String>
   <x:String x:Key="Text.License.Activate" xml:space="preserve">Activer</x:String>
   <x:String x:Key="Text.License.CodePlaceholder" xml:space="preserve">Code à 6 chiffres</x:String>
+  <x:String x:Key="Text.License.Deactivate" xml:space="preserve">Désactiver cet ordinateur</x:String>
+  <x:String x:Key="Text.License.DeactivateNote" xml:space="preserve">Désactive uniquement cet ordinateur. Votre achat reste valide : vous pouvez réactiver à tout moment avec la même adresse e-mail. La période d'essai n'est pas prolongée.</x:String>
   <x:String x:Key="Text.License.EmailPlaceholder" xml:space="preserve">E-mail utilisé lors de l'achat</x:String>
   <x:String x:Key="Text.License.Exit" xml:space="preserve">Quitter</x:String>
   <x:String x:Key="Text.License.KeyFallback" xml:space="preserve">Saisir plutôt une clé de licence</x:String>
@@ -126,6 +128,7 @@
   <x:String x:Key="Text.License.Msg.Checking" xml:space="preserve">Vérification en ligne…</x:String>
   <x:String x:Key="Text.License.Msg.CodeSent" xml:space="preserve">Un code de confirmation a été envoyé par e-mail. Saisissez les 6 chiffres reçus.</x:String>
   <x:String x:Key="Text.License.Msg.CodeTooSoon" xml:space="preserve">Trop de demandes. Patientez environ 30 secondes, puis réessayez.</x:String>
+  <x:String x:Key="Text.License.Msg.Deactivated" xml:space="preserve">Cet ordinateur a été désactivé. Vous pouvez réactiver à tout moment avec la même adresse e-mail.</x:String>
   <x:String x:Key="Text.License.Msg.EnterCode" xml:space="preserve">Saisissez le code à 6 chiffres reçu par e-mail.</x:String>
   <x:String x:Key="Text.License.Msg.EnterEmail" xml:space="preserve">Saisissez l'adresse e-mail utilisée lors de l'achat.</x:String>
   <x:String x:Key="Text.License.Msg.EnterKey" xml:space="preserve">Saisissez la clé de licence fournie lors de l'achat.</x:String>

@@ -113,6 +113,8 @@
   <x:String x:Key="Text.Launch.TerminalFailed" xml:space="preserve">Не удалось запустить Терминал: {0}</x:String>
   <x:String x:Key="Text.License.Activate" xml:space="preserve">Активировать</x:String>
   <x:String x:Key="Text.License.CodePlaceholder" xml:space="preserve">6-значный код</x:String>
+  <x:String x:Key="Text.License.Deactivate" xml:space="preserve">Отвязать этот компьютер</x:String>
+  <x:String x:Key="Text.License.DeactivateNote" xml:space="preserve">Отвязывает только этот компьютер. Покупка остаётся действительной, поэтому вы можете активировать снова в любой момент с тем же адресом эл. почты. Пробный период не продлевается.</x:String>
   <x:String x:Key="Text.License.EmailPlaceholder" xml:space="preserve">Эл. почта, указанная при покупке</x:String>
   <x:String x:Key="Text.License.Exit" xml:space="preserve">Выйти</x:String>
   <x:String x:Key="Text.License.KeyFallback" xml:space="preserve">Ввести лицензионный ключ</x:String>
@@ -126,6 +128,7 @@
   <x:String x:Key="Text.License.Msg.Checking" xml:space="preserve">Проверяем онлайн…</x:String>
   <x:String x:Key="Text.License.Msg.CodeSent" xml:space="preserve">Код подтверждения отправлен на почту. Введите полученные 6 цифр.</x:String>
   <x:String x:Key="Text.License.Msg.CodeTooSoon" xml:space="preserve">Слишком часто. Подождите около 30 секунд и попробуйте снова.</x:String>
+  <x:String x:Key="Text.License.Msg.Deactivated" xml:space="preserve">Этот компьютер отвязан. Вы можете активировать снова в любой момент с тем же адресом эл. почты.</x:String>
   <x:String x:Key="Text.License.Msg.EnterCode" xml:space="preserve">Введите 6-значный код из письма.</x:String>
   <x:String x:Key="Text.License.Msg.EnterEmail" xml:space="preserve">Введите адрес эл. почты, указанный при покупке.</x:String>
   <x:String x:Key="Text.License.Msg.EnterKey" xml:space="preserve">Введите лицензионный ключ, выданный при покупке.</x:String>

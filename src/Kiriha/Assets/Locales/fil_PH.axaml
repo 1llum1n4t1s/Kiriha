@@ -113,6 +113,8 @@
   <x:String x:Key="Text.Launch.TerminalFailed" xml:space="preserve">Hindi masimulan ang Terminal: {0}</x:String>
   <x:String x:Key="Text.License.Activate" xml:space="preserve">I-activate</x:String>
   <x:String x:Key="Text.License.CodePlaceholder" xml:space="preserve">6-digit na code</x:String>
+  <x:String x:Key="Text.License.Deactivate" xml:space="preserve">I-deactivate ang computer na ito</x:String>
+  <x:String x:Key="Text.License.DeactivateNote" xml:space="preserve">Ide-deactivate lang ang computer na ito. Mananatiling valid ang binili mo, kaya puwede kang mag-activate ulit anumang oras gamit ang parehong email. Hindi nadadagdagan ang trial period.</x:String>
   <x:String x:Key="Text.License.EmailPlaceholder" xml:space="preserve">Email na ginamit sa pagbili</x:String>
   <x:String x:Key="Text.License.Exit" xml:space="preserve">Lumabas</x:String>
   <x:String x:Key="Text.License.KeyFallback" xml:space="preserve">Maglagay na lang ng license key</x:String>
@@ -126,6 +128,7 @@
   <x:String x:Key="Text.License.Msg.Checking" xml:space="preserve">Nagve-verify online…</x:String>
   <x:String x:Key="Text.License.Msg.CodeSent" xml:space="preserve">Nagpadala kami ng confirmation code sa email. Ilagay ang 6 na numerong natanggap mo.</x:String>
   <x:String x:Key="Text.License.Msg.CodeTooSoon" xml:space="preserve">Masyadong madalas. Maghintay ng mga 30 segundo at subukan ulit.</x:String>
+  <x:String x:Key="Text.License.Msg.Deactivated" xml:space="preserve">Na-deactivate ang computer na ito. Puwede kang mag-activate ulit anumang oras gamit ang parehong email.</x:String>
   <x:String x:Key="Text.License.Msg.EnterCode" xml:space="preserve">Ilagay ang 6-digit na code mula sa email.</x:String>
   <x:String x:Key="Text.License.Msg.EnterEmail" xml:space="preserve">Ilagay ang email address na ginamit mo sa pagbili.</x:String>
   <x:String x:Key="Text.License.Msg.EnterKey" xml:space="preserve">Ilagay ang license key na ibinigay noong bumili ka.</x:String>

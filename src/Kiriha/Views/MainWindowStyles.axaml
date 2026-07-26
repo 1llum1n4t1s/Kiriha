@@ -33,13 +33,15 @@
         <Style Selector="ListBox.verticaltabs ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource TabHoverBg}" />
         </Style>
+        <!-- 選択中タブは TabSelectedBg（タブ専用の一段明るい色）。TabActiveBg はアドレスバー帯や
+             お気に入りバーと共有しているので、ここで使うとその帯まで明るくなってしまう。 -->
         <Style Selector="ListBox.verticaltabs ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource TabActiveBg}" />
+            <Setter Property="Background" Value="{DynamicResource TabSelectedBg}" />
             <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
             <Setter Property="BorderThickness" Value="2,0,0,0" />
         </Style>
         <Style Selector="ListBox.verticaltabs ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource TabActiveBg}" />
+            <Setter Property="Background" Value="{DynamicResource TabSelectedBg}" />
         </Style>
         <!-- ドラッグ中のタブ: フォルダードロップの仮配置タブ (TabRowOpacity=0.45) と同じ半透明で
              「その位置に置かれる」表現に揃える。挿入ライン (droptarget) はライブ並べ替え化で廃止 -->

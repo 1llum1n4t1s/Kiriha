@@ -113,6 +113,8 @@
   <x:String x:Key="Text.Launch.TerminalFailed" xml:space="preserve">டெர்மினலைத் தொடங்க முடியவில்லை: {0}</x:String>
   <x:String x:Key="Text.License.Activate" xml:space="preserve">செயல்படுத்து</x:String>
   <x:String x:Key="Text.License.CodePlaceholder" xml:space="preserve">6 இலக்க குறியீடு</x:String>
+  <x:String x:Key="Text.License.Deactivate" xml:space="preserve">இந்தக் கணினியின் உரிமத்தை நீக்கு</x:String>
+  <x:String x:Key="Text.License.DeactivateNote" xml:space="preserve">இந்தக் கணினியின் உரிமத்தை மட்டும் நீக்குகிறது. உங்கள் கொள்முதல் செல்லுபடியாகவே இருக்கும், எனவே அதே மின்னஞ்சல் முகவரியுடன் எப்போது வேண்டுமானாலும் மீண்டும் செயல்படுத்தலாம். சோதனைக் காலம் நீட்டிக்கப்படாது.</x:String>
   <x:String x:Key="Text.License.EmailPlaceholder" xml:space="preserve">வாங்கும்போது பயன்படுத்திய மின்னஞ்சல்</x:String>
   <x:String x:Key="Text.License.Exit" xml:space="preserve">வெளியேறு</x:String>
   <x:String x:Key="Text.License.KeyFallback" xml:space="preserve">உரிம விசையை நேரடியாக உள்ளிடவும்</x:String>
@@ -126,6 +128,7 @@
   <x:String x:Key="Text.License.Msg.Checking" xml:space="preserve">ஆன்லைனில் சரிபார்க்கிறது…</x:String>
   <x:String x:Key="Text.License.Msg.CodeSent" xml:space="preserve">உறுதிப்படுத்தல் குறியீட்டை மின்னஞ்சலில் அனுப்பியுள்ளோம். பெற்ற 6 இலக்கங்களை உள்ளிடவும்.</x:String>
   <x:String x:Key="Text.License.Msg.CodeTooSoon" xml:space="preserve">அதிக முறை கோரப்பட்டது. சுமார் 30 வினாடிகள் காத்திருந்து மீண்டும் முயற்சிக்கவும்.</x:String>
+  <x:String x:Key="Text.License.Msg.Deactivated" xml:space="preserve">இந்தக் கணினியின் உரிமம் நீக்கப்பட்டது. அதே மின்னஞ்சல் முகவரியுடன் எப்போது வேண்டுமானாலும் மீண்டும் செயல்படுத்தலாம்.</x:String>
   <x:String x:Key="Text.License.Msg.EnterCode" xml:space="preserve">மின்னஞ்சலில் வந்த 6 இலக்க குறியீட்டை உள்ளிடவும்.</x:String>
   <x:String x:Key="Text.License.Msg.EnterEmail" xml:space="preserve">வாங்கும்போது பயன்படுத்திய மின்னஞ்சல் முகவரியை உள்ளிடவும்.</x:String>
   <x:String x:Key="Text.License.Msg.EnterKey" xml:space="preserve">கொள்முதலின்போது வழங்கப்பட்ட உரிமக் குறியீட்டை உள்ளிடவும்.</x:String>

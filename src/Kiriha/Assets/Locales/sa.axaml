@@ -113,6 +113,8 @@
   <x:String x:Key="Text.Launch.TerminalFailed" xml:space="preserve">आदेशपटलं न आरब्धम्: {0}</x:String>
   <x:String x:Key="Text.License.Activate" xml:space="preserve">सक्रियं कुरु</x:String>
   <x:String x:Key="Text.License.CodePlaceholder" xml:space="preserve">षड्अङ्कसङ्केतः</x:String>
+  <x:String x:Key="Text.License.Deactivate" xml:space="preserve">अस्य गणकयन्त्रस्य अनुज्ञां निवारयतु</x:String>
+  <x:String x:Key="Text.License.DeactivateNote" xml:space="preserve">अस्य गणकयन्त्रस्य एव अनुज्ञां निवारयति। क्रयः सिद्ध एव तिष्ठति, अतः तेनैव विद्युत्पत्राभिलेखेन कदापि पुनः प्रमाणीकर्तुं शक्यते। परीक्षणकालः न वर्धते।</x:String>
   <x:String x:Key="Text.License.EmailPlaceholder" xml:space="preserve">क्रयकाले प्रयुक्तं विद्युत्पत्रम्</x:String>
   <x:String x:Key="Text.License.Exit" xml:space="preserve">निर्गच्छ</x:String>
   <x:String x:Key="Text.License.KeyFallback" xml:space="preserve">अनुज्ञाकुञ्चिकां साक्षात् लिखतु</x:String>
@@ -126,6 +128,7 @@
   <x:String x:Key="Text.License.Msg.Checking" xml:space="preserve">जालमाध्यमेन परीक्ष्यते…</x:String>
   <x:String x:Key="Text.License.Msg.CodeSent" xml:space="preserve">सत्यापनसङ्केतः विद्युत्पत्रेण प्रेषितः। प्राप्तान् षड् अङ्कान् लिखतु।</x:String>
   <x:String x:Key="Text.License.Msg.CodeTooSoon" xml:space="preserve">अतिशीघ्रं पुनः याचितम्। त्रिंशत्सेकण्ड्-पर्यन्तं प्रतीक्ष्य पुनः प्रयततु।</x:String>
+  <x:String x:Key="Text.License.Msg.Deactivated" xml:space="preserve">अस्य गणकयन्त्रस्य अनुज्ञा निवारिता। तेनैव विद्युत्पत्राभिलेखेन कदापि पुनः प्रमाणीकर्तुं शक्यते।</x:String>
   <x:String x:Key="Text.License.Msg.EnterCode" xml:space="preserve">विद्युत्पत्रे प्राप्तं षड्अङ्कसङ्केतं लिखतु।</x:String>
   <x:String x:Key="Text.License.Msg.EnterEmail" xml:space="preserve">क्रयकाले प्रयुक्तं विद्युत्पत्राभिलेखं लिखतु।</x:String>
   <x:String x:Key="Text.License.Msg.EnterKey" xml:space="preserve">क्रयकाले दत्तां अनुज्ञाकुञ्चिकां प्रविशय।</x:String>

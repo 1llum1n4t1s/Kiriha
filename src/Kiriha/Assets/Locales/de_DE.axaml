@@ -113,6 +113,8 @@
   <x:String x:Key="Text.Launch.TerminalFailed" xml:space="preserve">Das Terminal konnte nicht gestartet werden: {0}</x:String>
   <x:String x:Key="Text.License.Activate" xml:space="preserve">Aktivieren</x:String>
   <x:String x:Key="Text.License.CodePlaceholder" xml:space="preserve">6-stelliger Code</x:String>
+  <x:String x:Key="Text.License.Deactivate" xml:space="preserve">Aktivierung aufheben</x:String>
+  <x:String x:Key="Text.License.DeactivateNote" xml:space="preserve">Hebt die Aktivierung nur auf diesem Computer auf. Ihr Kauf bleibt gültig, Sie können jederzeit mit derselben E-Mail-Adresse erneut aktivieren. Der Testzeitraum wird nicht verlängert.</x:String>
   <x:String x:Key="Text.License.EmailPlaceholder" xml:space="preserve">E-Mail-Adresse des Kaufs</x:String>
   <x:String x:Key="Text.License.Exit" xml:space="preserve">Beenden</x:String>
   <x:String x:Key="Text.License.KeyFallback" xml:space="preserve">Stattdessen Lizenzschlüssel eingeben</x:String>
@@ -126,6 +128,7 @@
   <x:String x:Key="Text.License.Msg.Checking" xml:space="preserve">Wird online überprüft …</x:String>
   <x:String x:Key="Text.License.Msg.CodeSent" xml:space="preserve">Wir haben einen Bestätigungscode per E-Mail gesendet. Geben Sie die 6 Ziffern ein.</x:String>
   <x:String x:Key="Text.License.Msg.CodeTooSoon" xml:space="preserve">Zu viele Anfragen. Bitte warten Sie etwa 30 Sekunden und versuchen Sie es erneut.</x:String>
+  <x:String x:Key="Text.License.Msg.Deactivated" xml:space="preserve">Die Aktivierung auf diesem Computer wurde aufgehoben. Sie können jederzeit mit derselben E-Mail-Adresse erneut aktivieren.</x:String>
   <x:String x:Key="Text.License.Msg.EnterCode" xml:space="preserve">Geben Sie den 6-stelligen Code aus der E-Mail ein.</x:String>
   <x:String x:Key="Text.License.Msg.EnterEmail" xml:space="preserve">Geben Sie die beim Kauf verwendete E-Mail-Adresse ein.</x:String>
   <x:String x:Key="Text.License.Msg.EnterKey" xml:space="preserve">Geben Sie den beim Kauf ausgestellten Lizenzschlüssel ein.</x:String>

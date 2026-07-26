@@ -113,6 +113,8 @@
   <x:String x:Key="Text.Launch.TerminalFailed" xml:space="preserve">Impossibile avviare il Terminale: {0}</x:String>
   <x:String x:Key="Text.License.Activate" xml:space="preserve">Attiva</x:String>
   <x:String x:Key="Text.License.CodePlaceholder" xml:space="preserve">Codice a 6 cifre</x:String>
+  <x:String x:Key="Text.License.Deactivate" xml:space="preserve">Disattiva questo computer</x:String>
+  <x:String x:Key="Text.License.DeactivateNote" xml:space="preserve">Disattiva solo questo computer. L'acquisto resta valido, quindi puoi riattivarlo quando vuoi con la stessa e-mail. Il periodo di prova non viene prolungato.</x:String>
   <x:String x:Key="Text.License.EmailPlaceholder" xml:space="preserve">E-mail usata per l'acquisto</x:String>
   <x:String x:Key="Text.License.Exit" xml:space="preserve">Esci</x:String>
   <x:String x:Key="Text.License.KeyFallback" xml:space="preserve">Inserisci invece una chiave di licenza</x:String>
@@ -126,6 +128,7 @@
   <x:String x:Key="Text.License.Msg.Checking" xml:space="preserve">Verifica online in corso…</x:String>
   <x:String x:Key="Text.License.Msg.CodeSent" xml:space="preserve">Abbiamo inviato un codice di conferma via e-mail. Inserisci le 6 cifre ricevute.</x:String>
   <x:String x:Key="Text.License.Msg.CodeTooSoon" xml:space="preserve">Troppe richieste. Attendi circa 30 secondi e riprova.</x:String>
+  <x:String x:Key="Text.License.Msg.Deactivated" xml:space="preserve">Questo computer è stato disattivato. Puoi riattivarlo quando vuoi con la stessa e-mail.</x:String>
   <x:String x:Key="Text.License.Msg.EnterCode" xml:space="preserve">Inserisci il codice a 6 cifre ricevuto via e-mail.</x:String>
   <x:String x:Key="Text.License.Msg.EnterEmail" xml:space="preserve">Inserisci l'indirizzo e-mail usato per l'acquisto.</x:String>
   <x:String x:Key="Text.License.Msg.EnterKey" xml:space="preserve">Inserisci la chiave di licenza rilasciata al momento dell'acquisto.</x:String>

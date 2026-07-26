@@ -113,6 +113,8 @@
   <x:String x:Key="Text.Launch.TerminalFailed" xml:space="preserve">Не вдалося запустити Термінал: {0}</x:String>
   <x:String x:Key="Text.License.Activate" xml:space="preserve">Активувати</x:String>
   <x:String x:Key="Text.License.CodePlaceholder" xml:space="preserve">6-значний код</x:String>
+  <x:String x:Key="Text.License.Deactivate" xml:space="preserve">Відв'язати цей комп'ютер</x:String>
+  <x:String x:Key="Text.License.DeactivateNote" xml:space="preserve">Відв'язує лише цей комп'ютер. Покупка залишається дійсною, тож ви можете активувати знову будь-коли з тією ж адресою ел. пошти. Пробний період не подовжується.</x:String>
   <x:String x:Key="Text.License.EmailPlaceholder" xml:space="preserve">Ел. пошта, указана під час покупки</x:String>
   <x:String x:Key="Text.License.Exit" xml:space="preserve">Вийти</x:String>
   <x:String x:Key="Text.License.KeyFallback" xml:space="preserve">Ввести ліцензійний ключ</x:String>
@@ -126,6 +128,7 @@
   <x:String x:Key="Text.License.Msg.Checking" xml:space="preserve">Перевіряємо онлайн…</x:String>
   <x:String x:Key="Text.License.Msg.CodeSent" xml:space="preserve">Код підтвердження надіслано на пошту. Введіть отримані 6 цифр.</x:String>
   <x:String x:Key="Text.License.Msg.CodeTooSoon" xml:space="preserve">Забагато запитів. Зачекайте близько 30 секунд і спробуйте ще раз.</x:String>
+  <x:String x:Key="Text.License.Msg.Deactivated" xml:space="preserve">Цей комп'ютер відв'язано. Ви можете активувати знову будь-коли з тією ж адресою ел. пошти.</x:String>
   <x:String x:Key="Text.License.Msg.EnterCode" xml:space="preserve">Введіть 6-значний код із листа.</x:String>
   <x:String x:Key="Text.License.Msg.EnterEmail" xml:space="preserve">Введіть адресу ел. пошти, указану під час покупки.</x:String>
   <x:String x:Key="Text.License.Msg.EnterKey" xml:space="preserve">Введіть ліцензійний ключ, виданий під час покупки.</x:String>

@@ -113,6 +113,8 @@
   <x:String x:Key="Text.Launch.TerminalFailed" xml:space="preserve">Could not start Terminal: {0}</x:String>
   <x:String x:Key="Text.License.Activate" xml:space="preserve">Activate</x:String>
   <x:String x:Key="Text.License.CodePlaceholder" xml:space="preserve">6-digit code</x:String>
+  <x:String x:Key="Text.License.Deactivate" xml:space="preserve">Deactivate this computer</x:String>
+  <x:String x:Key="Text.License.DeactivateNote" xml:space="preserve">Deactivates only this computer. Your purchase stays valid, so you can activate again anytime with the same email address. The trial period is not extended.</x:String>
   <x:String x:Key="Text.License.EmailPlaceholder" xml:space="preserve">Email used at purchase</x:String>
   <x:String x:Key="Text.License.Exit" xml:space="preserve">Exit</x:String>
   <x:String x:Key="Text.License.KeyFallback" xml:space="preserve">Enter a license key instead</x:String>
@@ -126,6 +128,7 @@
   <x:String x:Key="Text.License.Msg.Checking" xml:space="preserve">Verifying online…</x:String>
   <x:String x:Key="Text.License.Msg.CodeSent" xml:space="preserve">We sent a confirmation code by email. Enter the 6 digits you received.</x:String>
   <x:String x:Key="Text.License.Msg.CodeTooSoon" xml:space="preserve">Too many requests. Please wait about 30 seconds and try again.</x:String>
+  <x:String x:Key="Text.License.Msg.Deactivated" xml:space="preserve">This computer has been deactivated. You can activate again anytime with the same email address.</x:String>
   <x:String x:Key="Text.License.Msg.EnterCode" xml:space="preserve">Enter the 6-digit code from the email.</x:String>
   <x:String x:Key="Text.License.Msg.EnterEmail" xml:space="preserve">Enter the email address you used at purchase.</x:String>
   <x:String x:Key="Text.License.Msg.EnterKey" xml:space="preserve">Enter the license key issued when you purchased.</x:String>

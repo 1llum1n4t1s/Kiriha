@@ -253,6 +253,33 @@ public static class LicenseService
         return true;
     }
 
+    /// <summary>
+    /// この PC のライセンス認証を解除して未認証へ戻す（購入自体は無効にならない）。
+    ///
+    /// 主な用途は認証まわりの動作確認。何台でも使える買い切りなので解除に制限は設けず、
+    /// 同じメールアドレスと確認コードでいつでも認証し直せる。
+    /// 試用開始日（trial.dat / レジストリ）は消さない。消すと解除するたびに試用期間が
+    /// 復活してしまい、期限切れ後の挙動を確認できなくなるうえ、試用の使い回しにもなる。
+    /// </summary>
+    public static void Deactivate()
+    {
+        lock (Gate)
+        {
+            if (_persisted.Key is null)
+            {
+                return;
+            }
+
+            // 時計の巻き戻し対策として観測済み最大時刻だけは引き継ぐ。
+            _persisted = new PersistedLicense { MaxSeenUtc = _persisted.MaxSeenUtc };
+            Save();
+        }
+
+        Logger.Log("ライセンス認証を解除しました（この PC のみ。購入は有効なまま）", LogLevel.Info);
+        RecomputeState();
+        NotifyStateChanged();
+    }
+
     // ===== メールアドレス + 確認コードでの認証（機種変更・2 台目） =====
     //
     // ライセンスキーは「決済完了ページに 1 度だけ出る文字列」なので、別の PC で使うときに

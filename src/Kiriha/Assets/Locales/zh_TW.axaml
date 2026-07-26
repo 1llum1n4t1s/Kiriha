@@ -113,6 +113,8 @@
   <x:String x:Key="Text.Launch.TerminalFailed" xml:space="preserve">無法啟動終端機: {0}</x:String>
   <x:String x:Key="Text.License.Activate" xml:space="preserve">啟用</x:String>
   <x:String x:Key="Text.License.CodePlaceholder" xml:space="preserve">6 位數驗證碼</x:String>
+  <x:String x:Key="Text.License.Deactivate" xml:space="preserve">解除本機授權</x:String>
+  <x:String x:Key="Text.License.DeactivateNote" xml:space="preserve">僅解除本機的授權。購買仍然有效，可隨時使用同一電子郵件重新啟用。試用期不會延長。</x:String>
   <x:String x:Key="Text.License.EmailPlaceholder" xml:space="preserve">購買時使用的電子郵件</x:String>
   <x:String x:Key="Text.License.Exit" xml:space="preserve">結束</x:String>
   <x:String x:Key="Text.License.KeyFallback" xml:space="preserve">改為直接輸入授權金鑰</x:String>
@@ -126,6 +128,7 @@
   <x:String x:Key="Text.License.Msg.Checking" xml:space="preserve">正在線上驗證…</x:String>
   <x:String x:Key="Text.License.Msg.CodeSent" xml:space="preserve">驗證碼已寄出，請輸入收到的 6 位數字。</x:String>
   <x:String x:Key="Text.License.Msg.CodeTooSoon" xml:space="preserve">要求過於頻繁。請等待約 30 秒後再試。</x:String>
+  <x:String x:Key="Text.License.Msg.Deactivated" xml:space="preserve">已解除本機的授權。可隨時使用同一電子郵件重新啟用。</x:String>
   <x:String x:Key="Text.License.Msg.EnterCode" xml:space="preserve">請輸入電子郵件中的 6 位數驗證碼。</x:String>
   <x:String x:Key="Text.License.Msg.EnterEmail" xml:space="preserve">請輸入購買時使用的電子郵件地址。</x:String>
   <x:String x:Key="Text.License.Msg.EnterKey" xml:space="preserve">請輸入購買時核發的授權金鑰。</x:String>

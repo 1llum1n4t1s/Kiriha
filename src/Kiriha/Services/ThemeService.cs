@@ -18,6 +18,10 @@ public static class ThemeService
     /// Dark 配色にフォールバックする。全ページで同一インスタンスを参照するため static で共有する。</summary>
     public static readonly ThemeVariant OneDark = new("OneDark", ThemeVariant.Dark);
 
+    /// <summary>X（旧 Twitter）の「Dim」と同じ、紺寄りのダーク。OneDark と同じ理由で専用の
+    /// ThemeVariant を用意する（カスタムバリアントは x:Static でしか XAML から参照できない）。</summary>
+    public static readonly ThemeVariant Dim = new("Dim", ThemeVariant.Dark);
+
     private static bool _acrylicEnabled;
 
     public static void Initialize(Application app, bool acrylicEnabled)
@@ -40,7 +44,7 @@ public static class ThemeService
     private static void ApplyClassicMenuTheme(Application app)
     {
         var variant = app.ActualThemeVariant;
-        ClassicMenuThemeService.SetDark(variant == ThemeVariant.Dark || variant == OneDark);
+        ClassicMenuThemeService.SetDark(variant == ThemeVariant.Dark || variant == OneDark || variant == Dim);
     }
 
     /// <summary>設定画面のトグルからアクリル効果の有効/無効を切り替える。</summary>
@@ -116,28 +120,61 @@ public static class ThemeService
     private static readonly Color OneDarkOmniboxBg = Color.Parse("#282C34");
     private static readonly Color OneDarkStatusBg = Color.Parse("#282C34");
 
-    /// <summary>コンテンツ部の半透明度（読みやすさ優先でやや濃いめ）。</summary>
-    private const byte ContentAlpha = 0xE6;
+    /// <summary>ライトのアクリル時だけ使う地色。通常の #DEE1E6 は無彩色なので、ぼかしで暗い壁紙を
+    /// 拾うとただのくすんだ灰色に見えてしまう。青をわずかに足して、沈んでも淡い青白に見えるようにする。</summary>
+    private static readonly Color LightAcrylicBase = Color.Parse("#E4EEFC");
 
-    /// <summary>クロム部（タブストリップ/サイドバー/アドレスバー/ステータスバー）の半透明度。</summary>
-    private const byte ChromeAlpha = 0xD8;
+    private static readonly Color DimTabStripBg = Color.Parse("#15202B");
+    private static readonly Color DimContentBg = Color.Parse("#1E2732");
+    private static readonly Color DimSidebarBg = Color.Parse("#1E2732");
+    private static readonly Color DimOmniboxBg = Color.Parse("#1E2732");
+    private static readonly Color DimStatusBg = Color.Parse("#1E2732");
+
+    // アクリル時の不透明度。ぼかしの質感は残しつつ、透ける部分が壁紙の色に染まって
+    // 不透明な面から浮かないよう、全体に濃いめへ寄せてある。
+    // （ExperimentalAcrylicMaterial の MaterialOpacity / TintOpacity は Win32 の
+    //  ACCENT_ENABLE_ACRYLICBLURBEHIND 経路ではほとんど効かない。0.85→0.97 に上げても
+    //  実測で 1 段しか変わらなかったため、濃さの調整はこちらのアルファで行う。）
+
+    /// <summary>コンテンツ部の不透明度（読みやすさ優先で最も濃い）。</summary>
+    private const byte ContentAlpha = 0xF2;
+
+    /// <summary>クロム部（サイドバー/アドレスバー/ステータスバー）の不透明度。</summary>
+    private const byte ChromeAlpha = 0xEC;
+
+    /// <summary>ぼかしの上に敷くテーマ色の膜の不透明度。タブストリップや垂直タブの背後など、
+    /// 面が乗らない場所の濃さはこれで決まる。0 にすると壁紙のぼかしがそのまま出て、
+    /// 不透明な面と明らかに色が違って見える。</summary>
+    private const byte ScrimAlpha = 0xF0;
 
     private static void ApplyAcrylicBackgrounds(Application app)
     {
         var variant = app.ActualThemeVariant;
         var (tabStrip, content, sidebar, omnibox, status) = variant == OneDark
             ? (OneDarkTabStripBg, OneDarkContentBg, OneDarkSidebarBg, OneDarkOmniboxBg, OneDarkStatusBg)
-            : variant == ThemeVariant.Dark
-                ? (DarkTabStripBg, DarkContentBg, DarkSidebarBg, DarkOmniboxBg, DarkStatusBg)
-                : (LightTabStripBg, LightContentBg, LightSidebarBg, LightOmniboxBg, LightStatusBg);
+            : variant == Dim
+                ? (DimTabStripBg, DimContentBg, DimSidebarBg, DimOmniboxBg, DimStatusBg)
+                : variant == ThemeVariant.Dark
+                    ? (DarkTabStripBg, DarkContentBg, DarkSidebarBg, DarkOmniboxBg, DarkStatusBg)
+                    : (LightTabStripBg, LightContentBg, LightSidebarBg, LightOmniboxBg, LightStatusBg);
+
+        // ライトのアクリルだけは地色を淡い青白へ寄せる（LightAcrylicBase の説明を参照）。
+        // 暗い系テーマはぼかしを拾っても色味が保たれるので、そのままテーマの地色を使う。
+        var isDark = variant == ThemeVariant.Dark || variant == OneDark || variant == Dim;
+        var acrylicBase = _acrylicEnabled && !isDark ? LightAcrylicBase : tabStrip;
 
         // ExperimentalAcrylicMaterial.TintColor は Color 型（Brush ではない）なので専用キーで持つ。
         // TabStripBg 自体は下で透明にすることがあるため、素の基準色はこちらに常時反映する。
-        app.Resources["AcrylicTintColor"] = tabStrip;
+        app.Resources["AcrylicTintColor"] = acrylicBase;
 
         // ウィンドウ自体の背景（Window.Background）はアクリル有効時のみ透明にし、
         // ExperimentalAcrylicBorder のぼかしをそのまま見せる。無効時は従来どおり不透明。
         app.Resources["TabStripBg"] = new SolidColorBrush(_acrylicEnabled ? Colors.Transparent : tabStrip);
+
+        // ぼかしの上に敷くテーマ色の膜（MainWindow.axaml の Border が使う）。
+        // アクリル部分が壁紙の色に染まって不透明な面から浮くのを防ぐ。
+        app.Resources["AcrylicScrimBrush"] = new SolidColorBrush(
+            _acrylicEnabled ? WithAlpha(acrylicBase, ScrimAlpha) : Colors.Transparent);
         // 垂直タブはタイトルバーと同じウィンドウ背景を共有する。OFF時も Window 自体が
         // 不透明な TabStripBg を持つため、ここへ別の面を重ねず質感を連続させる。
         app.Resources["VerticalTabsSurfaceBg"] = new SolidColorBrush(Colors.Transparent);

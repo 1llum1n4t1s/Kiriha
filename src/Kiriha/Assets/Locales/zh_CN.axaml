@@ -113,6 +113,8 @@
   <x:String x:Key="Text.Launch.TerminalFailed" xml:space="preserve">无法启动终端: {0}</x:String>
   <x:String x:Key="Text.License.Activate" xml:space="preserve">激活</x:String>
   <x:String x:Key="Text.License.CodePlaceholder" xml:space="preserve">6 位验证码</x:String>
+  <x:String x:Key="Text.License.Deactivate" xml:space="preserve">解除本机授权</x:String>
+  <x:String x:Key="Text.License.DeactivateNote" xml:space="preserve">仅解除本机的授权。购买仍然有效，可随时使用同一邮箱重新激活。试用期不会延长。</x:String>
   <x:String x:Key="Text.License.EmailPlaceholder" xml:space="preserve">购买时使用的邮箱</x:String>
   <x:String x:Key="Text.License.Exit" xml:space="preserve">退出</x:String>
   <x:String x:Key="Text.License.KeyFallback" xml:space="preserve">改为直接输入许可密钥</x:String>
@@ -126,6 +128,7 @@
   <x:String x:Key="Text.License.Msg.Checking" xml:space="preserve">正在在线验证…</x:String>
   <x:String x:Key="Text.License.Msg.CodeSent" xml:space="preserve">验证码已发送到邮箱，请输入收到的 6 位数字。</x:String>
   <x:String x:Key="Text.License.Msg.CodeTooSoon" xml:space="preserve">请求过于频繁。请等待约 30 秒后重试。</x:String>
+  <x:String x:Key="Text.License.Msg.Deactivated" xml:space="preserve">已解除本机的授权。可随时使用同一邮箱重新激活。</x:String>
   <x:String x:Key="Text.License.Msg.EnterCode" xml:space="preserve">请输入邮件中的 6 位验证码。</x:String>
   <x:String x:Key="Text.License.Msg.EnterEmail" xml:space="preserve">请输入购买时使用的邮箱地址。</x:String>
   <x:String x:Key="Text.License.Msg.EnterKey" xml:space="preserve">请输入购买时颁发的许可证密钥。</x:String>

@@ -13,6 +13,9 @@
                     <SolidColorBrush x:Key="VerticalTabsSurfaceBg" Color="Transparent" />
                     <SolidColorBrush x:Key="TabIdleBg" Color="#EAECEF" />
                     <SolidColorBrush x:Key="TabHoverBg" Color="#F1F3F5" />
+                    <!-- 選択中の垂直タブ専用。TabActiveBg（アドレスバー帯やお気に入りバーと共有）と
+                         分けてあり、地色に埋もれない一段明るい色を各テーマが持つ。 -->
+                    <SolidColorBrush x:Key="TabSelectedBg" Color="#FFFFFF" />
                     <SolidColorBrush x:Key="TabActiveBg" Color="#FFFFFF" />
                     <SolidColorBrush x:Key="ContentBg" Color="#FFFFFF" />
                     <SolidColorBrush x:Key="OmniboxBg" Color="#F1F3F4" />
@@ -45,6 +48,10 @@
                     <Color x:Key="NeutralBase">#202124</Color>
                     <Color x:Key="NeutralSurface">#2B2C2F</Color>
                     <Color x:Key="NeutralInteractive">#3C4043</Color>
+                    <!-- 選択中タブ用。地色と同じにすると背景へ完全に同化するので、常に一段明るい色を持たせる
+                         （ライトの #FFFFFF と同じ「アクティブが一番明るい」関係に揃える）。 -->
+                    <Color x:Key="NeutralElevated">#4A4D51</Color>
+                    <SolidColorBrush x:Key="TabSelectedBg" Color="{StaticResource NeutralElevated}" />
                     <SolidColorBrush x:Key="TabStripBg" Color="{StaticResource NeutralBase}" />
                     <SolidColorBrush x:Key="VerticalTabsSurfaceBg" Color="Transparent" />
                     <SolidColorBrush x:Key="TabIdleBg" Color="{StaticResource NeutralInteractive}" />
@@ -84,6 +91,9 @@
                     <Color x:Key="NeutralBase">#21252B</Color>
                     <Color x:Key="NeutralSurface">#282C34</Color>
                     <Color x:Key="NeutralInteractive">#3E4451</Color>
+                    <!-- 選択中タブ用（Dark の NeutralElevated と同じ役割）。 -->
+                    <Color x:Key="NeutralElevated">#4B5263</Color>
+                    <SolidColorBrush x:Key="TabSelectedBg" Color="{StaticResource NeutralElevated}" />
                     <SolidColorBrush x:Key="TabStripBg" Color="{StaticResource NeutralBase}" />
                     <SolidColorBrush x:Key="VerticalTabsSurfaceBg" Color="Transparent" />
                     <SolidColorBrush x:Key="TabIdleBg" Color="{StaticResource NeutralInteractive}" />
@@ -113,6 +123,46 @@
                     <Color x:Key="AcrylicTintColor">#21252B</Color>
                     <Color x:Key="DialogWindowColor">#1C1C1E</Color>
                     <SolidColorBrush x:Key="DialogWindowBrush" Color="#1C1C1E" />
+                </ResourceDictionary>
+                <!-- Dim 配色（X / 旧 Twitter の「Dim」と同じ紺寄りのダーク）。
+                     地の #15202B と面の #1E2732、境界の #38444D という 3 色が Dim の見た目を決めている。 -->
+                <ResourceDictionary x:Key="{x:Static services:ThemeService.Dim}">
+                    <Color x:Key="NeutralBase">#15202B</Color>
+                    <Color x:Key="NeutralSurface">#1E2732</Color>
+                    <Color x:Key="NeutralInteractive">#38444D</Color>
+                    <!-- 選択中タブ用（Dark の NeutralElevated と同じ役割）。X の Dim でも
+                         選択中の項目は地色より明るく描かれる。 -->
+                    <Color x:Key="NeutralElevated">#46535F</Color>
+                    <SolidColorBrush x:Key="TabSelectedBg" Color="{StaticResource NeutralElevated}" />
+                    <SolidColorBrush x:Key="TabStripBg" Color="{StaticResource NeutralBase}" />
+                    <SolidColorBrush x:Key="VerticalTabsSurfaceBg" Color="Transparent" />
+                    <SolidColorBrush x:Key="TabIdleBg" Color="{StaticResource NeutralInteractive}" />
+                    <SolidColorBrush x:Key="TabHoverBg" Color="{StaticResource NeutralSurface}" />
+                    <SolidColorBrush x:Key="TabActiveBg" Color="{StaticResource NeutralBase}" />
+                    <SolidColorBrush x:Key="ContentBg" Color="{StaticResource NeutralSurface}" />
+                    <SolidColorBrush x:Key="OmniboxBg" Color="{StaticResource NeutralSurface}" />
+                    <SolidColorBrush x:Key="SidebarBg" Color="{StaticResource NeutralSurface}" />
+                    <SolidColorBrush x:Key="StatusBg" Color="{StaticResource NeutralSurface}" />
+                    <SolidColorBrush x:Key="TextPrimary" Color="#F7F9F9" />
+                    <SolidColorBrush x:Key="TextSecondary" Color="#8B98A5" />
+                    <SolidColorBrush x:Key="TextTertiary" Color="#6E767D" />
+                    <SolidColorBrush x:Key="Divider" Color="{StaticResource NeutralInteractive}" />
+                    <SolidColorBrush x:Key="HoverBg" Color="{StaticResource NeutralInteractive}" />
+                    <SolidColorBrush x:Key="CrumbHoverBg" Color="{StaticResource NeutralInteractive}" />
+                    <SolidColorBrush x:Key="CaptionHoverBg" Color="{StaticResource NeutralInteractive}" />
+                    <SolidColorBrush x:Key="TabCloseHoverBg" Color="{StaticResource NeutralInteractive}" />
+                    <SolidColorBrush x:Key="StatusDivider" Color="{StaticResource NeutralInteractive}" />
+                    <SolidColorBrush x:Key="SettingsPageBg" Color="{StaticResource NeutralBase}" />
+                    <SolidColorBrush x:Key="SettingsNavBg" Color="{StaticResource NeutralSurface}" />
+                    <SolidColorBrush x:Key="SettingsCardBg" Color="{StaticResource NeutralSurface}" />
+                    <SolidColorBrush x:Key="SettingsCardBorder" Color="{StaticResource NeutralInteractive}" />
+                    <SolidColorBrush x:Key="SettingsNavSelected" Color="{StaticResource NeutralInteractive}" />
+                    <SolidColorBrush x:Key="SettingsHeroBg" Color="{StaticResource NeutralSurface}" />
+                    <SolidColorBrush x:Key="SettingsIconBg" Color="{StaticResource NeutralInteractive}" />
+                    <SolidColorBrush x:Key="SettingsButtonBg" Color="{StaticResource NeutralSurface}" />
+                    <Color x:Key="AcrylicTintColor">#15202B</Color>
+                    <Color x:Key="DialogWindowColor">#1E2732</Color>
+                    <SolidColorBrush x:Key="DialogWindowBrush" Color="#1E2732" />
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
 

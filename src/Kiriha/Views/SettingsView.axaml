@@ -189,6 +189,8 @@
                                                     <ComboBoxItem Tag="Light" Content="{DynamicResource Text.Settings.Theme.Light}" />
                                                     <ComboBoxItem Tag="Dark" Content="{DynamicResource Text.Settings.Theme.Dark}" />
                                                     <ComboBoxItem Tag="OneDark">One Dark</ComboBoxItem>
+                                                    <!-- One Dark と同じく配色名なので翻訳しない -->
+                                                    <ComboBoxItem Tag="Dim">Dim</ComboBoxItem>
                                                 </ComboBox>
                                                 <CheckBox Content="{DynamicResource Text.Settings.Acrylic}"
                                                           IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptUseAcrylicBackground}" />
@@ -381,6 +383,16 @@
                                                         HorizontalAlignment="Left"
                                                         IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsNotLicensed}"
                                                         BorderBrush="{DynamicResource Divider}" BorderThickness="1" />
+                                                <!-- 認証済みのときだけ出す解除ボタン。購入は無効にならず、
+                                                     同じメールアドレスでいつでも認証し直せる。 -->
+                                                <Button Classes="cmd" Content="{DynamicResource Text.License.Deactivate}"
+                                                        Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).DeactivateLicenseCommand}"
+                                                        HorizontalAlignment="Left"
+                                                        IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsLicensed}"
+                                                        BorderBrush="{DynamicResource Divider}" BorderThickness="1" />
+                                                <TextBlock Classes="settingscaption" TextWrapping="Wrap" Margin="0,4,0,0"
+                                                           IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsLicensed}"
+                                                           Text="{DynamicResource Text.License.DeactivateNote}" />
                                             </StackPanel>
                                         </HeaderedContentControl>
                                         <HeaderedContentControl Classes="settingscard" Header="{DynamicResource Text.Settings.About}">

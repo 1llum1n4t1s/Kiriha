@@ -31,6 +31,14 @@
             </ExperimentalAcrylicBorder.Material>
         </ExperimentalAcrylicBorder>
 
+        <!-- ぼかしの上に重ねるテーマ色の膜。BackgroundSource="Digger" はウィンドウの描画を
+             背後の合成面まで掘り抜くので、Window.Background を半透明にしても濃さは変えられず、
+             MaterialOpacity / TintOpacity も Win32 のアクリル経路ではほとんど効かない
+             （0.85→0.97 に上げても実測で 1 段しか変わらなかった）。濃さの調整はこの膜で行う。
+             ここが無いと、透ける部分だけ壁紙の色に染まって不透明な面から浮いて見える。
+             濃さは ThemeService.AcrylicScrimBrush が現在のテーマ色から作る。 -->
+        <Border Background="{DynamicResource AcrylicScrimBrush}" IsHitTestVisible="False" />
+
     <!-- ライセンスロック中は IsEnabled で操作領域全体を無効化する。ロック画面のオーバーレイは
          ヒットテスト（マウス）しか塞げず、フォーカスが残った一覧への Delete / Ctrl+X/V 等の
          コントロール直付け KeyDown ハンドラは Window.OnKeyDown のガードより先に発火するため、
@@ -245,9 +253,9 @@
                         Content="{Binding SelectedTab}">
             <ContentControl.ContentTemplate>
                 <DataTemplate x:DataType="vm:TabViewModel">
+                    <Panel>
                     <Border x:Name="ContentIsland"
                             Background="{DynamicResource ContentBg}"
-                            BorderBrush="{DynamicResource Divider}" BorderThickness="1"
                             CornerRadius="10">
                     <Border.Clip>
                         <!-- ClipToBounds は矩形なので、実寸へ追従する角丸ジオメトリで子要素まで切り抜く。 -->
@@ -1254,6 +1262,13 @@
                     </Grid>
                     </Panel>
                     </Border>
+
+                    <!-- 枠線はクリップの外側（兄弟要素）で描く。上の Border に BorderThickness を
+                         持たせると、同じ角丸ジオメトリのクリップが 1px の線をちょうど削り取ってしまい、
+                         四隅の弧だけ線が消えて見える（直線部分は残るので「角だけ切れている」ように見える）。 -->
+                    <Border BorderBrush="{DynamicResource Divider}" BorderThickness="1"
+                            CornerRadius="10" IsHitTestVisible="False" />
+                    </Panel>
                 </DataTemplate>
             </ContentControl.ContentTemplate>
         </ContentControl>

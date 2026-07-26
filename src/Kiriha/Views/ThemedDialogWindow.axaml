@@ -12,6 +12,10 @@
             </ExperimentalAcrylicBorder.Material>
         </ExperimentalAcrylicBorder>
 
+        <!-- メインウィンドウと同じ、ぼかしの上に敷くテーマ色の膜（ThemeService 参照）。
+             これが無いとダイアログだけ壁紙の色に染まって本体から浮く。 -->
+        <Border Background="{DynamicResource AcrylicScrimBrush}" IsHitTestVisible="False" />
+
         <!-- アクリル OFF 時だけ ContentBg を見せる。ON 時はコード側で透明化し、
              Lhamiel と同様にコンテンツをアクリル面へ直接重ねる。 -->
         <Border x:Name="ContentSurface" Background="{DynamicResource ContentBg}">

@@ -113,6 +113,8 @@
   <x:String x:Key="Text.Launch.TerminalFailed" xml:space="preserve">ターミナルを起動できませんでした: {0}</x:String>
   <x:String x:Key="Text.License.Activate" xml:space="preserve">認証する</x:String>
   <x:String x:Key="Text.License.CodePlaceholder" xml:space="preserve">6 桁の確認コード</x:String>
+  <x:String x:Key="Text.License.Deactivate" xml:space="preserve">ライセンス認証を解除</x:String>
+  <x:String x:Key="Text.License.DeactivateNote" xml:space="preserve">この PC の認証だけを解除します。購入は有効なままなので、同じメールアドレスでいつでも認証し直せます。試用期間は延びません。</x:String>
   <x:String x:Key="Text.License.EmailPlaceholder" xml:space="preserve">購入時のメールアドレス</x:String>
   <x:String x:Key="Text.License.Exit" xml:space="preserve">終了する</x:String>
   <x:String x:Key="Text.License.KeyFallback" xml:space="preserve">ライセンスキーを直接入力する</x:String>
@@ -126,6 +128,7 @@
   <x:String x:Key="Text.License.Msg.Checking" xml:space="preserve">オンラインで確認しています…</x:String>
   <x:String x:Key="Text.License.Msg.CodeSent" xml:space="preserve">確認コードをメールで送りました。届いた 6 桁の数字を入力してください。</x:String>
   <x:String x:Key="Text.License.Msg.CodeTooSoon" xml:space="preserve">送信の間隔が短すぎます。30 秒ほど待ってからもう一度お試しください。</x:String>
+  <x:String x:Key="Text.License.Msg.Deactivated" xml:space="preserve">この PC のライセンス認証を解除しました。同じメールアドレスでいつでも認証し直せます。</x:String>
   <x:String x:Key="Text.License.Msg.EnterCode" xml:space="preserve">メールに届いた 6 桁のコードを入力してください。</x:String>
   <x:String x:Key="Text.License.Msg.EnterEmail" xml:space="preserve">購入時のメールアドレスを入力してください。</x:String>
   <x:String x:Key="Text.License.Msg.EnterKey" xml:space="preserve">購入時に発行されたライセンスキーを入力してください。</x:String>

@@ -325,6 +325,7 @@ public partial class MainWindowViewModel : ObservableObject
                 "Light" => Avalonia.Styling.ThemeVariant.Light,
                 "Dark" => Avalonia.Styling.ThemeVariant.Dark,
                 "OneDark" => Services.ThemeService.OneDark,
+                "Dim" => Services.ThemeService.Dim,
                 _ => Avalonia.Styling.ThemeVariant.Default,
             };
 
@@ -962,6 +963,9 @@ public partial class MainWindowViewModel : ObservableObject
     /// <summary>認証済みでない（購入導線・キー入力欄を表示する状態）。</summary>
     public bool IsNotLicensed => LicenseService.State != LicenseState.Licensed;
 
+    /// <summary>認証済み（解除ボタンを表示する状態）。</summary>
+    public bool IsLicensed => LicenseService.State == LicenseState.Licensed;
+
     private void OnLicenseStateChanged()
     {
         OnPropertyChanged(nameof(LicenseStatusText));
@@ -970,6 +974,21 @@ public partial class MainWindowViewModel : ObservableObject
         OnPropertyChanged(nameof(IsOnlineCheckRequired));
         OnPropertyChanged(nameof(IsLicenseLocked));
         OnPropertyChanged(nameof(IsNotLicensed));
+        OnPropertyChanged(nameof(IsLicensed));
+    }
+
+    /// <summary>この PC の認証を解除して未認証へ戻す（購入は有効なまま。動作確認用）。</summary>
+    [RelayCommand]
+    private void DeactivateLicense()
+    {
+        LicenseService.Deactivate();
+        // 解除直後に前回の入力が残っていると紛らわしいので、認証欄を初期状態へ戻す。
+        LicenseEmailInput = "";
+        LicenseCodeInput = "";
+        IsLicenseCodeSent = false;
+        IsLicenseKeyEntryVisible = false;
+        LicenseMessage = LocalizationService.Text("Text.License.Msg.Deactivated");
+        OnLicenseStateChanged();
     }
 
     /// <summary>入力されたライセンスキーを検証して有効化する（オフラインで完結）。</summary>
