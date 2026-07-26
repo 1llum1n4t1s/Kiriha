@@ -174,6 +174,34 @@
                         <ScrollViewer VerticalScrollBarVisibility="Auto"
                                       HorizontalScrollBarVisibility="Disabled">
                             <StackPanel Spacing="2">
+                                <!-- 無劣化回転（Exif の向きだけを書き換えて即保存）。
+                                     向きタグを持てない形式では押せないようにする。 -->
+                                <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,0,10">
+                                    <Button Classes="galleryTool"
+                                            IsEnabled="{Binding SelectedTab.CanRotateSelected}"
+                                            Command="{Binding SelectedTab.RotateSelectedLeftCommand}"
+                                            AutomationProperties.Name="{DynamicResource Text.Gallery.RotateLeft}"
+                                            ToolTip.Tip="{DynamicResource Text.Gallery.RotateLeft}">
+                                        <TextBlock Classes="fico" Text="&#xE80D;" FontSize="14" />
+                                    </Button>
+                                    <Button Classes="galleryTool"
+                                            IsEnabled="{Binding SelectedTab.CanRotateSelected}"
+                                            Command="{Binding SelectedTab.RotateSelectedRightCommand}"
+                                            AutomationProperties.Name="{DynamicResource Text.Gallery.RotateRight}"
+                                            ToolTip.Tip="{DynamicResource Text.Gallery.RotateRight}">
+                                        <TextBlock Classes="fico" Text="&#xE80C;" FontSize="14" />
+                                    </Button>
+                                </StackPanel>
+
+                                <!-- 表示倍率。Ctrl+ホイールと同じ値を触る。 -->
+                                <TextBlock Text="{DynamicResource Text.Gallery.Zoom}" FontSize="11" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextSecondary}" />
+                                <Slider Classes="galleryzoom" Margin="0,0,0,12"
+                                        Minimum="0.2" Maximum="8" SmallChange="0.1" LargeChange="0.5"
+                                        AutomationProperties.Name="{DynamicResource Text.Gallery.Zoom}"
+                                        ToolTip.Tip="{DynamicResource Text.Gallery.ZoomTip}"
+                                        Value="{Binding SelectedTab.GalleryZoom, Mode=TwoWay}" />
+
                                 <TextBlock Text="{DynamicResource Text.Gallery.ImageInfo}" FontSize="11" FontWeight="SemiBold"
                                            Margin="0,0,0,8"
                                            Foreground="{DynamicResource TextSecondary}" />
@@ -945,16 +973,24 @@
                                         <Panel x:Name="GalleryImageArea" Grid.Row="0" Margin="18,18,18,6"
                                                Background="Transparent"
                                                Focusable="True"
+                                               ClipToBounds="True"
                                                PointerPressed="GalleryImage_PointerPressed"
+                                               PointerMoved="GalleryImage_PointerMoved"
                                                PointerReleased="GalleryImage_PointerReleased"
                                                KeyDown="GalleryImage_KeyDown">
-                                            <Image Source="{Binding PreviewBitmap}" Stretch="Uniform" StretchDirection="DownOnly"
-                                                   RenderOptions.BitmapInterpolationMode="HighQuality" />
-                                            <!-- 動画のフレーム。VideoFrame は 2 枚のビットマップを交互に差し替えて更新される。
-                                                 静止画と違い拡大も許すので StretchDirection は既定（Both）のまま。 -->
-                                            <Image Source="{Binding VideoFrame}" Stretch="Uniform"
-                                                   IsVisible="{Binding IsVideoPreview}"
-                                                   RenderOptions.BitmapInterpolationMode="HighQuality" />
+                                            <!-- 拡大縮小は RenderTransform で掛ける。レイアウトを動かさないので
+                                                 Stretch="Uniform" の「領域に収める」計算をそのまま活かせ、
+                                                 拡大中も下のオーバーレイ（閉じるボタン・再生バー）が動かない。 -->
+                                            <Panel RenderTransform="{Binding GalleryImageTransform}"
+                                                   RenderTransformOrigin="0.5,0.5">
+                                                <Image Source="{Binding PreviewBitmap}" Stretch="Uniform" StretchDirection="DownOnly"
+                                                       RenderOptions.BitmapInterpolationMode="HighQuality" />
+                                                <!-- 動画のフレーム。VideoFrame は 2 枚のビットマップを交互に差し替えて更新される。
+                                                     静止画と違い拡大も許すので StretchDirection は既定（Both）のまま。 -->
+                                                <Image Source="{Binding VideoFrame}" Stretch="Uniform"
+                                                       IsVisible="{Binding IsVideoPreview}"
+                                                       RenderOptions.BitmapInterpolationMode="HighQuality" />
+                                            </Panel>
                                             <!-- 画像プレビューも動画も無いファイルはアイコン + 名前で表示する -->
                                             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
                                                 <StackPanel.IsVisible>
@@ -992,9 +1028,17 @@
                                                            Foreground="#DDDDDD" FontSize="13"
                                                            TextWrapping="Wrap" MaxWidth="420" TextAlignment="Center" />
                                             </Border>
-                                            <!-- 動画の再生コントロール。プレビュー領域の下端に重ねる -->
-                                            <Border Classes="videobar" IsVisible="{Binding IsVideoPreview}"
+                                            <!-- 動画の再生コントロール。プレビュー領域の下端に重ねる。
+                                                 映像に被って邪魔にならないよう、プレビュー領域でマウスを
+                                                 動かしている間だけ出す（GalleryImage_PointerMoved）。 -->
+                                            <Border Classes="videobar"
                                                     VerticalAlignment="Bottom" HorizontalAlignment="Stretch">
+                                                <Border.IsVisible>
+                                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                                        <Binding Path="IsVideoPreview" />
+                                                        <Binding Path="IsVideoBarVisible" />
+                                                    </MultiBinding>
+                                                </Border.IsVisible>
                                                 <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto,Auto,Auto" RowDefinitions="Auto">
                                                     <Button Grid.Column="0" Classes="videobtn"
                                                             Command="{Binding ToggleVideoPlaybackCommand}"

@@ -101,6 +101,11 @@
   <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">Lumabas sa gallery (Esc)</x:String>
   <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">Impormasyon ng larawan</x:String>
   <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">Walang impormasyong makuha para sa larawang ito.</x:String>
+  <x:String x:Key="Text.Gallery.RotateFailed" xml:space="preserve">Hindi maiikot ang larawang ito nang walang kawalan ng kalidad.</x:String>
+  <x:String x:Key="Text.Gallery.RotateLeft" xml:space="preserve">Iikot pakaliwa (naka-save nang walang kawalan ng kalidad)</x:String>
+  <x:String x:Key="Text.Gallery.RotateRight" xml:space="preserve">Iikot pakanan (naka-save nang walang kawalan ng kalidad)</x:String>
+  <x:String x:Key="Text.Gallery.Zoom" xml:space="preserve">Zoom</x:String>
+  <x:String x:Key="Text.Gallery.ZoomTip" xml:space="preserve">Maaari ka ring mag-zoom gamit ang Ctrl + gulong ng mouse</x:String>
   <x:String x:Key="Text.Integration.OpenWithKiriha" xml:space="preserve">Buksan gamit ang Kiriha</x:String>
   <x:String x:Key="Text.Launch.ExplorerFailed" xml:space="preserve">Hindi masimulan ang File Explorer: {0}</x:String>
   <x:String x:Key="Text.Launch.Failed" xml:space="preserve">Hindi masimulan: {0}</x:String>

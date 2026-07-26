@@ -101,6 +101,11 @@
   <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">離開圖庫 (Esc)</x:String>
   <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">影像資訊</x:String>
   <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">沒有這張影像的資訊。</x:String>
+  <x:String x:Key="Text.Gallery.RotateFailed" xml:space="preserve">無法以無損方式旋轉這張影像。</x:String>
+  <x:String x:Key="Text.Gallery.RotateLeft" xml:space="preserve">向左旋轉（無損儲存）</x:String>
+  <x:String x:Key="Text.Gallery.RotateRight" xml:space="preserve">向右旋轉（無損儲存）</x:String>
+  <x:String x:Key="Text.Gallery.Zoom" xml:space="preserve">縮放</x:String>
+  <x:String x:Key="Text.Gallery.ZoomTip" xml:space="preserve">也可以使用 Ctrl + 滑鼠滾輪縮放</x:String>
   <x:String x:Key="Text.Integration.OpenWithKiriha" xml:space="preserve">以 Kiriha 開啟</x:String>
   <x:String x:Key="Text.Launch.ExplorerFailed" xml:space="preserve">無法啟動檔案總管: {0}</x:String>
   <x:String x:Key="Text.Launch.Failed" xml:space="preserve">無法啟動: {0}</x:String>

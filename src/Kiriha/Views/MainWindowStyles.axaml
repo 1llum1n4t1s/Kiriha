@@ -617,4 +617,28 @@
             <Setter Property="MinWidth" Value="0" />
             <Setter Property="Padding" Value="0" />
         </Style>
+
+        <!-- ギャラリー左ペインの操作ボタン（回転）。ここは通常のタブ一覧と同じ場所なので、
+             動画バーと違ってテーマ配色に従わせる。 -->
+        <Style Selector="Button.galleryTool">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+            <Setter Property="Width" Value="34" />
+            <Setter Property="Height" Value="30" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style Selector="Button.galleryTool:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource HoverBg}" />
+        </Style>
+        <Style Selector="Button.galleryTool:disabled">
+            <Setter Property="Opacity" Value="0.35" />
+        </Style>
+        <Style Selector="Slider.galleryzoom">
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="Padding" Value="0" />
+        </Style>
 </Styles>

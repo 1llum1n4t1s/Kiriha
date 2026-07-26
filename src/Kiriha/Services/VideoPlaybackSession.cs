@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 using Avalonia;
@@ -65,6 +66,22 @@ internal sealed partial class VideoPlaybackSession : IDisposable
 
     /// <summary>フレーム取得失敗のログを 1 回だけに絞るためのフラグ。</summary>
     private bool _transferFailureLogged;
+
+    /// <summary>シーク要求を engine へ投げっぱなしにしているか（EventSeeked で下ろす）。</summary>
+    private bool _seekInFlight;
+
+    /// <summary>実行中のシークが終わったら投げ直す位置。<see cref="_hasPendingSeek"/> が true のときだけ有効。</summary>
+    private double _pendingSeek;
+    private bool _hasPendingSeek;
+
+    /// <summary>実行中のシークを投げた時刻（Stopwatch のタイムスタンプ）。取りこぼし対策の番人に使う。</summary>
+    private long _seekIssuedAt;
+
+    /// <summary>直近に要求したシーク位置。完了までの間はこれを <see cref="Position"/> として見せる。</summary>
+    private double _seekTarget;
+
+    /// <summary>EventSeeked が来ないコーデックに備えた打ち切り時間。これを過ぎたら次のシークを許す。</summary>
+    private static readonly long SeekWatchdogTicks = Stopwatch.Frequency * 3;
 
     /// <summary>1 枚も絵が出ないまま経過したタイマー回数。原因調査用のログを 1 回だけ出すのに使う。</summary>
     private int _stallTicks;
@@ -258,6 +275,7 @@ internal sealed partial class VideoPlaybackSession : IDisposable
         _stallLogged = false;
         _stallTicks = 0;
         _framesRendered = 0;
+        ResetSeekState();
 
         var url = Marshal.StringToBSTR(path);
         try
@@ -287,15 +305,84 @@ internal sealed partial class VideoPlaybackSession : IDisposable
     /// <summary>再生中かどうか。</summary>
     public bool IsPlaying => !_disposed && _engine.IsPaused() == 0 && _engine.IsEnded() == 0;
 
-    /// <summary>現在位置（秒）。</summary>
-    public double Position => _disposed ? 0 : Sanitize(_engine.GetCurrentTime());
+    /// <summary>
+    /// 現在位置（秒）。シーク中は engine の現在位置ではなく要求位置を返す。
+    ///
+    /// engine はシークが終わるまで移動前の時刻を返し続けるため、そのまま公開すると
+    /// スライダーがつまみを離すまで元の位置へ引き戻され続ける（＝操作を受け付けていないように見える）。
+    /// </summary>
+    public double Position
+        => _disposed ? 0 : (IsSeekOutstanding() ? _seekTarget : Sanitize(_engine.GetCurrentTime()));
 
-    /// <summary>再生位置を移動する。</summary>
+    /// <summary>要求したシークがまだ終わっていないか。完了通知が来ないまま時間切れになった分は下ろす。</summary>
+    private bool IsSeekOutstanding()
+    {
+        if (_seekInFlight && Stopwatch.GetTimestamp() - _seekIssuedAt >= SeekWatchdogTicks)
+        {
+            _seekInFlight = false;
+            if (_hasPendingSeek)
+            {
+                IssueSeek(_pendingSeek);
+            }
+        }
+
+        return _seekInFlight || _hasPendingSeek;
+    }
+
+    /// <summary>
+    /// 再生位置を移動する。
+    ///
+    /// スライダーのドラッグは 1 回の操作で数十回この呼び出しを起こす。engine の SetCurrentTime は
+    /// 要求ごとに正確なシーク（キーフレームまで戻ってデコードし直す）を行い、しかも実行中の要求を
+    /// 取り消さずに順番に処理するため、素通しすると要求が行列を作り、つまみを離してから実際に
+    /// その位置の絵が出るまで十数秒待たされていた。実行中は 1 本だけに絞り、途中の要求は
+    /// 最後の 1 つへ畳んで完了時（EventSeeked）に投げ直す。
+    /// </summary>
     public void Seek(double seconds)
     {
         if (_disposed) return;
         var clamped = Duration > 0 ? Math.Clamp(seconds, 0, Duration) : Math.Max(0, seconds);
-        _ = _engine.SetCurrentTime(clamped);
+        _seekTarget = clamped;
+
+        // 完了通知が来ないまま長時間残っている場合だけは、行列に積まず新しい要求として投げ直す
+        if (_seekInFlight && Stopwatch.GetTimestamp() - _seekIssuedAt < SeekWatchdogTicks)
+        {
+            _pendingSeek = clamped;
+            _hasPendingSeek = true;
+            return;
+        }
+
+        IssueSeek(clamped);
+    }
+
+    private void IssueSeek(double seconds)
+    {
+        _hasPendingSeek = false;
+        _seekInFlight = true;
+        _seekIssuedAt = Stopwatch.GetTimestamp();
+        if (_engine.SetCurrentTime(seconds) < 0)
+        {
+            // 要求自体が弾かれたときは完了通知も来ないので、その場で下ろす
+            _seekInFlight = false;
+        }
+    }
+
+    /// <summary>シークの完了通知を受けて、畳んでおいた最後の要求を投げ直す。</summary>
+    private void CompleteSeek()
+    {
+        _seekInFlight = false;
+        if (_hasPendingSeek)
+        {
+            IssueSeek(_pendingSeek);
+        }
+    }
+
+    private void ResetSeekState()
+    {
+        _seekInFlight = false;
+        _hasPendingSeek = false;
+        _pendingSeek = 0;
+        _seekTarget = 0;
     }
 
     /// <summary>音量（0.0〜1.0）。</summary>
@@ -525,6 +612,9 @@ internal sealed partial class VideoPlaybackSession : IDisposable
                 _forceNextFrame = true;
                 break;
             case MediaEngineInterop.EventSeeked:
+                CompleteSeek();
+                _forceNextFrame = true;
+                break;
             case MediaEngineInterop.EventFirstFrameReady:
                 _forceNextFrame = true;
                 break;

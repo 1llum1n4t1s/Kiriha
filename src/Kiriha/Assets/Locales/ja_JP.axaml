@@ -101,6 +101,11 @@
   <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">ギャラリーを終了 (Esc)</x:String>
   <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">画像情報</x:String>
   <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">この画像の情報はありません。</x:String>
+  <x:String x:Key="Text.Gallery.RotateFailed" xml:space="preserve">この画像は無劣化で回転できません。</x:String>
+  <x:String x:Key="Text.Gallery.RotateLeft" xml:space="preserve">左に回転（無劣化で保存）</x:String>
+  <x:String x:Key="Text.Gallery.RotateRight" xml:space="preserve">右に回転（無劣化で保存）</x:String>
+  <x:String x:Key="Text.Gallery.Zoom" xml:space="preserve">拡大縮小</x:String>
+  <x:String x:Key="Text.Gallery.ZoomTip" xml:space="preserve">Ctrl + マウスホイールでも拡大縮小できます</x:String>
   <x:String x:Key="Text.Integration.OpenWithKiriha" xml:space="preserve">Kiriha で開く</x:String>
   <x:String x:Key="Text.Launch.ExplorerFailed" xml:space="preserve">エクスプローラーを起動できませんでした: {0}</x:String>
   <x:String x:Key="Text.Launch.Failed" xml:space="preserve">起動できませんでした: {0}</x:String>

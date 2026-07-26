@@ -101,6 +101,11 @@
   <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">चित्रशालायाः निर्गच्छ (Esc)</x:String>
   <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">चित्रविवरणम्</x:String>
   <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">अस्य चित्रस्य विवरणं नास्ति।</x:String>
+  <x:String x:Key="Text.Gallery.RotateFailed" xml:space="preserve">इदं चित्रम् अक्षतरूपेण परिवर्तयितुं न शक्यते।</x:String>
+  <x:String x:Key="Text.Gallery.RotateLeft" xml:space="preserve">वामतः परिवर्तनम् (अक्षतरूपेण रक्ष्यते)</x:String>
+  <x:String x:Key="Text.Gallery.RotateRight" xml:space="preserve">दक्षिणतः परिवर्तनम् (अक्षतरूपेण रक्ष्यते)</x:String>
+  <x:String x:Key="Text.Gallery.Zoom" xml:space="preserve">आवर्धनम्</x:String>
+  <x:String x:Key="Text.Gallery.ZoomTip" xml:space="preserve">Ctrl + मूषकचक्रेण अपि आवर्धनं शक्यते</x:String>
   <x:String x:Key="Text.Integration.OpenWithKiriha" xml:space="preserve">Kiriha द्वारा उद्घाटय</x:String>
   <x:String x:Key="Text.Launch.ExplorerFailed" xml:space="preserve">सञ्चिकादर्शकः न आरब्धः: {0}</x:String>
   <x:String x:Key="Text.Launch.Failed" xml:space="preserve">आरम्भः न शक्यते: {0}</x:String>

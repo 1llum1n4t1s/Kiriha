@@ -27,6 +27,17 @@ public partial class MainWindow : Window
     private Control? _fileDropTargetControl;
     private int _fileDropVisualRevision;
     private Point _dragStartPoint;
+
+    /// <summary>動画コントロールをマウス停止後に引っ込めるまでの時間。</summary>
+    private static readonly TimeSpan VideoBarHideDelay = TimeSpan.FromSeconds(2);
+
+    private DispatcherTimer? _videoBarTimer;
+
+    /// <summary>ギャラリーのプレビュー領域（DataTemplate 内なので x:Name のフィールドが生えない）。</summary>
+    private Panel? _galleryImageArea;
+
+    /// <summary>拡大中のドラッグ移動の基準点。null ならドラッグしていない。</summary>
+    private Point? _galleryPanOrigin;
     private bool _dragInProgress;
     private readonly HashSet<ListBox> _bulkSelectionLists = [];
     private ListBox? _marqueeListBox;
@@ -525,6 +536,19 @@ public partial class MainWindow : Window
                 e.Handled = true;
                 return;
             }
+        }
+
+        // ギャラリーのプレビュー領域（レターボックスの余白を含む）での Ctrl+ホイールは、
+        // 表示モードの切り替えではなく表示中の画像そのものの拡大縮小に割り当てる。
+        // ギャラリーを抜けたいときは Esc / ✕ / フィルムストリップ上の Ctrl+ホイールを使う。
+        if (e.KeyModifiers.HasFlag(KeyModifiers.Control)
+            && ViewModel?.SelectedTab is { IsSettingsTab: false, IsGalleryView: true } zoomTab
+            && e.Source is Visual zoomSource
+            && zoomSource.GetSelfAndVisualAncestors().OfType<Panel>().Any(p => p.Name == "GalleryImageArea"))
+        {
+            zoomTab.ZoomGalleryBy(e.Delta.Y * 0.15);
+            e.Handled = true;
+            return;
         }
 
         // Ctrl+ホイールで表示ズーム（アイコン表示中は Finder 同様の無段階、他は表示モードを段階切替）
@@ -1940,6 +1964,81 @@ public partial class MainWindow : Window
         // メイン画像へフォーカスを移す。以降のキー操作は GalleryImage_KeyDown が直接処理するため、
         // フォーカスさえこのパネルに乗れば、ファイル一覧の外でも Del / F2 などが確実に効く。
         (sender as Control)?.Focus();
+        _galleryImageArea = sender as Panel;
+
+        // 拡大中は左ドラッグで見たい場所へ画像を動かせるようにする。
+        // ただし再生バー上での操作（シークのドラッグ等）は画像移動にしない。
+        var onVideoBar = e.Source is Visual source
+            && source.GetSelfAndVisualAncestors().OfType<Border>().Any(b => b.Classes.Contains("videobar"));
+        _galleryPanOrigin = !onVideoBar
+            && e.GetCurrentPoint(this).Properties.IsLeftButtonPressed
+            && ViewModel?.SelectedTab is { IsSettingsTab: false, IsGalleryZoomed: true }
+            ? e.GetPosition(this)
+            : null;
+    }
+
+    /// <summary>プレビュー領域でのマウス移動。拡大中の画像移動と、動画コントロールの表示起こしを行う。</summary>
+    private void GalleryImage_PointerMoved(object? sender, PointerEventArgs e)
+    {
+        if (ViewModel?.SelectedTab is not { IsSettingsTab: false } tab)
+        {
+            return;
+        }
+
+        _galleryImageArea = sender as Panel;
+
+        if (_galleryPanOrigin is { } origin)
+        {
+            if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            {
+                var current = e.GetPosition(this);
+                tab.PanGalleryBy(current.X - origin.X, current.Y - origin.Y);
+                _galleryPanOrigin = current;
+            }
+            else
+            {
+                _galleryPanOrigin = null;
+            }
+        }
+
+        if (tab.IsVideoPreview)
+        {
+            ShowVideoBar(tab);
+        }
+    }
+
+    /// <summary>動画のコントロールバーを出し、一定時間マウスが止まったら自動で引っ込める。</summary>
+    private void ShowVideoBar(TabViewModel tab)
+    {
+        tab.IsVideoBarVisible = true;
+        _videoBarTimer ??= CreateVideoBarTimer();
+        _videoBarTimer.Stop();
+        _videoBarTimer.Start();
+    }
+
+    private DispatcherTimer CreateVideoBarTimer()
+    {
+        var timer = new DispatcherTimer { Interval = VideoBarHideDelay };
+        timer.Tick += (_, _) =>
+        {
+            timer.Stop();
+            if (ViewModel?.SelectedTab is not { IsSettingsTab: false } tab)
+            {
+                return;
+            }
+
+            // バーの上にカーソルを置いたまま（シークしようとして手を止めた等）なら消さない。
+            var bar = _galleryImageArea?.GetVisualDescendants().OfType<Border>()
+                .FirstOrDefault(b => b.Classes.Contains("videobar"));
+            if (bar?.IsPointerOver == true)
+            {
+                timer.Start();
+                return;
+            }
+
+            tab.IsVideoBarVisible = false;
+        };
+        return timer;
     }
 
     /// <summary>ギャラリーのメイン画像にフォーカスがあるときの一覧向けキー操作（Del / F2 / 切り取り等）。</summary>

@@ -101,6 +101,11 @@
   <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">Exit gallery (Esc)</x:String>
   <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">Image info</x:String>
   <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">No information is available for this image.</x:String>
+  <x:String x:Key="Text.Gallery.RotateFailed" xml:space="preserve">This image cannot be rotated losslessly.</x:String>
+  <x:String x:Key="Text.Gallery.RotateLeft" xml:space="preserve">Rotate left (saved losslessly)</x:String>
+  <x:String x:Key="Text.Gallery.RotateRight" xml:space="preserve">Rotate right (saved losslessly)</x:String>
+  <x:String x:Key="Text.Gallery.Zoom" xml:space="preserve">Zoom</x:String>
+  <x:String x:Key="Text.Gallery.ZoomTip" xml:space="preserve">You can also zoom with Ctrl + mouse wheel</x:String>
   <x:String x:Key="Text.Integration.OpenWithKiriha" xml:space="preserve">Open with Kiriha</x:String>
   <x:String x:Key="Text.Launch.ExplorerFailed" xml:space="preserve">Could not start File Explorer: {0}</x:String>
   <x:String x:Key="Text.Launch.Failed" xml:space="preserve">Could not start: {0}</x:String>

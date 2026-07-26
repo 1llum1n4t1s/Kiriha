@@ -58,7 +58,11 @@ internal static partial class ImageMetadataService
         IPropertyStore? store = null;
         try
         {
-            if (SHGetPropertyStoreFromParsingName(path, 0, 0, IidIPropertyStore, out var ptr) < 0 || ptr == 0)
+            // GPS_NO_OPLOCK。既定ではプロパティハンドラーがファイルへ oplock を張り、その解除応答が
+            // 返らないまま残ることがある。その状態で同じファイルを書き込みで開くと（ギャラリーの
+            // 無劣化回転がまさにそれ）open が例外も出さずに待ち続けるため、oplock を張らせない。
+            const int GpsNoOplock = 0x80;
+            if (SHGetPropertyStoreFromParsingName(path, 0, GpsNoOplock, IidIPropertyStore, out var ptr) < 0 || ptr == 0)
             {
                 return result;
             }

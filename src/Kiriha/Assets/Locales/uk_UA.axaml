@@ -101,6 +101,11 @@
   <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">Вийти з галереї (Esc)</x:String>
   <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">Відомості про зображення</x:String>
   <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">Для цього зображення немає відомостей.</x:String>
+  <x:String x:Key="Text.Gallery.RotateFailed" xml:space="preserve">Це зображення не можна повернути без втрат.</x:String>
+  <x:String x:Key="Text.Gallery.RotateLeft" xml:space="preserve">Повернути ліворуч (зберігається без втрат)</x:String>
+  <x:String x:Key="Text.Gallery.RotateRight" xml:space="preserve">Повернути праворуч (зберігається без втрат)</x:String>
+  <x:String x:Key="Text.Gallery.Zoom" xml:space="preserve">Масштаб</x:String>
+  <x:String x:Key="Text.Gallery.ZoomTip" xml:space="preserve">Масштабувати також можна за допомогою Ctrl + коліщатко миші</x:String>
   <x:String x:Key="Text.Integration.OpenWithKiriha" xml:space="preserve">Відкрити за допомогою Kiriha</x:String>
   <x:String x:Key="Text.Launch.ExplorerFailed" xml:space="preserve">Не вдалося запустити Провідник: {0}</x:String>
   <x:String x:Key="Text.Launch.Failed" xml:space="preserve">Не вдалося запустити: {0}</x:String>

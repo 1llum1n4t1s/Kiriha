@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -212,8 +213,13 @@ public partial class TabViewModel : ObservableObject
 
     partial void OnSelectedEntryChanged(FileSystemEntry? value)
     {
+        CanRotateSelected = value is { IsDirectory: false }
+            && ExifOrientationService.CanRotate(Path.GetExtension(value.Name).ToLowerInvariant());
+
         if (_previewEnabled || IsGalleryView)
         {
+            // 別の画像へ移ったら等倍に戻す（前の画像の拡大位置が残っていると何が写っているか分からなくなる）
+            ResetGalleryZoom();
             UpdatePreview();
         }
 
@@ -300,6 +306,137 @@ public partial class TabViewModel : ObservableObject
         SelectedEntry = _entries[next];
     }
 
+    // ===== ギャラリーの拡大縮小 =====
+    //
+    // 拡大は RenderTransform で行う（レイアウトを動かさないので Stretch="Uniform" の
+    // 「領域にぴったり収める」計算をそのまま活かせて、拡大中もフィルムストリップや
+    // 各オーバーレイの位置が一切ずれない）。等倍が 1.0 で、そこからの倍率だけを持つ。
+
+    /// <summary>ギャラリー拡大率の下限。</summary>
+    public const double GalleryZoomMinimum = 0.2;
+
+    /// <summary>ギャラリー拡大率の上限。</summary>
+    public const double GalleryZoomMaximum = 8.0;
+
+    private readonly ScaleTransform _galleryScale = new();
+    private readonly TranslateTransform _galleryPan = new();
+
+    /// <summary>メイン画像へ掛ける拡大・平行移動。RenderTransform はビジュアルツリーの外に居て
+    /// DataContext を継承しないため、XAML から ScaleX 等を個別に Binding できない。
+    /// ここで組み立てた Transform をまるごと渡す。</summary>
+    public Transform GalleryImageTransform { get; }
+
+    /// <summary>ギャラリーの拡大率（1.0 = 表示領域に収まるサイズ）。</summary>
+    [ObservableProperty]
+    private double _galleryZoom = 1.0;
+
+    partial void OnGalleryZoomChanged(double value)
+    {
+        var clamped = Math.Clamp(value, GalleryZoomMinimum, GalleryZoomMaximum);
+        if (Math.Abs(clamped - value) > double.Epsilon)
+        {
+            GalleryZoom = clamped;
+            return;
+        }
+
+        _galleryScale.ScaleX = clamped;
+        _galleryScale.ScaleY = clamped;
+
+        // 縮小側へ戻したら、はみ出しを見るための移動量は意味を失うので戻す。
+        if (clamped <= 1.0)
+        {
+            _galleryPan.X = 0;
+            _galleryPan.Y = 0;
+        }
+
+        OnPropertyChanged(nameof(IsGalleryZoomed));
+    }
+
+    /// <summary>等倍より拡大されている（ドラッグでの移動を受け付ける）。</summary>
+    public bool IsGalleryZoomed => GalleryZoom > 1.0;
+
+    /// <summary>ホイールやスライダーからの相対ズーム。</summary>
+    public void ZoomGalleryBy(double delta)
+        => GalleryZoom = Math.Clamp(GalleryZoom + delta, GalleryZoomMinimum, GalleryZoomMaximum);
+
+    /// <summary>拡大中に画像をドラッグで動かす。</summary>
+    public void PanGalleryBy(double deltaX, double deltaY)
+    {
+        if (!IsGalleryZoomed)
+        {
+            return;
+        }
+
+        _galleryPan.X += deltaX;
+        _galleryPan.Y += deltaY;
+    }
+
+    /// <summary>拡大率と移動量を初期状態へ戻す。</summary>
+    public void ResetGalleryZoom()
+    {
+        GalleryZoom = 1.0;
+        _galleryPan.X = 0;
+        _galleryPan.Y = 0;
+    }
+
+    // ===== ギャラリーの無劣化回転 =====
+
+    /// <summary>選択中のファイルを無劣化で回転できるか（回転ボタンの活性制御）。</summary>
+    [ObservableProperty]
+    private bool _canRotateSelected;
+
+    /// <summary>回転（＝Exif の書き込み）を諦めるまでの時間。</summary>
+    private static readonly TimeSpan RotateTimeout = TimeSpan.FromSeconds(10);
+
+    [RelayCommand]
+    private Task RotateSelectedLeft() => RotateSelectedAsync(clockwise: false);
+
+    [RelayCommand]
+    private Task RotateSelectedRight() => RotateSelectedAsync(clockwise: true);
+
+    /// <summary>Exif の向きだけを書き換えて即座に保存し、表示とサムネイルを作り直す。</summary>
+    private async Task RotateSelectedAsync(bool clockwise)
+    {
+        if (!CanRotateSelected || SelectedEntry is not { IsDirectory: false } entry)
+        {
+            return;
+        }
+
+        var path = entry.FullPath;
+        bool rotated;
+        try
+        {
+            // 他プロセス（ウイルス対策等）が oplock を握っていると、書き込み用の open は
+            // 例外も出さずに待ち続けることがある。待ちきりにするとコマンドが完了扱いにならず
+            // ボタンが二度と押せなくなるため、上限を切って失敗として扱う。
+            rotated = await Task.Run(() => ExifOrientationService.TryRotate(path, clockwise))
+                .WaitAsync(RotateTimeout);
+        }
+        catch (TimeoutException)
+        {
+            Logger.Log($"画像の回転がタイムアウトしました（ファイルがロックされている可能性）: {path}", LogLevel.Warning);
+            rotated = false;
+        }
+
+        if (!rotated)
+        {
+            StatusText = LocalizationService.Text("Text.Gallery.RotateFailed");
+            return;
+        }
+
+        // 選択が変わっていたら、いま出ている別の画像を作り直さない。
+        if (!ReferenceEquals(SelectedEntry, entry))
+        {
+            return;
+        }
+
+        ResetGalleryZoom();
+        entry.DisposeThumbnail();
+        UpdatePreview();
+        UpdateGalleryMetadata();
+        _ = EnsureThumbnailAsync(entry);
+    }
+
     private void ClearPreview()
     {
         _previewCts?.Cancel();
@@ -340,6 +477,12 @@ public partial class TabViewModel : ObservableObject
     /// <summary>ギャラリーで動画を表示中（コントロールバーの表示条件）。</summary>
     [ObservableProperty]
     private bool _isVideoPreview;
+
+    /// <summary>再生コントロールを今出しているか。動画の上に出しっぱなしだと視聴の邪魔になるので、
+    /// プレビュー領域でマウスを動かしている間だけ true にして、止まったら自動で引っ込める
+    /// （表示の起点と自動非表示のタイマーは MainWindow 側が持つ）。</summary>
+    [ObservableProperty]
+    private bool _isVideoBarVisible;
 
     /// <summary>コーデックが無い等で再生できなかった。</summary>
     [ObservableProperty]
@@ -474,6 +617,10 @@ public partial class TabViewModel : ObservableObject
     {
         // セッション（＝Media Engine）は作り直さず、ソースだけ差し替える。
         // 作り直すと前の engine の解放と競合して映像が出ないことがある（VideoPlaybackSession.Open 参照）。
+        // 動画へ入った直後だけはコントロールを見せる（存在に気付けるように）。
+        // 以降はプレビュー領域でマウスを動かしている間だけ出る。
+        IsVideoBarVisible = true;
+
         var session = _video;
         if (session is not null)
         {
@@ -521,6 +668,7 @@ public partial class TabViewModel : ObservableObject
 
         ResetVideoUiState();
         IsVideoPreview = false;
+        IsVideoBarVisible = false;
     }
 
     /// <summary>コントロールバーの表示値を初期状態へ戻す（セッション自体は畳まない）。</summary>
@@ -1108,6 +1256,7 @@ public partial class TabViewModel : ObservableObject
         }
 
         _wasGalleryView = IsGalleryView;
+        ResetGalleryZoom();
         if (IsGalleryView)
         {
             // 選択がなければ先頭から閲覧を始め、ギャラリー解像度で読み直す
@@ -1477,6 +1626,7 @@ public partial class TabViewModel : ObservableObject
     {
         _options = options;
         _folderViewSettings = folderViewSettings;
+        GalleryImageTransform = new TransformGroup { Children = { _galleryScale, _galleryPan } };
         DetailColumns =
         [
             new(this, SortKeys.Name, "Text.Column.Name"),

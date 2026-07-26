@@ -101,6 +101,11 @@
   <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">Esci dalla galleria (Esc)</x:String>
   <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">Informazioni immagine</x:String>
   <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">Non sono disponibili informazioni per questa immagine.</x:String>
+  <x:String x:Key="Text.Gallery.RotateFailed" xml:space="preserve">Impossibile ruotare questa immagine senza perdita.</x:String>
+  <x:String x:Key="Text.Gallery.RotateLeft" xml:space="preserve">Ruota a sinistra (salvata senza perdita)</x:String>
+  <x:String x:Key="Text.Gallery.RotateRight" xml:space="preserve">Ruota a destra (salvata senza perdita)</x:String>
+  <x:String x:Key="Text.Gallery.Zoom" xml:space="preserve">Zoom</x:String>
+  <x:String x:Key="Text.Gallery.ZoomTip" xml:space="preserve">Puoi ingrandire anche con Ctrl + rotellina del mouse</x:String>
   <x:String x:Key="Text.Integration.OpenWithKiriha" xml:space="preserve">Apri con Kiriha</x:String>
   <x:String x:Key="Text.Launch.ExplorerFailed" xml:space="preserve">Impossibile avviare Esplora file: {0}</x:String>
   <x:String x:Key="Text.Launch.Failed" xml:space="preserve">Avvio non riuscito: {0}</x:String>

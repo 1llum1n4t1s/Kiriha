@@ -101,6 +101,11 @@
   <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">தொகுப்பிலிருந்து வெளியேறு (Esc)</x:String>
   <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">பட தகவல்</x:String>
   <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">இந்தப் படத்திற்கான தகவல் இல்லை.</x:String>
+  <x:String x:Key="Text.Gallery.RotateFailed" xml:space="preserve">இந்தப் படத்தை தரம் குறையாமல் சுழற்ற முடியாது.</x:String>
+  <x:String x:Key="Text.Gallery.RotateLeft" xml:space="preserve">இடதுபுறம் சுழற்று (தரம் குறையாமல் சேமிக்கப்படும்)</x:String>
+  <x:String x:Key="Text.Gallery.RotateRight" xml:space="preserve">வலதுபுறம் சுழற்று (தரம் குறையாமல் சேமிக்கப்படும்)</x:String>
+  <x:String x:Key="Text.Gallery.Zoom" xml:space="preserve">பெரிதாக்கு / சிறிதாக்கு</x:String>
+  <x:String x:Key="Text.Gallery.ZoomTip" xml:space="preserve">Ctrl + மவுஸ் சக்கரத்தாலும் பெரிதாக்கலாம்</x:String>
   <x:String x:Key="Text.Integration.OpenWithKiriha" xml:space="preserve">Kiriha மூலம் திற</x:String>
   <x:String x:Key="Text.Launch.ExplorerFailed" xml:space="preserve">கோப்பு எக்ஸ்ப்ளோரரைத் தொடங்க முடியவில்லை: {0}</x:String>
   <x:String x:Key="Text.Launch.Failed" xml:space="preserve">தொடங்க முடியவில்லை: {0}</x:String>
