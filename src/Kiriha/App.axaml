@@ -115,6 +115,28 @@
                     <SolidColorBrush x:Key="DialogWindowBrush" Color="#1C1C1E" />
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
+
+            <!-- UI 表示言語。ここでは全言語を x:Key 付きで「保持」するだけで、実際に有効なのは
+                 LocalizationService.SetLocale が MergedDictionaries へ差し込んだ 1 つだけ。
+                 追加時は Models/Locale.Supported にも同じキーを足す。 -->
+            <ResourceInclude x:Key="ja_JP" Source="/Assets/Locales/ja_JP.axaml" />
+            <ResourceInclude x:Key="en_US" Source="/Assets/Locales/en_US.axaml" />
+            <ResourceInclude x:Key="de_DE" Source="/Assets/Locales/de_DE.axaml" />
+            <ResourceInclude x:Key="es_ES" Source="/Assets/Locales/es_ES.axaml" />
+            <ResourceInclude x:Key="fr_FR" Source="/Assets/Locales/fr_FR.axaml" />
+            <ResourceInclude x:Key="it_IT" Source="/Assets/Locales/it_IT.axaml" />
+            <ResourceInclude x:Key="pt_BR" Source="/Assets/Locales/pt_BR.axaml" />
+            <ResourceInclude x:Key="id_ID" Source="/Assets/Locales/id_ID.axaml" />
+            <ResourceInclude x:Key="fil_PH" Source="/Assets/Locales/fil_PH.axaml" />
+            <ResourceInclude x:Key="uk_UA" Source="/Assets/Locales/uk_UA.axaml" />
+            <ResourceInclude x:Key="ru_RU" Source="/Assets/Locales/ru_RU.axaml" />
+            <ResourceInclude x:Key="zh_CN" Source="/Assets/Locales/zh_CN.axaml" />
+            <ResourceInclude x:Key="zh_TW" Source="/Assets/Locales/zh_TW.axaml" />
+            <ResourceInclude x:Key="ko_KR" Source="/Assets/Locales/ko_KR.axaml" />
+            <ResourceInclude x:Key="ta_IN" Source="/Assets/Locales/ta_IN.axaml" />
+            <ResourceInclude x:Key="sa" Source="/Assets/Locales/sa.axaml" />
+            <ResourceInclude x:Key="la" Source="/Assets/Locales/la.axaml" />
+
             <SolidColorBrush x:Key="DialogAccentTintBrush" Color="Transparent" />
         </ResourceDictionary>
     </Application.Resources>

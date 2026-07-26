@@ -22,23 +22,24 @@ internal static partial class ImageMetadataService
     private static readonly Guid FmtPhoto = new("14b81da1-0135-4d31-96d9-6cbfc9671a99");
     private static readonly Guid FmtLens = new("e6ddcaf7-29c5-4f0a-9a68-d19412ec7090");
 
-    /// <summary>表示するプロパティ（この順で、値があるものだけ出す）。</summary>
-    private static readonly (string Label, Guid FmtId, uint Pid)[] Keys =
+    /// <summary>表示するプロパティ（この順で、値があるものだけ出す）。
+    /// ラベルはロケールキーで持ち、<see cref="Read"/> のたびに現在の言語へ解決する。</summary>
+    private static readonly (string LabelKey, Guid FmtId, uint Pid)[] Keys =
     [
-        ("種類", FmtSummary, 4u),        // System.ItemTypeText
-        ("寸法", FmtImage, 13u),         // System.Image.Dimensions
-        ("サイズ", FmtSummary, 12u),     // System.Size
-        ("撮影日時", FmtPhoto, 36867u),  // System.Photo.DateTaken
-        ("更新日時", FmtSummary, 14u),   // System.DateModified
-        ("カメラメーカー", FmtPhoto, 271u), // System.Photo.CameraManufacturer
-        ("カメラ", FmtPhoto, 272u),      // System.Photo.CameraModel
-        ("レンズ", FmtLens, 100u),       // System.Photo.LensModel
-        ("焦点距離", FmtPhoto, 37386u),  // System.Photo.FocalLength
-        ("F 値", FmtPhoto, 33437u),      // System.Photo.FNumber
-        ("露出時間", FmtPhoto, 33434u),  // System.Photo.ExposureTime
-        ("ISO 感度", FmtPhoto, 34855u),  // System.Photo.ISOSpeed
-        ("露出補正", FmtPhoto, 37380u),  // System.Photo.ExposureBias
-        ("フラッシュ", FmtPhoto, 37385u), // System.Photo.Flash
+        ("Text.Exif.Type", FmtSummary, 4u),          // System.ItemTypeText
+        ("Text.Exif.Dimensions", FmtImage, 13u),     // System.Image.Dimensions
+        ("Text.Exif.Size", FmtSummary, 12u),         // System.Size
+        ("Text.Exif.DateTaken", FmtPhoto, 36867u),   // System.Photo.DateTaken
+        ("Text.Exif.DateModified", FmtSummary, 14u), // System.DateModified
+        ("Text.Exif.CameraMaker", FmtPhoto, 271u),   // System.Photo.CameraManufacturer
+        ("Text.Exif.Camera", FmtPhoto, 272u),        // System.Photo.CameraModel
+        ("Text.Exif.Lens", FmtLens, 100u),           // System.Photo.LensModel
+        ("Text.Exif.FocalLength", FmtPhoto, 37386u), // System.Photo.FocalLength
+        ("Text.Exif.FNumber", FmtPhoto, 33437u),     // System.Photo.FNumber
+        ("Text.Exif.ExposureTime", FmtPhoto, 33434u),// System.Photo.ExposureTime
+        ("Text.Exif.Iso", FmtPhoto, 34855u),         // System.Photo.ISOSpeed
+        ("Text.Exif.ExposureBias", FmtPhoto, 37380u),// System.Photo.ExposureBias
+        ("Text.Exif.Flash", FmtPhoto, 37385u),       // System.Photo.Flash
     ];
 
     /// <summary>指定ファイルのメタ情報一覧を返す。取得できない場合は空リスト。</summary>
@@ -54,6 +55,7 @@ internal static partial class ImageMetadataService
             return result;
         }
 
+        IPropertyStore? store = null;
         try
         {
             if (SHGetPropertyStoreFromParsingName(path, 0, 0, IidIPropertyStore, out var ptr) < 0 || ptr == 0)
@@ -62,10 +64,10 @@ internal static partial class ImageMetadataService
             }
 
             var wrappers = new StrategyBasedComWrappers();
-            var store = (IPropertyStore)wrappers.GetOrCreateObjectForComInstance(ptr, CreateObjectFlags.None);
+            store = (IPropertyStore)wrappers.GetOrCreateObjectForComInstance(ptr, CreateObjectFlags.None);
             Marshal.Release(ptr);
 
-            foreach (var (label, fmt, pid) in Keys)
+            foreach (var (labelKey, fmt, pid) in Keys)
             {
                 var key = new PropertyKey { FmtId = fmt, Pid = pid };
                 if (store.GetValue(key, out var pv) < 0)
@@ -78,7 +80,7 @@ internal static partial class ImageMetadataService
                     var text = Format(key, pv);
                     if (!string.IsNullOrWhiteSpace(text))
                     {
-                        result.Add((label, text));
+                        result.Add((LocalizationService.Text(labelKey), text));
                     }
                 }
                 finally
@@ -93,6 +95,8 @@ internal static partial class ImageMetadataService
         }
         finally
         {
+            // CoUninitialize より先に COM オブジェクトを手放す
+            ComRelease.Release(store);
             if (shouldUninitialize)
             {
                 CoUninitialize();

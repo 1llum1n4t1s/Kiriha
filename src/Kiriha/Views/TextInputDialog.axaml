@@ -62,7 +62,7 @@
                         Click="OkButton_Click" />
                 <Button x:Name="CancelButton"
                         Classes="dialogAction"
-                        Content="キャンセル"
+                        Content="{DynamicResource Text.Common.Cancel}"
                         IsCancel="True"
                         Click="CancelButton_Click" />
             </StackPanel>

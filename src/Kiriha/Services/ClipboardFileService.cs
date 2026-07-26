@@ -73,16 +73,23 @@ internal static partial class ClipboardFileService
         {
             EmptyClipboard();
             var hDrop = CreateHDrop(paths);
-            if (hDrop == 0 || SetClipboardData(CfHdrop, hDrop) == 0)
+            if (hDrop == 0)
             {
+                return false;
+            }
+
+            if (SetClipboardData(CfHdrop, hDrop) == 0)
+            {
+                // 設定に失敗したときは所有権がクリップボードへ移らないので、こちらで解放する
+                _ = GlobalFree(hDrop);
                 return false;
             }
 
             var effectFormat = RegisterClipboardFormatW("Preferred DropEffect");
             var hEffect = CreateDword(cut ? DropEffectMove : DropEffectCopy);
-            if (hEffect != 0)
+            if (hEffect != 0 && SetClipboardData(effectFormat, hEffect) == 0)
             {
-                SetClipboardData(effectFormat, hEffect);
+                _ = GlobalFree(hEffect);
             }
 
             _cutPaths = cut
@@ -182,6 +189,7 @@ internal static partial class ClipboardFileService
         var ptr = GlobalLock(handle);
         if (ptr == 0)
         {
+            _ = GlobalFree(handle);
             return 0;
         }
 
@@ -213,6 +221,7 @@ internal static partial class ClipboardFileService
         var ptr = GlobalLock(handle);
         if (ptr == 0)
         {
+            _ = GlobalFree(handle);
             return 0;
         }
 
@@ -251,6 +260,10 @@ internal static partial class ClipboardFileService
 
     [LibraryImport("kernel32.dll")]
     private static partial nint GlobalAlloc(uint flags, nuint bytes);
+
+    /// <summary>クリップボードへ所有権が移らなかったときだけ呼ぶ（移った後に呼ぶと二重解放になる）。</summary>
+    [LibraryImport("kernel32.dll")]
+    private static partial nint GlobalFree(nint handle);
 
     [LibraryImport("kernel32.dll")]
     private static partial nint GlobalLock(nint handle);

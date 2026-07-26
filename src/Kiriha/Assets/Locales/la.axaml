@@ -1,0 +1,353 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:String x:Key="Text.A11y.OpenSubfolders" xml:space="preserve">Subplicas monstrare</x:String>
+  <x:String x:Key="Text.A11y.ResizeVerticalTabs" xml:space="preserve">Latitudinem tabulae verticalis mutare</x:String>
+  <x:String x:Key="Text.A11y.SwitchToTree" xml:space="preserve">Ad arborem transire</x:String>
+  <x:String x:Key="Text.A11y.ToggleSidebar" xml:space="preserve">Latus monstrare vel celare</x:String>
+  <x:String x:Key="Text.A11y.VerticalTabs" xml:space="preserve">Schedae verticales</x:String>
+  <x:String x:Key="Text.Address.Copy" xml:space="preserve">Inscriptionem exscribere</x:String>
+  <x:String x:Key="Text.Address.Edit" xml:space="preserve">Inscriptionem recensere</x:String>
+  <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">Plicam praesentem addere</x:String>
+  <x:String x:Key="Text.Bookmarks.AddFolderMenu" xml:space="preserve">Plicam addere...</x:String>
+  <x:String x:Key="Text.Bookmarks.AddFolderTitle" xml:space="preserve">Plicam addere</x:String>
+  <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">Plicam huc trahe ut inter notas addatur</x:String>
+  <x:String x:Key="Text.Bookmarks.Hide" xml:space="preserve">Tabulam notarum celare</x:String>
+  <x:String x:Key="Text.Bookmarks.NewFolderName" xml:space="preserve">Plica nova</x:String>
+  <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">Nomen mutare...</x:String>
+  <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">Nomen notae mutare</x:String>
+  <x:String x:Key="Text.Bookmarks.SortByName" xml:space="preserve">Secundum nomen ordinare</x:String>
+  <x:String x:Key="Text.Bookmarks.SortByPath" xml:space="preserve">Secundum semitam ordinare</x:String>
+  <x:String x:Key="Text.Caption.MaximizeRestore" xml:space="preserve">Amplificare vel restituere</x:String>
+  <x:String x:Key="Text.Caption.Minimize" xml:space="preserve">Minuere</x:String>
+  <x:String x:Key="Text.Clipboard.Copied" xml:space="preserve">Res {0} exscriptae</x:String>
+  <x:String x:Key="Text.Clipboard.CopiedToClipboard" xml:space="preserve">In tabellam exscriptum</x:String>
+  <x:String x:Key="Text.Clipboard.CopyFailed" xml:space="preserve">In tabellam exscribi non potuit</x:String>
+  <x:String x:Key="Text.Clipboard.Cut" xml:space="preserve">Res {0} exsectae</x:String>
+  <x:String x:Key="Text.Clipboard.VirtualPasteFailed" xml:space="preserve">Fasciculus virtualis agglutinari non potuit</x:String>
+  <x:String x:Key="Text.Clipboard.WriteFailed" xml:space="preserve">In tabellam scribi non potuit</x:String>
+  <x:String x:Key="Text.Column.AutoFitAll" xml:space="preserve">Latitudinem omnium columnarum aptare</x:String>
+  <x:String x:Key="Text.Column.AutoFitThis" xml:space="preserve">Latitudinem huius columnae aptare</x:String>
+  <x:String x:Key="Text.Column.Created" xml:space="preserve">Dies creationis</x:String>
+  <x:String x:Key="Text.Column.Modified" xml:space="preserve">Dies mutationis</x:String>
+  <x:String x:Key="Text.Column.Name" xml:space="preserve">Nomen</x:String>
+  <x:String x:Key="Text.Column.Size" xml:space="preserve">Magnitudo</x:String>
+  <x:String x:Key="Text.Column.Type" xml:space="preserve">Genus</x:String>
+  <x:String x:Key="Text.Command.CopyTip" xml:space="preserve">Exscribere (Ctrl+C)</x:String>
+  <x:String x:Key="Text.Command.Cut" xml:space="preserve">Exsecare</x:String>
+  <x:String x:Key="Text.Command.CutTip" xml:space="preserve">Exsecare (Ctrl+X)</x:String>
+  <x:String x:Key="Text.Command.DeleteTip" xml:space="preserve">Delere (Delete)</x:String>
+  <x:String x:Key="Text.Command.More" xml:space="preserve">Plura videre</x:String>
+  <x:String x:Key="Text.Command.NewFolder" xml:space="preserve">Plica nova</x:String>
+  <x:String x:Key="Text.Command.Options" xml:space="preserve">Optiones</x:String>
+  <x:String x:Key="Text.Command.Paste" xml:space="preserve">Agglutinare</x:String>
+  <x:String x:Key="Text.Command.PasteTip" xml:space="preserve">Agglutinare (Ctrl+V)</x:String>
+  <x:String x:Key="Text.Command.Rename" xml:space="preserve">Nomen mutare</x:String>
+  <x:String x:Key="Text.Command.RenameTip" xml:space="preserve">Nomen mutare (F2)</x:String>
+  <x:String x:Key="Text.Command.Share" xml:space="preserve">Communicare</x:String>
+  <x:String x:Key="Text.Command.SidebarTip" xml:space="preserve">Latus monstrare/celare (Aditus celer / arbor)</x:String>
+  <x:String x:Key="Text.Command.Sort" xml:space="preserve">Ordinare</x:String>
+  <x:String x:Key="Text.Command.View" xml:space="preserve">Aspectus</x:String>
+  <x:String x:Key="Text.Common.AddToBookmarks" xml:space="preserve">Inter notas addere</x:String>
+  <x:String x:Key="Text.Common.Cancel" xml:space="preserve">Abrogare</x:String>
+  <x:String x:Key="Text.Common.Close" xml:space="preserve">Claudere</x:String>
+  <x:String x:Key="Text.Common.Copy" xml:space="preserve">Exscribere</x:String>
+  <x:String x:Key="Text.Common.CopyPath" xml:space="preserve">Semitam exscribere</x:String>
+  <x:String x:Key="Text.Common.Delete" xml:space="preserve">Delere</x:String>
+  <x:String x:Key="Text.Common.Open" xml:space="preserve">Aperire</x:String>
+  <x:String x:Key="Text.Common.OpenInExplorer" xml:space="preserve">In Explorer aperire</x:String>
+  <x:String x:Key="Text.Common.OpenInNewTab" xml:space="preserve">In nova scheda aperire</x:String>
+  <x:String x:Key="Text.Common.OpenInTerminal" xml:space="preserve">In terminali aperire</x:String>
+  <x:String x:Key="Text.Common.PinToQuickAccess" xml:space="preserve">Ad aditum celerem affigere</x:String>
+  <x:String x:Key="Text.Common.Properties" xml:space="preserve">Proprietates</x:String>
+  <x:String x:Key="Text.Common.UnpinFromQuickAccess" xml:space="preserve">Ab aditu celeri removere</x:String>
+  <x:String x:Key="Text.Drag.Add" xml:space="preserve">Addere</x:String>
+  <x:String x:Key="Text.Drag.Copy" xml:space="preserve">Exscribere</x:String>
+  <x:String x:Key="Text.Drag.Dragging" xml:space="preserve">Trahitur</x:String>
+  <x:String x:Key="Text.Drag.File" xml:space="preserve">Fasciculus</x:String>
+  <x:String x:Key="Text.Drag.Folder" xml:space="preserve">Plica</x:String>
+  <x:String x:Key="Text.Drag.Move" xml:space="preserve">Movere</x:String>
+  <x:String x:Key="Text.Drag.OpenInTab" xml:space="preserve">In scheda aperire</x:String>
+  <x:String x:Key="Text.Drive.FreeOfTotal" xml:space="preserve">{0} vacua ex {1}</x:String>
+  <x:String x:Key="Text.Error.AccessDenied" xml:space="preserve">Aditus negatus est</x:String>
+  <x:String x:Key="Text.Error.Code" xml:space="preserve">Error {0}</x:String>
+  <x:String x:Key="Text.Error.CodeWithDesc" xml:space="preserve">Error {0}: {1}</x:String>
+  <x:String x:Key="Text.Error.DiskFull" xml:space="preserve">Spatium in disco non sufficit</x:String>
+  <x:String x:Key="Text.Error.FileExists" xml:space="preserve">Fasciculus eodem nomine iam exstat</x:String>
+  <x:String x:Key="Text.Error.InvalidName" xml:space="preserve">Nomen fasciculi litteras illicitas continet</x:String>
+  <x:String x:Key="Text.Error.PathNotFound" xml:space="preserve">Semita non inventa est</x:String>
+  <x:String x:Key="Text.Error.PathTooLong" xml:space="preserve">Semita nimis longa est</x:String>
+  <x:String x:Key="Text.Error.SharingViolation" xml:space="preserve">Fasciculus ab alio processu adhibetur</x:String>
+  <x:String x:Key="Text.Error.WriteProtected" xml:space="preserve">Medium a scriptura munitum est</x:String>
+  <x:String x:Key="Text.Exif.Camera" xml:space="preserve">Camera</x:String>
+  <x:String x:Key="Text.Exif.CameraMaker" xml:space="preserve">Fabricator camerae</x:String>
+  <x:String x:Key="Text.Exif.DateModified" xml:space="preserve">Dies mutationis</x:String>
+  <x:String x:Key="Text.Exif.DateTaken" xml:space="preserve">Dies imaginis captae</x:String>
+  <x:String x:Key="Text.Exif.Dimensions" xml:space="preserve">Dimensiones</x:String>
+  <x:String x:Key="Text.Exif.ExposureBias" xml:space="preserve">Correctio expositionis</x:String>
+  <x:String x:Key="Text.Exif.ExposureTime" xml:space="preserve">Tempus expositionis</x:String>
+  <x:String x:Key="Text.Exif.FNumber" xml:space="preserve">Numerus F</x:String>
+  <x:String x:Key="Text.Exif.Flash" xml:space="preserve">Fulgur</x:String>
+  <x:String x:Key="Text.Exif.FocalLength" xml:space="preserve">Longitudo focalis</x:String>
+  <x:String x:Key="Text.Exif.Iso" xml:space="preserve">Sensibilitas ISO</x:String>
+  <x:String x:Key="Text.Exif.Lens" xml:space="preserve">Lens</x:String>
+  <x:String x:Key="Text.Exif.Size" xml:space="preserve">Magnitudo</x:String>
+  <x:String x:Key="Text.Exif.Type" xml:space="preserve">Genus</x:String>
+  <x:String x:Key="Text.FileList.EmptyFolder" xml:space="preserve">Haec plica vacua est.</x:String>
+  <x:String x:Key="Text.Folder.Desktop" xml:space="preserve">Mensa</x:String>
+  <x:String x:Key="Text.Folder.Documents" xml:space="preserve">Documenta</x:String>
+  <x:String x:Key="Text.Folder.Downloads" xml:space="preserve">Recepta</x:String>
+  <x:String x:Key="Text.Folder.Music" xml:space="preserve">Musica</x:String>
+  <x:String x:Key="Text.Folder.Pictures" xml:space="preserve">Imagines</x:String>
+  <x:String x:Key="Text.Folder.Videos" xml:space="preserve">Pelliculae</x:String>
+  <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">E pinacotheca exire (Esc)</x:String>
+  <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">Informatio imaginis</x:String>
+  <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">Nulla informatio de hac imagine praesto est.</x:String>
+  <x:String x:Key="Text.Integration.OpenWithKiriha" xml:space="preserve">Cum Kiriha aperire</x:String>
+  <x:String x:Key="Text.Launch.ExplorerFailed" xml:space="preserve">Explorer incipi non potuit: {0}</x:String>
+  <x:String x:Key="Text.Launch.Failed" xml:space="preserve">Incipi non potuit: {0}</x:String>
+  <x:String x:Key="Text.Launch.TerminalFailed" xml:space="preserve">Terminale incipi non potuit: {0}</x:String>
+  <x:String x:Key="Text.License.Activate" xml:space="preserve">Activare</x:String>
+  <x:String x:Key="Text.License.Exit" xml:space="preserve">Exire</x:String>
+  <x:String x:Key="Text.License.KeyPlaceholder" xml:space="preserve">Clavis licentiae a KIRIHA- incipiens</x:String>
+  <x:String x:Key="Text.License.Lock.OnlineCheckBody" xml:space="preserve">Licentia plus quam XXX dies in linea non verificata est. Ad interrete te coniunge et «Iterum in linea verificare» preme.</x:String>
+  <x:String x:Key="Text.License.Lock.OnlineCheckTitle" xml:space="preserve">Licentia in linea verificanda est</x:String>
+  <x:String x:Key="Text.License.Lock.TrialExpiredBody" xml:space="preserve">Ad Kiriha utendum licentia activata requiritur (¥980, emptio unica).</x:String>
+  <x:String x:Key="Text.License.Lock.TrialExpiredTitle" xml:space="preserve">Tempus probationis finitum est</x:String>
+  <x:String x:Key="Text.License.Msg.Activated" xml:space="preserve">Licentia activata est 🎉 Gratias plurimas!</x:String>
+  <x:String x:Key="Text.License.Msg.CheckOk" xml:space="preserve">Verificatio perfecta est. Gratias quod Kiriha uteris!</x:String>
+  <x:String x:Key="Text.License.Msg.Checking" xml:space="preserve">In linea verificatur…</x:String>
+  <x:String x:Key="Text.License.Msg.EnterKey" xml:space="preserve">Clavem licentiae in emptione datam insere.</x:String>
+  <x:String x:Key="Text.License.Msg.InvalidKey" xml:space="preserve">Haec clavis licentiae non valet. Vide num litterae desint aut spatia superflua exscripta sint.</x:String>
+  <x:String x:Key="Text.License.Msg.PurchaseFailed" xml:space="preserve">Pagina emptionis aperiri non potuit. Postea itera.</x:String>
+  <x:String x:Key="Text.License.Msg.PurchaseOpened" xml:space="preserve">Pagina emptionis in navigatro aperta est. Clavem licentiae in pagina confirmationis ostensam supra agglutina.</x:String>
+  <x:String x:Key="Text.License.Msg.Revoked" xml:space="preserve">Haec licentia non iam valet (exempli gratia post pecuniam redditam). Iterum eme.</x:String>
+  <x:String x:Key="Text.License.Msg.ServerUnreachable" xml:space="preserve">Servitor attingi non potuit. Coniunctionem retis inspice et itera.</x:String>
+  <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">Paginam emptionis aperire (¥980, semel)</x:String>
+  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">Post emptionem clavis licentiae in pagina confirmationis solutionis ostenditur. Nec ratio nec tessera opus est.</x:String>
+  <x:String x:Key="Text.License.Recheck" xml:space="preserve">Iterum in linea verificare</x:String>
+  <x:String x:Key="Text.License.Status.Licensed" xml:space="preserve">Licentia activata: {0}</x:String>
+  <x:String x:Key="Text.License.Status.OnlineCheck" xml:space="preserve">Licentia in linea verificanda est (ad interrete te coniunge)</x:String>
+  <x:String x:Key="Text.License.Status.Trial" xml:space="preserve">Tempus probationis (dies {0} restant)</x:String>
+  <x:String x:Key="Text.License.Status.TrialExpired" xml:space="preserve">Probatio finita (licentia requiritur)</x:String>
+  <x:String x:Key="Text.Menu.About" xml:space="preserve">De Kiriha</x:String>
+  <x:String x:Key="Text.Menu.AccessDenied" xml:space="preserve">(Aditus negatus)</x:String>
+  <x:String x:Key="Text.Menu.BookmarksBar" xml:space="preserve">Tabula notarum</x:String>
+  <x:String x:Key="Text.Menu.CheckUpdate" xml:space="preserve">Renovationes quaerere</x:String>
+  <x:String x:Key="Text.Menu.Empty" xml:space="preserve">(Vacuum)</x:String>
+  <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">Fenestra nova</x:String>
+  <x:String x:Key="Text.Menu.NoSubfolders" xml:space="preserve">(Nullae subplicae)</x:String>
+  <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(Nihil)</x:String>
+  <x:String x:Key="Text.Nav.Back" xml:space="preserve">Retro</x:String>
+  <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">Retro (dextro clicu pro historia)</x:String>
+  <x:String x:Key="Text.Nav.EditPathTip" xml:space="preserve">Preme ut semitam recenseas</x:String>
+  <x:String x:Key="Text.Nav.Forward" xml:space="preserve">Prorsum</x:String>
+  <x:String x:Key="Text.Nav.ForwardTip" xml:space="preserve">Prorsum (dextro clicu pro historia)</x:String>
+  <x:String x:Key="Text.Nav.Home" xml:space="preserve">Domus</x:String>
+  <x:String x:Key="Text.Nav.HomeTip" xml:space="preserve">Domus (Alt+Home / dextro clicu pro plicis frequentibus)</x:String>
+  <x:String x:Key="Text.Nav.OpenFailed" xml:space="preserve">Aperiri non potuit: {0}</x:String>
+  <x:String x:Key="Text.Nav.OpenSettings" xml:space="preserve">Optiones aperire</x:String>
+  <x:String x:Key="Text.Nav.Refresh" xml:space="preserve">Renovare</x:String>
+  <x:String x:Key="Text.Nav.Settings" xml:space="preserve">Optiones</x:String>
+  <x:String x:Key="Text.Nav.UpFolder" xml:space="preserve">Gradum sursum</x:String>
+  <x:String x:Key="Text.Nav.UpTip" xml:space="preserve">Gradum sursum (dextro clicu pro plicis superioribus)</x:String>
+  <x:String x:Key="Text.New.CreateFailed" xml:space="preserve">Creari non potuit: {0}</x:String>
+  <x:String x:Key="Text.New.FolderName" xml:space="preserve">Plica nova</x:String>
+  <x:String x:Key="Text.New.ItemName" xml:space="preserve">Novum {0}</x:String>
+  <x:String x:Key="Text.New.UndoFailed" xml:space="preserve">Creatio plicae novae revocari non potuit: {0}</x:String>
+  <x:String x:Key="Text.Op.Copied" xml:space="preserve">Res {0} exscriptae</x:String>
+  <x:String x:Key="Text.Op.DeleteFailed" xml:space="preserve">Deletio defecit ({0})</x:String>
+  <x:String x:Key="Text.Op.Failed" xml:space="preserve">Operatio fasciculorum defecit ({0})</x:String>
+  <x:String x:Key="Text.Op.Moved" xml:space="preserve">Res {0} motae</x:String>
+  <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">Agglutinatio defecit ({0})</x:String>
+  <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">Mutatio nominis defecit ({0})</x:String>
+  <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">Fasciculi {0}  {1}</x:String>
+  <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> vel plures</x:String>
+  <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">Scrinium vacuefacere</x:String>
+  <x:String x:Key="Text.Rename.AlreadyExists" xml:space="preserve">Fasciculus vel plica eodem nomine iam exstat: {0}</x:String>
+  <x:String x:Key="Text.Rename.InvalidChars" xml:space="preserve">Nomen fasciculi litteras illicitas continet: \ / : * ? " &lt; &gt; |</x:String>
+  <x:String x:Key="Text.Rename.RevertedToOriginal" xml:space="preserve">Mutatio nominis defecit, itaque nomen pristinum restitutum est</x:String>
+  <x:String x:Key="Text.Rename.StuckAsTemporary" xml:space="preserve">Mutatio nominis defecit et nomen temporarium manet: {0}</x:String>
+  <x:String x:Key="Text.Search.ClearTip" xml:space="preserve">Quaesitionem vacuefacere</x:String>
+  <x:String x:Key="Text.Search.Failed" xml:space="preserve">Quaesitio defecit: {0}</x:String>
+  <x:String x:Key="Text.Search.Found" xml:space="preserve">Eventus {0} inventi (subplicis inclusis)</x:String>
+  <x:String x:Key="Text.Search.Placeholder" xml:space="preserve">In {0} quaerere</x:String>
+  <x:String x:Key="Text.Search.Searching" xml:space="preserve">Quaeritur... (subplicis inclusis)</x:String>
+  <x:String x:Key="Text.Search.Truncated" xml:space="preserve">Ad {0} eventus substitit (limes mille attactus est et nonnullae subplicae non perscrutatae sunt; quaesitionem angusta ut plura videas)</x:String>
+  <x:String x:Key="Text.Select.All" xml:space="preserve">Omnia eligere</x:String>
+  <x:String x:Key="Text.Select.FilesOnly" xml:space="preserve">Solos fasciculos eligere</x:String>
+  <x:String x:Key="Text.Select.FoldersOnly" xml:space="preserve">Solas plicas eligere</x:String>
+  <x:String x:Key="Text.Select.Invert" xml:space="preserve">Electionem invertere</x:String>
+  <x:String x:Key="Text.Select.None" xml:space="preserve">Electionem tollere</x:String>
+  <x:String x:Key="Text.Settings.About" xml:space="preserve">De Kiriha</x:String>
+  <x:String x:Key="Text.Settings.About.Body" xml:space="preserve">Kiriha operationes fasciculorum Exploratoris Windows cum schedis, tabula inscriptionis et notis Chrome in una fenestra coniungit. Optiones pro usuario praesenti servantur.</x:String>
+  <x:String x:Key="Text.Settings.Acrylic" xml:space="preserve">Effectum acrylicum (nebulam pellucidam) in fenestra adhibere</x:String>
+  <x:String x:Key="Text.Settings.DefaultFolderApp" xml:space="preserve">Kiriha applicationem praedefinitam ad plicas et discos aperiendos facere</x:String>
+  <x:String x:Key="Text.Settings.DefaultFolderApp.Off" xml:space="preserve">Si activatum est, Kiriha incipit quotiens plica vel discus ex Exploratore aperitur.</x:String>
+  <x:String x:Key="Text.Settings.DefaultFolderApp.On" xml:space="preserve">Nunc plicae et disci in Kiriha aperiuntur. Si deactivatur, mos pristinus restituitur.</x:String>
+  <x:String x:Key="Text.Settings.Display" xml:space="preserve">Species</x:String>
+  <x:String x:Key="Text.Settings.Display.Subtitle" xml:space="preserve">Speciem indicis fasciculorum et formam Kiriha aptare</x:String>
+  <x:String x:Key="Text.Settings.Explorer" xml:space="preserve">Index fasciculorum</x:String>
+  <x:String x:Key="Text.Settings.ExplorerContextMenu" xml:space="preserve">«Cum Kiriha aperire» ad menu contextuale Exploratoris addere</x:String>
+  <x:String x:Key="Text.Settings.ExplorerContextMenuNote" xml:space="preserve">Permittit plicam in Kiriha aperire dextro clicu in plicam vel in fundum contenti eius.</x:String>
+  <x:String x:Key="Text.Settings.FolderTree" xml:space="preserve">Arbor plicarum</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Material" xml:space="preserve">Material Icon Theme</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Note" xml:space="preserve">Material Icon Theme utitur material-icon-theme (licentia MIT, © Material Extensions). Copia Windows easdem imagunculas Shell quas Explorator ostendit.</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Original" xml:space="preserve">Imagunculae propriae Kiriha</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Windows" xml:space="preserve">Imagunculae Shell Windows</x:String>
+  <x:String x:Key="Text.Settings.Icons" xml:space="preserve">Imagunculae</x:String>
+  <x:String x:Key="Text.Settings.Language" xml:space="preserve">Lingua interfaciei</x:String>
+  <x:String x:Key="Text.Settings.Language.Note" xml:space="preserve">Praedefinite lingua ex lingua Windows deprehenditur.</x:String>
+  <x:String x:Key="Text.Settings.License" xml:space="preserve">Licentia</x:String>
+  <x:String x:Key="Text.Settings.Maintenance" xml:space="preserve">Curatio</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.Data" xml:space="preserve">Data et cella</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.OpenLogFolder" xml:space="preserve">Plicam commentariorum aperire</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.ReloadQuickAccess" xml:space="preserve">Aditum celerem iterum onerare</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.ResetSettings" xml:space="preserve">Optiones restituere</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.Subtitle" xml:space="preserve">Cellam, commentarios et data optionum administrare</x:String>
+  <x:String x:Key="Text.Settings.MinimizeToTray" xml:space="preserve">Minutum in aream nuntiorum reponere</x:String>
+  <x:String x:Key="Text.Settings.MinimizeToTrayNote" xml:space="preserve">Cum minuitur, Kiriha ex tabula officiorum evanescit et ex imaguncula areae nuntiorum restitui potest.</x:String>
+  <x:String x:Key="Text.Settings.Mouse" xml:space="preserve">Mus</x:String>
+  <x:String x:Key="Text.Settings.Mouse.BackgroundDoubleClick" xml:space="preserve">Cum fundus plicae bis premitur</x:String>
+  <x:String x:Key="Text.Settings.Mouse.BackgroundMiddleClick" xml:space="preserve">Cum fundus plicae rota premitur</x:String>
+  <x:String x:Key="Text.Settings.Mouse.CloseTab" xml:space="preserve">Schedam claudere</x:String>
+  <x:String x:Key="Text.Settings.Mouse.None" xml:space="preserve">Nihil facere</x:String>
+  <x:String x:Key="Text.Settings.Mouse.Pin" xml:space="preserve">Schedam affigere</x:String>
+  <x:String x:Key="Text.Settings.Mouse.Refresh" xml:space="preserve">Renovare</x:String>
+  <x:String x:Key="Text.Settings.Mouse.TabDoubleClick" xml:space="preserve">Cum scheda bis premitur</x:String>
+  <x:String x:Key="Text.Settings.Mouse.TabMiddleClick" xml:space="preserve">Cum scheda rota premitur</x:String>
+  <x:String x:Key="Text.Settings.Mouse.Up" xml:space="preserve">Gradum sursum ire</x:String>
+  <x:String x:Key="Text.Settings.RunAtStartup" xml:space="preserve">Kiriha cum Windows incipiente exsequi</x:String>
+  <x:String x:Key="Text.Settings.RunAtStartupNote" xml:space="preserve">Kiriha automatice incipit cum in systema ingrederis.</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts" xml:space="preserve">Compendia</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.FileOps" xml:space="preserve">Operationes fasciculorum</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.FileOpsBody" xml:space="preserve">Ctrl+X / C / V　Exsecare, exscribere, agglutinare　　Delete / Shift+Delete　Delere, penitus delere&#10;F2　Nomen mutare　　Alt+Enter　Proprietates　　Ctrl+Shift+N　Plica nova　　Alt+P　Praevisio</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.Navigation" xml:space="preserve">Navigatio et aspectus</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.NavigationBody" xml:space="preserve">Ctrl+L / F4　Inscriptionem recensere&#10;Ctrl+F / F3　Quaerere&#10;Alt+← / →　Retro et prorsum&#10;Alt+↑　Gradum sursum&#10;F5　Renovare / F11　Tota tabula</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.Subtitle" xml:space="preserve">Compendia claviaturae ad celerius operandum</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.Tabs" xml:space="preserve">Schedae</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.TabsBody" xml:space="preserve">Ctrl+T　Scheda nova&#10;Ctrl+W　Schedam claudere&#10;Ctrl+Shift+T　Schedam clausam iterum aperire&#10;Ctrl+Tab　Schedas permutare&#10;Ctrl+1..9　Schedam certam eligere</x:String>
+  <x:String x:Key="Text.Settings.ShowBookmarksBar" xml:space="preserve">Tabulam notarum monstrare (Ctrl+Shift+B)</x:String>
+  <x:String x:Key="Text.Settings.ShowCheckBoxes" xml:space="preserve">Quadrata electionis rerum monstrare</x:String>
+  <x:String x:Key="Text.Settings.ShowExtensions" xml:space="preserve">Extensiones nominum monstrare</x:String>
+  <x:String x:Key="Text.Settings.ShowHidden" xml:space="preserve">Fasciculos occultos monstrare</x:String>
+  <x:String x:Key="Text.Settings.StartMinimizedToTray" xml:space="preserve">Minutum in area nuntiorum incipere</x:String>
+  <x:String x:Key="Text.Settings.StartMinimizedToTrayNote" xml:space="preserve">Kiriha sine fenestra incipit, in area nuntiorum repositum.</x:String>
+  <x:String x:Key="Text.Settings.Startup" xml:space="preserve">Initium</x:String>
+  <x:String x:Key="Text.Settings.Startup.Behavior" xml:space="preserve">Mos in initio</x:String>
+  <x:String x:Key="Text.Settings.Startup.PathCaption" xml:space="preserve">Plica in schedis novis aperienda (vacuum relinque pro plica usuarii)</x:String>
+  <x:String x:Key="Text.Settings.Startup.RestoreTabs" xml:space="preserve">Schedas in clausura apertas proxime restituere</x:String>
+  <x:String x:Key="Text.Settings.Startup.Subtitle" xml:space="preserve">Initium, integrationem Windows et aream nuntiorum administrare</x:String>
+  <x:String x:Key="Text.Settings.Theme" xml:space="preserve">Thema</x:String>
+  <x:String x:Key="Text.Settings.Theme.Dark" xml:space="preserve">Obscurum</x:String>
+  <x:String x:Key="Text.Settings.Theme.Light" xml:space="preserve">Clarum</x:String>
+  <x:String x:Key="Text.Settings.Theme.System" xml:space="preserve">Systema</x:String>
+  <x:String x:Key="Text.Settings.Tray" xml:space="preserve">Area nuntiorum</x:String>
+  <x:String x:Key="Text.Settings.TreeDragDisabled" xml:space="preserve">Tractum ex arbore prohibere</x:String>
+  <x:String x:Key="Text.Settings.TreeDropDisabled" xml:space="preserve">Depositionem in arborem prohibere</x:String>
+  <x:String x:Key="Text.Settings.Updates" xml:space="preserve">Renovationes et informatio</x:String>
+  <x:String x:Key="Text.Settings.Updates.CheckNow" xml:space="preserve">Renovationes nunc quaerere</x:String>
+  <x:String x:Key="Text.Settings.Updates.CheckOnStartup" xml:space="preserve">Renovationes in initio quaerere</x:String>
+  <x:String x:Key="Text.Settings.Updates.Subtitle" xml:space="preserve">Versionem Kiriha inspicere et renovationes administrare</x:String>
+  <x:String x:Key="Text.Settings.Updates.VersionCard" xml:space="preserve">Versio et renovationes</x:String>
+  <x:String x:Key="Text.Settings.Window" xml:space="preserve">Fenestra</x:String>
+  <x:String x:Key="Text.Settings.Window.RememberBounds" xml:space="preserve">Magnitudinem et locum fenestrae meminisse</x:String>
+  <x:String x:Key="Text.Settings.Window.RememberBoundsNote" xml:space="preserve">Si deactivatur, proxime Kiriha magnitudine et loco praedefinitis aperietur.</x:String>
+  <x:String x:Key="Text.Settings.WindowsIntegration" xml:space="preserve">Integratio Windows</x:String>
+  <x:String x:Key="Text.Share.FileCount" xml:space="preserve">Fasciculi {0}</x:String>
+  <x:String x:Key="Text.Share.FoldersNotSupported" xml:space="preserve">Plicae communicari non possunt (fasciculos elige)</x:String>
+  <x:String x:Key="Text.Share.NoItems" xml:space="preserve">Nihil est quod communicetur</x:String>
+  <x:String x:Key="Text.Share.OpenFailed" xml:space="preserve">Tabula communicationis aperiri non potuit</x:String>
+  <x:String x:Key="Text.Share.PrepareFailed" xml:space="preserve">Data communicanda parari non potuerunt</x:String>
+  <x:String x:Key="Text.Share.SelectFiles" xml:space="preserve">Fasciculos communicandos elige</x:String>
+  <x:String x:Key="Text.Sidebar.Drives" xml:space="preserve">Disci</x:String>
+  <x:String x:Key="Text.Sidebar.QuickAccess" xml:space="preserve">Aditus celer</x:String>
+  <x:String x:Key="Text.Sidebar.RecentFiles" xml:space="preserve">Fasciculi recentes</x:String>
+  <x:String x:Key="Text.Sidebar.RecycleBin" xml:space="preserve">Scrinium</x:String>
+  <x:String x:Key="Text.Sidebar.RecycleBinTip" xml:space="preserve">Scrinium in Explorer aperire</x:String>
+  <x:String x:Key="Text.Sidebar.ToggleTip" xml:space="preserve">Inter aditum celerem et arborem plicarum permutat</x:String>
+  <x:String x:Key="Text.Sidebar.TreeView" xml:space="preserve">Aspectus arboris</x:String>
+  <x:String x:Key="Text.Sort.Ascending" xml:space="preserve">Ascendens</x:String>
+  <x:String x:Key="Text.Sort.Descending" xml:space="preserve">Descendens</x:String>
+  <x:String x:Key="Text.Status.Breakdown" xml:space="preserve">(plicae {0}, fasciculi {1})</x:String>
+  <x:String x:Key="Text.Status.ClearSelectionTip" xml:space="preserve">Preme ut electionem tollas</x:String>
+  <x:String x:Key="Text.Status.DetailsViewTip" xml:space="preserve">Aspectus singulorum</x:String>
+  <x:String x:Key="Text.Status.FreeSpace" xml:space="preserve">Spatium vacuum: {0}</x:String>
+  <x:String x:Key="Text.Status.IconSizeTip" xml:space="preserve">Magnitudo imagunculae</x:String>
+  <x:String x:Key="Text.Status.ItemCount" xml:space="preserve">Res {0}</x:String>
+  <x:String x:Key="Text.Status.ItemCountFiltered" xml:space="preserve">Res {0} (quaesitio: {1})</x:String>
+  <x:String x:Key="Text.Status.ItemsSelected" xml:space="preserve">Res {0} electae</x:String>
+  <x:String x:Key="Text.Status.LargeIconsTip" xml:space="preserve">Aspectus imagunculamm magnarum</x:String>
+  <x:String x:Key="Text.Tab.Category" xml:space="preserve">Schedae</x:String>
+  <x:String x:Key="Text.Tab.Close" xml:space="preserve">Schedam claudere</x:String>
+  <x:String x:Key="Text.Tab.CloseBelow" xml:space="preserve">Schedas infra claudere</x:String>
+  <x:String x:Key="Text.Tab.CloseOthers" xml:space="preserve">Ceteras schedas claudere</x:String>
+  <x:String x:Key="Text.Tab.Duplicate" xml:space="preserve">Schedam duplicare</x:String>
+  <x:String x:Key="Text.Tab.MoreActions" xml:space="preserve">Plures actiones schedarum</x:String>
+  <x:String x:Key="Text.Tab.New" xml:space="preserve">Scheda nova</x:String>
+  <x:String x:Key="Text.Tab.NewBelow" xml:space="preserve">Schedam novam infra aperire</x:String>
+  <x:String x:Key="Text.Tab.NewTip" xml:space="preserve">Scheda nova (Ctrl+T)</x:String>
+  <x:String x:Key="Text.Tab.Pin" xml:space="preserve">Schedam affigere</x:String>
+  <x:String x:Key="Text.Tab.Pinned" xml:space="preserve">Scheda affixa</x:String>
+  <x:String x:Key="Text.Tab.RecentlyClosed" xml:space="preserve">Schedae nuper clausae</x:String>
+  <x:String x:Key="Text.Tab.Reopen" xml:space="preserve">Schedam clausam iterum aperire</x:String>
+  <x:String x:Key="Text.Tab.Unpin" xml:space="preserve">Schedam solvere</x:String>
+  <x:String x:Key="Text.TabAction.CloseDuplicates" xml:space="preserve">Schedas geminas eiusdem plicae claudere</x:String>
+  <x:String x:Key="Text.TabAction.CloseLeft" xml:space="preserve">Schedas supra claudere</x:String>
+  <x:String x:Key="Text.TabAction.CloseUnpinned" xml:space="preserve">Omnes schedas non affixas claudere</x:String>
+  <x:String x:Key="Text.TabAction.CopyAllPaths" xml:space="preserve">Semitas omnium schedarum exscribere</x:String>
+  <x:String x:Key="Text.TabAction.CopyMarkdown" xml:space="preserve">Schedam ut nexum Markdown exscribere</x:String>
+  <x:String x:Key="Text.TabAction.CopyTitle" xml:space="preserve">Nomen schedae exscribere</x:String>
+  <x:String x:Key="Text.TabAction.CopyUri" xml:space="preserve">Schedam ut file URI exscribere</x:String>
+  <x:String x:Key="Text.TabAction.MoveFirst" xml:space="preserve">Schedam ad initium movere</x:String>
+  <x:String x:Key="Text.TabAction.MoveLast" xml:space="preserve">Schedam ad finem movere</x:String>
+  <x:String x:Key="Text.TabAction.OpenParent" xml:space="preserve">Plicam superiorem in nova scheda aperire</x:String>
+  <x:String x:Key="Text.TabAction.PinAll" xml:space="preserve">Omnes schedas affigere</x:String>
+  <x:String x:Key="Text.TabAction.PinLeft" xml:space="preserve">Schedas supra affigere</x:String>
+  <x:String x:Key="Text.TabAction.PinRight" xml:space="preserve">Schedas infra affigere</x:String>
+  <x:String x:Key="Text.TabAction.ReloadAll" xml:space="preserve">Omnes schedas iterum onerare</x:String>
+  <x:String x:Key="Text.TabAction.ReloadLeft" xml:space="preserve">Schedas supra iterum onerare</x:String>
+  <x:String x:Key="Text.TabAction.ReloadRight" xml:space="preserve">Schedas infra iterum onerare</x:String>
+  <x:String x:Key="Text.TabAction.Reverse" xml:space="preserve">Ordinem schedarum invertere</x:String>
+  <x:String x:Key="Text.TabAction.SortByName" xml:space="preserve">Schedas secundum nomen ordinare</x:String>
+  <x:String x:Key="Text.TabAction.SortByPath" xml:space="preserve">Schedas secundum semitam ordinare</x:String>
+  <x:String x:Key="Text.TabAction.UnpinAll" xml:space="preserve">Omnes schedas solvere</x:String>
+  <x:String x:Key="Text.Toast.PathCopied" xml:space="preserve">Semita exscripta: {0}</x:String>
+  <x:String x:Key="Text.Tooltip.Modified" xml:space="preserve">Dies mutationis: {0}</x:String>
+  <x:String x:Key="Text.Tooltip.Size" xml:space="preserve">Magnitudo: {0}</x:String>
+  <x:String x:Key="Text.Tooltip.Type" xml:space="preserve">Genus: {0}</x:String>
+  <x:String x:Key="Text.Tray.Exit" xml:space="preserve">Exire</x:String>
+  <x:String x:Key="Text.Tray.Open" xml:space="preserve">Kiriha aperire</x:String>
+  <x:String x:Key="Text.Tree.Loading" xml:space="preserve">Oneratur...</x:String>
+  <x:String x:Key="Text.Tree.MyComputer" xml:space="preserve">Computatrum meum</x:String>
+  <x:String x:Key="Text.Tree.MyDocuments" xml:space="preserve">Documenta mea</x:String>
+  <x:String x:Key="Text.Type.ExtFile" xml:space="preserve">Fasciculus {0}</x:String>
+  <x:String x:Key="Text.Type.File" xml:space="preserve">Fasciculus</x:String>
+  <x:String x:Key="Text.Type.FileFolder" xml:space="preserve">Plica fasciculorum</x:String>
+  <x:String x:Key="Text.Type.LocalDisk" xml:space="preserve">Discus localis</x:String>
+  <x:String x:Key="Text.Type.LocalDiskFormat" xml:space="preserve">Discus localis ({0})</x:String>
+  <x:String x:Key="Text.Video.Unavailable" xml:space="preserve">Haec pellicula agi non potest (nullus codec conveniens inventus est)</x:String>
+  <x:String x:Key="Text.Video.PlayPauseTip" xml:space="preserve">Agere / intermittere (Space)</x:String>
+  <x:String x:Key="Text.Video.MuteTip" xml:space="preserve">Silere</x:String>
+  <x:String x:Key="Text.Video.VolumeTip" xml:space="preserve">Sonus</x:String>
+  <x:String x:Key="Text.Video.LoopTip" xml:space="preserve">Iterare</x:String>
+  <x:String x:Key="Text.Video.RateTip" xml:space="preserve">Celeritas actionis</x:String>
+  <x:String x:Key="Text.Update.AvailableHeader" xml:space="preserve">Versio nova praesto est</x:String>
+  <x:String x:Key="Text.Update.Checking" xml:space="preserve">Renovationes quaeruntur...</x:String>
+  <x:String x:Key="Text.Update.DownloadAndInstall" xml:space="preserve">Recipere et instituere</x:String>
+  <x:String x:Key="Text.Update.ErrorHeader" xml:space="preserve">Renovationes quaeri non potuerunt</x:String>
+  <x:String x:Key="Text.Update.IgnoreThisVersion" xml:space="preserve">Hanc versionem praeterire</x:String>
+  <x:String x:Key="Text.Update.Title" xml:space="preserve">Renovatio programmatis</x:String>
+  <x:String x:Key="Text.Update.UpToDate" xml:space="preserve">Versione novissima uteris</x:String>
+  <x:String x:Key="Text.View.Compact" xml:space="preserve">Aspectus compactus</x:String>
+  <x:String x:Key="Text.View.Details" xml:space="preserve">Singula</x:String>
+  <x:String x:Key="Text.View.ExtraLarge" xml:space="preserve">Imagunculae permagnae</x:String>
+  <x:String x:Key="Text.View.FileExtensions" xml:space="preserve">Extensiones nominum</x:String>
+  <x:String x:Key="Text.View.HiddenFiles" xml:space="preserve">Res occultae</x:String>
+  <x:String x:Key="Text.View.ItemCheckBoxes" xml:space="preserve">Quadrata electionis rerum</x:String>
+  <x:String x:Key="Text.View.Large" xml:space="preserve">Imagunculae magnae</x:String>
+  <x:String x:Key="Text.View.List" xml:space="preserve">Index</x:String>
+  <x:String x:Key="Text.View.Medium" xml:space="preserve">Imagunculae mediae</x:String>
+  <x:String x:Key="Text.View.NavigationPane" xml:space="preserve">Tabula navigationis</x:String>
+  <x:String x:Key="Text.View.PreviewPane" xml:space="preserve">Tabula praevisionis</x:String>
+  <x:String x:Key="Text.View.Small" xml:space="preserve">Imagunculae parvae</x:String>
+  <x:String x:Key="Text.View.StatusBar" xml:space="preserve">Tabula status</x:String>
+</ResourceDictionary>

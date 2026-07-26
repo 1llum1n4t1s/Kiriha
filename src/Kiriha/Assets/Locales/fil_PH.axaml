@@ -1,0 +1,353 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:String x:Key="Text.A11y.OpenSubfolders" xml:space="preserve">Ipakita ang mga subfolder</x:String>
+  <x:String x:Key="Text.A11y.ResizeVerticalTabs" xml:space="preserve">Baguhin ang lapad ng patayong tab bar</x:String>
+  <x:String x:Key="Text.A11y.SwitchToTree" xml:space="preserve">Lumipat sa tree view</x:String>
+  <x:String x:Key="Text.A11y.ToggleSidebar" xml:space="preserve">Ipakita o itago ang sidebar</x:String>
+  <x:String x:Key="Text.A11y.VerticalTabs" xml:space="preserve">Mga patayong tab</x:String>
+  <x:String x:Key="Text.Address.Copy" xml:space="preserve">Kopyahin ang address</x:String>
+  <x:String x:Key="Text.Address.Edit" xml:space="preserve">I-edit ang address</x:String>
+  <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">Idagdag ang kasalukuyang folder</x:String>
+  <x:String x:Key="Text.Bookmarks.AddFolderMenu" xml:space="preserve">Magdagdag ng folder...</x:String>
+  <x:String x:Key="Text.Bookmarks.AddFolderTitle" xml:space="preserve">Magdagdag ng folder</x:String>
+  <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">I-drag dito ang isang folder para idagdag sa mga bookmark</x:String>
+  <x:String x:Key="Text.Bookmarks.Hide" xml:space="preserve">Itago ang bookmarks bar</x:String>
+  <x:String x:Key="Text.Bookmarks.NewFolderName" xml:space="preserve">Bagong folder</x:String>
+  <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">Palitan ang pangalan...</x:String>
+  <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">Palitan ang pangalan ng bookmark</x:String>
+  <x:String x:Key="Text.Bookmarks.SortByName" xml:space="preserve">Ayusin ayon sa pangalan</x:String>
+  <x:String x:Key="Text.Bookmarks.SortByPath" xml:space="preserve">Ayusin ayon sa path</x:String>
+  <x:String x:Key="Text.Caption.MaximizeRestore" xml:space="preserve">I-maximize o ibalik</x:String>
+  <x:String x:Key="Text.Caption.Minimize" xml:space="preserve">I-minimize</x:String>
+  <x:String x:Key="Text.Clipboard.Copied" xml:space="preserve">{0} item ang nakopya</x:String>
+  <x:String x:Key="Text.Clipboard.CopiedToClipboard" xml:space="preserve">Nakopya sa clipboard</x:String>
+  <x:String x:Key="Text.Clipboard.CopyFailed" xml:space="preserve">Hindi makopya sa clipboard</x:String>
+  <x:String x:Key="Text.Clipboard.Cut" xml:space="preserve">{0} item ang na-cut</x:String>
+  <x:String x:Key="Text.Clipboard.VirtualPasteFailed" xml:space="preserve">Hindi ma-paste ang virtual na file</x:String>
+  <x:String x:Key="Text.Clipboard.WriteFailed" xml:space="preserve">Hindi makasulat sa clipboard</x:String>
+  <x:String x:Key="Text.Column.AutoFitAll" xml:space="preserve">Iakma ang lapad ng lahat ng column</x:String>
+  <x:String x:Key="Text.Column.AutoFitThis" xml:space="preserve">Iakma ang lapad ng column na ito</x:String>
+  <x:String x:Key="Text.Column.Created" xml:space="preserve">Petsa ng paggawa</x:String>
+  <x:String x:Key="Text.Column.Modified" xml:space="preserve">Petsa ng pagbabago</x:String>
+  <x:String x:Key="Text.Column.Name" xml:space="preserve">Pangalan</x:String>
+  <x:String x:Key="Text.Column.Size" xml:space="preserve">Laki</x:String>
+  <x:String x:Key="Text.Column.Type" xml:space="preserve">Uri</x:String>
+  <x:String x:Key="Text.Command.CopyTip" xml:space="preserve">Kopyahin (Ctrl+C)</x:String>
+  <x:String x:Key="Text.Command.Cut" xml:space="preserve">I-cut</x:String>
+  <x:String x:Key="Text.Command.CutTip" xml:space="preserve">I-cut (Ctrl+X)</x:String>
+  <x:String x:Key="Text.Command.DeleteTip" xml:space="preserve">Tanggalin (Delete)</x:String>
+  <x:String x:Key="Text.Command.More" xml:space="preserve">Tumingin pa</x:String>
+  <x:String x:Key="Text.Command.NewFolder" xml:space="preserve">Bagong folder</x:String>
+  <x:String x:Key="Text.Command.Options" xml:space="preserve">Mga opsyon</x:String>
+  <x:String x:Key="Text.Command.Paste" xml:space="preserve">I-paste</x:String>
+  <x:String x:Key="Text.Command.PasteTip" xml:space="preserve">I-paste (Ctrl+V)</x:String>
+  <x:String x:Key="Text.Command.Rename" xml:space="preserve">Palitan ang pangalan</x:String>
+  <x:String x:Key="Text.Command.RenameTip" xml:space="preserve">Palitan ang pangalan (F2)</x:String>
+  <x:String x:Key="Text.Command.Share" xml:space="preserve">Ibahagi</x:String>
+  <x:String x:Key="Text.Command.SidebarTip" xml:space="preserve">Ipakita/itago ang sidebar (Quick access / tree)</x:String>
+  <x:String x:Key="Text.Command.Sort" xml:space="preserve">Ayusin</x:String>
+  <x:String x:Key="Text.Command.View" xml:space="preserve">Tingnan</x:String>
+  <x:String x:Key="Text.Common.AddToBookmarks" xml:space="preserve">Idagdag sa mga bookmark</x:String>
+  <x:String x:Key="Text.Common.Cancel" xml:space="preserve">Kanselahin</x:String>
+  <x:String x:Key="Text.Common.Close" xml:space="preserve">Isara</x:String>
+  <x:String x:Key="Text.Common.Copy" xml:space="preserve">Kopyahin</x:String>
+  <x:String x:Key="Text.Common.CopyPath" xml:space="preserve">Kopyahin ang path</x:String>
+  <x:String x:Key="Text.Common.Delete" xml:space="preserve">Tanggalin</x:String>
+  <x:String x:Key="Text.Common.Open" xml:space="preserve">Buksan</x:String>
+  <x:String x:Key="Text.Common.OpenInExplorer" xml:space="preserve">Buksan sa File Explorer</x:String>
+  <x:String x:Key="Text.Common.OpenInNewTab" xml:space="preserve">Buksan sa bagong tab</x:String>
+  <x:String x:Key="Text.Common.OpenInTerminal" xml:space="preserve">Buksan sa Terminal</x:String>
+  <x:String x:Key="Text.Common.PinToQuickAccess" xml:space="preserve">I-pin sa Quick access</x:String>
+  <x:String x:Key="Text.Common.Properties" xml:space="preserve">Mga katangian</x:String>
+  <x:String x:Key="Text.Common.UnpinFromQuickAccess" xml:space="preserve">Alisin sa pagka-pin sa Quick access</x:String>
+  <x:String x:Key="Text.Drag.Add" xml:space="preserve">Idagdag</x:String>
+  <x:String x:Key="Text.Drag.Copy" xml:space="preserve">Kopyahin</x:String>
+  <x:String x:Key="Text.Drag.Dragging" xml:space="preserve">Dinadala</x:String>
+  <x:String x:Key="Text.Drag.File" xml:space="preserve">File</x:String>
+  <x:String x:Key="Text.Drag.Folder" xml:space="preserve">Folder</x:String>
+  <x:String x:Key="Text.Drag.Move" xml:space="preserve">Ilipat</x:String>
+  <x:String x:Key="Text.Drag.OpenInTab" xml:space="preserve">Buksan sa tab</x:String>
+  <x:String x:Key="Text.Drive.FreeOfTotal" xml:space="preserve">{0} na libre sa {1}</x:String>
+  <x:String x:Key="Text.Error.AccessDenied" xml:space="preserve">Tinanggihan ang pag-access</x:String>
+  <x:String x:Key="Text.Error.Code" xml:space="preserve">Error {0}</x:String>
+  <x:String x:Key="Text.Error.CodeWithDesc" xml:space="preserve">Error {0}: {1}</x:String>
+  <x:String x:Key="Text.Error.DiskFull" xml:space="preserve">Kulang ang espasyo sa disk</x:String>
+  <x:String x:Key="Text.Error.FileExists" xml:space="preserve">May file nang ganito ang pangalan</x:String>
+  <x:String x:Key="Text.Error.InvalidName" xml:space="preserve">May hindi wastong karakter ang pangalan ng file</x:String>
+  <x:String x:Key="Text.Error.PathNotFound" xml:space="preserve">Hindi natagpuan ang path</x:String>
+  <x:String x:Key="Text.Error.PathTooLong" xml:space="preserve">Masyadong mahaba ang path</x:String>
+  <x:String x:Key="Text.Error.SharingViolation" xml:space="preserve">Ginagamit ang file ng ibang proseso</x:String>
+  <x:String x:Key="Text.Error.WriteProtected" xml:space="preserve">Protektado sa pagsulat ang media</x:String>
+  <x:String x:Key="Text.Exif.Camera" xml:space="preserve">Camera</x:String>
+  <x:String x:Key="Text.Exif.CameraMaker" xml:space="preserve">Gumawa ng camera</x:String>
+  <x:String x:Key="Text.Exif.DateModified" xml:space="preserve">Petsa ng pagbabago</x:String>
+  <x:String x:Key="Text.Exif.DateTaken" xml:space="preserve">Petsa ng pagkuha</x:String>
+  <x:String x:Key="Text.Exif.Dimensions" xml:space="preserve">Mga sukat</x:String>
+  <x:String x:Key="Text.Exif.ExposureBias" xml:space="preserve">Exposure bias</x:String>
+  <x:String x:Key="Text.Exif.ExposureTime" xml:space="preserve">Oras ng exposure</x:String>
+  <x:String x:Key="Text.Exif.FNumber" xml:space="preserve">F-stop</x:String>
+  <x:String x:Key="Text.Exif.Flash" xml:space="preserve">Flash</x:String>
+  <x:String x:Key="Text.Exif.FocalLength" xml:space="preserve">Focal length</x:String>
+  <x:String x:Key="Text.Exif.Iso" xml:space="preserve">ISO speed</x:String>
+  <x:String x:Key="Text.Exif.Lens" xml:space="preserve">Lens</x:String>
+  <x:String x:Key="Text.Exif.Size" xml:space="preserve">Laki</x:String>
+  <x:String x:Key="Text.Exif.Type" xml:space="preserve">Uri</x:String>
+  <x:String x:Key="Text.FileList.EmptyFolder" xml:space="preserve">Walang laman ang folder na ito.</x:String>
+  <x:String x:Key="Text.Folder.Desktop" xml:space="preserve">Desktop</x:String>
+  <x:String x:Key="Text.Folder.Documents" xml:space="preserve">Mga dokumento</x:String>
+  <x:String x:Key="Text.Folder.Downloads" xml:space="preserve">Mga download</x:String>
+  <x:String x:Key="Text.Folder.Music" xml:space="preserve">Musika</x:String>
+  <x:String x:Key="Text.Folder.Pictures" xml:space="preserve">Mga larawan</x:String>
+  <x:String x:Key="Text.Folder.Videos" xml:space="preserve">Mga video</x:String>
+  <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">Lumabas sa gallery (Esc)</x:String>
+  <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">Impormasyon ng larawan</x:String>
+  <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">Walang impormasyong makuha para sa larawang ito.</x:String>
+  <x:String x:Key="Text.Integration.OpenWithKiriha" xml:space="preserve">Buksan gamit ang Kiriha</x:String>
+  <x:String x:Key="Text.Launch.ExplorerFailed" xml:space="preserve">Hindi masimulan ang File Explorer: {0}</x:String>
+  <x:String x:Key="Text.Launch.Failed" xml:space="preserve">Hindi masimulan: {0}</x:String>
+  <x:String x:Key="Text.Launch.TerminalFailed" xml:space="preserve">Hindi masimulan ang Terminal: {0}</x:String>
+  <x:String x:Key="Text.License.Activate" xml:space="preserve">I-activate</x:String>
+  <x:String x:Key="Text.License.Exit" xml:space="preserve">Lumabas</x:String>
+  <x:String x:Key="Text.License.KeyPlaceholder" xml:space="preserve">License key na nagsisimula sa KIRIHA-</x:String>
+  <x:String x:Key="Text.License.Lock.OnlineCheckBody" xml:space="preserve">Mahigit 30 araw nang hindi na-verify online ang lisensya. Kumonekta sa internet at pindutin ang “I-verify ulit online”.</x:String>
+  <x:String x:Key="Text.License.Lock.OnlineCheckTitle" xml:space="preserve">Kailangang i-verify online ang lisensya</x:String>
+  <x:String x:Key="Text.License.Lock.TrialExpiredBody" xml:space="preserve">Kailangan ng aktibong lisensya para gamitin ang Kiriha (¥980, isahang bayad).</x:String>
+  <x:String x:Key="Text.License.Lock.TrialExpiredTitle" xml:space="preserve">Tapos na ang iyong panahon ng pagsubok</x:String>
+  <x:String x:Key="Text.License.Msg.Activated" xml:space="preserve">Na-activate na ang iyong lisensya 🎉 Maraming salamat!</x:String>
+  <x:String x:Key="Text.License.Msg.CheckOk" xml:space="preserve">Tapos na ang pag-verify. Salamat sa paggamit ng Kiriha!</x:String>
+  <x:String x:Key="Text.License.Msg.Checking" xml:space="preserve">Nagve-verify online…</x:String>
+  <x:String x:Key="Text.License.Msg.EnterKey" xml:space="preserve">Ilagay ang license key na ibinigay noong bumili ka.</x:String>
+  <x:String x:Key="Text.License.Msg.InvalidKey" xml:space="preserve">Hindi wasto ang license key na iyan. Tingnan kung may nawalang karakter o sobrang espasyong nakopya.</x:String>
+  <x:String x:Key="Text.License.Msg.PurchaseFailed" xml:space="preserve">Hindi mabuksan ang pahina ng pagbili. Subukan ulit mamaya.</x:String>
+  <x:String x:Key="Text.License.Msg.PurchaseOpened" xml:space="preserve">Nabuksan sa browser ang pahina ng pagbili. I-paste sa itaas ang license key na makikita sa pahina ng kumpirmasyon.</x:String>
+  <x:String x:Key="Text.License.Msg.Revoked" xml:space="preserve">Hindi na wasto ang lisensyang ito (halimbawa, na-refund). Mangyaring bumili ulit.</x:String>
+  <x:String x:Key="Text.License.Msg.ServerUnreachable" xml:space="preserve">Hindi maabot ang server. Tingnan ang iyong koneksyon sa network at subukan ulit.</x:String>
+  <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">Buksan ang pahina ng pagbili (¥980, isahang bayad)</x:String>
+  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">Pagkatapos bumili, makikita ang license key sa pahina ng kumpirmasyon ng bayad. Walang kailangang account o password.</x:String>
+  <x:String x:Key="Text.License.Recheck" xml:space="preserve">I-verify ulit online</x:String>
+  <x:String x:Key="Text.License.Status.Licensed" xml:space="preserve">Aktibo ang lisensya: {0}</x:String>
+  <x:String x:Key="Text.License.Status.OnlineCheck" xml:space="preserve">Kailangang i-verify online ang lisensya (kumonekta sa internet)</x:String>
+  <x:String x:Key="Text.License.Status.Trial" xml:space="preserve">Panahon ng pagsubok ({0} araw ang natitira)</x:String>
+  <x:String x:Key="Text.License.Status.TrialExpired" xml:space="preserve">Tapos na ang pagsubok (kailangan ng lisensya)</x:String>
+  <x:String x:Key="Text.Menu.About" xml:space="preserve">Tungkol sa Kiriha</x:String>
+  <x:String x:Key="Text.Menu.AccessDenied" xml:space="preserve">(Tinanggihan ang pag-access)</x:String>
+  <x:String x:Key="Text.Menu.BookmarksBar" xml:space="preserve">Bookmarks bar</x:String>
+  <x:String x:Key="Text.Menu.CheckUpdate" xml:space="preserve">Maghanap ng update</x:String>
+  <x:String x:Key="Text.Menu.Empty" xml:space="preserve">(Walang laman)</x:String>
+  <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">Bagong window</x:String>
+  <x:String x:Key="Text.Menu.NoSubfolders" xml:space="preserve">(Walang subfolder)</x:String>
+  <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(Wala)</x:String>
+  <x:String x:Key="Text.Nav.Back" xml:space="preserve">Bumalik</x:String>
+  <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">Bumalik (i-right click para sa history)</x:String>
+  <x:String x:Key="Text.Nav.EditPathTip" xml:space="preserve">I-click para i-edit ang path</x:String>
+  <x:String x:Key="Text.Nav.Forward" xml:space="preserve">Sumulong</x:String>
+  <x:String x:Key="Text.Nav.ForwardTip" xml:space="preserve">Sumulong (i-right click para sa history)</x:String>
+  <x:String x:Key="Text.Nav.Home" xml:space="preserve">Home</x:String>
+  <x:String x:Key="Text.Nav.HomeTip" xml:space="preserve">Home (Alt+Home / i-right click para sa mga madalas na folder)</x:String>
+  <x:String x:Key="Text.Nav.OpenFailed" xml:space="preserve">Hindi mabuksan: {0}</x:String>
+  <x:String x:Key="Text.Nav.OpenSettings" xml:space="preserve">Buksan ang mga setting</x:String>
+  <x:String x:Key="Text.Nav.Refresh" xml:space="preserve">I-refresh</x:String>
+  <x:String x:Key="Text.Nav.Settings" xml:space="preserve">Mga setting</x:String>
+  <x:String x:Key="Text.Nav.UpFolder" xml:space="preserve">Umakyat ng isang antas</x:String>
+  <x:String x:Key="Text.Nav.UpTip" xml:space="preserve">Umakyat ng isang antas (i-right click para sa mga folder sa itaas)</x:String>
+  <x:String x:Key="Text.New.CreateFailed" xml:space="preserve">Hindi magawa: {0}</x:String>
+  <x:String x:Key="Text.New.FolderName" xml:space="preserve">Bagong folder</x:String>
+  <x:String x:Key="Text.New.ItemName" xml:space="preserve">Bagong {0}</x:String>
+  <x:String x:Key="Text.New.UndoFailed" xml:space="preserve">Hindi ma-undo ang paggawa ng bagong folder: {0}</x:String>
+  <x:String x:Key="Text.Op.Copied" xml:space="preserve">{0} item ang nakopya</x:String>
+  <x:String x:Key="Text.Op.DeleteFailed" xml:space="preserve">Nabigo ang pagtanggal ({0})</x:String>
+  <x:String x:Key="Text.Op.Failed" xml:space="preserve">Nabigo ang operasyon sa file ({0})</x:String>
+  <x:String x:Key="Text.Op.Moved" xml:space="preserve">{0} item ang nailipat</x:String>
+  <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">Nabigo ang pag-paste ({0})</x:String>
+  <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">Nabigo ang pagpapalit ng pangalan ({0})</x:String>
+  <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">{0} file  {1}</x:String>
+  <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> o higit pa</x:String>
+  <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">Walisin ang Recycle Bin</x:String>
+  <x:String x:Key="Text.Rename.AlreadyExists" xml:space="preserve">May file o folder nang ganitong pangalan: {0}</x:String>
+  <x:String x:Key="Text.Rename.InvalidChars" xml:space="preserve">May hindi wastong karakter ang pangalan ng file: \ / : * ? " &lt; &gt; |</x:String>
+  <x:String x:Key="Text.Rename.RevertedToOriginal" xml:space="preserve">Nabigo ang pagpapalit ng pangalan kaya ibinalik ang orihinal</x:String>
+  <x:String x:Key="Text.Rename.StuckAsTemporary" xml:space="preserve">Nabigo ang pagpapalit ng pangalan at nanatili ang pansamantalang pangalan: {0}</x:String>
+  <x:String x:Key="Text.Search.ClearTip" xml:space="preserve">Burahin ang paghahanap</x:String>
+  <x:String x:Key="Text.Search.Failed" xml:space="preserve">Nabigo ang paghahanap: {0}</x:String>
+  <x:String x:Key="Text.Search.Found" xml:space="preserve">{0} resulta ang natagpuan (kasama ang mga subfolder)</x:String>
+  <x:String x:Key="Text.Search.Placeholder" xml:space="preserve">Maghanap sa {0}</x:String>
+  <x:String x:Key="Text.Search.Searching" xml:space="preserve">Naghahanap... (kasama ang mga subfolder)</x:String>
+  <x:String x:Key="Text.Search.Truncated" xml:space="preserve">Tumigil sa {0} resulta (naabot ang limitasyong 1000 at may mga subfolder na hindi nasuri; paliitin ang paghahanap para makakita pa)</x:String>
+  <x:String x:Key="Text.Select.All" xml:space="preserve">Piliin lahat</x:String>
+  <x:String x:Key="Text.Select.FilesOnly" xml:space="preserve">Mga file lang ang piliin</x:String>
+  <x:String x:Key="Text.Select.FoldersOnly" xml:space="preserve">Mga folder lang ang piliin</x:String>
+  <x:String x:Key="Text.Select.Invert" xml:space="preserve">Baligtarin ang pagpili</x:String>
+  <x:String x:Key="Text.Select.None" xml:space="preserve">Alisin ang pagpili</x:String>
+  <x:String x:Key="Text.Settings.About" xml:space="preserve">Tungkol sa Kiriha</x:String>
+  <x:String x:Key="Text.Settings.About.Body" xml:space="preserve">Pinagsasama ng Kiriha sa iisang window ang pamamahala ng file ng Windows Explorer at ang mga tab, address bar at bookmark ng Chrome. Nase-save ang mga setting para sa kasalukuyang user.</x:String>
+  <x:String x:Key="Text.Settings.Acrylic" xml:space="preserve">Gamitin ang acrylic effect (malabong translucent) sa window</x:String>
+  <x:String x:Key="Text.Settings.DefaultFolderApp" xml:space="preserve">Gawing default na app ang Kiriha sa pagbukas ng mga folder at drive</x:String>
+  <x:String x:Key="Text.Settings.DefaultFolderApp.Off" xml:space="preserve">Kapag naka-on, tumatakbo ang Kiriha tuwing bubuksan ang folder o drive mula sa File Explorer.</x:String>
+  <x:String x:Key="Text.Settings.DefaultFolderApp.On" xml:space="preserve">Sa kasalukuyan, bumubukas sa Kiriha ang mga folder at drive. Kapag ini-off ito, babalik ang dating gawi.</x:String>
+  <x:String x:Key="Text.Settings.Display" xml:space="preserve">Hitsura</x:String>
+  <x:String x:Key="Text.Settings.Display.Subtitle" xml:space="preserve">Iakma ang hitsura ng listahan ng file at ng Kiriha</x:String>
+  <x:String x:Key="Text.Settings.Explorer" xml:space="preserve">Listahan ng file</x:String>
+  <x:String x:Key="Text.Settings.ExplorerContextMenu" xml:space="preserve">Idagdag ang “Buksan gamit ang Kiriha” sa context menu ng File Explorer</x:String>
+  <x:String x:Key="Text.Settings.ExplorerContextMenuNote" xml:space="preserve">Nagbibigay-daan na buksan sa Kiriha ang folder sa pamamagitan ng right click sa folder o sa background nito.</x:String>
+  <x:String x:Key="Text.Settings.FolderTree" xml:space="preserve">Tree ng folder</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Material" xml:space="preserve">Material Icon Theme</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Note" xml:space="preserve">Gumagamit ang Material Icon Theme ng material-icon-theme (MIT License, © Material Extensions). Ipinapakita ng Windows set ang parehong shell icon ng File Explorer.</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Original" xml:space="preserve">Orihinal na mga icon ng Kiriha</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Windows" xml:space="preserve">Mga shell icon ng Windows</x:String>
+  <x:String x:Key="Text.Settings.Icons" xml:space="preserve">Mga icon</x:String>
+  <x:String x:Key="Text.Settings.Language" xml:space="preserve">Wika ng interface</x:String>
+  <x:String x:Key="Text.Settings.Language.Note" xml:space="preserve">Bilang default, kinukuha ang wika mula sa display language ng Windows.</x:String>
+  <x:String x:Key="Text.Settings.License" xml:space="preserve">Lisensya</x:String>
+  <x:String x:Key="Text.Settings.Maintenance" xml:space="preserve">Pagpapanatili</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.Data" xml:space="preserve">Data at cache</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.OpenLogFolder" xml:space="preserve">Buksan ang folder ng log</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.ReloadQuickAccess" xml:space="preserve">I-reload ang Quick access</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.ResetSettings" xml:space="preserve">I-reset ang mga setting</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.Subtitle" xml:space="preserve">Pamahalaan ang cache, mga log at data ng setting</x:String>
+  <x:String x:Key="Text.Settings.MinimizeToTray" xml:space="preserve">I-minimize sa notification area</x:String>
+  <x:String x:Key="Text.Settings.MinimizeToTrayNote" xml:space="preserve">Kapag na-minimize, nawawala ang Kiriha sa taskbar at maibabalik mula sa icon nito sa notification area.</x:String>
+  <x:String x:Key="Text.Settings.Mouse" xml:space="preserve">Mouse</x:String>
+  <x:String x:Key="Text.Settings.Mouse.BackgroundDoubleClick" xml:space="preserve">Kapag nag-double click sa background ng folder</x:String>
+  <x:String x:Key="Text.Settings.Mouse.BackgroundMiddleClick" xml:space="preserve">Kapag nag-click gamit ang gulong sa background ng folder</x:String>
+  <x:String x:Key="Text.Settings.Mouse.CloseTab" xml:space="preserve">Isara ang tab</x:String>
+  <x:String x:Key="Text.Settings.Mouse.None" xml:space="preserve">Walang gagawin</x:String>
+  <x:String x:Key="Text.Settings.Mouse.Pin" xml:space="preserve">I-pin ang tab</x:String>
+  <x:String x:Key="Text.Settings.Mouse.Refresh" xml:space="preserve">I-refresh</x:String>
+  <x:String x:Key="Text.Settings.Mouse.TabDoubleClick" xml:space="preserve">Kapag nag-double click sa isang tab</x:String>
+  <x:String x:Key="Text.Settings.Mouse.TabMiddleClick" xml:space="preserve">Kapag nag-click gamit ang gulong sa isang tab</x:String>
+  <x:String x:Key="Text.Settings.Mouse.Up" xml:space="preserve">Umakyat ng isang antas</x:String>
+  <x:String x:Key="Text.Settings.RunAtStartup" xml:space="preserve">Patakbuhin ang Kiriha kapag nagsimula ang Windows</x:String>
+  <x:String x:Key="Text.Settings.RunAtStartupNote" xml:space="preserve">Awtomatikong tumatakbo ang Kiriha kapag nag-sign in ka.</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts" xml:space="preserve">Mga shortcut</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.FileOps" xml:space="preserve">Mga operasyon sa file</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.FileOpsBody" xml:space="preserve">Ctrl+X / C / V　I-cut, kopyahin, i-paste　　Delete / Shift+Delete　Tanggalin, tanggalin nang tuluyan&#10;F2　Palitan ang pangalan　　Alt+Enter　Mga katangian　　Ctrl+Shift+N　Bagong folder　　Alt+P　Preview</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.Navigation" xml:space="preserve">Nabigasyon at pagtingin</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.NavigationBody" xml:space="preserve">Ctrl+L / F4　I-edit ang address&#10;Ctrl+F / F3　Maghanap&#10;Alt+← / →　Bumalik at sumulong&#10;Alt+↑　Umakyat ng isang antas&#10;F5　I-refresh / F11　Buong screen</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.Subtitle" xml:space="preserve">Mga keyboard shortcut para mas mabilis magtrabaho</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.Tabs" xml:space="preserve">Mga tab</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.TabsBody" xml:space="preserve">Ctrl+T　Bagong tab&#10;Ctrl+W　Isara ang tab&#10;Ctrl+Shift+T　Buksan ulit ang naisarang tab&#10;Ctrl+Tab　Lumipat ng tab&#10;Ctrl+1..9　Pumili ng partikular na tab</x:String>
+  <x:String x:Key="Text.Settings.ShowBookmarksBar" xml:space="preserve">Ipakita ang bookmarks bar (Ctrl+Shift+B)</x:String>
+  <x:String x:Key="Text.Settings.ShowCheckBoxes" xml:space="preserve">Ipakita ang mga check box ng item</x:String>
+  <x:String x:Key="Text.Settings.ShowExtensions" xml:space="preserve">Ipakita ang mga extension ng file</x:String>
+  <x:String x:Key="Text.Settings.ShowHidden" xml:space="preserve">Ipakita ang mga nakatagong file</x:String>
+  <x:String x:Key="Text.Settings.StartMinimizedToTray" xml:space="preserve">Magsimulang naka-minimize sa notification area</x:String>
+  <x:String x:Key="Text.Settings.StartMinimizedToTrayNote" xml:space="preserve">Nagsisimula ang Kiriha nang hindi ipinapakita ang window, naka-minimize sa notification area.</x:String>
+  <x:String x:Key="Text.Settings.Startup" xml:space="preserve">Pagsisimula</x:String>
+  <x:String x:Key="Text.Settings.Startup.Behavior" xml:space="preserve">Gawi sa pagsisimula</x:String>
+  <x:String x:Key="Text.Settings.Startup.PathCaption" xml:space="preserve">Folder na bubuksan sa mga bagong tab (iwanang blangko para sa iyong user folder)</x:String>
+  <x:String x:Key="Text.Settings.Startup.RestoreTabs" xml:space="preserve">Ibalik ang mga tab na nakabukas noong isinara ang app</x:String>
+  <x:String x:Key="Text.Settings.Startup.Subtitle" xml:space="preserve">Pamahalaan ang pagsisimula, integrasyon sa Windows at notification area</x:String>
+  <x:String x:Key="Text.Settings.Theme" xml:space="preserve">Tema</x:String>
+  <x:String x:Key="Text.Settings.Theme.Dark" xml:space="preserve">Madilim</x:String>
+  <x:String x:Key="Text.Settings.Theme.Light" xml:space="preserve">Maliwanag</x:String>
+  <x:String x:Key="Text.Settings.Theme.System" xml:space="preserve">Sistema</x:String>
+  <x:String x:Key="Text.Settings.Tray" xml:space="preserve">Notification area</x:String>
+  <x:String x:Key="Text.Settings.TreeDragDisabled" xml:space="preserve">Huwag payagan ang pag-drag mula sa tree</x:String>
+  <x:String x:Key="Text.Settings.TreeDropDisabled" xml:space="preserve">Huwag payagan ang pag-drop sa tree</x:String>
+  <x:String x:Key="Text.Settings.Updates" xml:space="preserve">Mga update at impormasyon</x:String>
+  <x:String x:Key="Text.Settings.Updates.CheckNow" xml:space="preserve">Maghanap ng update ngayon</x:String>
+  <x:String x:Key="Text.Settings.Updates.CheckOnStartup" xml:space="preserve">Maghanap ng update sa pagsisimula</x:String>
+  <x:String x:Key="Text.Settings.Updates.Subtitle" xml:space="preserve">Tingnan ang bersyon ng Kiriha at pamahalaan ang mga update</x:String>
+  <x:String x:Key="Text.Settings.Updates.VersionCard" xml:space="preserve">Bersyon at mga update</x:String>
+  <x:String x:Key="Text.Settings.Window" xml:space="preserve">Window</x:String>
+  <x:String x:Key="Text.Settings.Window.RememberBounds" xml:space="preserve">Tandaan ang laki at posisyon ng window</x:String>
+  <x:String x:Key="Text.Settings.Window.RememberBoundsNote" xml:space="preserve">Kapag naka-off, bubukas ang Kiriha sa default na laki at posisyon sa susunod.</x:String>
+  <x:String x:Key="Text.Settings.WindowsIntegration" xml:space="preserve">Integrasyon sa Windows</x:String>
+  <x:String x:Key="Text.Share.FileCount" xml:space="preserve">{0} file</x:String>
+  <x:String x:Key="Text.Share.FoldersNotSupported" xml:space="preserve">Hindi maibabahagi ang mga folder (pumili ng mga file)</x:String>
+  <x:String x:Key="Text.Share.NoItems" xml:space="preserve">Walang maibabahagi</x:String>
+  <x:String x:Key="Text.Share.OpenFailed" xml:space="preserve">Hindi mabuksan ang share sheet</x:String>
+  <x:String x:Key="Text.Share.PrepareFailed" xml:space="preserve">Hindi maihanda ang datos na ibabahagi</x:String>
+  <x:String x:Key="Text.Share.SelectFiles" xml:space="preserve">Piliin ang mga file na nais mong ibahagi</x:String>
+  <x:String x:Key="Text.Sidebar.Drives" xml:space="preserve">Mga drive</x:String>
+  <x:String x:Key="Text.Sidebar.QuickAccess" xml:space="preserve">Quick access</x:String>
+  <x:String x:Key="Text.Sidebar.RecentFiles" xml:space="preserve">Kamakailang mga file</x:String>
+  <x:String x:Key="Text.Sidebar.RecycleBin" xml:space="preserve">Recycle Bin</x:String>
+  <x:String x:Key="Text.Sidebar.RecycleBinTip" xml:space="preserve">Buksan ang Recycle Bin sa File Explorer</x:String>
+  <x:String x:Key="Text.Sidebar.ToggleTip" xml:space="preserve">Lumipat sa pagitan ng Quick access at tree ng folder</x:String>
+  <x:String x:Key="Text.Sidebar.TreeView" xml:space="preserve">Tree view</x:String>
+  <x:String x:Key="Text.Sort.Ascending" xml:space="preserve">Pataas</x:String>
+  <x:String x:Key="Text.Sort.Descending" xml:space="preserve">Pababa</x:String>
+  <x:String x:Key="Text.Status.Breakdown" xml:space="preserve">({0} folder, {1} file)</x:String>
+  <x:String x:Key="Text.Status.ClearSelectionTip" xml:space="preserve">I-click para alisin ang pagpili</x:String>
+  <x:String x:Key="Text.Status.DetailsViewTip" xml:space="preserve">Details view</x:String>
+  <x:String x:Key="Text.Status.FreeSpace" xml:space="preserve">Libreng espasyo: {0}</x:String>
+  <x:String x:Key="Text.Status.IconSizeTip" xml:space="preserve">Laki ng icon</x:String>
+  <x:String x:Key="Text.Status.ItemCount" xml:space="preserve">{0} item</x:String>
+  <x:String x:Key="Text.Status.ItemCountFiltered" xml:space="preserve">{0} item (paghahanap: {1})</x:String>
+  <x:String x:Key="Text.Status.ItemsSelected" xml:space="preserve">{0} item ang napili</x:String>
+  <x:String x:Key="Text.Status.LargeIconsTip" xml:space="preserve">Large icons view</x:String>
+  <x:String x:Key="Text.Tab.Category" xml:space="preserve">Mga tab</x:String>
+  <x:String x:Key="Text.Tab.Close" xml:space="preserve">Isara ang tab</x:String>
+  <x:String x:Key="Text.Tab.CloseBelow" xml:space="preserve">Isara ang mga tab sa ibaba</x:String>
+  <x:String x:Key="Text.Tab.CloseOthers" xml:space="preserve">Isara ang ibang mga tab</x:String>
+  <x:String x:Key="Text.Tab.Duplicate" xml:space="preserve">Doblehin ang tab</x:String>
+  <x:String x:Key="Text.Tab.MoreActions" xml:space="preserve">Iba pang aksyon sa tab</x:String>
+  <x:String x:Key="Text.Tab.New" xml:space="preserve">Bagong tab</x:String>
+  <x:String x:Key="Text.Tab.NewBelow" xml:space="preserve">Magbukas ng bagong tab sa ibaba</x:String>
+  <x:String x:Key="Text.Tab.NewTip" xml:space="preserve">Bagong tab (Ctrl+T)</x:String>
+  <x:String x:Key="Text.Tab.Pin" xml:space="preserve">I-pin ang tab</x:String>
+  <x:String x:Key="Text.Tab.Pinned" xml:space="preserve">Naka-pin na tab</x:String>
+  <x:String x:Key="Text.Tab.RecentlyClosed" xml:space="preserve">Kamakailang naisarang mga tab</x:String>
+  <x:String x:Key="Text.Tab.Reopen" xml:space="preserve">Buksan ulit ang naisarang tab</x:String>
+  <x:String x:Key="Text.Tab.Unpin" xml:space="preserve">Alisin sa pagka-pin ang tab</x:String>
+  <x:String x:Key="Text.TabAction.CloseDuplicates" xml:space="preserve">Isara ang dobleng tab ng parehong folder</x:String>
+  <x:String x:Key="Text.TabAction.CloseLeft" xml:space="preserve">Isara ang mga tab sa itaas</x:String>
+  <x:String x:Key="Text.TabAction.CloseUnpinned" xml:space="preserve">Isara ang lahat ng tab na hindi naka-pin</x:String>
+  <x:String x:Key="Text.TabAction.CopyAllPaths" xml:space="preserve">Kopyahin ang path ng lahat ng tab</x:String>
+  <x:String x:Key="Text.TabAction.CopyMarkdown" xml:space="preserve">Kopyahin ang tab bilang Markdown link</x:String>
+  <x:String x:Key="Text.TabAction.CopyTitle" xml:space="preserve">Kopyahin ang pangalan ng tab</x:String>
+  <x:String x:Key="Text.TabAction.CopyUri" xml:space="preserve">Kopyahin ang tab bilang file URI</x:String>
+  <x:String x:Key="Text.TabAction.MoveFirst" xml:space="preserve">Ilipat ang tab sa pinakataas</x:String>
+  <x:String x:Key="Text.TabAction.MoveLast" xml:space="preserve">Ilipat ang tab sa pinakababa</x:String>
+  <x:String x:Key="Text.TabAction.OpenParent" xml:space="preserve">Buksan ang folder sa itaas sa bagong tab</x:String>
+  <x:String x:Key="Text.TabAction.PinAll" xml:space="preserve">I-pin ang lahat ng tab</x:String>
+  <x:String x:Key="Text.TabAction.PinLeft" xml:space="preserve">I-pin ang mga tab sa itaas</x:String>
+  <x:String x:Key="Text.TabAction.PinRight" xml:space="preserve">I-pin ang mga tab sa ibaba</x:String>
+  <x:String x:Key="Text.TabAction.ReloadAll" xml:space="preserve">I-reload ang lahat ng tab</x:String>
+  <x:String x:Key="Text.TabAction.ReloadLeft" xml:space="preserve">I-reload ang mga tab sa itaas</x:String>
+  <x:String x:Key="Text.TabAction.ReloadRight" xml:space="preserve">I-reload ang mga tab sa ibaba</x:String>
+  <x:String x:Key="Text.TabAction.Reverse" xml:space="preserve">Baligtarin ang pagkakasunod ng mga tab</x:String>
+  <x:String x:Key="Text.TabAction.SortByName" xml:space="preserve">Ayusin ang mga tab ayon sa pangalan</x:String>
+  <x:String x:Key="Text.TabAction.SortByPath" xml:space="preserve">Ayusin ang mga tab ayon sa path</x:String>
+  <x:String x:Key="Text.TabAction.UnpinAll" xml:space="preserve">Alisin sa pagka-pin ang lahat ng tab</x:String>
+  <x:String x:Key="Text.Toast.PathCopied" xml:space="preserve">Nakopya ang path: {0}</x:String>
+  <x:String x:Key="Text.Tooltip.Modified" xml:space="preserve">Petsa ng pagbabago: {0}</x:String>
+  <x:String x:Key="Text.Tooltip.Size" xml:space="preserve">Laki: {0}</x:String>
+  <x:String x:Key="Text.Tooltip.Type" xml:space="preserve">Uri: {0}</x:String>
+  <x:String x:Key="Text.Tray.Exit" xml:space="preserve">Lumabas</x:String>
+  <x:String x:Key="Text.Tray.Open" xml:space="preserve">Buksan ang Kiriha</x:String>
+  <x:String x:Key="Text.Tree.Loading" xml:space="preserve">Naglo-load...</x:String>
+  <x:String x:Key="Text.Tree.MyComputer" xml:space="preserve">My Computer</x:String>
+  <x:String x:Key="Text.Tree.MyDocuments" xml:space="preserve">My Documents</x:String>
+  <x:String x:Key="Text.Type.ExtFile" xml:space="preserve">{0} File</x:String>
+  <x:String x:Key="Text.Type.File" xml:space="preserve">File</x:String>
+  <x:String x:Key="Text.Type.FileFolder" xml:space="preserve">File folder</x:String>
+  <x:String x:Key="Text.Type.LocalDisk" xml:space="preserve">Local Disk</x:String>
+  <x:String x:Key="Text.Type.LocalDiskFormat" xml:space="preserve">Local Disk ({0})</x:String>
+  <x:String x:Key="Text.Video.Unavailable" xml:space="preserve">Hindi mapatugtog ang video na ito (walang natagpuang tugmang codec)</x:String>
+  <x:String x:Key="Text.Video.PlayPauseTip" xml:space="preserve">Patugtugin / i-pause (Space)</x:String>
+  <x:String x:Key="Text.Video.MuteTip" xml:space="preserve">I-mute</x:String>
+  <x:String x:Key="Text.Video.VolumeTip" xml:space="preserve">Lakas ng tunog</x:String>
+  <x:String x:Key="Text.Video.LoopTip" xml:space="preserve">Ulitin</x:String>
+  <x:String x:Key="Text.Video.RateTip" xml:space="preserve">Bilis ng pagpapatugtog</x:String>
+  <x:String x:Key="Text.Update.AvailableHeader" xml:space="preserve">May bagong bersyon na available</x:String>
+  <x:String x:Key="Text.Update.Checking" xml:space="preserve">Naghahanap ng update...</x:String>
+  <x:String x:Key="Text.Update.DownloadAndInstall" xml:space="preserve">I-download at i-install</x:String>
+  <x:String x:Key="Text.Update.ErrorHeader" xml:space="preserve">Hindi makapaghanap ng update</x:String>
+  <x:String x:Key="Text.Update.IgnoreThisVersion" xml:space="preserve">Laktawan ang bersyong ito</x:String>
+  <x:String x:Key="Text.Update.Title" xml:space="preserve">Update ng software</x:String>
+  <x:String x:Key="Text.Update.UpToDate" xml:space="preserve">Nasa pinakabagong bersyon ka na</x:String>
+  <x:String x:Key="Text.View.Compact" xml:space="preserve">Compact view</x:String>
+  <x:String x:Key="Text.View.Details" xml:space="preserve">Mga detalye</x:String>
+  <x:String x:Key="Text.View.ExtraLarge" xml:space="preserve">Sobrang laking icon</x:String>
+  <x:String x:Key="Text.View.FileExtensions" xml:space="preserve">Mga extension ng file</x:String>
+  <x:String x:Key="Text.View.HiddenFiles" xml:space="preserve">Mga nakatagong item</x:String>
+  <x:String x:Key="Text.View.ItemCheckBoxes" xml:space="preserve">Mga check box ng item</x:String>
+  <x:String x:Key="Text.View.Large" xml:space="preserve">Malalaking icon</x:String>
+  <x:String x:Key="Text.View.List" xml:space="preserve">Listahan</x:String>
+  <x:String x:Key="Text.View.Medium" xml:space="preserve">Katamtamang icon</x:String>
+  <x:String x:Key="Text.View.NavigationPane" xml:space="preserve">Navigation pane</x:String>
+  <x:String x:Key="Text.View.PreviewPane" xml:space="preserve">Preview pane</x:String>
+  <x:String x:Key="Text.View.Small" xml:space="preserve">Maliliit na icon</x:String>
+  <x:String x:Key="Text.View.StatusBar" xml:space="preserve">Status bar</x:String>
+</ResourceDictionary>

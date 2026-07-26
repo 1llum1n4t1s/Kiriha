@@ -1,0 +1,353 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:String x:Key="Text.A11y.OpenSubfolders" xml:space="preserve">उपसञ्चिकाकोष्ठान् दर्शय</x:String>
+  <x:String x:Key="Text.A11y.ResizeVerticalTabs" xml:space="preserve">ऊर्ध्वपत्रपट्टिकायाः विस्तारं परिवर्तय</x:String>
+  <x:String x:Key="Text.A11y.SwitchToTree" xml:space="preserve">वृक्षदृश्यं प्रति गच्छ</x:String>
+  <x:String x:Key="Text.A11y.ToggleSidebar" xml:space="preserve">पार्श्वपट्टिकां दर्शय वा गोपय</x:String>
+  <x:String x:Key="Text.A11y.VerticalTabs" xml:space="preserve">ऊर्ध्वपत्राणि</x:String>
+  <x:String x:Key="Text.Address.Copy" xml:space="preserve">पदवीं प्रतिलिख</x:String>
+  <x:String x:Key="Text.Address.Edit" xml:space="preserve">पदवीं सम्पादय</x:String>
+  <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">वर्तमानं सञ्चिकाकोष्ठं योजय</x:String>
+  <x:String x:Key="Text.Bookmarks.AddFolderMenu" xml:space="preserve">सञ्चिकाकोष्ठं योजय...</x:String>
+  <x:String x:Key="Text.Bookmarks.AddFolderTitle" xml:space="preserve">सञ्चिकाकोष्ठं योजय</x:String>
+  <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">चिह्नेषु योजयितुम् अत्र सञ्चिकाकोष्ठम् आकर्षय</x:String>
+  <x:String x:Key="Text.Bookmarks.Hide" xml:space="preserve">चिह्नपट्टिकां गोपय</x:String>
+  <x:String x:Key="Text.Bookmarks.NewFolderName" xml:space="preserve">नवीनं सञ्चिकाकोष्ठम्</x:String>
+  <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">नाम परिवर्तय...</x:String>
+  <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">चिह्नस्य नाम परिवर्तय</x:String>
+  <x:String x:Key="Text.Bookmarks.SortByName" xml:space="preserve">नाम्ना क्रमय</x:String>
+  <x:String x:Key="Text.Bookmarks.SortByPath" xml:space="preserve">मार्गेण क्रमय</x:String>
+  <x:String x:Key="Text.Caption.MaximizeRestore" xml:space="preserve">विस्तारय वा पुनःस्थापय</x:String>
+  <x:String x:Key="Text.Caption.Minimize" xml:space="preserve">संकोचय</x:String>
+  <x:String x:Key="Text.Clipboard.Copied" xml:space="preserve">{0} वस्तूनि प्रतिलिखितानि</x:String>
+  <x:String x:Key="Text.Clipboard.CopiedToClipboard" xml:space="preserve">फलकं प्रति प्रतिलिखितम्</x:String>
+  <x:String x:Key="Text.Clipboard.CopyFailed" xml:space="preserve">फलकं प्रति प्रतिलेखनं न शक्यते</x:String>
+  <x:String x:Key="Text.Clipboard.Cut" xml:space="preserve">{0} वस्तूनि छिन्नानि</x:String>
+  <x:String x:Key="Text.Clipboard.VirtualPasteFailed" xml:space="preserve">आभासी सञ्चिका न लेपयितुं शक्यते</x:String>
+  <x:String x:Key="Text.Clipboard.WriteFailed" xml:space="preserve">फलके लेखनं न शक्यते</x:String>
+  <x:String x:Key="Text.Column.AutoFitAll" xml:space="preserve">सर्वेषां स्तम्भानां विस्तारं स्वयं समायोजय</x:String>
+  <x:String x:Key="Text.Column.AutoFitThis" xml:space="preserve">अस्य स्तम्भस्य विस्तारं स्वयं समायोजय</x:String>
+  <x:String x:Key="Text.Column.Created" xml:space="preserve">रचनादिनाङ्कः</x:String>
+  <x:String x:Key="Text.Column.Modified" xml:space="preserve">परिवर्तनदिनाङ्कः</x:String>
+  <x:String x:Key="Text.Column.Name" xml:space="preserve">नाम</x:String>
+  <x:String x:Key="Text.Column.Size" xml:space="preserve">परिमाणम्</x:String>
+  <x:String x:Key="Text.Column.Type" xml:space="preserve">प्रकारः</x:String>
+  <x:String x:Key="Text.Command.CopyTip" xml:space="preserve">प्रतिलिख (Ctrl+C)</x:String>
+  <x:String x:Key="Text.Command.Cut" xml:space="preserve">छिन्धि</x:String>
+  <x:String x:Key="Text.Command.CutTip" xml:space="preserve">छिन्धि (Ctrl+X)</x:String>
+  <x:String x:Key="Text.Command.DeleteTip" xml:space="preserve">अपनय (Delete)</x:String>
+  <x:String x:Key="Text.Command.More" xml:space="preserve">अधिकं पश्य</x:String>
+  <x:String x:Key="Text.Command.NewFolder" xml:space="preserve">नवीनं सञ्चिकाकोष्ठम्</x:String>
+  <x:String x:Key="Text.Command.Options" xml:space="preserve">विकल्पाः</x:String>
+  <x:String x:Key="Text.Command.Paste" xml:space="preserve">लेपय</x:String>
+  <x:String x:Key="Text.Command.PasteTip" xml:space="preserve">लेपय (Ctrl+V)</x:String>
+  <x:String x:Key="Text.Command.Rename" xml:space="preserve">नाम परिवर्तय</x:String>
+  <x:String x:Key="Text.Command.RenameTip" xml:space="preserve">नाम परिवर्तय (F2)</x:String>
+  <x:String x:Key="Text.Command.Share" xml:space="preserve">विभाजय</x:String>
+  <x:String x:Key="Text.Command.SidebarTip" xml:space="preserve">पार्श्वपट्टिकां दर्शय/गोपय (शीघ्रप्रवेशः / वृक्षः)</x:String>
+  <x:String x:Key="Text.Command.Sort" xml:space="preserve">क्रमय</x:String>
+  <x:String x:Key="Text.Command.View" xml:space="preserve">दृश्यम्</x:String>
+  <x:String x:Key="Text.Common.AddToBookmarks" xml:space="preserve">चिह्नेषु योजय</x:String>
+  <x:String x:Key="Text.Common.Cancel" xml:space="preserve">निरस्यताम्</x:String>
+  <x:String x:Key="Text.Common.Close" xml:space="preserve">पिधेहि</x:String>
+  <x:String x:Key="Text.Common.Copy" xml:space="preserve">प्रतिलिख</x:String>
+  <x:String x:Key="Text.Common.CopyPath" xml:space="preserve">मार्गं प्रतिलिख</x:String>
+  <x:String x:Key="Text.Common.Delete" xml:space="preserve">अपनय</x:String>
+  <x:String x:Key="Text.Common.Open" xml:space="preserve">उद्घाटय</x:String>
+  <x:String x:Key="Text.Common.OpenInExplorer" xml:space="preserve">सञ्चिकादर्शके उद्घाटय</x:String>
+  <x:String x:Key="Text.Common.OpenInNewTab" xml:space="preserve">नवीने पत्रे उद्घाटय</x:String>
+  <x:String x:Key="Text.Common.OpenInTerminal" xml:space="preserve">आदेशपटले उद्घाटय</x:String>
+  <x:String x:Key="Text.Common.PinToQuickAccess" xml:space="preserve">शीघ्रप्रवेशे स्थापय</x:String>
+  <x:String x:Key="Text.Common.Properties" xml:space="preserve">गुणधर्माः</x:String>
+  <x:String x:Key="Text.Common.UnpinFromQuickAccess" xml:space="preserve">शीघ्रप्रवेशात् अपनय</x:String>
+  <x:String x:Key="Text.Drag.Add" xml:space="preserve">योजय</x:String>
+  <x:String x:Key="Text.Drag.Copy" xml:space="preserve">प्रतिलेखनम्</x:String>
+  <x:String x:Key="Text.Drag.Dragging" xml:space="preserve">आकर्षणम्</x:String>
+  <x:String x:Key="Text.Drag.File" xml:space="preserve">सञ्चिका</x:String>
+  <x:String x:Key="Text.Drag.Folder" xml:space="preserve">सञ्चिकाकोष्ठम्</x:String>
+  <x:String x:Key="Text.Drag.Move" xml:space="preserve">स्थानान्तरणम्</x:String>
+  <x:String x:Key="Text.Drag.OpenInTab" xml:space="preserve">पत्रे उद्घाटय</x:String>
+  <x:String x:Key="Text.Drive.FreeOfTotal" xml:space="preserve">{1} इत्यस्मात् {0} रिक्तम्</x:String>
+  <x:String x:Key="Text.Error.AccessDenied" xml:space="preserve">प्रवेशः निषिद्धः</x:String>
+  <x:String x:Key="Text.Error.Code" xml:space="preserve">दोषः {0}</x:String>
+  <x:String x:Key="Text.Error.CodeWithDesc" xml:space="preserve">दोषः {0}: {1}</x:String>
+  <x:String x:Key="Text.Error.DiskFull" xml:space="preserve">चक्रे पर्याप्तम् अवकाशः नास्ति</x:String>
+  <x:String x:Key="Text.Error.FileExists" xml:space="preserve">समाननाम्नी सञ्चिका पूर्वमेव विद्यते</x:String>
+  <x:String x:Key="Text.Error.InvalidName" xml:space="preserve">सञ्चिकानाम्नि अयोग्याः अक्षराः सन्ति</x:String>
+  <x:String x:Key="Text.Error.PathNotFound" xml:space="preserve">मार्गः न प्राप्तः</x:String>
+  <x:String x:Key="Text.Error.PathTooLong" xml:space="preserve">मार्गः अतिदीर्घः</x:String>
+  <x:String x:Key="Text.Error.SharingViolation" xml:space="preserve">अन्या प्रक्रिया सञ्चिकां प्रयुङ्क्ते</x:String>
+  <x:String x:Key="Text.Error.WriteProtected" xml:space="preserve">माध्यमं लेखनात् रक्षितम्</x:String>
+  <x:String x:Key="Text.Exif.Camera" xml:space="preserve">छायाग्राहकः</x:String>
+  <x:String x:Key="Text.Exif.CameraMaker" xml:space="preserve">छायाग्राहकनिर्माता</x:String>
+  <x:String x:Key="Text.Exif.DateModified" xml:space="preserve">परिवर्तनदिनाङ्कः</x:String>
+  <x:String x:Key="Text.Exif.DateTaken" xml:space="preserve">ग्रहणदिनाङ्कः</x:String>
+  <x:String x:Key="Text.Exif.Dimensions" xml:space="preserve">आयामाः</x:String>
+  <x:String x:Key="Text.Exif.ExposureBias" xml:space="preserve">प्रकाशसंशोधनम्</x:String>
+  <x:String x:Key="Text.Exif.ExposureTime" xml:space="preserve">प्रकाशकालः</x:String>
+  <x:String x:Key="Text.Exif.FNumber" xml:space="preserve">F-मूल्यम्</x:String>
+  <x:String x:Key="Text.Exif.Flash" xml:space="preserve">विद्युद्दीपः</x:String>
+  <x:String x:Key="Text.Exif.FocalLength" xml:space="preserve">केन्द्रदूरम्</x:String>
+  <x:String x:Key="Text.Exif.Iso" xml:space="preserve">ISO संवेदनशीलता</x:String>
+  <x:String x:Key="Text.Exif.Lens" xml:space="preserve">भिङ्गः</x:String>
+  <x:String x:Key="Text.Exif.Size" xml:space="preserve">परिमाणम्</x:String>
+  <x:String x:Key="Text.Exif.Type" xml:space="preserve">प्रकारः</x:String>
+  <x:String x:Key="Text.FileList.EmptyFolder" xml:space="preserve">इदं सञ्चिकाकोष्ठं रिक्तम् अस्ति।</x:String>
+  <x:String x:Key="Text.Folder.Desktop" xml:space="preserve">पटलम्</x:String>
+  <x:String x:Key="Text.Folder.Documents" xml:space="preserve">लेखपत्राणि</x:String>
+  <x:String x:Key="Text.Folder.Downloads" xml:space="preserve">अवतारणानि</x:String>
+  <x:String x:Key="Text.Folder.Music" xml:space="preserve">सङ्गीतम्</x:String>
+  <x:String x:Key="Text.Folder.Pictures" xml:space="preserve">चित्राणि</x:String>
+  <x:String x:Key="Text.Folder.Videos" xml:space="preserve">चलच्चित्राणि</x:String>
+  <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">चित्रशालायाः निर्गच्छ (Esc)</x:String>
+  <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">चित्रविवरणम्</x:String>
+  <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">अस्य चित्रस्य विवरणं नास्ति।</x:String>
+  <x:String x:Key="Text.Integration.OpenWithKiriha" xml:space="preserve">Kiriha द्वारा उद्घाटय</x:String>
+  <x:String x:Key="Text.Launch.ExplorerFailed" xml:space="preserve">सञ्चिकादर्शकः न आरब्धः: {0}</x:String>
+  <x:String x:Key="Text.Launch.Failed" xml:space="preserve">आरम्भः न शक्यते: {0}</x:String>
+  <x:String x:Key="Text.Launch.TerminalFailed" xml:space="preserve">आदेशपटलं न आरब्धम्: {0}</x:String>
+  <x:String x:Key="Text.License.Activate" xml:space="preserve">सक्रियं कुरु</x:String>
+  <x:String x:Key="Text.License.Exit" xml:space="preserve">निर्गच्छ</x:String>
+  <x:String x:Key="Text.License.KeyPlaceholder" xml:space="preserve">KIRIHA- इत्यनेन आरभमाणा अनुज्ञाकुञ्चिका</x:String>
+  <x:String x:Key="Text.License.Lock.OnlineCheckBody" xml:space="preserve">त्रिंशद्दिनेभ्यः अधिकं यावत् अनुज्ञापत्रं जालमाध्यमेन न परीक्षितम्। अन्तर्जालेन संयोज्य “पुनः जालमाध्यमेन परीक्षय” इति नुद।</x:String>
+  <x:String x:Key="Text.License.Lock.OnlineCheckTitle" xml:space="preserve">अनुज्ञापत्रस्य जालपरीक्षा आवश्यका</x:String>
+  <x:String x:Key="Text.License.Lock.TrialExpiredBody" xml:space="preserve">Kiriha इत्यस्य उपयोगाय सक्रियम् अनुज्ञापत्रम् आवश्यकम् (¥980, एकवारक्रयः)।</x:String>
+  <x:String x:Key="Text.License.Lock.TrialExpiredTitle" xml:space="preserve">परीक्षाकालः समाप्तः</x:String>
+  <x:String x:Key="Text.License.Msg.Activated" xml:space="preserve">अनुज्ञापत्रं सक्रियं जातम् 🎉 बहु धन्यवादाः!</x:String>
+  <x:String x:Key="Text.License.Msg.CheckOk" xml:space="preserve">परीक्षा समाप्ता। Kiriha इत्यस्य उपयोगाय धन्यवादाः!</x:String>
+  <x:String x:Key="Text.License.Msg.Checking" xml:space="preserve">जालमाध्यमेन परीक्ष्यते…</x:String>
+  <x:String x:Key="Text.License.Msg.EnterKey" xml:space="preserve">क्रयकाले दत्तां अनुज्ञाकुञ्चिकां प्रविशय।</x:String>
+  <x:String x:Key="Text.License.Msg.InvalidKey" xml:space="preserve">इयम् अनुज्ञाकुञ्चिका न सम्यक्। प्रतिलेखनकाले किमपि अक्षरं लुप्तं वा अधिकम् अवकाशः आगतः इति पश्य।</x:String>
+  <x:String x:Key="Text.License.Msg.PurchaseFailed" xml:space="preserve">क्रयपृष्ठं न उद्घाटितम्। कञ्चित्कालं यावत् प्रतीक्ष्य पुनः प्रयत्नं कुरु।</x:String>
+  <x:String x:Key="Text.License.Msg.PurchaseOpened" xml:space="preserve">जालदर्शके क्रयपृष्ठम् उद्घाटितम्। पुष्टिपृष्ठे दृश्यमानाम् अनुज्ञाकुञ्चिकाम् उपरि लेपय।</x:String>
+  <x:String x:Key="Text.License.Msg.Revoked" xml:space="preserve">इदम् अनुज्ञापत्रं न वैधम् (यथा धनप्रत्यर्पणम्)। पुनः क्रीणीहि।</x:String>
+  <x:String x:Key="Text.License.Msg.ServerUnreachable" xml:space="preserve">सेवकः न प्राप्तः। जालसंयोगं परीक्ष्य पुनः प्रयत्नं कुरु।</x:String>
+  <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">क्रयपृष्ठम् उद्घाटय (¥980, एकवारम्)</x:String>
+  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">क्रयानन्तरं मूल्यपुष्टिपृष्ठे अनुज्ञाकुञ्चिका दृश्यते। लेखा वा गुप्तशब्दः न आवश्यकः।</x:String>
+  <x:String x:Key="Text.License.Recheck" xml:space="preserve">पुनः जालमाध्यमेन परीक्षय</x:String>
+  <x:String x:Key="Text.License.Status.Licensed" xml:space="preserve">अनुज्ञापत्रं सक्रियम्: {0}</x:String>
+  <x:String x:Key="Text.License.Status.OnlineCheck" xml:space="preserve">अनुज्ञापत्रस्य जालपरीक्षा आवश्यका (अन्तर्जालेन संयोजय)</x:String>
+  <x:String x:Key="Text.License.Status.Trial" xml:space="preserve">परीक्षाकालः (शिष्टाः {0} दिनानि)</x:String>
+  <x:String x:Key="Text.License.Status.TrialExpired" xml:space="preserve">परीक्षा समाप्ता (अनुज्ञापत्रम् आवश्यकम्)</x:String>
+  <x:String x:Key="Text.Menu.About" xml:space="preserve">Kiriha विषये</x:String>
+  <x:String x:Key="Text.Menu.AccessDenied" xml:space="preserve">(प्रवेशः न शक्यते)</x:String>
+  <x:String x:Key="Text.Menu.BookmarksBar" xml:space="preserve">चिह्नपट्टिका</x:String>
+  <x:String x:Key="Text.Menu.CheckUpdate" xml:space="preserve">नवीकरणं परीक्षय</x:String>
+  <x:String x:Key="Text.Menu.Empty" xml:space="preserve">(रिक्तम्)</x:String>
+  <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">नवीनं गवाक्षम्</x:String>
+  <x:String x:Key="Text.Menu.NoSubfolders" xml:space="preserve">(उपसञ्चिकाकोष्ठानि न सन्ति)</x:String>
+  <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(किमपि नास्ति)</x:String>
+  <x:String x:Key="Text.Nav.Back" xml:space="preserve">पश्चात्</x:String>
+  <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">पश्चात् (इतिहासाय दक्षिणनुदनम्)</x:String>
+  <x:String x:Key="Text.Nav.EditPathTip" xml:space="preserve">मार्गं सम्पादयितुं नुद</x:String>
+  <x:String x:Key="Text.Nav.Forward" xml:space="preserve">अग्रे</x:String>
+  <x:String x:Key="Text.Nav.ForwardTip" xml:space="preserve">अग्रे (इतिहासाय दक्षिणनुदनम्)</x:String>
+  <x:String x:Key="Text.Nav.Home" xml:space="preserve">गृहम्</x:String>
+  <x:String x:Key="Text.Nav.HomeTip" xml:space="preserve">गृहम् (Alt+Home / प्रायःप्रयुक्तकोष्ठेभ्यः दक्षिणनुदनम्)</x:String>
+  <x:String x:Key="Text.Nav.OpenFailed" xml:space="preserve">उद्घाटनं न शक्यते: {0}</x:String>
+  <x:String x:Key="Text.Nav.OpenSettings" xml:space="preserve">विन्यासान् उद्घाटय</x:String>
+  <x:String x:Key="Text.Nav.Refresh" xml:space="preserve">नवीकुरु</x:String>
+  <x:String x:Key="Text.Nav.Settings" xml:space="preserve">विन्यासाः</x:String>
+  <x:String x:Key="Text.Nav.UpFolder" xml:space="preserve">एकं स्तरम् ऊर्ध्वम्</x:String>
+  <x:String x:Key="Text.Nav.UpTip" xml:space="preserve">एकं स्तरम् ऊर्ध्वम् (पितृकोष्ठेभ्यः दक्षिणनुदनम्)</x:String>
+  <x:String x:Key="Text.New.CreateFailed" xml:space="preserve">रचना न शक्यते: {0}</x:String>
+  <x:String x:Key="Text.New.FolderName" xml:space="preserve">नवीनं सञ्चिकाकोष्ठम्</x:String>
+  <x:String x:Key="Text.New.ItemName" xml:space="preserve">नवीनं {0}</x:String>
+  <x:String x:Key="Text.New.UndoFailed" xml:space="preserve">नवीनकोष्ठरचनायाः निवर्तनं न शक्यते: {0}</x:String>
+  <x:String x:Key="Text.Op.Copied" xml:space="preserve">{0} वस्तूनि प्रतिलिखितानि</x:String>
+  <x:String x:Key="Text.Op.DeleteFailed" xml:space="preserve">अपनयनं विफलम् ({0})</x:String>
+  <x:String x:Key="Text.Op.Failed" xml:space="preserve">सञ्चिकाकर्म विफलम् ({0})</x:String>
+  <x:String x:Key="Text.Op.Moved" xml:space="preserve">{0} वस्तूनि स्थानान्तरितानि</x:String>
+  <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">लेपनं विफलम् ({0})</x:String>
+  <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">नामपरिवर्तनं विफलम् ({0})</x:String>
+  <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">{0} सञ्चिकाः  {1}</x:String>
+  <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> तदधिकम्</x:String>
+  <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">पुनश्चक्रपेटिकां रिक्तां कुरु</x:String>
+  <x:String x:Key="Text.Rename.AlreadyExists" xml:space="preserve">तन्नाम्नी सञ्चिका वा कोष्ठं पूर्वमेव विद्यते: {0}</x:String>
+  <x:String x:Key="Text.Rename.InvalidChars" xml:space="preserve">सञ्चिकानाम्नि अयोग्याः अक्षराः सन्ति: \ / : * ? " &lt; &gt; |</x:String>
+  <x:String x:Key="Text.Rename.RevertedToOriginal" xml:space="preserve">नामपरिवर्तनं विफलम्, अतः मूलनाम पुनःस्थापितम्</x:String>
+  <x:String x:Key="Text.Rename.StuckAsTemporary" xml:space="preserve">नामपरिवर्तनं विफलम्, तात्कालिकं नाम एव अवशिष्टम्: {0}</x:String>
+  <x:String x:Key="Text.Search.ClearTip" xml:space="preserve">अन्वेषणं मार्जय</x:String>
+  <x:String x:Key="Text.Search.Failed" xml:space="preserve">अन्वेषणं विफलम्: {0}</x:String>
+  <x:String x:Key="Text.Search.Found" xml:space="preserve">{0} फलानि प्राप्तानि (उपकोष्ठैः सह)</x:String>
+  <x:String x:Key="Text.Search.Placeholder" xml:space="preserve">{0} इत्यत्र अन्विष्य</x:String>
+  <x:String x:Key="Text.Search.Searching" xml:space="preserve">अन्विष्यते... (उपकोष्ठैः सह)</x:String>
+  <x:String x:Key="Text.Search.Truncated" xml:space="preserve">{0} फलेषु स्थगितम् (सहस्रसीमा प्राप्ता, केचन उपकोष्ठाः न परीक्षिताः; अधिकं द्रष्टुं अन्वेषणं संकोचय)</x:String>
+  <x:String x:Key="Text.Select.All" xml:space="preserve">सर्वं चिनु</x:String>
+  <x:String x:Key="Text.Select.FilesOnly" xml:space="preserve">केवलं सञ्चिकाः चिनु</x:String>
+  <x:String x:Key="Text.Select.FoldersOnly" xml:space="preserve">केवलं कोष्ठानि चिनु</x:String>
+  <x:String x:Key="Text.Select.Invert" xml:space="preserve">चयनं विपर्यस्य</x:String>
+  <x:String x:Key="Text.Select.None" xml:space="preserve">चयनं मुञ्च</x:String>
+  <x:String x:Key="Text.Settings.About" xml:space="preserve">Kiriha विषये</x:String>
+  <x:String x:Key="Text.Settings.About.Body" xml:space="preserve">Kiriha इत्येतत् Windows सञ्चिकादर्शकस्य सञ्चिकाकर्म, Chrome इत्यस्य पत्राणि, पदवीपट्टिका, चिह्नानि च एकस्मिन् गवाक्षे संयोजयति। विन्यासाः वर्तमानप्रयोक्तुः कृते रक्ष्यन्ते।</x:String>
+  <x:String x:Key="Text.Settings.Acrylic" xml:space="preserve">गवाक्षे आक्रिलिकप्रभावं (अर्धपारदर्शकं मन्दीकरणम्) प्रयुङ्क्ष्व</x:String>
+  <x:String x:Key="Text.Settings.DefaultFolderApp" xml:space="preserve">कोष्ठानां चालकानां च उद्घाटनाय Kiriha इत्येतत् प्रामाणिकम् अनुप्रयोगं कुरु</x:String>
+  <x:String x:Key="Text.Settings.DefaultFolderApp.Off" xml:space="preserve">सक्रिये सति, सञ्चिकादर्शकात् कोष्ठं वा चालकं उद्घाटयति चेत् Kiriha आरभते।</x:String>
+  <x:String x:Key="Text.Settings.DefaultFolderApp.On" xml:space="preserve">सम्प्रति कोष्ठानि चालकाश्च Kiriha इत्यत्र उद्घाट्यन्ते। निष्क्रिये सति पूर्वव्यवहारः पुनरागच्छति।</x:String>
+  <x:String x:Key="Text.Settings.Display" xml:space="preserve">दर्शनम्</x:String>
+  <x:String x:Key="Text.Settings.Display.Subtitle" xml:space="preserve">सञ्चिकासूच्याः दर्शनं Kiriha इत्यस्य रूपं च समायोजय</x:String>
+  <x:String x:Key="Text.Settings.Explorer" xml:space="preserve">सञ्चिकासूची</x:String>
+  <x:String x:Key="Text.Settings.ExplorerContextMenu" xml:space="preserve">सञ्चिकादर्शकस्य दक्षिणनुदनसूच्यां “Kiriha द्वारा उद्घाटय” इति योजय</x:String>
+  <x:String x:Key="Text.Settings.ExplorerContextMenuNote" xml:space="preserve">कोष्ठे तस्य अन्तः रिक्तस्थाने वा दक्षिणनुदनेन तत् कोष्ठं Kiriha इत्यत्र उद्घाटयितुं शक्यते।</x:String>
+  <x:String x:Key="Text.Settings.FolderTree" xml:space="preserve">कोष्ठवृक्षः</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Material" xml:space="preserve">Material Icon Theme</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Note" xml:space="preserve">Material Icon Theme इत्येतत् material-icon-theme (MIT अनुज्ञा, © Material Extensions) प्रयुङ्क्ते। Windows समूहः सञ्चिकादर्शकस्य एव Shell प्रतीकानि दर्शयति।</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Original" xml:space="preserve">Kiriha इत्यस्य मूलप्रतीकानि</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Windows" xml:space="preserve">Windows Shell प्रतीकानि</x:String>
+  <x:String x:Key="Text.Settings.Icons" xml:space="preserve">प्रतीकानि</x:String>
+  <x:String x:Key="Text.Settings.Language" xml:space="preserve">दर्शनभाषा</x:String>
+  <x:String x:Key="Text.Settings.Language.Note" xml:space="preserve">प्रामाणिकरूपेण Windows इत्यस्य दर्शनभाषातः स्वयं चीयते।</x:String>
+  <x:String x:Key="Text.Settings.License" xml:space="preserve">अनुज्ञापत्रम्</x:String>
+  <x:String x:Key="Text.Settings.Maintenance" xml:space="preserve">परिपालनम्</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.Data" xml:space="preserve">दत्तांशः संग्रहश्च</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.OpenLogFolder" xml:space="preserve">अभिलेखकोष्ठम् उद्घाटय</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.ReloadQuickAccess" xml:space="preserve">शीघ्रप्रवेशं पुनः आरोपय</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.ResetSettings" xml:space="preserve">विन्यासान् पुनःस्थापय</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.Subtitle" xml:space="preserve">संग्रहम्, अभिलेखान्, विन्यासदत्तांशं च परिपालय</x:String>
+  <x:String x:Key="Text.Settings.MinimizeToTray" xml:space="preserve">संकोचनकाले सूचनाक्षेत्रे स्थापय</x:String>
+  <x:String x:Key="Text.Settings.MinimizeToTrayNote" xml:space="preserve">संकोचिते सति Kiriha कार्यपट्टिकातः अन्तर्धीयते, सूचनाक्षेत्रस्य प्रतीकात् पुनःस्थापयितुं शक्यते।</x:String>
+  <x:String x:Key="Text.Settings.Mouse" xml:space="preserve">मूषकः</x:String>
+  <x:String x:Key="Text.Settings.Mouse.BackgroundDoubleClick" xml:space="preserve">कोष्ठस्य रिक्तस्थाने द्विनुदने सति</x:String>
+  <x:String x:Key="Text.Settings.Mouse.BackgroundMiddleClick" xml:space="preserve">कोष्ठस्य रिक्तस्थाने चक्रनुदने सति</x:String>
+  <x:String x:Key="Text.Settings.Mouse.CloseTab" xml:space="preserve">पत्रं पिधेहि</x:String>
+  <x:String x:Key="Text.Settings.Mouse.None" xml:space="preserve">किमपि न कुरु</x:String>
+  <x:String x:Key="Text.Settings.Mouse.Pin" xml:space="preserve">पत्रं स्थापय</x:String>
+  <x:String x:Key="Text.Settings.Mouse.Refresh" xml:space="preserve">नवीकुरु</x:String>
+  <x:String x:Key="Text.Settings.Mouse.TabDoubleClick" xml:space="preserve">पत्रे द्विनुदने सति</x:String>
+  <x:String x:Key="Text.Settings.Mouse.TabMiddleClick" xml:space="preserve">पत्रे चक्रनुदने सति</x:String>
+  <x:String x:Key="Text.Settings.Mouse.Up" xml:space="preserve">एकं स्तरम् ऊर्ध्वं गच्छ</x:String>
+  <x:String x:Key="Text.Settings.RunAtStartup" xml:space="preserve">Windows आरम्भे Kiriha चालय</x:String>
+  <x:String x:Key="Text.Settings.RunAtStartupNote" xml:space="preserve">प्रवेशकाले Kiriha स्वयम् आरभते।</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts" xml:space="preserve">कुञ्चिकासङ्केताः</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.FileOps" xml:space="preserve">सञ्चिकाकर्माणि</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.FileOpsBody" xml:space="preserve">Ctrl+X / C / V　छेदनम्, प्रतिलेखनम्, लेपनम्　　Delete / Shift+Delete　अपनयनम्, नित्यापनयनम्&#10;F2　नामपरिवर्तनम्　　Alt+Enter　गुणधर्माः　　Ctrl+Shift+N　नवीनं कोष्ठम्　　Alt+P　पूर्वदर्शनम्</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.Navigation" xml:space="preserve">सञ्चरणं दर्शनं च</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.NavigationBody" xml:space="preserve">Ctrl+L / F4　पदवीसम्पादनम्&#10;Ctrl+F / F3　अन्वेषणम्&#10;Alt+← / →　पश्चात् अग्रे च&#10;Alt+↑　एकं स्तरम् ऊर्ध्वम्&#10;F5　नवीकरणम् / F11　पूर्णपटलम्</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.Subtitle" xml:space="preserve">शीघ्रं कार्यं कर्तुं कुञ्चिकासङ्केतानां सूची</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.Tabs" xml:space="preserve">पत्राणि</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.TabsBody" xml:space="preserve">Ctrl+T　नवीनं पत्रम्&#10;Ctrl+W　पत्रं पिधेहि&#10;Ctrl+Shift+T　पिहितं पत्रं पुनः उद्घाटय&#10;Ctrl+Tab　पत्राणि परिवर्तय&#10;Ctrl+1..9　निर्दिष्टं पत्रं चिनु</x:String>
+  <x:String x:Key="Text.Settings.ShowBookmarksBar" xml:space="preserve">चिह्नपट्टिकां दर्शय (Ctrl+Shift+B)</x:String>
+  <x:String x:Key="Text.Settings.ShowCheckBoxes" xml:space="preserve">वस्तुचयनपेटिकाः दर्शय</x:String>
+  <x:String x:Key="Text.Settings.ShowExtensions" xml:space="preserve">सञ्चिकाविस्तारान् दर्शय</x:String>
+  <x:String x:Key="Text.Settings.ShowHidden" xml:space="preserve">गुप्ताः सञ्चिकाः दर्शय</x:String>
+  <x:String x:Key="Text.Settings.StartMinimizedToTray" xml:space="preserve">आरम्भे सूचनाक्षेत्रे स्थापय</x:String>
+  <x:String x:Key="Text.Settings.StartMinimizedToTrayNote" xml:space="preserve">आरम्भानन्तरं गवाक्षं न दर्शयित्वा सूचनाक्षेत्रे स्थापितम् एव आरभते।</x:String>
+  <x:String x:Key="Text.Settings.Startup" xml:space="preserve">आरम्भः</x:String>
+  <x:String x:Key="Text.Settings.Startup.Behavior" xml:space="preserve">आरम्भकाले व्यवहारः</x:String>
+  <x:String x:Key="Text.Settings.Startup.PathCaption" xml:space="preserve">नवीनपत्रेषु उद्घाट्यमानं कोष्ठम् (रिक्ते सति प्रयोक्तुः कोष्ठम्)</x:String>
+  <x:String x:Key="Text.Settings.Startup.RestoreTabs" xml:space="preserve">पिधाने उद्घाटितानि पत्राणि अग्रिमवारं पुनःस्थापय</x:String>
+  <x:String x:Key="Text.Settings.Startup.Subtitle" xml:space="preserve">आरम्भविधिम्, Windows संयोगम्, सूचनाक्षेत्रं च परिपालय</x:String>
+  <x:String x:Key="Text.Settings.Theme" xml:space="preserve">वर्णविन्यासः</x:String>
+  <x:String x:Key="Text.Settings.Theme.Dark" xml:space="preserve">तमः</x:String>
+  <x:String x:Key="Text.Settings.Theme.Light" xml:space="preserve">प्रकाशः</x:String>
+  <x:String x:Key="Text.Settings.Theme.System" xml:space="preserve">प्रणाली</x:String>
+  <x:String x:Key="Text.Settings.Tray" xml:space="preserve">सूचनाक्षेत्रम्</x:String>
+  <x:String x:Key="Text.Settings.TreeDragDisabled" xml:space="preserve">वृक्षात् आकर्षणं निवारय</x:String>
+  <x:String x:Key="Text.Settings.TreeDropDisabled" xml:space="preserve">वृक्षे स्थापनं निवारय</x:String>
+  <x:String x:Key="Text.Settings.Updates" xml:space="preserve">नवीकरणं विवरणं च</x:String>
+  <x:String x:Key="Text.Settings.Updates.CheckNow" xml:space="preserve">इदानीं नवीकरणं परीक्षय</x:String>
+  <x:String x:Key="Text.Settings.Updates.CheckOnStartup" xml:space="preserve">आरम्भे नवीकरणं परीक्षय</x:String>
+  <x:String x:Key="Text.Settings.Updates.Subtitle" xml:space="preserve">Kiriha इत्यस्य संस्करणं पश्य नवीकरणानि च परिपालय</x:String>
+  <x:String x:Key="Text.Settings.Updates.VersionCard" xml:space="preserve">संस्करणं नवीकरणं च</x:String>
+  <x:String x:Key="Text.Settings.Window" xml:space="preserve">गवाक्षम्</x:String>
+  <x:String x:Key="Text.Settings.Window.RememberBounds" xml:space="preserve">गवाक्षस्य परिमाणं स्थानं च स्मर</x:String>
+  <x:String x:Key="Text.Settings.Window.RememberBoundsNote" xml:space="preserve">निष्क्रिये सति अग्रिमवारं प्रामाणिकपरिमाणेन स्थानेन च आरभते।</x:String>
+  <x:String x:Key="Text.Settings.WindowsIntegration" xml:space="preserve">Windows संयोगः</x:String>
+  <x:String x:Key="Text.Share.FileCount" xml:space="preserve">{0} सञ्चिकाः</x:String>
+  <x:String x:Key="Text.Share.FoldersNotSupported" xml:space="preserve">कोष्ठानि विभाजयितुं न शक्यन्ते (सञ्चिकाः चिनु)</x:String>
+  <x:String x:Key="Text.Share.NoItems" xml:space="preserve">विभाजनाय किमपि नास्ति</x:String>
+  <x:String x:Key="Text.Share.OpenFailed" xml:space="preserve">विभाजनपटलं न उद्घाटितम्</x:String>
+  <x:String x:Key="Text.Share.PrepareFailed" xml:space="preserve">विभाजनदत्तांशः न सज्जीकृतः</x:String>
+  <x:String x:Key="Text.Share.SelectFiles" xml:space="preserve">विभाजयितुम् इष्टाः सञ्चिकाः चिनु</x:String>
+  <x:String x:Key="Text.Sidebar.Drives" xml:space="preserve">चालकाः</x:String>
+  <x:String x:Key="Text.Sidebar.QuickAccess" xml:space="preserve">शीघ्रप्रवेशः</x:String>
+  <x:String x:Key="Text.Sidebar.RecentFiles" xml:space="preserve">सद्यःप्रयुक्ताः सञ्चिकाः</x:String>
+  <x:String x:Key="Text.Sidebar.RecycleBin" xml:space="preserve">पुनश्चक्रपेटिका</x:String>
+  <x:String x:Key="Text.Sidebar.RecycleBinTip" xml:space="preserve">पुनश्चक्रपेटिकां सञ्चिकादर्शके उद्घाटय</x:String>
+  <x:String x:Key="Text.Sidebar.ToggleTip" xml:space="preserve">शीघ्रप्रवेशस्य कोष्ठवृक्षस्य च मध्ये परिवर्तयति</x:String>
+  <x:String x:Key="Text.Sidebar.TreeView" xml:space="preserve">वृक्षदृश्यम्</x:String>
+  <x:String x:Key="Text.Sort.Ascending" xml:space="preserve">आरोहक्रमः</x:String>
+  <x:String x:Key="Text.Sort.Descending" xml:space="preserve">अवरोहक्रमः</x:String>
+  <x:String x:Key="Text.Status.Breakdown" xml:space="preserve">({0} कोष्ठानि, {1} सञ्चिकाः)</x:String>
+  <x:String x:Key="Text.Status.ClearSelectionTip" xml:space="preserve">चयनं मोक्तुं नुद</x:String>
+  <x:String x:Key="Text.Status.DetailsViewTip" xml:space="preserve">विस्तृतदृश्यम्</x:String>
+  <x:String x:Key="Text.Status.FreeSpace" xml:space="preserve">रिक्तम् अवकाशः: {0}</x:String>
+  <x:String x:Key="Text.Status.IconSizeTip" xml:space="preserve">प्रतीकपरिमाणम्</x:String>
+  <x:String x:Key="Text.Status.ItemCount" xml:space="preserve">{0} वस्तूनि</x:String>
+  <x:String x:Key="Text.Status.ItemCountFiltered" xml:space="preserve">{0} वस्तूनि (अन्वेषणम्: {1})</x:String>
+  <x:String x:Key="Text.Status.ItemsSelected" xml:space="preserve">{0} वस्तूनि चितानि</x:String>
+  <x:String x:Key="Text.Status.LargeIconsTip" xml:space="preserve">बृहत्प्रतीकदृश्यम्</x:String>
+  <x:String x:Key="Text.Tab.Category" xml:space="preserve">पत्राणि</x:String>
+  <x:String x:Key="Text.Tab.Close" xml:space="preserve">पत्रं पिधेहि</x:String>
+  <x:String x:Key="Text.Tab.CloseBelow" xml:space="preserve">अधःस्थानि पत्राणि पिधेहि</x:String>
+  <x:String x:Key="Text.Tab.CloseOthers" xml:space="preserve">अन्यानि पत्राणि पिधेहि</x:String>
+  <x:String x:Key="Text.Tab.Duplicate" xml:space="preserve">पत्रं द्विगुणय</x:String>
+  <x:String x:Key="Text.Tab.MoreActions" xml:space="preserve">अधिकानि पत्रकर्माणि</x:String>
+  <x:String x:Key="Text.Tab.New" xml:space="preserve">नवीनं पत्रम्</x:String>
+  <x:String x:Key="Text.Tab.NewBelow" xml:space="preserve">अधः नवीनं पत्रम् उद्घाटय</x:String>
+  <x:String x:Key="Text.Tab.NewTip" xml:space="preserve">नवीनं पत्रम् (Ctrl+T)</x:String>
+  <x:String x:Key="Text.Tab.Pin" xml:space="preserve">पत्रं स्थापय</x:String>
+  <x:String x:Key="Text.Tab.Pinned" xml:space="preserve">स्थापितं पत्रम्</x:String>
+  <x:String x:Key="Text.Tab.RecentlyClosed" xml:space="preserve">सद्यः पिहितानि पत्राणि</x:String>
+  <x:String x:Key="Text.Tab.Reopen" xml:space="preserve">पिहितं पत्रं पुनः उद्घाटय</x:String>
+  <x:String x:Key="Text.Tab.Unpin" xml:space="preserve">पत्रस्थापनं मुञ्च</x:String>
+  <x:String x:Key="Text.TabAction.CloseDuplicates" xml:space="preserve">समानस्थानस्य द्विगुणपत्राणि पिधेहि</x:String>
+  <x:String x:Key="Text.TabAction.CloseLeft" xml:space="preserve">उपरिस्थानि पत्राणि पिधेहि</x:String>
+  <x:String x:Key="Text.TabAction.CloseUnpinned" xml:space="preserve">अस्थापितानि सर्वाणि पत्राणि पिधेहि</x:String>
+  <x:String x:Key="Text.TabAction.CopyAllPaths" xml:space="preserve">सर्वेषां पत्राणां मार्गान् प्रतिलिख</x:String>
+  <x:String x:Key="Text.TabAction.CopyMarkdown" xml:space="preserve">पत्रं Markdown सम्बन्धरूपेण प्रतिलिख</x:String>
+  <x:String x:Key="Text.TabAction.CopyTitle" xml:space="preserve">पत्रस्य नाम प्रतिलिख</x:String>
+  <x:String x:Key="Text.TabAction.CopyUri" xml:space="preserve">पत्रं file URI रूपेण प्रतिलिख</x:String>
+  <x:String x:Key="Text.TabAction.MoveFirst" xml:space="preserve">पत्रम् आदौ स्थापय</x:String>
+  <x:String x:Key="Text.TabAction.MoveLast" xml:space="preserve">पत्रम् अन्ते स्थापय</x:String>
+  <x:String x:Key="Text.TabAction.OpenParent" xml:space="preserve">पितृकोष्ठं नवीने पत्रे उद्घाटय</x:String>
+  <x:String x:Key="Text.TabAction.PinAll" xml:space="preserve">सर्वाणि पत्राणि स्थापय</x:String>
+  <x:String x:Key="Text.TabAction.PinLeft" xml:space="preserve">उपरिस्थानि पत्राणि स्थापय</x:String>
+  <x:String x:Key="Text.TabAction.PinRight" xml:space="preserve">अधःस्थानि पत्राणि स्थापय</x:String>
+  <x:String x:Key="Text.TabAction.ReloadAll" xml:space="preserve">सर्वाणि पत्राणि पुनः आरोपय</x:String>
+  <x:String x:Key="Text.TabAction.ReloadLeft" xml:space="preserve">उपरिस्थानि पत्राणि पुनः आरोपय</x:String>
+  <x:String x:Key="Text.TabAction.ReloadRight" xml:space="preserve">अधःस्थानि पत्राणि पुनः आरोपय</x:String>
+  <x:String x:Key="Text.TabAction.Reverse" xml:space="preserve">पत्रक्रमं विपर्यस्य</x:String>
+  <x:String x:Key="Text.TabAction.SortByName" xml:space="preserve">पत्राणि नाम्ना क्रमय</x:String>
+  <x:String x:Key="Text.TabAction.SortByPath" xml:space="preserve">पत्राणि मार्गेण क्रमय</x:String>
+  <x:String x:Key="Text.TabAction.UnpinAll" xml:space="preserve">सर्वेषां पत्राणां स्थापनं मुञ्च</x:String>
+  <x:String x:Key="Text.Toast.PathCopied" xml:space="preserve">मार्गः प्रतिलिखितः: {0}</x:String>
+  <x:String x:Key="Text.Tooltip.Modified" xml:space="preserve">परिवर्तनदिनाङ्कः: {0}</x:String>
+  <x:String x:Key="Text.Tooltip.Size" xml:space="preserve">परिमाणम्: {0}</x:String>
+  <x:String x:Key="Text.Tooltip.Type" xml:space="preserve">प्रकारः: {0}</x:String>
+  <x:String x:Key="Text.Tray.Exit" xml:space="preserve">निर्गमः</x:String>
+  <x:String x:Key="Text.Tray.Open" xml:space="preserve">Kiriha उद्घाटय</x:String>
+  <x:String x:Key="Text.Tree.Loading" xml:space="preserve">आरोप्यते...</x:String>
+  <x:String x:Key="Text.Tree.MyComputer" xml:space="preserve">मम गणकः</x:String>
+  <x:String x:Key="Text.Tree.MyDocuments" xml:space="preserve">मम लेखपत्राणि</x:String>
+  <x:String x:Key="Text.Type.ExtFile" xml:space="preserve">{0} सञ्चिका</x:String>
+  <x:String x:Key="Text.Type.File" xml:space="preserve">सञ्चिका</x:String>
+  <x:String x:Key="Text.Type.FileFolder" xml:space="preserve">सञ्चिकाकोष्ठम्</x:String>
+  <x:String x:Key="Text.Type.LocalDisk" xml:space="preserve">स्थानीयं चक्रम्</x:String>
+  <x:String x:Key="Text.Type.LocalDiskFormat" xml:space="preserve">स्थानीयं चक्रम् ({0})</x:String>
+  <x:String x:Key="Text.Video.Unavailable" xml:space="preserve">इदं चलच्चित्रं न चालयितुं शक्यते (उपयुक्तः कोडेकः न प्राप्तः)</x:String>
+  <x:String x:Key="Text.Video.PlayPauseTip" xml:space="preserve">चालय / विरमय (Space)</x:String>
+  <x:String x:Key="Text.Video.MuteTip" xml:space="preserve">निःशब्दम्</x:String>
+  <x:String x:Key="Text.Video.VolumeTip" xml:space="preserve">ध्वनिमानम्</x:String>
+  <x:String x:Key="Text.Video.LoopTip" xml:space="preserve">पुनरावृत्तिः</x:String>
+  <x:String x:Key="Text.Video.RateTip" xml:space="preserve">चालनवेगः</x:String>
+  <x:String x:Key="Text.Update.AvailableHeader" xml:space="preserve">नवीनं संस्करणं लभ्यते</x:String>
+  <x:String x:Key="Text.Update.Checking" xml:space="preserve">नवीकरणं परीक्ष्यते...</x:String>
+  <x:String x:Key="Text.Update.DownloadAndInstall" xml:space="preserve">अवतारय संस्थापय च</x:String>
+  <x:String x:Key="Text.Update.ErrorHeader" xml:space="preserve">नवीकरणपरीक्षा विफला</x:String>
+  <x:String x:Key="Text.Update.IgnoreThisVersion" xml:space="preserve">इदं संस्करणं त्यज</x:String>
+  <x:String x:Key="Text.Update.Title" xml:space="preserve">क्रमादेशनवीकरणम्</x:String>
+  <x:String x:Key="Text.Update.UpToDate" xml:space="preserve">भवतः संस्करणम् नवीनतमम् अस्ति</x:String>
+  <x:String x:Key="Text.View.Compact" xml:space="preserve">संक्षिप्तदृश्यम्</x:String>
+  <x:String x:Key="Text.View.Details" xml:space="preserve">विस्तारः</x:String>
+  <x:String x:Key="Text.View.ExtraLarge" xml:space="preserve">अतिबृहत्प्रतीकानि</x:String>
+  <x:String x:Key="Text.View.FileExtensions" xml:space="preserve">सञ्चिकाविस्ताराः</x:String>
+  <x:String x:Key="Text.View.HiddenFiles" xml:space="preserve">गुप्तानि वस्तूनि</x:String>
+  <x:String x:Key="Text.View.ItemCheckBoxes" xml:space="preserve">वस्तुचयनपेटिकाः</x:String>
+  <x:String x:Key="Text.View.Large" xml:space="preserve">बृहत्प्रतीकानि</x:String>
+  <x:String x:Key="Text.View.List" xml:space="preserve">सूची</x:String>
+  <x:String x:Key="Text.View.Medium" xml:space="preserve">मध्यमप्रतीकानि</x:String>
+  <x:String x:Key="Text.View.NavigationPane" xml:space="preserve">सञ्चरणपटलम्</x:String>
+  <x:String x:Key="Text.View.PreviewPane" xml:space="preserve">पूर्वदर्शनपटलम्</x:String>
+  <x:String x:Key="Text.View.Small" xml:space="preserve">लघुप्रतीकानि</x:String>
+  <x:String x:Key="Text.View.StatusBar" xml:space="preserve">स्थितिपट्टिका</x:String>
+</ResourceDictionary>

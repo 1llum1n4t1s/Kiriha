@@ -1,0 +1,353 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:String x:Key="Text.A11y.OpenSubfolders" xml:space="preserve">துணைக் கோப்புறைகளைக் காட்டு</x:String>
+  <x:String x:Key="Text.A11y.ResizeVerticalTabs" xml:space="preserve">செங்குத்து தாவல் பட்டையின் அகலத்தை மாற்று</x:String>
+  <x:String x:Key="Text.A11y.SwitchToTree" xml:space="preserve">மரக் காட்சிக்கு மாறு</x:String>
+  <x:String x:Key="Text.A11y.ToggleSidebar" xml:space="preserve">பக்கப்பட்டியைக் காட்டு அல்லது மறை</x:String>
+  <x:String x:Key="Text.A11y.VerticalTabs" xml:space="preserve">செங்குத்து தாவல்கள்</x:String>
+  <x:String x:Key="Text.Address.Copy" xml:space="preserve">முகவரியை நகலெடு</x:String>
+  <x:String x:Key="Text.Address.Edit" xml:space="preserve">முகவரியைத் திருத்து</x:String>
+  <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">தற்போதைய கோப்புறையைச் சேர்</x:String>
+  <x:String x:Key="Text.Bookmarks.AddFolderMenu" xml:space="preserve">கோப்புறையைச் சேர்...</x:String>
+  <x:String x:Key="Text.Bookmarks.AddFolderTitle" xml:space="preserve">கோப்புறையைச் சேர்</x:String>
+  <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">புத்தகக்குறிகளில் சேர்க்க இங்கே ஒரு கோப்புறையை இழுத்து விடுங்கள்</x:String>
+  <x:String x:Key="Text.Bookmarks.Hide" xml:space="preserve">புத்தகக்குறிப் பட்டியை மறை</x:String>
+  <x:String x:Key="Text.Bookmarks.NewFolderName" xml:space="preserve">புதிய கோப்புறை</x:String>
+  <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">பெயர் மாற்று...</x:String>
+  <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">புத்தகக்குறியின் பெயரை மாற்று</x:String>
+  <x:String x:Key="Text.Bookmarks.SortByName" xml:space="preserve">பெயர் வரிசையில் அடுக்கு</x:String>
+  <x:String x:Key="Text.Bookmarks.SortByPath" xml:space="preserve">பாதை வரிசையில் அடுக்கு</x:String>
+  <x:String x:Key="Text.Caption.MaximizeRestore" xml:space="preserve">பெரிதாக்கு அல்லது மீட்டமை</x:String>
+  <x:String x:Key="Text.Caption.Minimize" xml:space="preserve">சிறிதாக்கு</x:String>
+  <x:String x:Key="Text.Clipboard.Copied" xml:space="preserve">{0} உருப்படிகள் நகலெடுக்கப்பட்டன</x:String>
+  <x:String x:Key="Text.Clipboard.CopiedToClipboard" xml:space="preserve">இடைநிலைப் பலகைக்கு நகலெடுக்கப்பட்டது</x:String>
+  <x:String x:Key="Text.Clipboard.CopyFailed" xml:space="preserve">இடைநிலைப் பலகைக்கு நகலெடுக்க முடியவில்லை</x:String>
+  <x:String x:Key="Text.Clipboard.Cut" xml:space="preserve">{0} உருப்படிகள் வெட்டப்பட்டன</x:String>
+  <x:String x:Key="Text.Clipboard.VirtualPasteFailed" xml:space="preserve">மெய்நிகர் கோப்பை ஒட்ட முடியவில்லை</x:String>
+  <x:String x:Key="Text.Clipboard.WriteFailed" xml:space="preserve">இடைநிலைப் பலகையில் எழுத முடியவில்லை</x:String>
+  <x:String x:Key="Text.Column.AutoFitAll" xml:space="preserve">அனைத்து நெடுவரிசைகளின் அகலத்தையும் தானாகச் சரிசெய்</x:String>
+  <x:String x:Key="Text.Column.AutoFitThis" xml:space="preserve">இந்த நெடுவரிசையின் அகலத்தைத் தானாகச் சரிசெய்</x:String>
+  <x:String x:Key="Text.Column.Created" xml:space="preserve">உருவாக்கிய தேதி</x:String>
+  <x:String x:Key="Text.Column.Modified" xml:space="preserve">மாற்றிய தேதி</x:String>
+  <x:String x:Key="Text.Column.Name" xml:space="preserve">பெயர்</x:String>
+  <x:String x:Key="Text.Column.Size" xml:space="preserve">அளவு</x:String>
+  <x:String x:Key="Text.Column.Type" xml:space="preserve">வகை</x:String>
+  <x:String x:Key="Text.Command.CopyTip" xml:space="preserve">நகலெடு (Ctrl+C)</x:String>
+  <x:String x:Key="Text.Command.Cut" xml:space="preserve">வெட்டு</x:String>
+  <x:String x:Key="Text.Command.CutTip" xml:space="preserve">வெட்டு (Ctrl+X)</x:String>
+  <x:String x:Key="Text.Command.DeleteTip" xml:space="preserve">நீக்கு (Delete)</x:String>
+  <x:String x:Key="Text.Command.More" xml:space="preserve">மேலும் காண்க</x:String>
+  <x:String x:Key="Text.Command.NewFolder" xml:space="preserve">புதிய கோப்புறை</x:String>
+  <x:String x:Key="Text.Command.Options" xml:space="preserve">விருப்பங்கள்</x:String>
+  <x:String x:Key="Text.Command.Paste" xml:space="preserve">ஒட்டு</x:String>
+  <x:String x:Key="Text.Command.PasteTip" xml:space="preserve">ஒட்டு (Ctrl+V)</x:String>
+  <x:String x:Key="Text.Command.Rename" xml:space="preserve">பெயர் மாற்று</x:String>
+  <x:String x:Key="Text.Command.RenameTip" xml:space="preserve">பெயர் மாற்று (F2)</x:String>
+  <x:String x:Key="Text.Command.Share" xml:space="preserve">பகிர்</x:String>
+  <x:String x:Key="Text.Command.SidebarTip" xml:space="preserve">பக்கப்பட்டியைக் காட்டு/மறை (விரைவு அணுகல் / மரம்)</x:String>
+  <x:String x:Key="Text.Command.Sort" xml:space="preserve">அடுக்கு</x:String>
+  <x:String x:Key="Text.Command.View" xml:space="preserve">காட்சி</x:String>
+  <x:String x:Key="Text.Common.AddToBookmarks" xml:space="preserve">புத்தகக்குறிகளில் சேர்</x:String>
+  <x:String x:Key="Text.Common.Cancel" xml:space="preserve">ரத்து செய்</x:String>
+  <x:String x:Key="Text.Common.Close" xml:space="preserve">மூடு</x:String>
+  <x:String x:Key="Text.Common.Copy" xml:space="preserve">நகலெடு</x:String>
+  <x:String x:Key="Text.Common.CopyPath" xml:space="preserve">பாதையை நகலெடு</x:String>
+  <x:String x:Key="Text.Common.Delete" xml:space="preserve">நீக்கு</x:String>
+  <x:String x:Key="Text.Common.Open" xml:space="preserve">திற</x:String>
+  <x:String x:Key="Text.Common.OpenInExplorer" xml:space="preserve">கோப்பு எக்ஸ்ப்ளோரரில் திற</x:String>
+  <x:String x:Key="Text.Common.OpenInNewTab" xml:space="preserve">புதிய தாவலில் திற</x:String>
+  <x:String x:Key="Text.Common.OpenInTerminal" xml:space="preserve">டெர்மினலில் திற</x:String>
+  <x:String x:Key="Text.Common.PinToQuickAccess" xml:space="preserve">விரைவு அணுகலில் பொருத்து</x:String>
+  <x:String x:Key="Text.Common.Properties" xml:space="preserve">பண்புகள்</x:String>
+  <x:String x:Key="Text.Common.UnpinFromQuickAccess" xml:space="preserve">விரைவு அணுகலிலிருந்து அகற்று</x:String>
+  <x:String x:Key="Text.Drag.Add" xml:space="preserve">சேர்</x:String>
+  <x:String x:Key="Text.Drag.Copy" xml:space="preserve">நகலெடு</x:String>
+  <x:String x:Key="Text.Drag.Dragging" xml:space="preserve">இழுக்கிறது</x:String>
+  <x:String x:Key="Text.Drag.File" xml:space="preserve">கோப்பு</x:String>
+  <x:String x:Key="Text.Drag.Folder" xml:space="preserve">கோப்புறை</x:String>
+  <x:String x:Key="Text.Drag.Move" xml:space="preserve">நகர்த்து</x:String>
+  <x:String x:Key="Text.Drag.OpenInTab" xml:space="preserve">தாவலில் திற</x:String>
+  <x:String x:Key="Text.Drive.FreeOfTotal" xml:space="preserve">{1} இல் {0} காலி</x:String>
+  <x:String x:Key="Text.Error.AccessDenied" xml:space="preserve">அணுகல் மறுக்கப்பட்டது</x:String>
+  <x:String x:Key="Text.Error.Code" xml:space="preserve">பிழை {0}</x:String>
+  <x:String x:Key="Text.Error.CodeWithDesc" xml:space="preserve">பிழை {0}: {1}</x:String>
+  <x:String x:Key="Text.Error.DiskFull" xml:space="preserve">வட்டில் போதிய இடம் இல்லை</x:String>
+  <x:String x:Key="Text.Error.FileExists" xml:space="preserve">இதே பெயரில் ஒரு கோப்பு ஏற்கெனவே உள்ளது</x:String>
+  <x:String x:Key="Text.Error.InvalidName" xml:space="preserve">கோப்புப் பெயரில் செல்லாத எழுத்துகள் உள்ளன</x:String>
+  <x:String x:Key="Text.Error.PathNotFound" xml:space="preserve">பாதை கிடைக்கவில்லை</x:String>
+  <x:String x:Key="Text.Error.PathTooLong" xml:space="preserve">பாதை மிக நீளமானது</x:String>
+  <x:String x:Key="Text.Error.SharingViolation" xml:space="preserve">கோப்பை வேறொரு செயல்முறை பயன்படுத்துகிறது</x:String>
+  <x:String x:Key="Text.Error.WriteProtected" xml:space="preserve">ஊடகம் எழுதுவதற்குப் பாதுகாக்கப்பட்டுள்ளது</x:String>
+  <x:String x:Key="Text.Exif.Camera" xml:space="preserve">கேமரா</x:String>
+  <x:String x:Key="Text.Exif.CameraMaker" xml:space="preserve">கேமரா தயாரிப்பாளர்</x:String>
+  <x:String x:Key="Text.Exif.DateModified" xml:space="preserve">மாற்றிய தேதி</x:String>
+  <x:String x:Key="Text.Exif.DateTaken" xml:space="preserve">எடுத்த தேதி</x:String>
+  <x:String x:Key="Text.Exif.Dimensions" xml:space="preserve">பரிமாணங்கள்</x:String>
+  <x:String x:Key="Text.Exif.ExposureBias" xml:space="preserve">வெளிச்ச ஈடுசெய்தல்</x:String>
+  <x:String x:Key="Text.Exif.ExposureTime" xml:space="preserve">வெளிச்ச நேரம்</x:String>
+  <x:String x:Key="Text.Exif.FNumber" xml:space="preserve">F எண்</x:String>
+  <x:String x:Key="Text.Exif.Flash" xml:space="preserve">ஃபிளாஷ்</x:String>
+  <x:String x:Key="Text.Exif.FocalLength" xml:space="preserve">குவிய தூரம்</x:String>
+  <x:String x:Key="Text.Exif.Iso" xml:space="preserve">ISO உணர்திறன்</x:String>
+  <x:String x:Key="Text.Exif.Lens" xml:space="preserve">லென்ஸ்</x:String>
+  <x:String x:Key="Text.Exif.Size" xml:space="preserve">அளவு</x:String>
+  <x:String x:Key="Text.Exif.Type" xml:space="preserve">வகை</x:String>
+  <x:String x:Key="Text.FileList.EmptyFolder" xml:space="preserve">இந்தக் கோப்புறை காலியாக உள்ளது.</x:String>
+  <x:String x:Key="Text.Folder.Desktop" xml:space="preserve">டெஸ்க்டாப்</x:String>
+  <x:String x:Key="Text.Folder.Documents" xml:space="preserve">ஆவணங்கள்</x:String>
+  <x:String x:Key="Text.Folder.Downloads" xml:space="preserve">பதிவிறக்கங்கள்</x:String>
+  <x:String x:Key="Text.Folder.Music" xml:space="preserve">இசை</x:String>
+  <x:String x:Key="Text.Folder.Pictures" xml:space="preserve">படங்கள்</x:String>
+  <x:String x:Key="Text.Folder.Videos" xml:space="preserve">வீடியோக்கள்</x:String>
+  <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">தொகுப்பிலிருந்து வெளியேறு (Esc)</x:String>
+  <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">பட தகவல்</x:String>
+  <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">இந்தப் படத்திற்கான தகவல் இல்லை.</x:String>
+  <x:String x:Key="Text.Integration.OpenWithKiriha" xml:space="preserve">Kiriha மூலம் திற</x:String>
+  <x:String x:Key="Text.Launch.ExplorerFailed" xml:space="preserve">கோப்பு எக்ஸ்ப்ளோரரைத் தொடங்க முடியவில்லை: {0}</x:String>
+  <x:String x:Key="Text.Launch.Failed" xml:space="preserve">தொடங்க முடியவில்லை: {0}</x:String>
+  <x:String x:Key="Text.Launch.TerminalFailed" xml:space="preserve">டெர்மினலைத் தொடங்க முடியவில்லை: {0}</x:String>
+  <x:String x:Key="Text.License.Activate" xml:space="preserve">செயல்படுத்து</x:String>
+  <x:String x:Key="Text.License.Exit" xml:space="preserve">வெளியேறு</x:String>
+  <x:String x:Key="Text.License.KeyPlaceholder" xml:space="preserve">KIRIHA- என்று தொடங்கும் உரிமக் குறியீடு</x:String>
+  <x:String x:Key="Text.License.Lock.OnlineCheckBody" xml:space="preserve">உரிமம் 30 நாட்களுக்கு மேலாக ஆன்லைனில் சரிபார்க்கப்படவில்லை. இணையத்துடன் இணைத்து “மீண்டும் ஆன்லைனில் சரிபார்” என்பதை அழுத்தவும்.</x:String>
+  <x:String x:Key="Text.License.Lock.OnlineCheckTitle" xml:space="preserve">உரிமத்தை ஆன்லைனில் சரிபார்க்க வேண்டும்</x:String>
+  <x:String x:Key="Text.License.Lock.TrialExpiredBody" xml:space="preserve">Kiriha ஐப் பயன்படுத்த செயல்படுத்தப்பட்ட உரிமம் தேவை (¥980, ஒரு முறை கொள்முதல்).</x:String>
+  <x:String x:Key="Text.License.Lock.TrialExpiredTitle" xml:space="preserve">சோதனைக் காலம் முடிந்தது</x:String>
+  <x:String x:Key="Text.License.Msg.Activated" xml:space="preserve">உரிமம் செயல்படுத்தப்பட்டது 🎉 மிக்க நன்றி!</x:String>
+  <x:String x:Key="Text.License.Msg.CheckOk" xml:space="preserve">சரிபார்ப்பு முடிந்தது. Kiriha ஐப் பயன்படுத்தியதற்கு நன்றி!</x:String>
+  <x:String x:Key="Text.License.Msg.Checking" xml:space="preserve">ஆன்லைனில் சரிபார்க்கிறது…</x:String>
+  <x:String x:Key="Text.License.Msg.EnterKey" xml:space="preserve">கொள்முதலின்போது வழங்கப்பட்ட உரிமக் குறியீட்டை உள்ளிடவும்.</x:String>
+  <x:String x:Key="Text.License.Msg.InvalidKey" xml:space="preserve">இந்த உரிமக் குறியீடு சரியில்லை. நகலெடுக்கும்போது எழுத்துகள் விடுபட்டதா அல்லது கூடுதல் இடைவெளி வந்ததா எனப் பாருங்கள்.</x:String>
+  <x:String x:Key="Text.License.Msg.PurchaseFailed" xml:space="preserve">கொள்முதல் பக்கத்தைத் திறக்க முடியவில்லை. சிறிது நேரம் கழித்து மீண்டும் முயலவும்.</x:String>
+  <x:String x:Key="Text.License.Msg.PurchaseOpened" xml:space="preserve">உலாவியில் கொள்முதல் பக்கம் திறக்கப்பட்டது. உறுதிப்படுத்தல் பக்கத்தில் காட்டப்படும் உரிமக் குறியீட்டை மேலே ஒட்டவும்.</x:String>
+  <x:String x:Key="Text.License.Msg.Revoked" xml:space="preserve">இந்த உரிமம் இனி செல்லாது (எடுத்துக்காட்டாக, பணம் திரும்பப்பெறப்பட்டது). மீண்டும் வாங்கவும்.</x:String>
+  <x:String x:Key="Text.License.Msg.ServerUnreachable" xml:space="preserve">சேவையகத்தை அணுக முடியவில்லை. உங்கள் இணைய இணைப்பைச் சரிபார்த்து மீண்டும் முயலவும்.</x:String>
+  <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">கொள்முதல் பக்கத்தைத் திற (¥980, ஒரு முறை)</x:String>
+  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">வாங்கிய பிறகு, கட்டண உறுதிப்படுத்தல் பக்கத்தில் உரிமக் குறியீடு காட்டப்படும். கணக்கோ கடவுச்சொல்லோ தேவையில்லை.</x:String>
+  <x:String x:Key="Text.License.Recheck" xml:space="preserve">மீண்டும் ஆன்லைனில் சரிபார்</x:String>
+  <x:String x:Key="Text.License.Status.Licensed" xml:space="preserve">உரிமம் செயல்படுத்தப்பட்டது: {0}</x:String>
+  <x:String x:Key="Text.License.Status.OnlineCheck" xml:space="preserve">உரிமத்தை ஆன்லைனில் சரிபார்க்க வேண்டும் (இணையத்துடன் இணைக்கவும்)</x:String>
+  <x:String x:Key="Text.License.Status.Trial" xml:space="preserve">சோதனைக் காலம் ({0} நாட்கள் மீதம்)</x:String>
+  <x:String x:Key="Text.License.Status.TrialExpired" xml:space="preserve">சோதனை முடிந்தது (உரிமம் தேவை)</x:String>
+  <x:String x:Key="Text.Menu.About" xml:space="preserve">Kiriha பற்றி</x:String>
+  <x:String x:Key="Text.Menu.AccessDenied" xml:space="preserve">(அணுக முடியவில்லை)</x:String>
+  <x:String x:Key="Text.Menu.BookmarksBar" xml:space="preserve">புத்தகக்குறிப் பட்டி</x:String>
+  <x:String x:Key="Text.Menu.CheckUpdate" xml:space="preserve">புதுப்பிப்புகளைச் சரிபார்</x:String>
+  <x:String x:Key="Text.Menu.Empty" xml:space="preserve">(காலி)</x:String>
+  <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">புதிய சாளரம்</x:String>
+  <x:String x:Key="Text.Menu.NoSubfolders" xml:space="preserve">(துணைக் கோப்புறைகள் இல்லை)</x:String>
+  <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(எதுவும் இல்லை)</x:String>
+  <x:String x:Key="Text.Nav.Back" xml:space="preserve">பின்</x:String>
+  <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">பின் (வரலாற்றுக்கு வலது கிளிக்)</x:String>
+  <x:String x:Key="Text.Nav.EditPathTip" xml:space="preserve">பாதையைத் திருத்த கிளிக் செய்யவும்</x:String>
+  <x:String x:Key="Text.Nav.Forward" xml:space="preserve">முன்</x:String>
+  <x:String x:Key="Text.Nav.ForwardTip" xml:space="preserve">முன் (வரலாற்றுக்கு வலது கிளிக்)</x:String>
+  <x:String x:Key="Text.Nav.Home" xml:space="preserve">முகப்பு</x:String>
+  <x:String x:Key="Text.Nav.HomeTip" xml:space="preserve">முகப்பு (Alt+Home / அடிக்கடி பயன்படுத்தும் கோப்புறைகளுக்கு வலது கிளிக்)</x:String>
+  <x:String x:Key="Text.Nav.OpenFailed" xml:space="preserve">திறக்க முடியவில்லை: {0}</x:String>
+  <x:String x:Key="Text.Nav.OpenSettings" xml:space="preserve">அமைப்புகளைத் திற</x:String>
+  <x:String x:Key="Text.Nav.Refresh" xml:space="preserve">புதுப்பி</x:String>
+  <x:String x:Key="Text.Nav.Settings" xml:space="preserve">அமைப்புகள்</x:String>
+  <x:String x:Key="Text.Nav.UpFolder" xml:space="preserve">ஒரு நிலை மேலே</x:String>
+  <x:String x:Key="Text.Nav.UpTip" xml:space="preserve">ஒரு நிலை மேலே (மேல் கோப்புறைகளுக்கு வலது கிளிக்)</x:String>
+  <x:String x:Key="Text.New.CreateFailed" xml:space="preserve">உருவாக்க முடியவில்லை: {0}</x:String>
+  <x:String x:Key="Text.New.FolderName" xml:space="preserve">புதிய கோப்புறை</x:String>
+  <x:String x:Key="Text.New.ItemName" xml:space="preserve">புதிய {0}</x:String>
+  <x:String x:Key="Text.New.UndoFailed" xml:space="preserve">புதிய கோப்புறை உருவாக்கத்தை மீளமைக்க முடியவில்லை: {0}</x:String>
+  <x:String x:Key="Text.Op.Copied" xml:space="preserve">{0} உருப்படிகள் நகலெடுக்கப்பட்டன</x:String>
+  <x:String x:Key="Text.Op.DeleteFailed" xml:space="preserve">நீக்குதல் தோல்வியடைந்தது ({0})</x:String>
+  <x:String x:Key="Text.Op.Failed" xml:space="preserve">கோப்புச் செயல்பாடு தோல்வியடைந்தது ({0})</x:String>
+  <x:String x:Key="Text.Op.Moved" xml:space="preserve">{0} உருப்படிகள் நகர்த்தப்பட்டன</x:String>
+  <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">ஒட்டுதல் தோல்வியடைந்தது ({0})</x:String>
+  <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">பெயர் மாற்றம் தோல்வியடைந்தது ({0})</x:String>
+  <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">{0} கோப்புகள்  {1}</x:String>
+  <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> அல்லது அதற்கு மேல்</x:String>
+  <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">மறுசுழற்சிக் கூடையைக் காலி செய்</x:String>
+  <x:String x:Key="Text.Rename.AlreadyExists" xml:space="preserve">இதே பெயரில் ஒரு கோப்பு அல்லது கோப்புறை ஏற்கெனவே உள்ளது: {0}</x:String>
+  <x:String x:Key="Text.Rename.InvalidChars" xml:space="preserve">கோப்புப் பெயரில் செல்லாத எழுத்துகள் உள்ளன: \ / : * ? " &lt; &gt; |</x:String>
+  <x:String x:Key="Text.Rename.RevertedToOriginal" xml:space="preserve">பெயர் மாற்றம் தோல்வியடைந்ததால் அசல் பெயர் மீட்கப்பட்டது</x:String>
+  <x:String x:Key="Text.Rename.StuckAsTemporary" xml:space="preserve">பெயர் மாற்றம் தோல்வியடைந்தது, தற்காலிகப் பெயரே உள்ளது: {0}</x:String>
+  <x:String x:Key="Text.Search.ClearTip" xml:space="preserve">தேடலை அழி</x:String>
+  <x:String x:Key="Text.Search.Failed" xml:space="preserve">தேடல் தோல்வியடைந்தது: {0}</x:String>
+  <x:String x:Key="Text.Search.Found" xml:space="preserve">{0} முடிவுகள் கிடைத்தன (துணைக் கோப்புறைகள் உட்பட)</x:String>
+  <x:String x:Key="Text.Search.Placeholder" xml:space="preserve">{0} இல் தேடு</x:String>
+  <x:String x:Key="Text.Search.Searching" xml:space="preserve">தேடுகிறது... (துணைக் கோப்புறைகள் உட்பட)</x:String>
+  <x:String x:Key="Text.Search.Truncated" xml:space="preserve">{0} முடிவுகளில் நிறுத்தப்பட்டது (1000 என்ற வரம்பை எட்டியது, சில துணைக் கோப்புறைகள் பார்க்கப்படவில்லை; மேலும் காண தேடலைக் குறுக்குங்கள்)</x:String>
+  <x:String x:Key="Text.Select.All" xml:space="preserve">அனைத்தையும் தேர்ந்தெடு</x:String>
+  <x:String x:Key="Text.Select.FilesOnly" xml:space="preserve">கோப்புகளை மட்டும் தேர்ந்தெடு</x:String>
+  <x:String x:Key="Text.Select.FoldersOnly" xml:space="preserve">கோப்புறைகளை மட்டும் தேர்ந்தெடு</x:String>
+  <x:String x:Key="Text.Select.Invert" xml:space="preserve">தேர்வை மாற்று</x:String>
+  <x:String x:Key="Text.Select.None" xml:space="preserve">தேர்வை நீக்கு</x:String>
+  <x:String x:Key="Text.Settings.About" xml:space="preserve">Kiriha பற்றி</x:String>
+  <x:String x:Key="Text.Settings.About.Body" xml:space="preserve">Windows எக்ஸ்ப்ளோரரின் கோப்புச் செயல்பாடுகளையும், Chrome இன் தாவல்கள், முகவரிப் பட்டி, புத்தகக்குறிகளையும் Kiriha ஒரே திரையில் இணைக்கிறது. அமைப்புகள் தற்போதைய பயனருக்குச் சேமிக்கப்படும்.</x:String>
+  <x:String x:Key="Text.Settings.Acrylic" xml:space="preserve">சாளரத்திற்கு அக்ரிலிக் விளைவை (ஒளிபுகும் மங்கல்) பயன்படுத்து</x:String>
+  <x:String x:Key="Text.Settings.DefaultFolderApp" xml:space="preserve">கோப்புறைகளையும் இயக்ககங்களையும் திறக்க Kiriha ஐ இயல்புநிலை பயன்பாடாக அமை</x:String>
+  <x:String x:Key="Text.Settings.DefaultFolderApp.Off" xml:space="preserve">இயக்கினால், எக்ஸ்ப்ளோரரில் கோப்புறை அல்லது இயக்ககத்தைத் திறக்கும்போது Kiriha தொடங்கும்.</x:String>
+  <x:String x:Key="Text.Settings.DefaultFolderApp.On" xml:space="preserve">தற்போது கோப்புறைகளும் இயக்ககங்களும் Kiriha இல் திறக்கின்றன. முடக்கினால் முந்தைய நடத்தை மீட்கப்படும்.</x:String>
+  <x:String x:Key="Text.Settings.Display" xml:space="preserve">தோற்றம்</x:String>
+  <x:String x:Key="Text.Settings.Display.Subtitle" xml:space="preserve">கோப்புப் பட்டியலின் தோற்றத்தையும் Kiriha இன் வடிவமைப்பையும் சரிசெய்யுங்கள்</x:String>
+  <x:String x:Key="Text.Settings.Explorer" xml:space="preserve">கோப்புப் பட்டியல்</x:String>
+  <x:String x:Key="Text.Settings.ExplorerContextMenu" xml:space="preserve">எக்ஸ்ப்ளோரரின் வலது கிளிக் மெனுவில் “Kiriha மூலம் திற” ஐச் சேர்</x:String>
+  <x:String x:Key="Text.Settings.ExplorerContextMenuNote" xml:space="preserve">கோப்புறையின் மீதோ அதன் உள்ளடக்கத்தின் வெற்றிடத்திலோ வலது கிளிக் செய்து அந்தக் கோப்புறையை Kiriha இல் திறக்கலாம்.</x:String>
+  <x:String x:Key="Text.Settings.FolderTree" xml:space="preserve">கோப்புறை மரம்</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Material" xml:space="preserve">Material Icon Theme</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Note" xml:space="preserve">Material Icon Theme ஆனது material-icon-theme (MIT உரிமம், © Material Extensions) ஐப் பயன்படுத்துகிறது. Windows தொகுப்பு எக்ஸ்ப்ளோரரின் அதே Shell சின்னங்களைக் காட்டும்.</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Original" xml:space="preserve">Kiriha இன் அசல் சின்னங்கள்</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Windows" xml:space="preserve">Windows Shell சின்னங்கள்</x:String>
+  <x:String x:Key="Text.Settings.Icons" xml:space="preserve">சின்னங்கள்</x:String>
+  <x:String x:Key="Text.Settings.Language" xml:space="preserve">காட்சி மொழி</x:String>
+  <x:String x:Key="Text.Settings.Language.Note" xml:space="preserve">இயல்பாக, Windows இன் காட்சி மொழியிலிருந்து தானாகத் தேர்ந்தெடுக்கப்படும்.</x:String>
+  <x:String x:Key="Text.Settings.License" xml:space="preserve">உரிமம்</x:String>
+  <x:String x:Key="Text.Settings.Maintenance" xml:space="preserve">பராமரிப்பு</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.Data" xml:space="preserve">தரவும் தற்காலிகச் சேமிப்பும்</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.OpenLogFolder" xml:space="preserve">பதிவுக் கோப்புறையைத் திற</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.ReloadQuickAccess" xml:space="preserve">விரைவு அணுகலை மீண்டும் ஏற்று</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.ResetSettings" xml:space="preserve">அமைப்புகளை மீட்டமை</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.Subtitle" xml:space="preserve">தற்காலிகச் சேமிப்பு, பதிவுகள், அமைப்புத் தரவை நிர்வகிக்கவும்</x:String>
+  <x:String x:Key="Text.Settings.MinimizeToTray" xml:space="preserve">சிறிதாக்கும்போது அறிவிப்புப் பகுதிக்குச் செல்</x:String>
+  <x:String x:Key="Text.Settings.MinimizeToTrayNote" xml:space="preserve">சிறிதாக்கினால் Kiriha பணிப்பட்டியிலிருந்து மறையும்; அறிவிப்புப் பகுதியின் சின்னத்திலிருந்து மீட்கலாம்.</x:String>
+  <x:String x:Key="Text.Settings.Mouse" xml:space="preserve">சுட்டி</x:String>
+  <x:String x:Key="Text.Settings.Mouse.BackgroundDoubleClick" xml:space="preserve">கோப்புறையின் வெற்றிடத்தில் இரட்டைக் கிளிக் செய்யும்போது</x:String>
+  <x:String x:Key="Text.Settings.Mouse.BackgroundMiddleClick" xml:space="preserve">கோப்புறையின் வெற்றிடத்தில் சக்கரக் கிளிக் செய்யும்போது</x:String>
+  <x:String x:Key="Text.Settings.Mouse.CloseTab" xml:space="preserve">தாவலை மூடு</x:String>
+  <x:String x:Key="Text.Settings.Mouse.None" xml:space="preserve">எதுவும் செய்யாதே</x:String>
+  <x:String x:Key="Text.Settings.Mouse.Pin" xml:space="preserve">தாவலைப் பொருத்து</x:String>
+  <x:String x:Key="Text.Settings.Mouse.Refresh" xml:space="preserve">புதுப்பி</x:String>
+  <x:String x:Key="Text.Settings.Mouse.TabDoubleClick" xml:space="preserve">தாவலில் இரட்டைக் கிளிக் செய்யும்போது</x:String>
+  <x:String x:Key="Text.Settings.Mouse.TabMiddleClick" xml:space="preserve">தாவலில் சக்கரக் கிளிக் செய்யும்போது</x:String>
+  <x:String x:Key="Text.Settings.Mouse.Up" xml:space="preserve">ஒரு நிலை மேலே செல்</x:String>
+  <x:String x:Key="Text.Settings.RunAtStartup" xml:space="preserve">Windows தொடங்கும்போது Kiriha ஐ இயக்கு</x:String>
+  <x:String x:Key="Text.Settings.RunAtStartupNote" xml:space="preserve">உள்நுழையும்போது Kiriha தானாகத் தொடங்கும்.</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts" xml:space="preserve">குறுக்குவழிகள்</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.FileOps" xml:space="preserve">கோப்புச் செயல்பாடுகள்</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.FileOpsBody" xml:space="preserve">Ctrl+X / C / V　வெட்டு, நகலெடு, ஒட்டு　　Delete / Shift+Delete　நீக்கு, நிரந்தரமாக நீக்கு&#10;F2　பெயர் மாற்று　　Alt+Enter　பண்புகள்　　Ctrl+Shift+N　புதிய கோப்புறை　　Alt+P　முன்னோட்டம்</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.Navigation" xml:space="preserve">வழிசெலுத்தலும் காட்சியும்</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.NavigationBody" xml:space="preserve">Ctrl+L / F4　முகவரியைத் திருத்து&#10;Ctrl+F / F3　தேடு&#10;Alt+← / →　பின்னும் முன்னும்&#10;Alt+↑　ஒரு நிலை மேலே&#10;F5　புதுப்பி / F11　முழுத் திரை</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.Subtitle" xml:space="preserve">வேகமாக வேலை செய்யும் விசைப்பலகைக் குறுக்குவழிகள்</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.Tabs" xml:space="preserve">தாவல்கள்</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.TabsBody" xml:space="preserve">Ctrl+T　புதிய தாவல்&#10;Ctrl+W　தாவலை மூடு&#10;Ctrl+Shift+T　மூடிய தாவலை மீண்டும் திற&#10;Ctrl+Tab　தாவல்களை மாற்று&#10;Ctrl+1..9　குறிப்பிட்ட தாவலைத் தேர்ந்தெடு</x:String>
+  <x:String x:Key="Text.Settings.ShowBookmarksBar" xml:space="preserve">புத்தகக்குறிப் பட்டியைக் காட்டு (Ctrl+Shift+B)</x:String>
+  <x:String x:Key="Text.Settings.ShowCheckBoxes" xml:space="preserve">உருப்படித் தேர்வுப்பெட்டிகளைக் காட்டு</x:String>
+  <x:String x:Key="Text.Settings.ShowExtensions" xml:space="preserve">கோப்பு நீட்டிப்புகளைக் காட்டு</x:String>
+  <x:String x:Key="Text.Settings.ShowHidden" xml:space="preserve">மறைந்த கோப்புகளைக் காட்டு</x:String>
+  <x:String x:Key="Text.Settings.StartMinimizedToTray" xml:space="preserve">தொடங்கும்போது அறிவிப்புப் பகுதியில் வை</x:String>
+  <x:String x:Key="Text.Settings.StartMinimizedToTrayNote" xml:space="preserve">தொடங்கியவுடன் சாளரத்தைக் காட்டாமல், அறிவிப்புப் பகுதியில் வைத்தபடி இயங்கும்.</x:String>
+  <x:String x:Key="Text.Settings.Startup" xml:space="preserve">தொடக்கம்</x:String>
+  <x:String x:Key="Text.Settings.Startup.Behavior" xml:space="preserve">தொடக்கத்தின் நடத்தை</x:String>
+  <x:String x:Key="Text.Settings.Startup.PathCaption" xml:space="preserve">புதிய தாவல்களில் திறக்கும் கோப்புறை (காலியாக விட்டால் பயனர் கோப்புறை)</x:String>
+  <x:String x:Key="Text.Settings.Startup.RestoreTabs" xml:space="preserve">மூடும்போது திறந்திருந்த தாவல்களை அடுத்த முறை மீட்டமை</x:String>
+  <x:String x:Key="Text.Settings.Startup.Subtitle" xml:space="preserve">தொடக்க முறை, Windows ஒருங்கிணைப்பு, அறிவிப்புப் பகுதியை நிர்வகிக்கவும்</x:String>
+  <x:String x:Key="Text.Settings.Theme" xml:space="preserve">தீம்</x:String>
+  <x:String x:Key="Text.Settings.Theme.Dark" xml:space="preserve">அடர்</x:String>
+  <x:String x:Key="Text.Settings.Theme.Light" xml:space="preserve">ஒளி</x:String>
+  <x:String x:Key="Text.Settings.Theme.System" xml:space="preserve">அமைப்பு</x:String>
+  <x:String x:Key="Text.Settings.Tray" xml:space="preserve">அறிவிப்புப் பகுதி</x:String>
+  <x:String x:Key="Text.Settings.TreeDragDisabled" xml:space="preserve">மரத்திலிருந்து இழுப்பதைத் தடு</x:String>
+  <x:String x:Key="Text.Settings.TreeDropDisabled" xml:space="preserve">மரத்தில் விடுவதைத் தடு</x:String>
+  <x:String x:Key="Text.Settings.Updates" xml:space="preserve">புதுப்பிப்புகளும் தகவலும்</x:String>
+  <x:String x:Key="Text.Settings.Updates.CheckNow" xml:space="preserve">இப்போது புதுப்பிப்புகளைச் சரிபார்</x:String>
+  <x:String x:Key="Text.Settings.Updates.CheckOnStartup" xml:space="preserve">தொடங்கும்போது புதுப்பிப்புகளைச் சரிபார்</x:String>
+  <x:String x:Key="Text.Settings.Updates.Subtitle" xml:space="preserve">Kiriha இன் பதிப்பைப் பார்த்து புதுப்பிப்புகளை நிர்வகிக்கவும்</x:String>
+  <x:String x:Key="Text.Settings.Updates.VersionCard" xml:space="preserve">பதிப்பும் புதுப்பிப்பும்</x:String>
+  <x:String x:Key="Text.Settings.Window" xml:space="preserve">சாளரம்</x:String>
+  <x:String x:Key="Text.Settings.Window.RememberBounds" xml:space="preserve">சாளரத்தின் அளவையும் இடத்தையும் நினைவில் வை</x:String>
+  <x:String x:Key="Text.Settings.Window.RememberBoundsNote" xml:space="preserve">முடக்கினால், அடுத்த முறை இயல்பு அளவிலும் இடத்திலும் தொடங்கும்.</x:String>
+  <x:String x:Key="Text.Settings.WindowsIntegration" xml:space="preserve">Windows ஒருங்கிணைப்பு</x:String>
+  <x:String x:Key="Text.Share.FileCount" xml:space="preserve">{0} கோப்புகள்</x:String>
+  <x:String x:Key="Text.Share.FoldersNotSupported" xml:space="preserve">கோப்புறைகளைப் பகிர முடியாது (கோப்புகளைத் தேர்ந்தெடுக்கவும்)</x:String>
+  <x:String x:Key="Text.Share.NoItems" xml:space="preserve">பகிர எதுவும் இல்லை</x:String>
+  <x:String x:Key="Text.Share.OpenFailed" xml:space="preserve">பகிர்வுப் பலகத்தைத் திறக்க முடியவில்லை</x:String>
+  <x:String x:Key="Text.Share.PrepareFailed" xml:space="preserve">பகிரும் தரவைத் தயாரிக்க முடியவில்லை</x:String>
+  <x:String x:Key="Text.Share.SelectFiles" xml:space="preserve">பகிர விரும்பும் கோப்புகளைத் தேர்ந்தெடுக்கவும்</x:String>
+  <x:String x:Key="Text.Sidebar.Drives" xml:space="preserve">இயக்ககங்கள்</x:String>
+  <x:String x:Key="Text.Sidebar.QuickAccess" xml:space="preserve">விரைவு அணுகல்</x:String>
+  <x:String x:Key="Text.Sidebar.RecentFiles" xml:space="preserve">சமீபத்திய கோப்புகள்</x:String>
+  <x:String x:Key="Text.Sidebar.RecycleBin" xml:space="preserve">மறுசுழற்சிக் கூடை</x:String>
+  <x:String x:Key="Text.Sidebar.RecycleBinTip" xml:space="preserve">மறுசுழற்சிக் கூடையை எக்ஸ்ப்ளோரரில் திற</x:String>
+  <x:String x:Key="Text.Sidebar.ToggleTip" xml:space="preserve">விரைவு அணுகலுக்கும் கோப்புறை மரத்திற்கும் இடையே மாற்றும்</x:String>
+  <x:String x:Key="Text.Sidebar.TreeView" xml:space="preserve">மரக் காட்சி</x:String>
+  <x:String x:Key="Text.Sort.Ascending" xml:space="preserve">ஏறுவரிசை</x:String>
+  <x:String x:Key="Text.Sort.Descending" xml:space="preserve">இறங்குவரிசை</x:String>
+  <x:String x:Key="Text.Status.Breakdown" xml:space="preserve">({0} கோப்புறைகள், {1} கோப்புகள்)</x:String>
+  <x:String x:Key="Text.Status.ClearSelectionTip" xml:space="preserve">தேர்வை நீக்க கிளிக் செய்யவும்</x:String>
+  <x:String x:Key="Text.Status.DetailsViewTip" xml:space="preserve">விவரக் காட்சி</x:String>
+  <x:String x:Key="Text.Status.FreeSpace" xml:space="preserve">காலி இடம்: {0}</x:String>
+  <x:String x:Key="Text.Status.IconSizeTip" xml:space="preserve">சின்ன அளவு</x:String>
+  <x:String x:Key="Text.Status.ItemCount" xml:space="preserve">{0} உருப்படிகள்</x:String>
+  <x:String x:Key="Text.Status.ItemCountFiltered" xml:space="preserve">{0} உருப்படிகள் (தேடல்: {1})</x:String>
+  <x:String x:Key="Text.Status.ItemsSelected" xml:space="preserve">{0} உருப்படிகள் தேர்ந்தெடுக்கப்பட்டன</x:String>
+  <x:String x:Key="Text.Status.LargeIconsTip" xml:space="preserve">பெரிய சின்னக் காட்சி</x:String>
+  <x:String x:Key="Text.Tab.Category" xml:space="preserve">தாவல்கள்</x:String>
+  <x:String x:Key="Text.Tab.Close" xml:space="preserve">தாவலை மூடு</x:String>
+  <x:String x:Key="Text.Tab.CloseBelow" xml:space="preserve">கீழுள்ள தாவல்களை மூடு</x:String>
+  <x:String x:Key="Text.Tab.CloseOthers" xml:space="preserve">மற்ற தாவல்களை மூடு</x:String>
+  <x:String x:Key="Text.Tab.Duplicate" xml:space="preserve">தாவலை நகலெடு</x:String>
+  <x:String x:Key="Text.Tab.MoreActions" xml:space="preserve">மேலும் தாவல் செயல்கள்</x:String>
+  <x:String x:Key="Text.Tab.New" xml:space="preserve">புதிய தாவல்</x:String>
+  <x:String x:Key="Text.Tab.NewBelow" xml:space="preserve">கீழே புதிய தாவலைத் திற</x:String>
+  <x:String x:Key="Text.Tab.NewTip" xml:space="preserve">புதிய தாவல் (Ctrl+T)</x:String>
+  <x:String x:Key="Text.Tab.Pin" xml:space="preserve">தாவலைப் பொருத்து</x:String>
+  <x:String x:Key="Text.Tab.Pinned" xml:space="preserve">பொருத்தப்பட்ட தாவல்</x:String>
+  <x:String x:Key="Text.Tab.RecentlyClosed" xml:space="preserve">சமீபத்தில் மூடிய தாவல்கள்</x:String>
+  <x:String x:Key="Text.Tab.Reopen" xml:space="preserve">மூடிய தாவலை மீண்டும் திற</x:String>
+  <x:String x:Key="Text.Tab.Unpin" xml:space="preserve">தாவலின் பொருத்தத்தை நீக்கு</x:String>
+  <x:String x:Key="Text.TabAction.CloseDuplicates" xml:space="preserve">ஒரே இடத்தின் நகல் தாவல்களை மூடு</x:String>
+  <x:String x:Key="Text.TabAction.CloseLeft" xml:space="preserve">மேலுள்ள தாவல்களை மூடு</x:String>
+  <x:String x:Key="Text.TabAction.CloseUnpinned" xml:space="preserve">பொருத்தப்படாத அனைத்து தாவல்களையும் மூடு</x:String>
+  <x:String x:Key="Text.TabAction.CopyAllPaths" xml:space="preserve">அனைத்து தாவல்களின் பாதைகளையும் நகலெடு</x:String>
+  <x:String x:Key="Text.TabAction.CopyMarkdown" xml:space="preserve">தாவலை Markdown இணைப்பாக நகலெடு</x:String>
+  <x:String x:Key="Text.TabAction.CopyTitle" xml:space="preserve">தாவலின் பெயரை நகலெடு</x:String>
+  <x:String x:Key="Text.TabAction.CopyUri" xml:space="preserve">தாவலை file URI ஆக நகலெடு</x:String>
+  <x:String x:Key="Text.TabAction.MoveFirst" xml:space="preserve">தாவலை முதலிடத்திற்கு நகர்த்து</x:String>
+  <x:String x:Key="Text.TabAction.MoveLast" xml:space="preserve">தாவலைக் கடைசிக்கு நகர்த்து</x:String>
+  <x:String x:Key="Text.TabAction.OpenParent" xml:space="preserve">மேல் கோப்புறையைப் புதிய தாவலில் திற</x:String>
+  <x:String x:Key="Text.TabAction.PinAll" xml:space="preserve">அனைத்து தாவல்களையும் பொருத்து</x:String>
+  <x:String x:Key="Text.TabAction.PinLeft" xml:space="preserve">மேலுள்ள தாவல்களைப் பொருத்து</x:String>
+  <x:String x:Key="Text.TabAction.PinRight" xml:space="preserve">கீழுள்ள தாவல்களைப் பொருத்து</x:String>
+  <x:String x:Key="Text.TabAction.ReloadAll" xml:space="preserve">அனைத்து தாவல்களையும் மீண்டும் ஏற்று</x:String>
+  <x:String x:Key="Text.TabAction.ReloadLeft" xml:space="preserve">மேலுள்ள தாவல்களை மீண்டும் ஏற்று</x:String>
+  <x:String x:Key="Text.TabAction.ReloadRight" xml:space="preserve">கீழுள்ள தாவல்களை மீண்டும் ஏற்று</x:String>
+  <x:String x:Key="Text.TabAction.Reverse" xml:space="preserve">தாவல் வரிசையைத் தலைகீழாக்கு</x:String>
+  <x:String x:Key="Text.TabAction.SortByName" xml:space="preserve">தாவல்களைப் பெயர் வரிசையில் அடுக்கு</x:String>
+  <x:String x:Key="Text.TabAction.SortByPath" xml:space="preserve">தாவல்களைப் பாதை வரிசையில் அடுக்கு</x:String>
+  <x:String x:Key="Text.TabAction.UnpinAll" xml:space="preserve">அனைத்து தாவல்களின் பொருத்தத்தையும் நீக்கு</x:String>
+  <x:String x:Key="Text.Toast.PathCopied" xml:space="preserve">பாதை நகலெடுக்கப்பட்டது: {0}</x:String>
+  <x:String x:Key="Text.Tooltip.Modified" xml:space="preserve">மாற்றிய தேதி: {0}</x:String>
+  <x:String x:Key="Text.Tooltip.Size" xml:space="preserve">அளவு: {0}</x:String>
+  <x:String x:Key="Text.Tooltip.Type" xml:space="preserve">வகை: {0}</x:String>
+  <x:String x:Key="Text.Tray.Exit" xml:space="preserve">வெளியேறு</x:String>
+  <x:String x:Key="Text.Tray.Open" xml:space="preserve">Kiriha ஐத் திற</x:String>
+  <x:String x:Key="Text.Tree.Loading" xml:space="preserve">ஏற்றுகிறது...</x:String>
+  <x:String x:Key="Text.Tree.MyComputer" xml:space="preserve">என் கணினி</x:String>
+  <x:String x:Key="Text.Tree.MyDocuments" xml:space="preserve">என் ஆவணங்கள்</x:String>
+  <x:String x:Key="Text.Type.ExtFile" xml:space="preserve">{0} கோப்பு</x:String>
+  <x:String x:Key="Text.Type.File" xml:space="preserve">கோப்பு</x:String>
+  <x:String x:Key="Text.Type.FileFolder" xml:space="preserve">கோப்புக் கோப்புறை</x:String>
+  <x:String x:Key="Text.Type.LocalDisk" xml:space="preserve">உள்ளூர் வட்டு</x:String>
+  <x:String x:Key="Text.Type.LocalDiskFormat" xml:space="preserve">உள்ளூர் வட்டு ({0})</x:String>
+  <x:String x:Key="Text.Video.Unavailable" xml:space="preserve">இந்த வீடியோவை இயக்க முடியவில்லை (பொருந்தும் கோடெக் கிடைக்கவில்லை)</x:String>
+  <x:String x:Key="Text.Video.PlayPauseTip" xml:space="preserve">இயக்கு / இடைநிறுத்து (Space)</x:String>
+  <x:String x:Key="Text.Video.MuteTip" xml:space="preserve">ஒலியடக்கு</x:String>
+  <x:String x:Key="Text.Video.VolumeTip" xml:space="preserve">ஒலியளவு</x:String>
+  <x:String x:Key="Text.Video.LoopTip" xml:space="preserve">மீண்டும் இயக்கு</x:String>
+  <x:String x:Key="Text.Video.RateTip" xml:space="preserve">இயக்க வேகம்</x:String>
+  <x:String x:Key="Text.Update.AvailableHeader" xml:space="preserve">புதிய பதிப்பு கிடைக்கிறது</x:String>
+  <x:String x:Key="Text.Update.Checking" xml:space="preserve">புதுப்பிப்புகளைச் சரிபார்க்கிறது...</x:String>
+  <x:String x:Key="Text.Update.DownloadAndInstall" xml:space="preserve">பதிவிறக்கி நிறுவு</x:String>
+  <x:String x:Key="Text.Update.ErrorHeader" xml:space="preserve">புதுப்பிப்புச் சரிபார்ப்பு தோல்வியடைந்தது</x:String>
+  <x:String x:Key="Text.Update.IgnoreThisVersion" xml:space="preserve">இந்தப் பதிப்பைத் தவிர்</x:String>
+  <x:String x:Key="Text.Update.Title" xml:space="preserve">மென்பொருள் புதுப்பிப்பு</x:String>
+  <x:String x:Key="Text.Update.UpToDate" xml:space="preserve">நீங்கள் சமீபத்திய பதிப்பைப் பயன்படுத்துகிறீர்கள்</x:String>
+  <x:String x:Key="Text.View.Compact" xml:space="preserve">சுருக்கக் காட்சி</x:String>
+  <x:String x:Key="Text.View.Details" xml:space="preserve">விவரங்கள்</x:String>
+  <x:String x:Key="Text.View.ExtraLarge" xml:space="preserve">மிகப் பெரிய சின்னங்கள்</x:String>
+  <x:String x:Key="Text.View.FileExtensions" xml:space="preserve">கோப்பு நீட்டிப்புகள்</x:String>
+  <x:String x:Key="Text.View.HiddenFiles" xml:space="preserve">மறைந்த உருப்படிகள்</x:String>
+  <x:String x:Key="Text.View.ItemCheckBoxes" xml:space="preserve">உருப்படித் தேர்வுப்பெட்டிகள்</x:String>
+  <x:String x:Key="Text.View.Large" xml:space="preserve">பெரிய சின்னங்கள்</x:String>
+  <x:String x:Key="Text.View.List" xml:space="preserve">பட்டியல்</x:String>
+  <x:String x:Key="Text.View.Medium" xml:space="preserve">நடுத்தர சின்னங்கள்</x:String>
+  <x:String x:Key="Text.View.NavigationPane" xml:space="preserve">வழிசெலுத்தல் பலகம்</x:String>
+  <x:String x:Key="Text.View.PreviewPane" xml:space="preserve">முன்னோட்டப் பலகம்</x:String>
+  <x:String x:Key="Text.View.Small" xml:space="preserve">சிறிய சின்னங்கள்</x:String>
+  <x:String x:Key="Text.View.StatusBar" xml:space="preserve">நிலைப் பட்டி</x:String>
+</ResourceDictionary>

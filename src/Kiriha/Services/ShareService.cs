@@ -38,6 +38,14 @@ internal static partial class ShareService
             var interop = GetInterop();
             if (_manager is null || _managerHwnd != hwnd)
             {
+                // 作り直す前に古い manager の購読を外す（外さないと旧ウィンドウ用の
+                // manager が生き残り、共有内容の要求に二重で応じ得る）
+                if (_manager is not null)
+                {
+                    _manager.DataRequested -= OnDataRequested;
+                    _manager = null;
+                }
+
                 Marshal.ThrowExceptionForHR(interop.GetForWindow(hwnd, IidIDataTransferManager, out var abi));
                 try
                 {
@@ -68,7 +76,7 @@ internal static partial class ShareService
         var paths = _pendingPaths;
         if (paths is null || paths.Count == 0)
         {
-            args.Request.FailWithDisplayText("共有する項目がありません");
+            args.Request.FailWithDisplayText(LocalizationService.Text("Text.Share.NoItems"));
             return;
         }
 
@@ -84,13 +92,13 @@ internal static partial class ShareService
 
             args.Request.Data.Properties.Title = items.Count == 1
                 ? items[0].Name
-                : $"{items.Count} 個のファイル";
+                : LocalizationService.Text("Text.Share.FileCount", items.Count);
             args.Request.Data.SetStorageItems(items, readOnly: true);
         }
         catch (Exception ex)
         {
             Logger.LogException("共有データの準備に失敗しました", ex);
-            args.Request.FailWithDisplayText("共有データを準備できませんでした");
+            args.Request.FailWithDisplayText(LocalizationService.Text("Text.Share.PrepareFailed"));
         }
         finally
         {

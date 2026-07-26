@@ -37,43 +37,51 @@ internal static partial class ShellContextMenuService
                 return false;
             }
 
-            var hmenu = CreatePopupMenu();
-            if (hmenu == 0)
-            {
-                LogVerbFailure(verb, path, "CreatePopupMenu");
-                return false;
-            }
-
-            var verbPtr = Marshal.StringToHGlobalAnsi(verb);
+            // IContextMenu の実体はサードパーティのシェル拡張。使い終えたら必ず手放す
             try
             {
-                if (menu.QueryContextMenu(hmenu, 0, 1, 0x7FFF, 0) < 0)
+                var hmenu = CreatePopupMenu();
+                if (hmenu == 0)
                 {
-                    LogVerbFailure(verb, path, "QueryContextMenu");
+                    LogVerbFailure(verb, path, "CreatePopupMenu");
                     return false;
                 }
 
-                unsafe
+                var verbPtr = Marshal.StringToHGlobalAnsi(verb);
+                try
                 {
-                    var info = new CmInvokeCommandInfo
+                    if (menu.QueryContextMenu(hmenu, 0, 1, 0x7FFF, 0) < 0)
                     {
-                        Size = (uint)sizeof(CmInvokeCommandInfo),
-                        Hwnd = hwnd,
-                        Verb = verbPtr,
-                        Show = 1,
-                    };
-                    var hr = menu.InvokeCommand((nint)(&info));
-                    if (hr < 0)
-                    {
-                        LogVerbFailure(verb, path, $"InvokeCommand (hr=0x{hr:X8})");
+                        LogVerbFailure(verb, path, "QueryContextMenu");
+                        return false;
                     }
-                    return hr >= 0;
+
+                    unsafe
+                    {
+                        var info = new CmInvokeCommandInfo
+                        {
+                            Size = (uint)sizeof(CmInvokeCommandInfo),
+                            Hwnd = hwnd,
+                            Verb = verbPtr,
+                            Show = 1,
+                        };
+                        var hr = menu.InvokeCommand((nint)(&info));
+                        if (hr < 0)
+                        {
+                            LogVerbFailure(verb, path, $"InvokeCommand (hr=0x{hr:X8})");
+                        }
+                        return hr >= 0;
+                    }
+                }
+                finally
+                {
+                    Marshal.FreeHGlobal(verbPtr);
+                    DestroyMenu(hmenu);
                 }
             }
             finally
             {
-                Marshal.FreeHGlobal(verbPtr);
-                DestroyMenu(hmenu);
+                ComRelease.Release(menu);
             }
         }
         finally
@@ -114,28 +122,39 @@ internal static partial class ShellContextMenuService
                 CreateObjectFlags.None);
             Marshal.Release(parentPtr);
 
-            result = parent.BindToObject(childPidl, 0, IidIShellFolder, out var folderPtr);
-            if (result < 0 || folderPtr == 0)
+            IShellFolder? folder = null;
+            IContextMenu? menu = null;
+            try
             {
-                return LogBackgroundVerbFailure("IShellFolder.BindToObject", result);
+                result = parent.BindToObject(childPidl, 0, IidIShellFolder, out var folderPtr);
+                if (result < 0 || folderPtr == 0)
+                {
+                    return LogBackgroundVerbFailure("IShellFolder.BindToObject", result);
+                }
+
+                folder = (IShellFolder)wrappers.GetOrCreateObjectForComInstance(
+                    folderPtr,
+                    CreateObjectFlags.None);
+                Marshal.Release(folderPtr);
+
+                result = folder.CreateViewObject(hwnd, IidIContextMenu, out var contextMenuPtr);
+                if (result < 0 || contextMenuPtr == 0)
+                {
+                    return LogBackgroundVerbFailure("IShellFolder.CreateViewObject", result);
+                }
+
+                menu = (IContextMenu)wrappers.GetOrCreateObjectForComInstance(
+                    contextMenuPtr,
+                    CreateObjectFlags.None);
+                Marshal.Release(contextMenuPtr);
+                return InvokeVerb(menu, hwnd, verb);
             }
-
-            var folder = (IShellFolder)wrappers.GetOrCreateObjectForComInstance(
-                folderPtr,
-                CreateObjectFlags.None);
-            Marshal.Release(folderPtr);
-
-            result = folder.CreateViewObject(hwnd, IidIContextMenu, out var contextMenuPtr);
-            if (result < 0 || contextMenuPtr == 0)
+            finally
             {
-                return LogBackgroundVerbFailure("IShellFolder.CreateViewObject", result);
+                ComRelease.Release(menu);
+                ComRelease.Release(folder);
+                ComRelease.Release(parent);
             }
-
-            var menu = (IContextMenu)wrappers.GetOrCreateObjectForComInstance(
-                contextMenuPtr,
-                CreateObjectFlags.None);
-            Marshal.Release(contextMenuPtr);
-            return InvokeVerb(menu, hwnd, verb);
         }
         finally
         {
@@ -201,19 +220,27 @@ internal static partial class ShellContextMenuService
         var folder = (IShellFolder)wrappers.GetOrCreateObjectForComInstance(folderPtr, CreateObjectFlags.None);
         Marshal.Release(folderPtr);
 
-        nint ctxPtr;
-        unsafe
+        // 返した IContextMenu は呼び出し側が ComRelease.Release する
+        try
         {
-            var child = childPidl;
-            if (folder.GetUIObjectOf(hwnd, 1, (nint)(&child), IidIContextMenu, 0, out ctxPtr) < 0 || ctxPtr == 0)
+            nint ctxPtr;
+            unsafe
             {
-                return null;
+                var child = childPidl;
+                if (folder.GetUIObjectOf(hwnd, 1, (nint)(&child), IidIContextMenu, 0, out ctxPtr) < 0 || ctxPtr == 0)
+                {
+                    return null;
+                }
             }
-        }
 
-        var menu = (IContextMenu)wrappers.GetOrCreateObjectForComInstance(ctxPtr, CreateObjectFlags.None);
-        Marshal.Release(ctxPtr);
-        return menu;
+            var menu = (IContextMenu)wrappers.GetOrCreateObjectForComInstance(ctxPtr, CreateObjectFlags.None);
+            Marshal.Release(ctxPtr);
+            return menu;
+        }
+        finally
+        {
+            ComRelease.Release(folder);
+        }
     }
 
     /// <summary>指定パスのシェルコンテキストメニューをスクリーン座標 (x, y) に表示する。コマンド実行時 true。</summary>
@@ -270,6 +297,7 @@ internal static partial class ShellContextMenuService
         {
             if (SHBindToParent(pidls[i], IidIShellFolder, out var parentPtr, out var child) < 0 || parentPtr == 0)
             {
+                ComRelease.Release(folder);
                 return false;
             }
 
@@ -285,6 +313,7 @@ internal static partial class ShellContextMenuService
                 if (folder.GetUIObjectOf(hwnd, (uint)children.Length, (nint)pChildren, IidIContextMenu, 0, out ctxPtr) < 0
                     || ctxPtr == 0)
                 {
+                    ComRelease.Release(folder);
                     return false;
                 }
             }
@@ -297,6 +326,8 @@ internal static partial class ShellContextMenuService
         var hmenu = CreatePopupMenu();
         if (hmenu == 0)
         {
+            ComRelease.Release(menu);
+            ComRelease.Release(folder);
             return false;
         }
 
@@ -373,6 +404,9 @@ internal static partial class ShellContextMenuService
         finally
         {
             DestroyMenu(hmenu);
+            // IContextMenu の実体はサードパーティのシェル拡張。GC 任せにせずここで手放す
+            ComRelease.Release(menu);
+            ComRelease.Release(folder);
         }
     }
 

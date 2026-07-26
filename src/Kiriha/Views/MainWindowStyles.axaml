@@ -580,4 +580,41 @@
             <Setter Property="CornerRadius" Value="10" />
             <Setter Property="Padding" Value="14,8" />
         </Style>
+
+        <!-- ギャラリーの動画コントロールバー。プレビュー領域へ重ねるため、テーマ配色ではなく
+             映像の上で見やすい半透明の暗色で固定する（ギャラリー自体が黒背景固定なのと揃える）。 -->
+        <Style Selector="Border.videobar">
+            <Setter Property="Background" Value="#B3000000" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Padding" Value="8,6" />
+            <Setter Property="Margin" Value="12" />
+        </Style>
+        <Style Selector="Border.videobar Button.videobtn">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Foreground" Value="#DDDDDD" />
+            <Setter Property="Width" Value="34" />
+            <Setter Property="Height" Value="30" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style Selector="Border.videobar Button.videobtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#33FFFFFF" />
+            <Setter Property="TextElement.Foreground" Value="#FFFFFF" />
+        </Style>
+        <!-- ループ ON はアクセントカラーで示す（トグル状態が一目で分かるように） -->
+        <Style Selector="Border.videobar Button.videobtn.active">
+            <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorLight2}" />
+        </Style>
+        <Style Selector="Border.videobar TextBlock.videotime">
+            <Setter Property="Foreground" Value="#DDDDDD" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style Selector="Border.videobar Slider">
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="Padding" Value="0" />
+        </Style>
 </Styles>

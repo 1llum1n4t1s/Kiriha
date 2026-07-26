@@ -1,22 +1,28 @@
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Kiriha.Services;
 
 namespace Kiriha.ViewModels;
 
 /// <summary>詳細表示の1カラム。幅・表示状態・ソート表示を所有タブへ中継する。</summary>
 public partial class DetailColumnViewModel : ObservableObject
 {
-    public DetailColumnViewModel(TabViewModel owner, string key, string title)
+    public DetailColumnViewModel(TabViewModel owner, string key, string titleKey)
     {
         Owner = owner;
         Key = key;
-        Title = title;
+        TitleKey = titleKey;
         owner.PropertyChanged += Owner_PropertyChanged;
+        LocalizationService.Changed += Localization_Changed;
     }
 
     public TabViewModel Owner { get; }
     public string Key { get; }
-    public string Title { get; }
+
+    /// <summary>列見出しのロケールキー。表示名は現在の言語で都度解決する。</summary>
+    public string TitleKey { get; }
+
+    public string Title => LocalizationService.Text(TitleKey);
 
     [ObservableProperty] private bool _isDragging;
     [ObservableProperty] private bool _isDropTarget;
@@ -85,5 +91,11 @@ public partial class DetailColumnViewModel : ObservableObject
             OnPropertyChanged(nameof(SortGlyph));
     }
 
-    public void Detach() => Owner.PropertyChanged -= Owner_PropertyChanged;
+    private void Localization_Changed(object? sender, EventArgs e) => OnPropertyChanged(nameof(Title));
+
+    public void Detach()
+    {
+        Owner.PropertyChanged -= Owner_PropertyChanged;
+        LocalizationService.Changed -= Localization_Changed;
+    }
 }

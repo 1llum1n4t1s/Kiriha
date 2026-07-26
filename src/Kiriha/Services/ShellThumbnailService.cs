@@ -67,22 +67,31 @@ internal static partial class ShellThumbnailService
                 Marshal.Release(factoryPointer);
             }
 
-            if (factory.GetImage(
-                    new NativeSize(requestedSize, requestedSize),
-                    flags,
-                    out var hBitmap) < 0
-                || hBitmap == 0)
-            {
-                return null;
-            }
-
             try
             {
-                return CopyBitmap(hBitmap, alphaFormat);
+                if (factory.GetImage(
+                        new NativeSize(requestedSize, requestedSize),
+                        flags,
+                        out var hBitmap) < 0
+                    || hBitmap == 0)
+                {
+                    return null;
+                }
+
+                try
+                {
+                    return CopyBitmap(hBitmap, alphaFormat);
+                }
+                finally
+                {
+                    _ = DeleteObject(hBitmap);
+                }
             }
             finally
             {
-                _ = DeleteObject(hBitmap);
+                // 1 ファイルにつき 2 回（低解像度→高解像度）通る最頻経路。ここを放置すると
+                // シェルのサムネイルハンドラーが GC まで生き残る。
+                ComRelease.Release(factory);
             }
         }
         finally

@@ -1,0 +1,353 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:String x:Key="Text.A11y.OpenSubfolders" xml:space="preserve">Unterordner anzeigen</x:String>
+  <x:String x:Key="Text.A11y.ResizeVerticalTabs" xml:space="preserve">Breite der vertikalen Tableiste ändern</x:String>
+  <x:String x:Key="Text.A11y.SwitchToTree" xml:space="preserve">Zur Baumansicht wechseln</x:String>
+  <x:String x:Key="Text.A11y.ToggleSidebar" xml:space="preserve">Seitenleiste ein-/ausblenden</x:String>
+  <x:String x:Key="Text.A11y.VerticalTabs" xml:space="preserve">Vertikale Tabs</x:String>
+  <x:String x:Key="Text.Address.Copy" xml:space="preserve">Adresse kopieren</x:String>
+  <x:String x:Key="Text.Address.Edit" xml:space="preserve">Adresse bearbeiten</x:String>
+  <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">Aktuellen Ordner hinzufügen</x:String>
+  <x:String x:Key="Text.Bookmarks.AddFolderMenu" xml:space="preserve">Ordner hinzufügen ...</x:String>
+  <x:String x:Key="Text.Bookmarks.AddFolderTitle" xml:space="preserve">Ordner hinzufügen</x:String>
+  <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">Ziehen Sie einen Ordner hierher, um ihn zu den Lesezeichen hinzuzufügen</x:String>
+  <x:String x:Key="Text.Bookmarks.Hide" xml:space="preserve">Lesezeichenleiste ausblenden</x:String>
+  <x:String x:Key="Text.Bookmarks.NewFolderName" xml:space="preserve">Neuer Ordner</x:String>
+  <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">Umbenennen ...</x:String>
+  <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">Lesezeichen umbenennen</x:String>
+  <x:String x:Key="Text.Bookmarks.SortByName" xml:space="preserve">Nach Name sortieren</x:String>
+  <x:String x:Key="Text.Bookmarks.SortByPath" xml:space="preserve">Nach Pfad sortieren</x:String>
+  <x:String x:Key="Text.Caption.MaximizeRestore" xml:space="preserve">Maximieren oder wiederherstellen</x:String>
+  <x:String x:Key="Text.Caption.Minimize" xml:space="preserve">Minimieren</x:String>
+  <x:String x:Key="Text.Clipboard.Copied" xml:space="preserve">{0} Element(e) kopiert</x:String>
+  <x:String x:Key="Text.Clipboard.CopiedToClipboard" xml:space="preserve">In die Zwischenablage kopiert</x:String>
+  <x:String x:Key="Text.Clipboard.CopyFailed" xml:space="preserve">Kopieren in die Zwischenablage nicht möglich</x:String>
+  <x:String x:Key="Text.Clipboard.Cut" xml:space="preserve">{0} Element(e) ausgeschnitten</x:String>
+  <x:String x:Key="Text.Clipboard.VirtualPasteFailed" xml:space="preserve">Die virtuelle Datei konnte nicht eingefügt werden</x:String>
+  <x:String x:Key="Text.Clipboard.WriteFailed" xml:space="preserve">Schreiben in die Zwischenablage nicht möglich</x:String>
+  <x:String x:Key="Text.Column.AutoFitAll" xml:space="preserve">Breite aller Spalten anpassen</x:String>
+  <x:String x:Key="Text.Column.AutoFitThis" xml:space="preserve">Breite dieser Spalte anpassen</x:String>
+  <x:String x:Key="Text.Column.Created" xml:space="preserve">Erstelldatum</x:String>
+  <x:String x:Key="Text.Column.Modified" xml:space="preserve">Änderungsdatum</x:String>
+  <x:String x:Key="Text.Column.Name" xml:space="preserve">Name</x:String>
+  <x:String x:Key="Text.Column.Size" xml:space="preserve">Größe</x:String>
+  <x:String x:Key="Text.Column.Type" xml:space="preserve">Typ</x:String>
+  <x:String x:Key="Text.Command.CopyTip" xml:space="preserve">Kopieren (Strg+C)</x:String>
+  <x:String x:Key="Text.Command.Cut" xml:space="preserve">Ausschneiden</x:String>
+  <x:String x:Key="Text.Command.CutTip" xml:space="preserve">Ausschneiden (Strg+X)</x:String>
+  <x:String x:Key="Text.Command.DeleteTip" xml:space="preserve">Löschen (Entf)</x:String>
+  <x:String x:Key="Text.Command.More" xml:space="preserve">Mehr anzeigen</x:String>
+  <x:String x:Key="Text.Command.NewFolder" xml:space="preserve">Neuer Ordner</x:String>
+  <x:String x:Key="Text.Command.Options" xml:space="preserve">Optionen</x:String>
+  <x:String x:Key="Text.Command.Paste" xml:space="preserve">Einfügen</x:String>
+  <x:String x:Key="Text.Command.PasteTip" xml:space="preserve">Einfügen (Strg+V)</x:String>
+  <x:String x:Key="Text.Command.Rename" xml:space="preserve">Umbenennen</x:String>
+  <x:String x:Key="Text.Command.RenameTip" xml:space="preserve">Umbenennen (F2)</x:String>
+  <x:String x:Key="Text.Command.Share" xml:space="preserve">Teilen</x:String>
+  <x:String x:Key="Text.Command.SidebarTip" xml:space="preserve">Seitenleiste ein-/ausblenden (Schnellzugriff / Baum)</x:String>
+  <x:String x:Key="Text.Command.Sort" xml:space="preserve">Sortieren</x:String>
+  <x:String x:Key="Text.Command.View" xml:space="preserve">Ansicht</x:String>
+  <x:String x:Key="Text.Common.AddToBookmarks" xml:space="preserve">Zu Lesezeichen hinzufügen</x:String>
+  <x:String x:Key="Text.Common.Cancel" xml:space="preserve">Abbrechen</x:String>
+  <x:String x:Key="Text.Common.Close" xml:space="preserve">Schließen</x:String>
+  <x:String x:Key="Text.Common.Copy" xml:space="preserve">Kopieren</x:String>
+  <x:String x:Key="Text.Common.CopyPath" xml:space="preserve">Pfad kopieren</x:String>
+  <x:String x:Key="Text.Common.Delete" xml:space="preserve">Löschen</x:String>
+  <x:String x:Key="Text.Common.Open" xml:space="preserve">Öffnen</x:String>
+  <x:String x:Key="Text.Common.OpenInExplorer" xml:space="preserve">Im Explorer öffnen</x:String>
+  <x:String x:Key="Text.Common.OpenInNewTab" xml:space="preserve">In neuem Tab öffnen</x:String>
+  <x:String x:Key="Text.Common.OpenInTerminal" xml:space="preserve">Im Terminal öffnen</x:String>
+  <x:String x:Key="Text.Common.PinToQuickAccess" xml:space="preserve">An Schnellzugriff anheften</x:String>
+  <x:String x:Key="Text.Common.Properties" xml:space="preserve">Eigenschaften</x:String>
+  <x:String x:Key="Text.Common.UnpinFromQuickAccess" xml:space="preserve">Vom Schnellzugriff lösen</x:String>
+  <x:String x:Key="Text.Drag.Add" xml:space="preserve">Hinzufügen</x:String>
+  <x:String x:Key="Text.Drag.Copy" xml:space="preserve">Kopieren</x:String>
+  <x:String x:Key="Text.Drag.Dragging" xml:space="preserve">Wird gezogen</x:String>
+  <x:String x:Key="Text.Drag.File" xml:space="preserve">Datei</x:String>
+  <x:String x:Key="Text.Drag.Folder" xml:space="preserve">Ordner</x:String>
+  <x:String x:Key="Text.Drag.Move" xml:space="preserve">Verschieben</x:String>
+  <x:String x:Key="Text.Drag.OpenInTab" xml:space="preserve">In Tab öffnen</x:String>
+  <x:String x:Key="Text.Drive.FreeOfTotal" xml:space="preserve">{0} frei von {1}</x:String>
+  <x:String x:Key="Text.Error.AccessDenied" xml:space="preserve">Zugriff verweigert</x:String>
+  <x:String x:Key="Text.Error.Code" xml:space="preserve">Fehler {0}</x:String>
+  <x:String x:Key="Text.Error.CodeWithDesc" xml:space="preserve">Fehler {0}: {1}</x:String>
+  <x:String x:Key="Text.Error.DiskFull" xml:space="preserve">Nicht genügend Speicherplatz auf dem Datenträger</x:String>
+  <x:String x:Key="Text.Error.FileExists" xml:space="preserve">Eine Datei mit demselben Namen ist bereits vorhanden</x:String>
+  <x:String x:Key="Text.Error.InvalidName" xml:space="preserve">Der Dateiname enthält ungültige Zeichen</x:String>
+  <x:String x:Key="Text.Error.PathNotFound" xml:space="preserve">Der Pfad wurde nicht gefunden</x:String>
+  <x:String x:Key="Text.Error.PathTooLong" xml:space="preserve">Der Pfad ist zu lang</x:String>
+  <x:String x:Key="Text.Error.SharingViolation" xml:space="preserve">Die Datei wird von einem anderen Prozess verwendet</x:String>
+  <x:String x:Key="Text.Error.WriteProtected" xml:space="preserve">Das Medium ist schreibgeschützt</x:String>
+  <x:String x:Key="Text.Exif.Camera" xml:space="preserve">Kamera</x:String>
+  <x:String x:Key="Text.Exif.CameraMaker" xml:space="preserve">Kamerahersteller</x:String>
+  <x:String x:Key="Text.Exif.DateModified" xml:space="preserve">Änderungsdatum</x:String>
+  <x:String x:Key="Text.Exif.DateTaken" xml:space="preserve">Aufnahmedatum</x:String>
+  <x:String x:Key="Text.Exif.Dimensions" xml:space="preserve">Abmessungen</x:String>
+  <x:String x:Key="Text.Exif.ExposureBias" xml:space="preserve">Belichtungskorrektur</x:String>
+  <x:String x:Key="Text.Exif.ExposureTime" xml:space="preserve">Belichtungszeit</x:String>
+  <x:String x:Key="Text.Exif.FNumber" xml:space="preserve">Blende</x:String>
+  <x:String x:Key="Text.Exif.Flash" xml:space="preserve">Blitz</x:String>
+  <x:String x:Key="Text.Exif.FocalLength" xml:space="preserve">Brennweite</x:String>
+  <x:String x:Key="Text.Exif.Iso" xml:space="preserve">ISO-Wert</x:String>
+  <x:String x:Key="Text.Exif.Lens" xml:space="preserve">Objektiv</x:String>
+  <x:String x:Key="Text.Exif.Size" xml:space="preserve">Größe</x:String>
+  <x:String x:Key="Text.Exif.Type" xml:space="preserve">Typ</x:String>
+  <x:String x:Key="Text.FileList.EmptyFolder" xml:space="preserve">Dieser Ordner ist leer.</x:String>
+  <x:String x:Key="Text.Folder.Desktop" xml:space="preserve">Desktop</x:String>
+  <x:String x:Key="Text.Folder.Documents" xml:space="preserve">Dokumente</x:String>
+  <x:String x:Key="Text.Folder.Downloads" xml:space="preserve">Downloads</x:String>
+  <x:String x:Key="Text.Folder.Music" xml:space="preserve">Musik</x:String>
+  <x:String x:Key="Text.Folder.Pictures" xml:space="preserve">Bilder</x:String>
+  <x:String x:Key="Text.Folder.Videos" xml:space="preserve">Videos</x:String>
+  <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">Galerie beenden (Esc)</x:String>
+  <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">Bildinformationen</x:String>
+  <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">Für dieses Bild sind keine Informationen vorhanden.</x:String>
+  <x:String x:Key="Text.Integration.OpenWithKiriha" xml:space="preserve">Mit Kiriha öffnen</x:String>
+  <x:String x:Key="Text.Launch.ExplorerFailed" xml:space="preserve">Der Explorer konnte nicht gestartet werden: {0}</x:String>
+  <x:String x:Key="Text.Launch.Failed" xml:space="preserve">Start nicht möglich: {0}</x:String>
+  <x:String x:Key="Text.Launch.TerminalFailed" xml:space="preserve">Das Terminal konnte nicht gestartet werden: {0}</x:String>
+  <x:String x:Key="Text.License.Activate" xml:space="preserve">Aktivieren</x:String>
+  <x:String x:Key="Text.License.Exit" xml:space="preserve">Beenden</x:String>
+  <x:String x:Key="Text.License.KeyPlaceholder" xml:space="preserve">Lizenzschlüssel, der mit KIRIHA- beginnt</x:String>
+  <x:String x:Key="Text.License.Lock.OnlineCheckBody" xml:space="preserve">Die Lizenz wurde seit mehr als 30 Tagen nicht online überprüft. Stellen Sie eine Internetverbindung her und drücken Sie „Erneut online prüfen“.</x:String>
+  <x:String x:Key="Text.License.Lock.OnlineCheckTitle" xml:space="preserve">Die Lizenz muss online überprüft werden</x:String>
+  <x:String x:Key="Text.License.Lock.TrialExpiredBody" xml:space="preserve">Für die Nutzung von Kiriha ist eine aktivierte Lizenz erforderlich (¥980, einmaliger Kauf).</x:String>
+  <x:String x:Key="Text.License.Lock.TrialExpiredTitle" xml:space="preserve">Der Testzeitraum ist abgelaufen</x:String>
+  <x:String x:Key="Text.License.Msg.Activated" xml:space="preserve">Die Lizenz wurde aktiviert 🎉 Vielen Dank!</x:String>
+  <x:String x:Key="Text.License.Msg.CheckOk" xml:space="preserve">Überprüfung abgeschlossen. Danke, dass Sie Kiriha nutzen!</x:String>
+  <x:String x:Key="Text.License.Msg.Checking" xml:space="preserve">Wird online überprüft …</x:String>
+  <x:String x:Key="Text.License.Msg.EnterKey" xml:space="preserve">Geben Sie den beim Kauf ausgestellten Lizenzschlüssel ein.</x:String>
+  <x:String x:Key="Text.License.Msg.InvalidKey" xml:space="preserve">Dieser Lizenzschlüssel ist ungültig. Prüfen Sie, ob beim Kopieren Zeichen fehlen oder Leerzeichen hinzugekommen sind.</x:String>
+  <x:String x:Key="Text.License.Msg.PurchaseFailed" xml:space="preserve">Die Kaufseite konnte nicht geöffnet werden. Bitte versuchen Sie es später erneut.</x:String>
+  <x:String x:Key="Text.License.Msg.PurchaseOpened" xml:space="preserve">Die Kaufseite wurde im Browser geöffnet. Fügen Sie den auf der Bestätigungsseite angezeigten Lizenzschlüssel oben ein.</x:String>
+  <x:String x:Key="Text.License.Msg.Revoked" xml:space="preserve">Diese Lizenz ist nicht mehr gültig (z. B. nach einer Rückerstattung). Bitte kaufen Sie erneut.</x:String>
+  <x:String x:Key="Text.License.Msg.ServerUnreachable" xml:space="preserve">Der Server war nicht erreichbar. Prüfen Sie Ihre Netzwerkverbindung und versuchen Sie es erneut.</x:String>
+  <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">Kaufseite öffnen (¥980, einmalig)</x:String>
+  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">Nach dem Kauf wird der Lizenzschlüssel auf der Zahlungsbestätigung angezeigt. Es ist kein Konto und kein Passwort nötig.</x:String>
+  <x:String x:Key="Text.License.Recheck" xml:space="preserve">Erneut online prüfen</x:String>
+  <x:String x:Key="Text.License.Status.Licensed" xml:space="preserve">Lizenz aktiviert: {0}</x:String>
+  <x:String x:Key="Text.License.Status.OnlineCheck" xml:space="preserve">Die Lizenz muss online überprüft werden (bitte mit dem Internet verbinden)</x:String>
+  <x:String x:Key="Text.License.Status.Trial" xml:space="preserve">Testzeitraum (noch {0} Tag(e))</x:String>
+  <x:String x:Key="Text.License.Status.TrialExpired" xml:space="preserve">Testzeitraum beendet (Lizenz erforderlich)</x:String>
+  <x:String x:Key="Text.Menu.About" xml:space="preserve">Über Kiriha</x:String>
+  <x:String x:Key="Text.Menu.AccessDenied" xml:space="preserve">(Zugriff verweigert)</x:String>
+  <x:String x:Key="Text.Menu.BookmarksBar" xml:space="preserve">Lesezeichenleiste</x:String>
+  <x:String x:Key="Text.Menu.CheckUpdate" xml:space="preserve">Nach Updates suchen</x:String>
+  <x:String x:Key="Text.Menu.Empty" xml:space="preserve">(Leer)</x:String>
+  <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">Neues Fenster</x:String>
+  <x:String x:Key="Text.Menu.NoSubfolders" xml:space="preserve">(Keine Unterordner)</x:String>
+  <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(Keine)</x:String>
+  <x:String x:Key="Text.Nav.Back" xml:space="preserve">Zurück</x:String>
+  <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">Zurück (Rechtsklick für Verlauf)</x:String>
+  <x:String x:Key="Text.Nav.EditPathTip" xml:space="preserve">Klicken, um den Pfad zu bearbeiten</x:String>
+  <x:String x:Key="Text.Nav.Forward" xml:space="preserve">Vorwärts</x:String>
+  <x:String x:Key="Text.Nav.ForwardTip" xml:space="preserve">Vorwärts (Rechtsklick für Verlauf)</x:String>
+  <x:String x:Key="Text.Nav.Home" xml:space="preserve">Start</x:String>
+  <x:String x:Key="Text.Nav.HomeTip" xml:space="preserve">Start (Alt+Pos1 / Rechtsklick für häufige Ordner)</x:String>
+  <x:String x:Key="Text.Nav.OpenFailed" xml:space="preserve">Öffnen nicht möglich: {0}</x:String>
+  <x:String x:Key="Text.Nav.OpenSettings" xml:space="preserve">Einstellungen öffnen</x:String>
+  <x:String x:Key="Text.Nav.Refresh" xml:space="preserve">Aktualisieren</x:String>
+  <x:String x:Key="Text.Nav.Settings" xml:space="preserve">Einstellungen</x:String>
+  <x:String x:Key="Text.Nav.UpFolder" xml:space="preserve">Eine Ebene nach oben</x:String>
+  <x:String x:Key="Text.Nav.UpTip" xml:space="preserve">Eine Ebene nach oben (Rechtsklick für übergeordnete Ordner)</x:String>
+  <x:String x:Key="Text.New.CreateFailed" xml:space="preserve">Erstellen nicht möglich: {0}</x:String>
+  <x:String x:Key="Text.New.FolderName" xml:space="preserve">Neuer Ordner</x:String>
+  <x:String x:Key="Text.New.ItemName" xml:space="preserve">Neu {0}</x:String>
+  <x:String x:Key="Text.New.UndoFailed" xml:space="preserve">Das Erstellen des neuen Ordners konnte nicht rückgängig gemacht werden: {0}</x:String>
+  <x:String x:Key="Text.Op.Copied" xml:space="preserve">{0} Element(e) kopiert</x:String>
+  <x:String x:Key="Text.Op.DeleteFailed" xml:space="preserve">Löschen fehlgeschlagen ({0})</x:String>
+  <x:String x:Key="Text.Op.Failed" xml:space="preserve">Der Dateivorgang ist fehlgeschlagen ({0})</x:String>
+  <x:String x:Key="Text.Op.Moved" xml:space="preserve">{0} Element(e) verschoben</x:String>
+  <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">Einfügen fehlgeschlagen ({0})</x:String>
+  <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">Umbenennen fehlgeschlagen ({0})</x:String>
+  <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">{0} Datei(en)  {1}</x:String>
+  <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> oder mehr</x:String>
+  <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">Papierkorb leeren</x:String>
+  <x:String x:Key="Text.Rename.AlreadyExists" xml:space="preserve">Eine Datei oder ein Ordner mit diesem Namen ist bereits vorhanden: {0}</x:String>
+  <x:String x:Key="Text.Rename.InvalidChars" xml:space="preserve">Der Dateiname enthält ungültige Zeichen: \ / : * ? " &lt; &gt; |</x:String>
+  <x:String x:Key="Text.Rename.RevertedToOriginal" xml:space="preserve">Das Umbenennen ist fehlgeschlagen, der ursprüngliche Name wurde wiederhergestellt</x:String>
+  <x:String x:Key="Text.Rename.StuckAsTemporary" xml:space="preserve">Das Umbenennen ist fehlgeschlagen, der temporäre Name bleibt bestehen: {0}</x:String>
+  <x:String x:Key="Text.Search.ClearTip" xml:space="preserve">Suche löschen</x:String>
+  <x:String x:Key="Text.Search.Failed" xml:space="preserve">Die Suche ist fehlgeschlagen: {0}</x:String>
+  <x:String x:Key="Text.Search.Found" xml:space="preserve">{0} Treffer gefunden (einschließlich Unterordner)</x:String>
+  <x:String x:Key="Text.Search.Placeholder" xml:space="preserve">{0} durchsuchen</x:String>
+  <x:String x:Key="Text.Search.Searching" xml:space="preserve">Wird gesucht ... (einschließlich Unterordner)</x:String>
+  <x:String x:Key="Text.Search.Truncated" xml:space="preserve">Bei {0} Treffern abgebrochen (die Grenze von 1000 Treffern wurde erreicht, einige Unterordner wurden nicht durchsucht; grenzen Sie die Suche ein, um mehr zu sehen)</x:String>
+  <x:String x:Key="Text.Select.All" xml:space="preserve">Alles auswählen</x:String>
+  <x:String x:Key="Text.Select.FilesOnly" xml:space="preserve">Nur Dateien auswählen</x:String>
+  <x:String x:Key="Text.Select.FoldersOnly" xml:space="preserve">Nur Ordner auswählen</x:String>
+  <x:String x:Key="Text.Select.Invert" xml:space="preserve">Auswahl umkehren</x:String>
+  <x:String x:Key="Text.Select.None" xml:space="preserve">Auswahl aufheben</x:String>
+  <x:String x:Key="Text.Settings.About" xml:space="preserve">Über Kiriha</x:String>
+  <x:String x:Key="Text.Settings.About.Body" xml:space="preserve">Kiriha vereint die Dateiverwaltung des Windows-Explorers mit den Tabs, der Adressleiste und den Lesezeichen von Chrome in einem Fenster. Die Einstellungen werden für den aktuellen Benutzer gespeichert.</x:String>
+  <x:String x:Key="Text.Settings.Acrylic" xml:space="preserve">Acryleffekt (durchscheinende Unschärfe) für das Fenster verwenden</x:String>
+  <x:String x:Key="Text.Settings.DefaultFolderApp" xml:space="preserve">Kiriha als Standard-App zum Öffnen von Ordnern und Laufwerken festlegen</x:String>
+  <x:String x:Key="Text.Settings.DefaultFolderApp.Off" xml:space="preserve">Wenn aktiviert, startet Kiriha, sobald im Explorer ein Ordner oder Laufwerk geöffnet wird.</x:String>
+  <x:String x:Key="Text.Settings.DefaultFolderApp.On" xml:space="preserve">Ordner und Laufwerke werden derzeit in Kiriha geöffnet. Beim Deaktivieren wird das vorherige Verhalten wiederhergestellt.</x:String>
+  <x:String x:Key="Text.Settings.Display" xml:space="preserve">Darstellung</x:String>
+  <x:String x:Key="Text.Settings.Display.Subtitle" xml:space="preserve">Passen Sie die Dateiliste und das Erscheinungsbild von Kiriha an</x:String>
+  <x:String x:Key="Text.Settings.Explorer" xml:space="preserve">Dateiliste</x:String>
+  <x:String x:Key="Text.Settings.ExplorerContextMenu" xml:space="preserve">„Mit Kiriha öffnen“ zum Kontextmenü des Explorers hinzufügen</x:String>
+  <x:String x:Key="Text.Settings.ExplorerContextMenuNote" xml:space="preserve">So können Sie einen Ordner per Rechtsklick auf den Ordner oder auf den Hintergrund darin in Kiriha öffnen.</x:String>
+  <x:String x:Key="Text.Settings.FolderTree" xml:space="preserve">Ordnerbaum</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Material" xml:space="preserve">Material Icon Theme</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Note" xml:space="preserve">Das Material Icon Theme verwendet material-icon-theme (MIT-Lizenz, © Material Extensions). Der Windows-Satz zeigt dieselben Shell-Symbole wie der Explorer.</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Original" xml:space="preserve">Original-Symbole von Kiriha</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Windows" xml:space="preserve">Windows-Shell-Symbole</x:String>
+  <x:String x:Key="Text.Settings.Icons" xml:space="preserve">Symbole</x:String>
+  <x:String x:Key="Text.Settings.Language" xml:space="preserve">Anzeigesprache</x:String>
+  <x:String x:Key="Text.Settings.Language.Note" xml:space="preserve">Standardmäßig wird die Sprache aus der Windows-Anzeigesprache ermittelt.</x:String>
+  <x:String x:Key="Text.Settings.License" xml:space="preserve">Lizenz</x:String>
+  <x:String x:Key="Text.Settings.Maintenance" xml:space="preserve">Wartung</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.Data" xml:space="preserve">Daten und Cache</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.OpenLogFolder" xml:space="preserve">Protokollordner öffnen</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.ReloadQuickAccess" xml:space="preserve">Schnellzugriff neu laden</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.ResetSettings" xml:space="preserve">Einstellungen zurücksetzen</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.Subtitle" xml:space="preserve">Cache, Protokolle und Einstellungsdaten verwalten</x:String>
+  <x:String x:Key="Text.Settings.MinimizeToTray" xml:space="preserve">Beim Minimieren in den Infobereich ablegen</x:String>
+  <x:String x:Key="Text.Settings.MinimizeToTrayNote" xml:space="preserve">Beim Minimieren verschwindet Kiriha aus der Taskleiste und kann über das Symbol im Infobereich wiederhergestellt werden.</x:String>
+  <x:String x:Key="Text.Settings.Mouse" xml:space="preserve">Maus</x:String>
+  <x:String x:Key="Text.Settings.Mouse.BackgroundDoubleClick" xml:space="preserve">Beim Doppelklick auf den Ordnerhintergrund</x:String>
+  <x:String x:Key="Text.Settings.Mouse.BackgroundMiddleClick" xml:space="preserve">Beim Klick mit dem Mausrad auf den Ordnerhintergrund</x:String>
+  <x:String x:Key="Text.Settings.Mouse.CloseTab" xml:space="preserve">Tab schließen</x:String>
+  <x:String x:Key="Text.Settings.Mouse.None" xml:space="preserve">Nichts tun</x:String>
+  <x:String x:Key="Text.Settings.Mouse.Pin" xml:space="preserve">Tab anheften</x:String>
+  <x:String x:Key="Text.Settings.Mouse.Refresh" xml:space="preserve">Aktualisieren</x:String>
+  <x:String x:Key="Text.Settings.Mouse.TabDoubleClick" xml:space="preserve">Beim Doppelklick auf einen Tab</x:String>
+  <x:String x:Key="Text.Settings.Mouse.TabMiddleClick" xml:space="preserve">Beim Klick mit dem Mausrad auf einen Tab</x:String>
+  <x:String x:Key="Text.Settings.Mouse.Up" xml:space="preserve">Eine Ebene nach oben</x:String>
+  <x:String x:Key="Text.Settings.RunAtStartup" xml:space="preserve">Kiriha beim Start von Windows ausführen</x:String>
+  <x:String x:Key="Text.Settings.RunAtStartupNote" xml:space="preserve">Kiriha startet automatisch bei der Anmeldung.</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts" xml:space="preserve">Tastenkürzel</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.FileOps" xml:space="preserve">Dateivorgänge</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.FileOpsBody" xml:space="preserve">Strg+X / C / V　Ausschneiden, kopieren, einfügen　　Entf / Umschalt+Entf　Löschen, endgültig löschen&#10;F2　Umbenennen　　Alt+Eingabe　Eigenschaften　　Strg+Umschalt+N　Neuer Ordner　　Alt+P　Vorschau</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.Navigation" xml:space="preserve">Navigation und Ansicht</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.NavigationBody" xml:space="preserve">Strg+L / F4　Adresse bearbeiten&#10;Strg+F / F3　Suchen&#10;Alt+← / →　Zurück und vorwärts&#10;Alt+↑　Eine Ebene nach oben&#10;F5　Aktualisieren / F11　Vollbild</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.Subtitle" xml:space="preserve">Tastenkürzel für schnelleres Arbeiten</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.Tabs" xml:space="preserve">Tabs</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.TabsBody" xml:space="preserve">Strg+T　Neuer Tab&#10;Strg+W　Tab schließen&#10;Strg+Umschalt+T　Geschlossenen Tab öffnen&#10;Strg+Tab　Tabs wechseln&#10;Strg+1..9　Bestimmten Tab auswählen</x:String>
+  <x:String x:Key="Text.Settings.ShowBookmarksBar" xml:space="preserve">Lesezeichenleiste anzeigen (Strg+Umschalt+B)</x:String>
+  <x:String x:Key="Text.Settings.ShowCheckBoxes" xml:space="preserve">Kontrollkästchen für Elemente anzeigen</x:String>
+  <x:String x:Key="Text.Settings.ShowExtensions" xml:space="preserve">Dateinamenerweiterungen anzeigen</x:String>
+  <x:String x:Key="Text.Settings.ShowHidden" xml:space="preserve">Versteckte Dateien anzeigen</x:String>
+  <x:String x:Key="Text.Settings.StartMinimizedToTray" xml:space="preserve">Beim Start in den Infobereich ablegen</x:String>
+  <x:String x:Key="Text.Settings.StartMinimizedToTrayNote" xml:space="preserve">Kiriha startet ohne Fenster und liegt im Infobereich.</x:String>
+  <x:String x:Key="Text.Settings.Startup" xml:space="preserve">Start</x:String>
+  <x:String x:Key="Text.Settings.Startup.Behavior" xml:space="preserve">Startverhalten</x:String>
+  <x:String x:Key="Text.Settings.Startup.PathCaption" xml:space="preserve">Ordner für neue Tabs (leer lassen für Ihren Benutzerordner)</x:String>
+  <x:String x:Key="Text.Settings.Startup.RestoreTabs" xml:space="preserve">Beim Beenden geöffnete Tabs wiederherstellen</x:String>
+  <x:String x:Key="Text.Settings.Startup.Subtitle" xml:space="preserve">Start, Windows-Integration und Infobereich verwalten</x:String>
+  <x:String x:Key="Text.Settings.Theme" xml:space="preserve">Design</x:String>
+  <x:String x:Key="Text.Settings.Theme.Dark" xml:space="preserve">Dunkel</x:String>
+  <x:String x:Key="Text.Settings.Theme.Light" xml:space="preserve">Hell</x:String>
+  <x:String x:Key="Text.Settings.Theme.System" xml:space="preserve">System</x:String>
+  <x:String x:Key="Text.Settings.Tray" xml:space="preserve">Infobereich</x:String>
+  <x:String x:Key="Text.Settings.TreeDragDisabled" xml:space="preserve">Ziehen aus dem Baum nicht zulassen</x:String>
+  <x:String x:Key="Text.Settings.TreeDropDisabled" xml:space="preserve">Ablegen im Baum nicht zulassen</x:String>
+  <x:String x:Key="Text.Settings.Updates" xml:space="preserve">Updates und Info</x:String>
+  <x:String x:Key="Text.Settings.Updates.CheckNow" xml:space="preserve">Jetzt nach Updates suchen</x:String>
+  <x:String x:Key="Text.Settings.Updates.CheckOnStartup" xml:space="preserve">Beim Start nach Updates suchen</x:String>
+  <x:String x:Key="Text.Settings.Updates.Subtitle" xml:space="preserve">Kiriha-Version prüfen und Updates verwalten</x:String>
+  <x:String x:Key="Text.Settings.Updates.VersionCard" xml:space="preserve">Version und Updates</x:String>
+  <x:String x:Key="Text.Settings.Window" xml:space="preserve">Fenster</x:String>
+  <x:String x:Key="Text.Settings.Window.RememberBounds" xml:space="preserve">Fenstergröße und -position merken</x:String>
+  <x:String x:Key="Text.Settings.Window.RememberBoundsNote" xml:space="preserve">Wenn deaktiviert, startet Kiriha beim nächsten Mal mit Standardgröße und -position.</x:String>
+  <x:String x:Key="Text.Settings.WindowsIntegration" xml:space="preserve">Windows-Integration</x:String>
+  <x:String x:Key="Text.Share.FileCount" xml:space="preserve">{0} Datei(en)</x:String>
+  <x:String x:Key="Text.Share.FoldersNotSupported" xml:space="preserve">Ordner können nicht geteilt werden (bitte Dateien auswählen)</x:String>
+  <x:String x:Key="Text.Share.NoItems" xml:space="preserve">Es gibt nichts zu teilen</x:String>
+  <x:String x:Key="Text.Share.OpenFailed" xml:space="preserve">Das Teilen-Fenster konnte nicht geöffnet werden</x:String>
+  <x:String x:Key="Text.Share.PrepareFailed" xml:space="preserve">Die Daten zum Teilen konnten nicht vorbereitet werden</x:String>
+  <x:String x:Key="Text.Share.SelectFiles" xml:space="preserve">Wählen Sie die Dateien aus, die Sie teilen möchten</x:String>
+  <x:String x:Key="Text.Sidebar.Drives" xml:space="preserve">Laufwerke</x:String>
+  <x:String x:Key="Text.Sidebar.QuickAccess" xml:space="preserve">Schnellzugriff</x:String>
+  <x:String x:Key="Text.Sidebar.RecentFiles" xml:space="preserve">Zuletzt verwendete Dateien</x:String>
+  <x:String x:Key="Text.Sidebar.RecycleBin" xml:space="preserve">Papierkorb</x:String>
+  <x:String x:Key="Text.Sidebar.RecycleBinTip" xml:space="preserve">Papierkorb im Explorer öffnen</x:String>
+  <x:String x:Key="Text.Sidebar.ToggleTip" xml:space="preserve">Zwischen Schnellzugriff und Ordnerbaum wechseln</x:String>
+  <x:String x:Key="Text.Sidebar.TreeView" xml:space="preserve">Baumansicht</x:String>
+  <x:String x:Key="Text.Sort.Ascending" xml:space="preserve">Aufsteigend</x:String>
+  <x:String x:Key="Text.Sort.Descending" xml:space="preserve">Absteigend</x:String>
+  <x:String x:Key="Text.Status.Breakdown" xml:space="preserve">({0} Ordner, {1} Datei(en))</x:String>
+  <x:String x:Key="Text.Status.ClearSelectionTip" xml:space="preserve">Klicken, um die Auswahl aufzuheben</x:String>
+  <x:String x:Key="Text.Status.DetailsViewTip" xml:space="preserve">Detailansicht</x:String>
+  <x:String x:Key="Text.Status.FreeSpace" xml:space="preserve">Freier Speicher: {0}</x:String>
+  <x:String x:Key="Text.Status.IconSizeTip" xml:space="preserve">Symbolgröße</x:String>
+  <x:String x:Key="Text.Status.ItemCount" xml:space="preserve">{0} Element(e)</x:String>
+  <x:String x:Key="Text.Status.ItemCountFiltered" xml:space="preserve">{0} Element(e) (Suche: {1})</x:String>
+  <x:String x:Key="Text.Status.ItemsSelected" xml:space="preserve">{0} Element(e) ausgewählt</x:String>
+  <x:String x:Key="Text.Status.LargeIconsTip" xml:space="preserve">Große Symbole</x:String>
+  <x:String x:Key="Text.Tab.Category" xml:space="preserve">Tabs</x:String>
+  <x:String x:Key="Text.Tab.Close" xml:space="preserve">Tab schließen</x:String>
+  <x:String x:Key="Text.Tab.CloseBelow" xml:space="preserve">Tabs unterhalb schließen</x:String>
+  <x:String x:Key="Text.Tab.CloseOthers" xml:space="preserve">Andere Tabs schließen</x:String>
+  <x:String x:Key="Text.Tab.Duplicate" xml:space="preserve">Tab duplizieren</x:String>
+  <x:String x:Key="Text.Tab.MoreActions" xml:space="preserve">Weitere Tab-Aktionen</x:String>
+  <x:String x:Key="Text.Tab.New" xml:space="preserve">Neuer Tab</x:String>
+  <x:String x:Key="Text.Tab.NewBelow" xml:space="preserve">Neuen Tab unterhalb öffnen</x:String>
+  <x:String x:Key="Text.Tab.NewTip" xml:space="preserve">Neuer Tab (Strg+T)</x:String>
+  <x:String x:Key="Text.Tab.Pin" xml:space="preserve">Tab anheften</x:String>
+  <x:String x:Key="Text.Tab.Pinned" xml:space="preserve">Angehefteter Tab</x:String>
+  <x:String x:Key="Text.Tab.RecentlyClosed" xml:space="preserve">Zuletzt geschlossene Tabs</x:String>
+  <x:String x:Key="Text.Tab.Reopen" xml:space="preserve">Geschlossenen Tab öffnen</x:String>
+  <x:String x:Key="Text.Tab.Unpin" xml:space="preserve">Tab lösen</x:String>
+  <x:String x:Key="Text.TabAction.CloseDuplicates" xml:space="preserve">Doppelte Tabs desselben Ordners schließen</x:String>
+  <x:String x:Key="Text.TabAction.CloseLeft" xml:space="preserve">Tabs oberhalb schließen</x:String>
+  <x:String x:Key="Text.TabAction.CloseUnpinned" xml:space="preserve">Alle nicht angehefteten Tabs schließen</x:String>
+  <x:String x:Key="Text.TabAction.CopyAllPaths" xml:space="preserve">Pfade aller Tabs kopieren</x:String>
+  <x:String x:Key="Text.TabAction.CopyMarkdown" xml:space="preserve">Tab als Markdown-Link kopieren</x:String>
+  <x:String x:Key="Text.TabAction.CopyTitle" xml:space="preserve">Tabnamen kopieren</x:String>
+  <x:String x:Key="Text.TabAction.CopyUri" xml:space="preserve">Tab als file-URI kopieren</x:String>
+  <x:String x:Key="Text.TabAction.MoveFirst" xml:space="preserve">Tab nach ganz oben verschieben</x:String>
+  <x:String x:Key="Text.TabAction.MoveLast" xml:space="preserve">Tab nach ganz unten verschieben</x:String>
+  <x:String x:Key="Text.TabAction.OpenParent" xml:space="preserve">Übergeordneten Ordner in neuem Tab öffnen</x:String>
+  <x:String x:Key="Text.TabAction.PinAll" xml:space="preserve">Alle Tabs anheften</x:String>
+  <x:String x:Key="Text.TabAction.PinLeft" xml:space="preserve">Tabs oberhalb anheften</x:String>
+  <x:String x:Key="Text.TabAction.PinRight" xml:space="preserve">Tabs unterhalb anheften</x:String>
+  <x:String x:Key="Text.TabAction.ReloadAll" xml:space="preserve">Alle Tabs neu laden</x:String>
+  <x:String x:Key="Text.TabAction.ReloadLeft" xml:space="preserve">Tabs oberhalb neu laden</x:String>
+  <x:String x:Key="Text.TabAction.ReloadRight" xml:space="preserve">Tabs unterhalb neu laden</x:String>
+  <x:String x:Key="Text.TabAction.Reverse" xml:space="preserve">Tab-Reihenfolge umkehren</x:String>
+  <x:String x:Key="Text.TabAction.SortByName" xml:space="preserve">Tabs nach Name sortieren</x:String>
+  <x:String x:Key="Text.TabAction.SortByPath" xml:space="preserve">Tabs nach Pfad sortieren</x:String>
+  <x:String x:Key="Text.TabAction.UnpinAll" xml:space="preserve">Alle Tabs lösen</x:String>
+  <x:String x:Key="Text.Toast.PathCopied" xml:space="preserve">Pfad kopiert: {0}</x:String>
+  <x:String x:Key="Text.Tooltip.Modified" xml:space="preserve">Änderungsdatum: {0}</x:String>
+  <x:String x:Key="Text.Tooltip.Size" xml:space="preserve">Größe: {0}</x:String>
+  <x:String x:Key="Text.Tooltip.Type" xml:space="preserve">Typ: {0}</x:String>
+  <x:String x:Key="Text.Tray.Exit" xml:space="preserve">Beenden</x:String>
+  <x:String x:Key="Text.Tray.Open" xml:space="preserve">Kiriha öffnen</x:String>
+  <x:String x:Key="Text.Tree.Loading" xml:space="preserve">Wird geladen ...</x:String>
+  <x:String x:Key="Text.Tree.MyComputer" xml:space="preserve">Arbeitsplatz</x:String>
+  <x:String x:Key="Text.Tree.MyDocuments" xml:space="preserve">Eigene Dateien</x:String>
+  <x:String x:Key="Text.Type.ExtFile" xml:space="preserve">{0}-Datei</x:String>
+  <x:String x:Key="Text.Type.File" xml:space="preserve">Datei</x:String>
+  <x:String x:Key="Text.Type.FileFolder" xml:space="preserve">Dateiordner</x:String>
+  <x:String x:Key="Text.Type.LocalDisk" xml:space="preserve">Lokaler Datenträger</x:String>
+  <x:String x:Key="Text.Type.LocalDiskFormat" xml:space="preserve">Lokaler Datenträger ({0})</x:String>
+  <x:String x:Key="Text.Video.Unavailable" xml:space="preserve">Dieses Video kann nicht wiedergegeben werden (kein passender Codec gefunden)</x:String>
+  <x:String x:Key="Text.Video.PlayPauseTip" xml:space="preserve">Wiedergabe / Pause (Leertaste)</x:String>
+  <x:String x:Key="Text.Video.MuteTip" xml:space="preserve">Stumm</x:String>
+  <x:String x:Key="Text.Video.VolumeTip" xml:space="preserve">Lautstärke</x:String>
+  <x:String x:Key="Text.Video.LoopTip" xml:space="preserve">Wiederholen</x:String>
+  <x:String x:Key="Text.Video.RateTip" xml:space="preserve">Wiedergabegeschwindigkeit</x:String>
+  <x:String x:Key="Text.Update.AvailableHeader" xml:space="preserve">Eine neue Version ist verfügbar</x:String>
+  <x:String x:Key="Text.Update.Checking" xml:space="preserve">Nach Updates wird gesucht ...</x:String>
+  <x:String x:Key="Text.Update.DownloadAndInstall" xml:space="preserve">Herunterladen und installieren</x:String>
+  <x:String x:Key="Text.Update.ErrorHeader" xml:space="preserve">Die Updatesuche ist fehlgeschlagen</x:String>
+  <x:String x:Key="Text.Update.IgnoreThisVersion" xml:space="preserve">Diese Version überspringen</x:String>
+  <x:String x:Key="Text.Update.Title" xml:space="preserve">Softwareupdate</x:String>
+  <x:String x:Key="Text.Update.UpToDate" xml:space="preserve">Sie verwenden die neueste Version</x:String>
+  <x:String x:Key="Text.View.Compact" xml:space="preserve">Kompakte Ansicht</x:String>
+  <x:String x:Key="Text.View.Details" xml:space="preserve">Details</x:String>
+  <x:String x:Key="Text.View.ExtraLarge" xml:space="preserve">Extra große Symbole</x:String>
+  <x:String x:Key="Text.View.FileExtensions" xml:space="preserve">Dateinamenerweiterungen</x:String>
+  <x:String x:Key="Text.View.HiddenFiles" xml:space="preserve">Ausgeblendete Elemente</x:String>
+  <x:String x:Key="Text.View.ItemCheckBoxes" xml:space="preserve">Kontrollkästchen für Elemente</x:String>
+  <x:String x:Key="Text.View.Large" xml:space="preserve">Große Symbole</x:String>
+  <x:String x:Key="Text.View.List" xml:space="preserve">Liste</x:String>
+  <x:String x:Key="Text.View.Medium" xml:space="preserve">Mittelgroße Symbole</x:String>
+  <x:String x:Key="Text.View.NavigationPane" xml:space="preserve">Navigationsbereich</x:String>
+  <x:String x:Key="Text.View.PreviewPane" xml:space="preserve">Vorschaubereich</x:String>
+  <x:String x:Key="Text.View.Small" xml:space="preserve">Kleine Symbole</x:String>
+  <x:String x:Key="Text.View.StatusBar" xml:space="preserve">Statusleiste</x:String>
+</ResourceDictionary>

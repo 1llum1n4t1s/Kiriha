@@ -117,6 +117,10 @@ public sealed class AppSettings
     /// <summary>テーマ（System / Light / Dark）。</summary>
     public string ThemePreference { get; set; } = "System";
 
+    /// <summary>UI 表示言語のロケールキー（例: "ja_JP"）。空文字は「自動判定」で、
+    /// 初回インストール直後はこれになる（OS の UI 言語から LocalizationService が決める）。</summary>
+    public string Locale { get; set; } = "";
+
     /// <summary>新しいタブで開く既定フォルダー（空ならユーザーフォルダー）。</summary>
     public string StartupPath { get; set; } = "";
 

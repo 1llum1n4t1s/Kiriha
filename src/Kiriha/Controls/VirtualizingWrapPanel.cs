@@ -536,7 +536,14 @@ public sealed class VirtualizingWrapPanel : VirtualizingPanel
     private void BuildVerticalColumnOffsets(int columnCount)
     {
         _verticalColumnCount = columnCount;
-        _verticalColumnOffsets = new double[columnCount + 1];
+
+        // 1 回の Measure で 2 回呼ばれる（列幅を測る前と後）。列数が変わらない限り配列は使い回す。
+        if (_verticalColumnOffsets.Length != columnCount + 1)
+        {
+            _verticalColumnOffsets = new double[columnCount + 1];
+        }
+
+        _verticalColumnOffsets[0] = 0;
         for (var column = 0; column < columnCount; column++)
         {
             _verticalColumnOffsets[column + 1] =
@@ -551,15 +558,11 @@ public sealed class VirtualizingWrapPanel : VirtualizingPanel
             return 0;
         }
 
-        for (var column = 0; column < _verticalColumnCount; column++)
-        {
-            if (offset < _verticalColumnOffsets[column + 1])
-            {
-                return column;
-            }
-        }
-
-        return _verticalColumnCount - 1;
+        // オフセットは単調増加なので、水平方向（FindHorizontalRow）と同じく二分探索でよい。
+        // 列数は項目数に比例するため、線形走査だと大量ファイルのスクロールで効いてくる。
+        var offsetIndex = Array.BinarySearch(_verticalColumnOffsets, 0, _verticalColumnCount + 1, offset);
+        var column = offsetIndex >= 0 ? offsetIndex : ~offsetIndex - 1;
+        return Math.Clamp(column, 0, _verticalColumnCount - 1);
     }
 
     private void ResetVerticalLayout()

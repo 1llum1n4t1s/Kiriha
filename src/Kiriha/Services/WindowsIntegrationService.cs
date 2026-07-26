@@ -11,7 +11,7 @@ namespace Kiriha.Services;
 public static partial class WindowsIntegrationService
 {
     private const string AppName = "Kiriha";
-    private const string MenuLabel = "Kiriha で開く";
+    private static string MenuLabel => LocalizationService.Text("Text.Integration.OpenWithKiriha");
     private const int ShcneAssocChanged = 0x08000000;
     private const uint ShcnfIdList = 0x0000;
 
@@ -191,7 +191,7 @@ public static partial class WindowsIntegrationService
                 {
                     SaveOriginalDefaultOnce(currentUser, className, shell);
                     using var verb = shell.CreateSubKey(AppName);
-                    verb?.SetValue(null, "Kiriha で開く");
+                    verb?.SetValue(null, MenuLabel);
                     verb?.SetValue("Icon", $"\"{exe}\"");
                     using var command = verb?.CreateSubKey("command");
                     command?.SetValue(null, $"\"{exe}\" \"%1\"");

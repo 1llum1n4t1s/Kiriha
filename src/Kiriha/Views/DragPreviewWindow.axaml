@@ -41,7 +41,7 @@
                 <Border Grid.Column="2" MinWidth="52" Padding="8,4" CornerRadius="9"
                         Background="{DynamicResource AccentBrush}"
                         VerticalAlignment="Center">
-                    <TextBlock x:Name="DragPreviewOperation" Text="ドラッグ中" FontSize="10.5"
+                    <TextBlock x:Name="DragPreviewOperation" Text="{DynamicResource Text.Drag.Dragging}" FontSize="10.5"
                                FontWeight="SemiBold" Foreground="White"
                                HorizontalAlignment="Center" />
                 </Border>

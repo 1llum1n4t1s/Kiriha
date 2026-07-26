@@ -141,7 +141,7 @@ public partial class TabViewModel : ObservableObject
     private bool _showColCreated;
 
     /// <summary>検索ボックスのプレースホルダー（エクスプローラー同様「○○の検索」）。</summary>
-    public string SearchPlaceholder => $"{Title}の検索";
+    public string SearchPlaceholder => LocalizationService.Text("Text.Search.Placeholder", Title);
 
     partial void OnTitleChanged(string value) => OnPropertyChanged(nameof(SearchPlaceholder));
 
@@ -179,9 +179,6 @@ public partial class TabViewModel : ObservableObject
 
     private static readonly string[] ImageExtensions =
         [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".ico"];
-
-    private static readonly string[] VideoThumbnailExtensions =
-        [".mp4", ".m4v", ".mkv", ".avi", ".mov", ".wmv", ".webm", ".mpg", ".mpeg", ".mts", ".m2ts"];
 
     // Skia（Bitmap.DecodeToWidth）が対応しない新世代画像は、Explorer と同じく
     // シェルの WIC コーデック経由でサムネイル・プレビューを生成する（コーデック未導入なら従来どおりアイコン表示）。
@@ -306,10 +303,375 @@ public partial class TabViewModel : ObservableObject
     private void ClearPreview()
     {
         _previewCts?.Cancel();
+        StopVideo();
         PreviewBitmap?.Dispose();
         PreviewBitmap = null;
         PreviewText = "";
         PreviewInfo = "";
+    }
+
+    // ===== ギャラリーの動画再生 =====
+    //
+    // Media Foundation の frame-server 再生（Services/VideoPlaybackSession）を、ここが所有する
+    // 描画フレーム同期のループで駆動する（StartVideoPump 参照）。フレームは 2 枚のビットマップを
+    // 交互に差し替えて Image へ流すので、描画のためにコードビハインドへ降りる必要がない。
+    //
+    // 音量・ミュート・ループ・速度は「そのセッション中の既定」として静的に持ち回る。ファイルを
+    // 送るたびに音量が戻ると使いづらいため。settings.json へは保存しない。
+
+    private static double s_videoVolume = 0.7;
+    private static bool s_videoMuted;
+    private static bool s_videoLooping;
+    private static double s_videoRate = 1.0;
+
+    /// <summary>速度切り替えボタンで巡回する倍率。</summary>
+    private static readonly double[] VideoRates = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0];
+
+    private VideoPlaybackSession? _video;
+
+    /// <summary>描画フレームごとの取り出しループが回っているか（StartVideoPump 参照）。</summary>
+    private bool _videoPumpActive;
+
+    /// <summary>再生位置をスライダーへ書き戻した最後の時刻（Stopwatch のタイムスタンプ）。</summary>
+    private long _lastVideoUiSync;
+
+    private bool _suppressSeek;
+
+    /// <summary>ギャラリーで動画を表示中（コントロールバーの表示条件）。</summary>
+    [ObservableProperty]
+    private bool _isVideoPreview;
+
+    /// <summary>コーデックが無い等で再生できなかった。</summary>
+    [ObservableProperty]
+    private bool _isVideoUnavailable;
+
+    /// <summary>いま画面に出すフレーム。</summary>
+    [ObservableProperty]
+    private WriteableBitmap? _videoFrame;
+
+    [ObservableProperty]
+    private bool _isVideoPlaying;
+
+    [ObservableProperty]
+    private double _videoDurationSeconds;
+
+    [ObservableProperty]
+    private double _videoPositionSeconds;
+
+    [ObservableProperty]
+    private string _videoPositionText = "0:00";
+
+    [ObservableProperty]
+    private string _videoDurationText = "0:00";
+
+    public double VideoVolume
+    {
+        get => s_videoVolume;
+        set
+        {
+            var clamped = Math.Clamp(value, 0, 1);
+            if (Math.Abs(clamped - s_videoVolume) < 0.0001) return;
+            s_videoVolume = clamped;
+            _video?.SetVolume(clamped);
+            OnPropertyChanged();
+        }
+    }
+
+    public bool IsVideoMuted
+    {
+        get => s_videoMuted;
+        set
+        {
+            if (s_videoMuted == value) return;
+            s_videoMuted = value;
+            _video?.SetMuted(value);
+            OnPropertyChanged();
+        }
+    }
+
+    public bool IsVideoLooping
+    {
+        get => s_videoLooping;
+        set
+        {
+            if (s_videoLooping == value) return;
+            s_videoLooping = value;
+            _video?.SetLoop(value);
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>再生速度。ボタンで <see cref="VideoRates"/> を巡回する。</summary>
+    public double VideoRate
+    {
+        get => s_videoRate;
+        private set
+        {
+            if (Math.Abs(s_videoRate - value) < 0.0001) return;
+            s_videoRate = value;
+            _video?.SetRate(value);
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(VideoRateText));
+        }
+    }
+
+    public string VideoRateText => $"{VideoRate:0.##}x";
+
+    /// <summary>再生 / 一時停止の切り替え（Space とボタンの両方から呼ぶ）。</summary>
+    [RelayCommand]
+    private void ToggleVideoPlayback()
+    {
+        if (_video is null) return;
+        if (_video.IsPlaying)
+        {
+            _video.Pause();
+        }
+        else
+        {
+            // 末尾で止まっているときは頭出ししてから再生する
+            if (VideoDurationSeconds > 0 && VideoPositionSeconds >= VideoDurationSeconds - 0.05)
+            {
+                _video.Seek(0);
+            }
+
+            _video.Play();
+        }
+
+        IsVideoPlaying = _video.IsPlaying;
+    }
+
+    [RelayCommand]
+    private void ToggleVideoMute() => IsVideoMuted = !IsVideoMuted;
+
+    [RelayCommand]
+    private void ToggleVideoLoop() => IsVideoLooping = !IsVideoLooping;
+
+    /// <summary>再生速度を次の候補へ送る。</summary>
+    [RelayCommand]
+    private void CycleVideoRate()
+    {
+        var index = Array.FindIndex(VideoRates, r => Math.Abs(r - VideoRate) < 0.0001);
+        VideoRate = VideoRates[(index + 1) % VideoRates.Length];
+    }
+
+    /// <summary>現在位置を相対移動する（Shift+← / →）。</summary>
+    public void SeekVideoBy(double deltaSeconds)
+    {
+        if (_video is null) return;
+        _video.Seek(_video.Position + deltaSeconds);
+        SyncVideoPosition();
+    }
+
+    /// <summary>スライダー操作での明示シーク。タイマー由来の更新では走らせない。</summary>
+    partial void OnVideoPositionSecondsChanged(double value)
+    {
+        if (_suppressSeek || _video is null) return;
+        _video.Seek(value);
+        VideoPositionText = FormatDuration(value);
+    }
+
+    private void StartVideo(FileSystemEntry entry)
+    {
+        // セッション（＝Media Engine）は作り直さず、ソースだけ差し替える。
+        // 作り直すと前の engine の解放と競合して映像が出ないことがある（VideoPlaybackSession.Open 参照）。
+        var session = _video;
+        if (session is not null)
+        {
+            ResetVideoUiState();
+            IsVideoPreview = true;
+            if (session.Open(entry.FullPath))
+            {
+                return;
+            }
+
+            // 開き直しに失敗したセッションは畳んで作り直す
+            StopVideo();
+        }
+
+        session = VideoPlaybackSession.TryCreate(entry.FullPath);
+        IsVideoPreview = true;
+        if (session is null)
+        {
+            IsVideoUnavailable = true;
+            return;
+        }
+
+        _video = session;
+        IsVideoUnavailable = false;
+        session.Changed += OnVideoSessionChanged;
+        session.Ended += OnVideoSessionEnded;
+        session.SetVolume(s_videoVolume);
+        session.SetMuted(s_videoMuted);
+        session.SetLoop(s_videoLooping);
+
+        StartVideoPump();
+    }
+
+    private void StopVideo()
+    {
+        _videoPumpActive = false;
+
+        if (_video is not null)
+        {
+            _video.Changed -= OnVideoSessionChanged;
+            _video.Ended -= OnVideoSessionEnded;
+            _video.Dispose();
+            _video = null;
+        }
+
+        ResetVideoUiState();
+        IsVideoPreview = false;
+    }
+
+    /// <summary>コントロールバーの表示値を初期状態へ戻す（セッション自体は畳まない）。</summary>
+    private void ResetVideoUiState()
+    {
+        VideoFrame = null;
+        IsVideoPlaying = false;
+        IsVideoUnavailable = false;
+        _videoStarted = false;
+        VideoDurationSeconds = 0;
+        VideoDurationText = FormatDuration(0);
+        _suppressSeek = true;
+        VideoPositionSeconds = 0;
+        _suppressSeek = false;
+        VideoPositionText = FormatDuration(0);
+    }
+
+    /// <summary>別のタブへ切り替わるときに呼ぶ。見えていないタブで音が鳴り続けないよう再生を畳む。</summary>
+    public void SuspendGalleryVideo() => StopVideo();
+
+    /// <summary>このタブへ戻ってきたときに呼ぶ。ギャラリーで動画を選んだままなら再生し直す。</summary>
+    public void ResumeGalleryVideo()
+    {
+        if (_video is not null || !IsGalleryView || SelectedEntry is not { IsDirectory: false } entry)
+        {
+            return;
+        }
+
+        if (VideoPlaybackSession.IsPlayable(Path.GetExtension(entry.Name).ToLowerInvariant()))
+        {
+            UpdatePreview();
+        }
+    }
+
+    /// <summary>
+    /// フレームの取り出しをコンポジターの描画フレーム（＝垂直同期）に合わせて回す。
+    ///
+    /// 以前は 16ms 間隔の <see cref="DispatcherTimer"/> で回していたが、Win32 のディスパッチャーは
+    /// タイマーを WM_TIMER で実装しているためシステムのタイマー分解能（約 15.6ms）へ丸められ、
+    /// 実測で毎秒 35 回前後（約 28ms 間隔）しか回らなかった。30fps の動画を 28ms 間隔で取りに行くと、
+    /// 1 枚を 1 回分だけ出したり 2 回分続けて出したりする（＝28ms と 57ms が混ざる）ため、
+    /// 毎秒 30 枚を取れていても表示間隔がばらついてカクついて見える。
+    /// 描画フレームへ同期させると毎秒 60 回まで上がり、30fps なら常に 2 フレーム保持で揃う。
+    ///
+    /// なお <see cref="VideoPlaybackSession.TryRenderNextFrame"/> は色変換と転送で 1 枚あたり
+    /// 3ms 前後かかるため、描画パスの都合で毎秒 数フレームは 1 描画分ずれる。ここを詰めるには
+    /// 転送を UI スレッド外へ出す必要があり、engine の生成スレッドと apartment の問題を伴う。
+    /// </summary>
+    private void StartVideoPump()
+    {
+        if (_videoPumpActive) return;
+        _videoPumpActive = true;
+        RequestVideoFrame();
+    }
+
+    private void RequestVideoFrame()
+    {
+        // 単一ウィンドウ構成なのでメインウィンドウをそのまま描画フレームの供給元にする
+        var topLevel = (Avalonia.Application.Current?.ApplicationLifetime
+            as Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime)?.MainWindow;
+        if (topLevel is null)
+        {
+            _videoPumpActive = false;
+            return;
+        }
+
+        topLevel.RequestAnimationFrame(OnVideoAnimationFrame);
+    }
+
+    private void OnVideoAnimationFrame(TimeSpan _)
+    {
+        if (!_videoPumpActive || _video is null)
+        {
+            _videoPumpActive = false;
+            return;
+        }
+
+        if (_video.TryRenderNextFrame())
+        {
+            VideoFrame = _video.CurrentFrame;
+        }
+
+        // 再生位置は毎フレーム書き戻すとスライダーの再レイアウトが描画と競合するので間引く
+        var now = Stopwatch.GetTimestamp();
+        if (now - _lastVideoUiSync >= Stopwatch.Frequency / 10)
+        {
+            _lastVideoUiSync = now;
+            SyncVideoPosition();
+            IsVideoPlaying = _video.IsPlaying;
+        }
+
+        RequestVideoFrame();
+    }
+
+    private void SyncVideoPosition()
+    {
+        if (_video is null) return;
+
+        // スライダーへ書き戻すだけなので、シーク扱いにしない
+        _suppressSeek = true;
+        VideoPositionSeconds = _video.Position;
+        _suppressSeek = false;
+        VideoPositionText = FormatDuration(_video.Position);
+    }
+
+    private void OnVideoSessionChanged(object? sender, EventArgs e)
+    {
+        if (_video is null || !ReferenceEquals(sender, _video)) return;
+
+        if (_video.State == VideoPlaybackState.Failed)
+        {
+            IsVideoUnavailable = true;
+            return;
+        }
+
+        if (Math.Abs(VideoDurationSeconds - _video.Duration) > 0.001)
+        {
+            VideoDurationSeconds = _video.Duration;
+            VideoDurationText = FormatDuration(_video.Duration);
+        }
+
+        if (_video.State == VideoPlaybackState.Ready && !_videoStarted)
+        {
+            _videoStarted = true;
+            _video.SetRate(s_videoRate);
+            _video.Play();
+        }
+
+        IsVideoPlaying = _video.IsPlaying;
+    }
+
+    private bool _videoStarted;
+
+    private void OnVideoSessionEnded(object? sender, EventArgs e)
+    {
+        if (_video is null || !ReferenceEquals(sender, _video)) return;
+        IsVideoPlaying = _video.IsPlaying;
+    }
+
+    /// <summary>秒数を m:ss / h:mm:ss へ整形する。</summary>
+    internal static string FormatDuration(double seconds)
+    {
+        if (!double.IsFinite(seconds) || seconds < 0)
+        {
+            seconds = 0;
+        }
+
+        var span = TimeSpan.FromSeconds(seconds);
+        return span.TotalHours >= 1
+            ? $"{(int)span.TotalHours}:{span.Minutes:00}:{span.Seconds:00}"
+            : $"{span.Minutes}:{span.Seconds:00}";
     }
 
     private async void UpdatePreview()
@@ -319,6 +681,16 @@ public partial class TabViewModel : ObservableObject
         _previewCts = cts;
 
         var entry = SelectedEntry;
+
+        // 次も動画なら engine を残してソースだけ差し替える。動画以外へ移るときだけ完全に畳む。
+        var nextIsVideo = IsGalleryView
+            && entry is { IsDirectory: false }
+            && VideoPlaybackSession.IsPlayable(Path.GetExtension(entry.Name).ToLowerInvariant());
+        if (!nextIsVideo)
+        {
+            StopVideo();
+        }
+
         if (entry is null || entry.IsDirectory)
         {
             PreviewBitmap?.Dispose();
@@ -327,20 +699,31 @@ public partial class TabViewModel : ObservableObject
             if (entry is null)
             {
                 PreviewInfo = _selection.Count > 1
-                    ? $"{_selection.Count} 個の項目を選択"
+                    ? LocalizationService.Text("Text.Status.ItemsSelected", _selection.Count)
                     : "";
             }
             else
             {
-                PreviewInfo = $"{entry.Name}\nファイル フォルダー";
+                PreviewInfo = $"{entry.Name}\n" + LocalizationService.Text("Text.Type.FileFolder");
                 _ = LoadFolderPreviewInfoAsync(entry, cts.Token);
             }
 
             return;
         }
 
-        PreviewInfo = $"{entry.Name}\n{entry.TypeText}  {entry.SizeText}\n更新日時: {entry.ModifiedText}";
+        PreviewInfo = $"{entry.Name}\n{entry.TypeText}  {entry.SizeText}\n" + LocalizationService.Text("Text.Tooltip.Modified", entry.ModifiedText);
         var ext = Path.GetExtension(entry.Name).ToLowerInvariant();
+
+        // ギャラリー表示中の動画は静止画プレビューではなく再生セッションへ切り替える。
+        // 通常のプレビューペインでは従来どおりシェルサムネイル任せにする（常時再生させない）。
+        if (IsGalleryView && VideoPlaybackSession.IsPlayable(ext))
+        {
+            PreviewBitmap?.Dispose();
+            PreviewBitmap = null;
+            PreviewText = "";
+            StartVideo(entry);
+            return;
+        }
 
         try
         {
@@ -362,7 +745,7 @@ public partial class TabViewModel : ObservableObject
                     PreviewBitmap = bmp;
                     PreviewText = "";
                     // 画像は寸法も表示する
-                    PreviewInfo = $"{entry.Name}\n{entry.TypeText}  {entry.SizeText}  {bmp.PixelSize.Width}×{bmp.PixelSize.Height}\n更新日時: {entry.ModifiedText}";
+                    PreviewInfo = $"{entry.Name}\n{entry.TypeText}  {entry.SizeText}  {bmp.PixelSize.Width}×{bmp.PixelSize.Height}\n" + LocalizationService.Text("Text.Tooltip.Modified", entry.ModifiedText);
                     return;
                 }
 
@@ -378,7 +761,7 @@ public partial class TabViewModel : ObservableObject
                     PreviewBitmap?.Dispose();
                     PreviewBitmap = bmp;
                     PreviewText = "";
-                    PreviewInfo = $"{entry.Name}\n{entry.TypeText}  {entry.SizeText}  {bmp.PixelSize.Width}×{bmp.PixelSize.Height}\n更新日時: {entry.ModifiedText}";
+                    PreviewInfo = $"{entry.Name}\n{entry.TypeText}  {entry.SizeText}  {bmp.PixelSize.Width}×{bmp.PixelSize.Height}\n" + LocalizationService.Text("Text.Tooltip.Modified", entry.ModifiedText);
                     return;
                 }
 
@@ -455,7 +838,9 @@ public partial class TabViewModel : ObservableObject
 
             if (!token.IsCancellationRequested && SelectedEntry == entry)
             {
-                PreviewInfo = $"{entry.Name}\nファイル フォルダー\n{count}{(capped ? "+" : "")} 個のファイル  {FileSystemEntry.FormatSize(size)}{(capped ? " 以上" : "")}";
+                PreviewInfo = $"{entry.Name}\n" + LocalizationService.Text("Text.Type.FileFolder") + "\n"
+                + LocalizationService.Text("Text.Preview.FolderSummary", $"{count}{(capped ? "+" : "")}", FileSystemEntry.FormatSize(size))
+                + (capped ? LocalizationService.Text("Text.Preview.OrMore") : "");
             }
         }
         catch (Exception ex)
@@ -530,7 +915,7 @@ public partial class TabViewModel : ObservableObject
         var cts = CancellationTokenSource.CreateLinkedTokenSource(_lifetimeCts.Token);
         _searchCts = cts;
         var generation = Interlocked.Increment(ref _searchGeneration);
-        StatusText = "検索中... (サブフォルダーを含む)";
+        StatusText = LocalizationService.Text("Text.Search.Searching");
 
         var root = CurrentPath;
         var showExt = _options.ShowExtensions;
@@ -612,7 +997,7 @@ public partial class TabViewModel : ObservableObject
             Logger.LogException($"再帰検索に失敗しました: {root}", ex);
             if (!_isDetached && generation == _searchGeneration)
             {
-                StatusText = $"検索に失敗しました: {ex.Message}";
+                StatusText = LocalizationService.Text("Text.Search.Failed", ex.Message);
             }
 
             return;
@@ -628,8 +1013,8 @@ public partial class TabViewModel : ObservableObject
         ReplaceEntries(ApplySort(results));
 
         StatusText = truncated
-            ? $"{results.Count} 件で打ち切りました (上限 1000 件到達、未走査のサブフォルダーがあります。検索語を絞ると続きを確認できます)"
-            : $"{results.Count} 件見つかりました (サブフォルダー含む)";
+            ? LocalizationService.Text("Text.Search.Truncated", results.Count)
+            : LocalizationService.Text("Text.Search.Found", results.Count);
     }
 
     // ===== アイコンビューの画像・動画・PDFサムネイル =====
@@ -750,16 +1135,24 @@ public partial class TabViewModel : ObservableObject
 
     public async Task EnsureThumbnailAsync(FileSystemEntry entry)
     {
+        // 安価な判定を先に済ませる。このメソッドは EffectiveViewportChanged から
+        // 1 項目あたりレイアウト中に何度も呼ばれるため、対象外のときに拡張子判定まで
+        // 走らせると（詳細・一覧表示では毎回まるごと無駄になる）無視できない回数になる。
+        if (!IsIconsView || _isDetached || entry.IsDirectory || entry.IsThumbnailFinal
+            || _thumbnailScope is not { } scope)
+        {
+            return;
+        }
+
         var extension = Path.GetExtension(entry.Name).ToLowerInvariant();
         var isImage = ImageExtensions.Contains(extension);
         var isPdf = extension == ".pdf";
-        var useShellThumbnail = VideoThumbnailExtensions.Contains(extension)
+        // 動画は再生対象と同じ範囲をサムネイル対象にする（定義を 2 箇所に持たない）
+        var useShellThumbnail = VideoPlaybackSession.IsPlayable(extension)
             || RawThumbnailExtensions.Contains(extension)
             || ShellImageThumbnailExtensions.Contains(extension);
-        if (!IsIconsView || _isDetached || entry.IsDirectory || entry.IsThumbnailFinal
-            || (!isImage && !isPdf && !useShellThumbnail)
+        if ((!isImage && !isPdf && !useShellThumbnail)
             || (isImage && entry.Size is null or > 32 * 1024 * 1024)
-            || _thumbnailScope is not { } scope
             || !scope.Loading.TryAdd(entry.FullPath, 0))
         {
             return;
@@ -1086,11 +1479,11 @@ public partial class TabViewModel : ObservableObject
         _folderViewSettings = folderViewSettings;
         DetailColumns =
         [
-            new(this, SortKeys.Name, "名前"),
-            new(this, SortKeys.Modified, "更新日時"),
-            new(this, SortKeys.Created, "作成日時"),
-            new(this, SortKeys.Type, "種類"),
-            new(this, SortKeys.Size, "サイズ"),
+            new(this, SortKeys.Name, "Text.Column.Name"),
+            new(this, SortKeys.Modified, "Text.Column.Modified"),
+            new(this, SortKeys.Created, "Text.Column.Created"),
+            new(this, SortKeys.Type, "Text.Column.Type"),
+            new(this, SortKeys.Size, "Text.Column.Size"),
         ];
         IsSettingsTab = isSettingsTab;
         IsDropPreview = isDropPreview;
@@ -1104,8 +1497,10 @@ public partial class TabViewModel : ObservableObject
 
         if (isSettingsTab)
         {
-            Title = "設定";
-            PathText = "設定";
+            // 設定タブのタイトルだけは固定文言なので、言語切り替え時に付け直す
+            // （通常タブのタイトルはフォルダー名で、言語に依存しない）。
+            ApplySettingsTabTitle();
+            LocalizationService.Changed += OnLocalizationChanged;
         }
         else if (isDropPreview)
         {
@@ -1134,6 +1529,7 @@ public partial class TabViewModel : ObservableObject
         _lifetimeCts.Cancel();
         _options.Changed -= OnOptionsChanged;
         ClipboardFileService.CutStateChanged -= OnCutStateChanged;
+        LocalizationService.Changed -= OnLocalizationChanged;
         _watcherSubscription?.Dispose();
         _watcherSubscription = null;
         _filterDebounceCts?.Cancel();
@@ -1180,6 +1576,14 @@ public partial class TabViewModel : ObservableObject
     }
 
     /// <summary>切り取り状態の変化を全エントリの半透明表示へ反映する（エクスプローラーと同じ見た目）。</summary>
+    private void ApplySettingsTabTitle()
+    {
+        Title = LocalizationService.Text("Text.Nav.Settings");
+        PathText = Title;
+    }
+
+    private void OnLocalizationChanged(object? sender, EventArgs e) => ApplySettingsTabTitle();
+
     private void OnCutStateChanged(object? sender, EventArgs e)
     {
         foreach (var entry in _allEntries)
@@ -1271,7 +1675,7 @@ public partial class TabViewModel : ObservableObject
                 if (currentFolderExists)
                 {
                     Logger.LogException($"フォルダーを開けませんでした: {path}", ex);
-                    StatusText = $"開けませんでした: {ex.Message}";
+                    StatusText = LocalizationService.Text("Text.Nav.OpenFailed", ex.Message);
                     PathText = CurrentPath;
                     return;
                 }
@@ -1283,7 +1687,7 @@ public partial class TabViewModel : ObservableObject
             catch (Exception ex)
             {
                 Logger.LogException($"フォルダーを開けませんでした: {path}", ex);
-                StatusText = $"開けませんでした: {ex.Message}";
+                StatusText = LocalizationService.Text("Text.Nav.OpenFailed", ex.Message);
                 PathText = CurrentPath;
                 return;
             }
@@ -1497,8 +1901,8 @@ public partial class TabViewModel : ObservableObject
         ReplaceEntries(filtered);
 
         StatusText = query.Length == 0
-            ? $"{filtered.Count} 個の項目"
-            : $"{filtered.Count} 個の項目 (検索: {query})";
+            ? LocalizationService.Text("Text.Status.ItemCount", filtered.Count)
+            : LocalizationService.Text("Text.Status.ItemCountFiltered", filtered.Count, query);
     }
 
     /// <summary>一覧をスナップショット単位で置換し、3 つの ListBox へ各 1 回だけ通知する。
@@ -1563,7 +1967,7 @@ public partial class TabViewModel : ObservableObject
             string text;
             try
             {
-                text = $"空き領域: {FileSystemEntry.FormatSize(new DriveInfo(root).AvailableFreeSpace)}";
+                text = LocalizationService.Text("Text.Status.FreeSpace", FileSystemEntry.FormatSize(new DriveInfo(root).AvailableFreeSpace));
             }
             catch
             {
@@ -1709,7 +2113,7 @@ public partial class TabViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            StatusText = $"起動できませんでした: {ex.Message}";
+            StatusText = LocalizationService.Text("Text.Launch.Failed", ex.Message);
         }
     }
 
@@ -1743,7 +2147,7 @@ public partial class TabViewModel : ObservableObject
             }
             catch (Exception ex)
             {
-                StatusText = $"起動できませんでした: {ex.Message}";
+                StatusText = LocalizationService.Text("Text.Launch.Failed", ex.Message);
             }
 
             return;
@@ -1796,8 +2200,8 @@ public partial class TabViewModel : ObservableObject
         var sizeText = selection.Any(e => e.Size is not null) ? $" {FileSystemEntry.FormatSize(totalSize)}" : "";
         var folders = selection.Count(e => e.IsDirectory);
         var files = selection.Count - folders;
-        var breakdown = folders > 0 && files > 0 ? $" (フォルダー {folders}、ファイル {files})" : "";
-        SelectionText = $"{selection.Count} 個の項目を選択{sizeText}{breakdown}";
+        var breakdown = folders > 0 && files > 0 ? " " + LocalizationService.Text("Text.Status.Breakdown", folders, files) : "";
+        SelectionText = LocalizationService.Text("Text.Status.ItemsSelected", selection.Count) + sizeText + breakdown;
 
         if (_previewEnabled && selection.Count > 1)
         {
@@ -1852,12 +2256,12 @@ public partial class TabViewModel : ObservableObject
     {
         if (ClipboardFileService.SetFiles(_selection.Select(e => e.FullPath).ToList(), cut: true))
         {
-            StatusText = $"{_selection.Count} 個の項目を切り取りました";
+            StatusText = LocalizationService.Text("Text.Clipboard.Cut", _selection.Count);
             PasteCommand.NotifyCanExecuteChanged();
         }
         else
         {
-            StatusText = "クリップボードへ書き込めませんでした";
+            StatusText = LocalizationService.Text("Text.Clipboard.WriteFailed");
         }
     }
 
@@ -1866,12 +2270,12 @@ public partial class TabViewModel : ObservableObject
     {
         if (ClipboardFileService.SetFiles(_selection.Select(e => e.FullPath).ToList(), cut: false))
         {
-            StatusText = $"{_selection.Count} 個の項目をコピーしました";
+            StatusText = LocalizationService.Text("Text.Clipboard.Copied", _selection.Count);
             PasteCommand.NotifyCanExecuteChanged();
         }
         else
         {
-            StatusText = "クリップボードへ書き込めませんでした";
+            StatusText = LocalizationService.Text("Text.Clipboard.WriteFailed");
         }
     }
 
@@ -1903,7 +2307,7 @@ public partial class TabViewModel : ObservableObject
             var pasteInvokedAtUtc = DateTime.UtcNow;
             if (!ShellContextMenuService.InvokeDirectoryBackgroundVerb(0, dest, "paste"))
             {
-                StatusText = "仮想ファイルを貼り付けられませんでした";
+                StatusText = LocalizationService.Text("Text.Clipboard.VirtualPasteFailed");
                 return;
             }
 
@@ -1929,7 +2333,7 @@ public partial class TabViewModel : ObservableObject
         var result = await Task.Run(() => FileOperationService.CopyOrMove(files, dest, move: isCut, renameOnCollision: sameDir));
         if (result.IsSuccess && isCut) ClipboardFileService.Clear();
         if (result.IsSuccess) Refresh();
-        else if (!result.IsCancelled) StatusText = $"貼り付けに失敗しました（{FormatOpError(result.NativeErrorCode)}）";
+        else if (!result.IsCancelled) StatusText = LocalizationService.Text("Text.Op.PasteFailed", FormatOpError(result.NativeErrorCode));
     }
 
     [RelayCommand(CanExecute = nameof(HasSelection))]
@@ -1943,7 +2347,9 @@ public partial class TabViewModel : ObservableObject
     private static string FormatOpError(int code)
     {
         var desc = FileOperationService.DescribeError(code);
-        return desc.Length > 0 ? $"エラー {code}: {desc}" : $"エラー {code}";
+        return desc.Length > 0
+            ? LocalizationService.Text("Text.Error.CodeWithDesc", code, desc)
+            : LocalizationService.Text("Text.Error.Code", code);
     }
 
     private async Task DeleteCoreAsync(bool permanent)
@@ -1955,7 +2361,7 @@ public partial class TabViewModel : ObservableObject
         var result = await Task.Run(() => FileOperationService.DeleteToRecycleBin(targets, permanent));
         if (!result.IsSuccess)
         {
-            if (!result.IsCancelled) StatusText = $"削除に失敗しました（{FormatOpError(result.NativeErrorCode)}）";
+            if (!result.IsCancelled) StatusText = LocalizationService.Text("Text.Op.DeleteFailed", FormatOpError(result.NativeErrorCode));
             return;
         }
         await NavigateToAsync(CurrentPath, record: false);
@@ -1990,7 +2396,7 @@ public partial class TabViewModel : ObservableObject
 
         if (newName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
         {
-            StatusText = "ファイル名に使えない文字が含まれています: \\ / : * ? \" < > |";
+            StatusText = LocalizationService.Text("Text.Rename.InvalidChars");
             return;
         }
 
@@ -2004,7 +2410,7 @@ public partial class TabViewModel : ObservableObject
         var isCaseOnlyRename = string.Equals(entry.FullPath, newPath, StringComparison.OrdinalIgnoreCase);
         if (!isCaseOnlyRename && (File.Exists(newPath) || Directory.Exists(newPath)))
         {
-            StatusText = $"同じ名前のファイルまたはフォルダーが既に存在します: {newName}";
+            StatusText = LocalizationService.Text("Text.Rename.AlreadyExists", newName);
             return;
         }
 
@@ -2015,7 +2421,7 @@ public partial class TabViewModel : ObservableObject
             var first = FileOperationService.Rename(entry.FullPath, temporary);
             if (!first.IsSuccess)
             {
-                if (!first.IsCancelled) StatusText = $"名前を変更できませんでした（{FormatOpError(first.NativeErrorCode)}）";
+                if (!first.IsCancelled) StatusText = LocalizationService.Text("Text.Op.RenameFailed", FormatOpError(first.NativeErrorCode));
                 return;
             }
 
@@ -2025,8 +2431,8 @@ public partial class TabViewModel : ObservableObject
             {
                 var rollback = FileOperationService.Rename(temporary, entry.FullPath);
                 StatusText = rollback.IsSuccess
-                    ? "名前を変更できなかったため、元の名前へ戻しました"
-                    : $"名前を変更できませんでした。一時名のまま残っています: {Path.GetFileName(temporary)}";
+                    ? LocalizationService.Text("Text.Rename.RevertedToOriginal")
+                    : LocalizationService.Text("Text.Rename.StuckAsTemporary", Path.GetFileName(temporary));
                 await NavigateToAsync(CurrentPath, record: false);
                 return;
             }
@@ -2036,7 +2442,7 @@ public partial class TabViewModel : ObservableObject
             var result = FileOperationService.Rename(entry.FullPath, newPath);
             if (!result.IsSuccess)
             {
-                if (!result.IsCancelled) StatusText = $"名前を変更できませんでした（{FormatOpError(result.NativeErrorCode)}）";
+                if (!result.IsCancelled) StatusText = LocalizationService.Text("Text.Op.RenameFailed", FormatOpError(result.NativeErrorCode));
                 return;
             }
         }
@@ -2069,8 +2475,8 @@ public partial class TabViewModel : ObservableObject
         if (targets.Count == 0)
         {
             StatusText = _selection.Count > 0
-                ? "フォルダーは共有できません（ファイルを選択してください）"
-                : "共有するファイルを選択してください";
+                ? LocalizationService.Text("Text.Share.FoldersNotSupported")
+                : LocalizationService.Text("Text.Share.SelectFiles");
             return;
         }
 
@@ -2079,7 +2485,7 @@ public partial class TabViewModel : ObservableObject
             .MainWindow?.TryGetPlatformHandle()?.Handle ?? 0;
         if (!ShareService.Show(hwnd, targets))
         {
-            StatusText = "共有シートを開けませんでした";
+            StatusText = LocalizationService.Text("Text.Share.OpenFailed");
         }
     }
 
@@ -2116,11 +2522,11 @@ public partial class TabViewModel : ObservableObject
         if (result.IsSuccess)
         {
             Refresh();
-            StatusText = $"{effective.Count} 個の項目を{(move ? "移動" : "コピー")}しました";
+            StatusText = LocalizationService.Text(move ? "Text.Op.Moved" : "Text.Op.Copied", effective.Count);
         }
         else if (!result.IsCancelled)
         {
-            StatusText = $"ファイル操作に失敗しました（{FormatOpError(result.NativeErrorCode)}）";
+            StatusText = LocalizationService.Text("Text.Op.Failed", FormatOpError(result.NativeErrorCode));
         }
     }
 
@@ -2137,7 +2543,7 @@ public partial class TabViewModel : ObservableObject
 
         try
         {
-            var path = GetUniquePath("新しいフォルダー", "");
+            var path = GetUniquePath(LocalizationService.Text("Text.New.FolderName"), "");
             Directory.CreateDirectory(path);
             _pendingNewFolderPaths.Add(path);
             await NavigateToAsync(CurrentPath, record: false);
@@ -2151,7 +2557,7 @@ public partial class TabViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            StatusText = $"作成できませんでした: {ex.Message}";
+            StatusText = LocalizationService.Text("Text.New.CreateFailed", ex.Message);
         }
     }
 
@@ -2171,7 +2577,7 @@ public partial class TabViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            StatusText = $"新規フォルダーの作成を取り消せませんでした: {ex.Message}";
+            StatusText = LocalizationService.Text("Text.New.UndoFailed", ex.Message);
         }
     }
 
@@ -2196,7 +2602,7 @@ public partial class TabViewModel : ObservableObject
             }
             catch (Exception ex)
             {
-                StatusText = $"ターミナルを起動できませんでした: {ex.Message}";
+                StatusText = LocalizationService.Text("Text.Launch.TerminalFailed", ex.Message);
             }
         }
     }
@@ -2214,7 +2620,7 @@ public partial class TabViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            StatusText = $"エクスプローラーを起動できませんでした: {ex.Message}";
+            StatusText = LocalizationService.Text("Text.Launch.ExplorerFailed", ex.Message);
         }
     }
 
@@ -2231,7 +2637,7 @@ public partial class TabViewModel : ObservableObject
 
         try
         {
-            var path = GetUniquePath($"新規 {template.DisplayName}", template.Extension);
+            var path = GetUniquePath(LocalizationService.Text("Text.New.ItemName", template.DisplayName), template.Extension);
             switch (template.Kind)
             {
                 case NewItemKind.NullFile:
@@ -2249,7 +2655,7 @@ public partial class TabViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            StatusText = $"作成できませんでした: {ex.Message}";
+            StatusText = LocalizationService.Text("Text.New.CreateFailed", ex.Message);
         }
     }
 

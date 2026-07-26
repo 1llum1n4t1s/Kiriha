@@ -1,0 +1,353 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:String x:Key="Text.A11y.OpenSubfolders" xml:space="preserve">Tampilkan subfolder</x:String>
+  <x:String x:Key="Text.A11y.ResizeVerticalTabs" xml:space="preserve">Ubah lebar bilah tab vertikal</x:String>
+  <x:String x:Key="Text.A11y.SwitchToTree" xml:space="preserve">Beralih ke tampilan pohon</x:String>
+  <x:String x:Key="Text.A11y.ToggleSidebar" xml:space="preserve">Tampilkan atau sembunyikan bilah sisi</x:String>
+  <x:String x:Key="Text.A11y.VerticalTabs" xml:space="preserve">Tab vertikal</x:String>
+  <x:String x:Key="Text.Address.Copy" xml:space="preserve">Salin alamat</x:String>
+  <x:String x:Key="Text.Address.Edit" xml:space="preserve">Edit alamat</x:String>
+  <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">Tambahkan folder saat ini</x:String>
+  <x:String x:Key="Text.Bookmarks.AddFolderMenu" xml:space="preserve">Tambah folder...</x:String>
+  <x:String x:Key="Text.Bookmarks.AddFolderTitle" xml:space="preserve">Tambah folder</x:String>
+  <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">Seret folder ke sini untuk menambahkannya ke markah</x:String>
+  <x:String x:Key="Text.Bookmarks.Hide" xml:space="preserve">Sembunyikan bilah markah</x:String>
+  <x:String x:Key="Text.Bookmarks.NewFolderName" xml:space="preserve">Folder baru</x:String>
+  <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">Ganti nama...</x:String>
+  <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">Ganti nama markah</x:String>
+  <x:String x:Key="Text.Bookmarks.SortByName" xml:space="preserve">Urutkan menurut nama</x:String>
+  <x:String x:Key="Text.Bookmarks.SortByPath" xml:space="preserve">Urutkan menurut jalur</x:String>
+  <x:String x:Key="Text.Caption.MaximizeRestore" xml:space="preserve">Maksimalkan atau pulihkan</x:String>
+  <x:String x:Key="Text.Caption.Minimize" xml:space="preserve">Minimalkan</x:String>
+  <x:String x:Key="Text.Clipboard.Copied" xml:space="preserve">{0} item disalin</x:String>
+  <x:String x:Key="Text.Clipboard.CopiedToClipboard" xml:space="preserve">Disalin ke papan klip</x:String>
+  <x:String x:Key="Text.Clipboard.CopyFailed" xml:space="preserve">Tidak dapat menyalin ke papan klip</x:String>
+  <x:String x:Key="Text.Clipboard.Cut" xml:space="preserve">{0} item dipotong</x:String>
+  <x:String x:Key="Text.Clipboard.VirtualPasteFailed" xml:space="preserve">Tidak dapat menempelkan berkas virtual</x:String>
+  <x:String x:Key="Text.Clipboard.WriteFailed" xml:space="preserve">Tidak dapat menulis ke papan klip</x:String>
+  <x:String x:Key="Text.Column.AutoFitAll" xml:space="preserve">Sesuaikan lebar semua kolom</x:String>
+  <x:String x:Key="Text.Column.AutoFitThis" xml:space="preserve">Sesuaikan lebar kolom ini</x:String>
+  <x:String x:Key="Text.Column.Created" xml:space="preserve">Tanggal dibuat</x:String>
+  <x:String x:Key="Text.Column.Modified" xml:space="preserve">Tanggal diubah</x:String>
+  <x:String x:Key="Text.Column.Name" xml:space="preserve">Nama</x:String>
+  <x:String x:Key="Text.Column.Size" xml:space="preserve">Ukuran</x:String>
+  <x:String x:Key="Text.Column.Type" xml:space="preserve">Jenis</x:String>
+  <x:String x:Key="Text.Command.CopyTip" xml:space="preserve">Salin (Ctrl+C)</x:String>
+  <x:String x:Key="Text.Command.Cut" xml:space="preserve">Potong</x:String>
+  <x:String x:Key="Text.Command.CutTip" xml:space="preserve">Potong (Ctrl+X)</x:String>
+  <x:String x:Key="Text.Command.DeleteTip" xml:space="preserve">Hapus (Delete)</x:String>
+  <x:String x:Key="Text.Command.More" xml:space="preserve">Lihat lainnya</x:String>
+  <x:String x:Key="Text.Command.NewFolder" xml:space="preserve">Folder baru</x:String>
+  <x:String x:Key="Text.Command.Options" xml:space="preserve">Opsi</x:String>
+  <x:String x:Key="Text.Command.Paste" xml:space="preserve">Tempel</x:String>
+  <x:String x:Key="Text.Command.PasteTip" xml:space="preserve">Tempel (Ctrl+V)</x:String>
+  <x:String x:Key="Text.Command.Rename" xml:space="preserve">Ganti nama</x:String>
+  <x:String x:Key="Text.Command.RenameTip" xml:space="preserve">Ganti nama (F2)</x:String>
+  <x:String x:Key="Text.Command.Share" xml:space="preserve">Bagikan</x:String>
+  <x:String x:Key="Text.Command.SidebarTip" xml:space="preserve">Tampilkan/sembunyikan bilah sisi (Akses cepat / pohon)</x:String>
+  <x:String x:Key="Text.Command.Sort" xml:space="preserve">Urutkan</x:String>
+  <x:String x:Key="Text.Command.View" xml:space="preserve">Tampilan</x:String>
+  <x:String x:Key="Text.Common.AddToBookmarks" xml:space="preserve">Tambahkan ke markah</x:String>
+  <x:String x:Key="Text.Common.Cancel" xml:space="preserve">Batal</x:String>
+  <x:String x:Key="Text.Common.Close" xml:space="preserve">Tutup</x:String>
+  <x:String x:Key="Text.Common.Copy" xml:space="preserve">Salin</x:String>
+  <x:String x:Key="Text.Common.CopyPath" xml:space="preserve">Salin jalur</x:String>
+  <x:String x:Key="Text.Common.Delete" xml:space="preserve">Hapus</x:String>
+  <x:String x:Key="Text.Common.Open" xml:space="preserve">Buka</x:String>
+  <x:String x:Key="Text.Common.OpenInExplorer" xml:space="preserve">Buka di File Explorer</x:String>
+  <x:String x:Key="Text.Common.OpenInNewTab" xml:space="preserve">Buka di tab baru</x:String>
+  <x:String x:Key="Text.Common.OpenInTerminal" xml:space="preserve">Buka di Terminal</x:String>
+  <x:String x:Key="Text.Common.PinToQuickAccess" xml:space="preserve">Sematkan ke Akses cepat</x:String>
+  <x:String x:Key="Text.Common.Properties" xml:space="preserve">Properti</x:String>
+  <x:String x:Key="Text.Common.UnpinFromQuickAccess" xml:space="preserve">Lepas sematan dari Akses cepat</x:String>
+  <x:String x:Key="Text.Drag.Add" xml:space="preserve">Tambahkan</x:String>
+  <x:String x:Key="Text.Drag.Copy" xml:space="preserve">Salin</x:String>
+  <x:String x:Key="Text.Drag.Dragging" xml:space="preserve">Menyeret</x:String>
+  <x:String x:Key="Text.Drag.File" xml:space="preserve">Berkas</x:String>
+  <x:String x:Key="Text.Drag.Folder" xml:space="preserve">Folder</x:String>
+  <x:String x:Key="Text.Drag.Move" xml:space="preserve">Pindahkan</x:String>
+  <x:String x:Key="Text.Drag.OpenInTab" xml:space="preserve">Buka di tab</x:String>
+  <x:String x:Key="Text.Drive.FreeOfTotal" xml:space="preserve">{0} kosong dari {1}</x:String>
+  <x:String x:Key="Text.Error.AccessDenied" xml:space="preserve">Akses ditolak</x:String>
+  <x:String x:Key="Text.Error.Code" xml:space="preserve">Kesalahan {0}</x:String>
+  <x:String x:Key="Text.Error.CodeWithDesc" xml:space="preserve">Kesalahan {0}: {1}</x:String>
+  <x:String x:Key="Text.Error.DiskFull" xml:space="preserve">Ruang disk tidak mencukupi</x:String>
+  <x:String x:Key="Text.Error.FileExists" xml:space="preserve">Berkas dengan nama yang sama sudah ada</x:String>
+  <x:String x:Key="Text.Error.InvalidName" xml:space="preserve">Nama berkas mengandung karakter yang tidak valid</x:String>
+  <x:String x:Key="Text.Error.PathNotFound" xml:space="preserve">Jalur tidak ditemukan</x:String>
+  <x:String x:Key="Text.Error.PathTooLong" xml:space="preserve">Jalur terlalu panjang</x:String>
+  <x:String x:Key="Text.Error.SharingViolation" xml:space="preserve">Berkas sedang digunakan proses lain</x:String>
+  <x:String x:Key="Text.Error.WriteProtected" xml:space="preserve">Media terlindung dari penulisan</x:String>
+  <x:String x:Key="Text.Exif.Camera" xml:space="preserve">Kamera</x:String>
+  <x:String x:Key="Text.Exif.CameraMaker" xml:space="preserve">Produsen kamera</x:String>
+  <x:String x:Key="Text.Exif.DateModified" xml:space="preserve">Tanggal diubah</x:String>
+  <x:String x:Key="Text.Exif.DateTaken" xml:space="preserve">Tanggal pengambilan</x:String>
+  <x:String x:Key="Text.Exif.Dimensions" xml:space="preserve">Dimensi</x:String>
+  <x:String x:Key="Text.Exif.ExposureBias" xml:space="preserve">Kompensasi pencahayaan</x:String>
+  <x:String x:Key="Text.Exif.ExposureTime" xml:space="preserve">Waktu pencahayaan</x:String>
+  <x:String x:Key="Text.Exif.FNumber" xml:space="preserve">Bukaan</x:String>
+  <x:String x:Key="Text.Exif.Flash" xml:space="preserve">Lampu kilat</x:String>
+  <x:String x:Key="Text.Exif.FocalLength" xml:space="preserve">Panjang fokus</x:String>
+  <x:String x:Key="Text.Exif.Iso" xml:space="preserve">Sensitivitas ISO</x:String>
+  <x:String x:Key="Text.Exif.Lens" xml:space="preserve">Lensa</x:String>
+  <x:String x:Key="Text.Exif.Size" xml:space="preserve">Ukuran</x:String>
+  <x:String x:Key="Text.Exif.Type" xml:space="preserve">Jenis</x:String>
+  <x:String x:Key="Text.FileList.EmptyFolder" xml:space="preserve">Folder ini kosong.</x:String>
+  <x:String x:Key="Text.Folder.Desktop" xml:space="preserve">Desktop</x:String>
+  <x:String x:Key="Text.Folder.Documents" xml:space="preserve">Dokumen</x:String>
+  <x:String x:Key="Text.Folder.Downloads" xml:space="preserve">Unduhan</x:String>
+  <x:String x:Key="Text.Folder.Music" xml:space="preserve">Musik</x:String>
+  <x:String x:Key="Text.Folder.Pictures" xml:space="preserve">Gambar</x:String>
+  <x:String x:Key="Text.Folder.Videos" xml:space="preserve">Video</x:String>
+  <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">Keluar dari galeri (Esc)</x:String>
+  <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">Informasi gambar</x:String>
+  <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">Tidak ada informasi untuk gambar ini.</x:String>
+  <x:String x:Key="Text.Integration.OpenWithKiriha" xml:space="preserve">Buka dengan Kiriha</x:String>
+  <x:String x:Key="Text.Launch.ExplorerFailed" xml:space="preserve">Tidak dapat menjalankan File Explorer: {0}</x:String>
+  <x:String x:Key="Text.Launch.Failed" xml:space="preserve">Tidak dapat menjalankan: {0}</x:String>
+  <x:String x:Key="Text.Launch.TerminalFailed" xml:space="preserve">Tidak dapat menjalankan Terminal: {0}</x:String>
+  <x:String x:Key="Text.License.Activate" xml:space="preserve">Aktifkan</x:String>
+  <x:String x:Key="Text.License.Exit" xml:space="preserve">Keluar</x:String>
+  <x:String x:Key="Text.License.KeyPlaceholder" xml:space="preserve">Kunci lisensi yang diawali KIRIHA-</x:String>
+  <x:String x:Key="Text.License.Lock.OnlineCheckBody" xml:space="preserve">Lisensi belum diverifikasi secara daring selama lebih dari 30 hari. Sambungkan ke internet lalu tekan “Verifikasi ulang secara daring”.</x:String>
+  <x:String x:Key="Text.License.Lock.OnlineCheckTitle" xml:space="preserve">Lisensi perlu diverifikasi secara daring</x:String>
+  <x:String x:Key="Text.License.Lock.TrialExpiredBody" xml:space="preserve">Untuk memakai Kiriha diperlukan lisensi yang aktif (¥980, sekali beli).</x:String>
+  <x:String x:Key="Text.License.Lock.TrialExpiredTitle" xml:space="preserve">Masa uji coba Anda telah berakhir</x:String>
+  <x:String x:Key="Text.License.Msg.Activated" xml:space="preserve">Lisensi Anda telah diaktifkan 🎉 Terima kasih!</x:String>
+  <x:String x:Key="Text.License.Msg.CheckOk" xml:space="preserve">Verifikasi selesai. Terima kasih telah memakai Kiriha!</x:String>
+  <x:String x:Key="Text.License.Msg.Checking" xml:space="preserve">Memverifikasi secara daring…</x:String>
+  <x:String x:Key="Text.License.Msg.EnterKey" xml:space="preserve">Masukkan kunci lisensi yang diterbitkan saat pembelian.</x:String>
+  <x:String x:Key="Text.License.Msg.InvalidKey" xml:space="preserve">Kunci lisensi tersebut tidak valid. Periksa apakah ada karakter yang terpotong atau spasi berlebih saat menyalin.</x:String>
+  <x:String x:Key="Text.License.Msg.PurchaseFailed" xml:space="preserve">Tidak dapat membuka halaman pembelian. Coba lagi nanti.</x:String>
+  <x:String x:Key="Text.License.Msg.PurchaseOpened" xml:space="preserve">Halaman pembelian telah terbuka di peramban. Tempelkan kunci lisensi dari halaman konfirmasi ke kolom di atas.</x:String>
+  <x:String x:Key="Text.License.Msg.Revoked" xml:space="preserve">Lisensi ini sudah tidak berlaku (misalnya karena pengembalian dana). Silakan beli kembali.</x:String>
+  <x:String x:Key="Text.License.Msg.ServerUnreachable" xml:space="preserve">Server tidak dapat dihubungi. Periksa koneksi jaringan Anda lalu coba lagi.</x:String>
+  <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">Buka halaman pembelian (¥980, sekali beli)</x:String>
+  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">Setelah pembelian, kunci lisensi ditampilkan di halaman konfirmasi pembayaran. Tidak perlu akun maupun kata sandi.</x:String>
+  <x:String x:Key="Text.License.Recheck" xml:space="preserve">Verifikasi ulang secara daring</x:String>
+  <x:String x:Key="Text.License.Status.Licensed" xml:space="preserve">Lisensi aktif: {0}</x:String>
+  <x:String x:Key="Text.License.Status.OnlineCheck" xml:space="preserve">Lisensi perlu diverifikasi secara daring (sambungkan ke internet)</x:String>
+  <x:String x:Key="Text.License.Status.Trial" xml:space="preserve">Masa uji coba (tersisa {0} hari)</x:String>
+  <x:String x:Key="Text.License.Status.TrialExpired" xml:space="preserve">Uji coba berakhir (diperlukan lisensi)</x:String>
+  <x:String x:Key="Text.Menu.About" xml:space="preserve">Tentang Kiriha</x:String>
+  <x:String x:Key="Text.Menu.AccessDenied" xml:space="preserve">(Akses ditolak)</x:String>
+  <x:String x:Key="Text.Menu.BookmarksBar" xml:space="preserve">Bilah markah</x:String>
+  <x:String x:Key="Text.Menu.CheckUpdate" xml:space="preserve">Periksa pembaruan</x:String>
+  <x:String x:Key="Text.Menu.Empty" xml:space="preserve">(Kosong)</x:String>
+  <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">Jendela baru</x:String>
+  <x:String x:Key="Text.Menu.NoSubfolders" xml:space="preserve">(Tidak ada subfolder)</x:String>
+  <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(Tidak ada)</x:String>
+  <x:String x:Key="Text.Nav.Back" xml:space="preserve">Kembali</x:String>
+  <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">Kembali (klik kanan untuk riwayat)</x:String>
+  <x:String x:Key="Text.Nav.EditPathTip" xml:space="preserve">Klik untuk mengedit jalur</x:String>
+  <x:String x:Key="Text.Nav.Forward" xml:space="preserve">Maju</x:String>
+  <x:String x:Key="Text.Nav.ForwardTip" xml:space="preserve">Maju (klik kanan untuk riwayat)</x:String>
+  <x:String x:Key="Text.Nav.Home" xml:space="preserve">Beranda</x:String>
+  <x:String x:Key="Text.Nav.HomeTip" xml:space="preserve">Beranda (Alt+Home / klik kanan untuk folder yang sering dipakai)</x:String>
+  <x:String x:Key="Text.Nav.OpenFailed" xml:space="preserve">Tidak dapat membuka: {0}</x:String>
+  <x:String x:Key="Text.Nav.OpenSettings" xml:space="preserve">Buka pengaturan</x:String>
+  <x:String x:Key="Text.Nav.Refresh" xml:space="preserve">Segarkan</x:String>
+  <x:String x:Key="Text.Nav.Settings" xml:space="preserve">Pengaturan</x:String>
+  <x:String x:Key="Text.Nav.UpFolder" xml:space="preserve">Naik satu tingkat</x:String>
+  <x:String x:Key="Text.Nav.UpTip" xml:space="preserve">Naik satu tingkat (klik kanan untuk folder induk)</x:String>
+  <x:String x:Key="Text.New.CreateFailed" xml:space="preserve">Tidak dapat membuat: {0}</x:String>
+  <x:String x:Key="Text.New.FolderName" xml:space="preserve">Folder baru</x:String>
+  <x:String x:Key="Text.New.ItemName" xml:space="preserve">{0} baru</x:String>
+  <x:String x:Key="Text.New.UndoFailed" xml:space="preserve">Tidak dapat membatalkan pembuatan folder baru: {0}</x:String>
+  <x:String x:Key="Text.Op.Copied" xml:space="preserve">{0} item disalin</x:String>
+  <x:String x:Key="Text.Op.DeleteFailed" xml:space="preserve">Gagal menghapus ({0})</x:String>
+  <x:String x:Key="Text.Op.Failed" xml:space="preserve">Operasi berkas gagal ({0})</x:String>
+  <x:String x:Key="Text.Op.Moved" xml:space="preserve">{0} item dipindahkan</x:String>
+  <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">Gagal menempel ({0})</x:String>
+  <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">Gagal mengganti nama ({0})</x:String>
+  <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">{0} berkas  {1}</x:String>
+  <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> atau lebih</x:String>
+  <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">Kosongkan Recycle Bin</x:String>
+  <x:String x:Key="Text.Rename.AlreadyExists" xml:space="preserve">Berkas atau folder dengan nama itu sudah ada: {0}</x:String>
+  <x:String x:Key="Text.Rename.InvalidChars" xml:space="preserve">Nama berkas mengandung karakter yang tidak valid: \ / : * ? " &lt; &gt; |</x:String>
+  <x:String x:Key="Text.Rename.RevertedToOriginal" xml:space="preserve">Penggantian nama gagal, jadi nama asli dipulihkan</x:String>
+  <x:String x:Key="Text.Rename.StuckAsTemporary" xml:space="preserve">Penggantian nama gagal dan nama sementara masih tersisa: {0}</x:String>
+  <x:String x:Key="Text.Search.ClearTip" xml:space="preserve">Bersihkan pencarian</x:String>
+  <x:String x:Key="Text.Search.Failed" xml:space="preserve">Pencarian gagal: {0}</x:String>
+  <x:String x:Key="Text.Search.Found" xml:space="preserve">{0} hasil ditemukan (termasuk subfolder)</x:String>
+  <x:String x:Key="Text.Search.Placeholder" xml:space="preserve">Cari di {0}</x:String>
+  <x:String x:Key="Text.Search.Searching" xml:space="preserve">Mencari... (termasuk subfolder)</x:String>
+  <x:String x:Key="Text.Search.Truncated" xml:space="preserve">Dihentikan pada {0} hasil (batas 1000 tercapai dan sebagian subfolder belum ditelusuri; persempit pencarian untuk melihat lebih banyak)</x:String>
+  <x:String x:Key="Text.Select.All" xml:space="preserve">Pilih semua</x:String>
+  <x:String x:Key="Text.Select.FilesOnly" xml:space="preserve">Pilih berkas saja</x:String>
+  <x:String x:Key="Text.Select.FoldersOnly" xml:space="preserve">Pilih folder saja</x:String>
+  <x:String x:Key="Text.Select.Invert" xml:space="preserve">Balik pilihan</x:String>
+  <x:String x:Key="Text.Select.None" xml:space="preserve">Batalkan pilihan</x:String>
+  <x:String x:Key="Text.Settings.About" xml:space="preserve">Tentang Kiriha</x:String>
+  <x:String x:Key="Text.Settings.About.Body" xml:space="preserve">Kiriha menyatukan pengelolaan berkas ala Windows Explorer dengan tab, bilah alamat, dan markah ala Chrome dalam satu jendela. Pengaturan disimpan untuk pengguna saat ini.</x:String>
+  <x:String x:Key="Text.Settings.Acrylic" xml:space="preserve">Gunakan efek akrilik (buram tembus pandang) pada jendela</x:String>
+  <x:String x:Key="Text.Settings.DefaultFolderApp" xml:space="preserve">Jadikan Kiriha aplikasi bawaan untuk membuka folder dan drive</x:String>
+  <x:String x:Key="Text.Settings.DefaultFolderApp.Off" xml:space="preserve">Jika diaktifkan, Kiriha berjalan setiap kali folder atau drive dibuka dari File Explorer.</x:String>
+  <x:String x:Key="Text.Settings.DefaultFolderApp.On" xml:space="preserve">Saat ini folder dan drive dibuka di Kiriha. Menonaktifkannya akan memulihkan perilaku sebelumnya.</x:String>
+  <x:String x:Key="Text.Settings.Display" xml:space="preserve">Tampilan</x:String>
+  <x:String x:Key="Text.Settings.Display.Subtitle" xml:space="preserve">Atur tampilan daftar berkas dan gaya Kiriha</x:String>
+  <x:String x:Key="Text.Settings.Explorer" xml:space="preserve">Daftar berkas</x:String>
+  <x:String x:Key="Text.Settings.ExplorerContextMenu" xml:space="preserve">Tambahkan “Buka dengan Kiriha” ke menu konteks File Explorer</x:String>
+  <x:String x:Key="Text.Settings.ExplorerContextMenuNote" xml:space="preserve">Memungkinkan membuka folder di Kiriha dengan klik kanan pada folder atau pada latar isinya.</x:String>
+  <x:String x:Key="Text.Settings.FolderTree" xml:space="preserve">Pohon folder</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Material" xml:space="preserve">Material Icon Theme</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Note" xml:space="preserve">Material Icon Theme memakai material-icon-theme (Lisensi MIT, © Material Extensions). Set Windows menampilkan ikon shell yang sama dengan File Explorer.</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Original" xml:space="preserve">Ikon asli Kiriha</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Windows" xml:space="preserve">Ikon shell Windows</x:String>
+  <x:String x:Key="Text.Settings.Icons" xml:space="preserve">Ikon</x:String>
+  <x:String x:Key="Text.Settings.Language" xml:space="preserve">Bahasa tampilan</x:String>
+  <x:String x:Key="Text.Settings.Language.Note" xml:space="preserve">Secara bawaan, bahasa dideteksi dari bahasa tampilan Windows.</x:String>
+  <x:String x:Key="Text.Settings.License" xml:space="preserve">Lisensi</x:String>
+  <x:String x:Key="Text.Settings.Maintenance" xml:space="preserve">Pemeliharaan</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.Data" xml:space="preserve">Data dan singgahan</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.OpenLogFolder" xml:space="preserve">Buka folder log</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.ReloadQuickAccess" xml:space="preserve">Muat ulang Akses cepat</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.ResetSettings" xml:space="preserve">Setel ulang pengaturan</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.Subtitle" xml:space="preserve">Kelola singgahan, log, dan data pengaturan</x:String>
+  <x:String x:Key="Text.Settings.MinimizeToTray" xml:space="preserve">Minimalkan ke area notifikasi</x:String>
+  <x:String x:Key="Text.Settings.MinimizeToTrayNote" xml:space="preserve">Saat diminimalkan, Kiriha hilang dari bilah tugas dan dapat dipulihkan dari ikon di area notifikasi.</x:String>
+  <x:String x:Key="Text.Settings.Mouse" xml:space="preserve">Tetikus</x:String>
+  <x:String x:Key="Text.Settings.Mouse.BackgroundDoubleClick" xml:space="preserve">Saat klik ganda pada latar folder</x:String>
+  <x:String x:Key="Text.Settings.Mouse.BackgroundMiddleClick" xml:space="preserve">Saat klik roda pada latar folder</x:String>
+  <x:String x:Key="Text.Settings.Mouse.CloseTab" xml:space="preserve">Tutup tab</x:String>
+  <x:String x:Key="Text.Settings.Mouse.None" xml:space="preserve">Tidak melakukan apa pun</x:String>
+  <x:String x:Key="Text.Settings.Mouse.Pin" xml:space="preserve">Sematkan tab</x:String>
+  <x:String x:Key="Text.Settings.Mouse.Refresh" xml:space="preserve">Segarkan</x:String>
+  <x:String x:Key="Text.Settings.Mouse.TabDoubleClick" xml:space="preserve">Saat klik ganda pada tab</x:String>
+  <x:String x:Key="Text.Settings.Mouse.TabMiddleClick" xml:space="preserve">Saat klik roda pada tab</x:String>
+  <x:String x:Key="Text.Settings.Mouse.Up" xml:space="preserve">Naik satu tingkat</x:String>
+  <x:String x:Key="Text.Settings.RunAtStartup" xml:space="preserve">Jalankan Kiriha saat Windows dimulai</x:String>
+  <x:String x:Key="Text.Settings.RunAtStartupNote" xml:space="preserve">Kiriha berjalan otomatis saat Anda masuk.</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts" xml:space="preserve">Pintasan</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.FileOps" xml:space="preserve">Operasi berkas</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.FileOpsBody" xml:space="preserve">Ctrl+X / C / V　Potong, salin, tempel　　Delete / Shift+Delete　Hapus, hapus permanen&#10;F2　Ganti nama　　Alt+Enter　Properti　　Ctrl+Shift+N　Folder baru　　Alt+P　Pratinjau</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.Navigation" xml:space="preserve">Navigasi dan tampilan</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.NavigationBody" xml:space="preserve">Ctrl+L / F4　Edit alamat&#10;Ctrl+F / F3　Cari&#10;Alt+← / →　Kembali dan maju&#10;Alt+↑　Naik satu tingkat&#10;F5　Segarkan / F11　Layar penuh</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.Subtitle" xml:space="preserve">Pintasan papan ketik agar bekerja lebih cepat</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.Tabs" xml:space="preserve">Tab</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.TabsBody" xml:space="preserve">Ctrl+T　Tab baru&#10;Ctrl+W　Tutup tab&#10;Ctrl+Shift+T　Buka lagi tab yang ditutup&#10;Ctrl+Tab　Berpindah tab&#10;Ctrl+1..9　Pilih tab tertentu</x:String>
+  <x:String x:Key="Text.Settings.ShowBookmarksBar" xml:space="preserve">Tampilkan bilah markah (Ctrl+Shift+B)</x:String>
+  <x:String x:Key="Text.Settings.ShowCheckBoxes" xml:space="preserve">Tampilkan kotak centang item</x:String>
+  <x:String x:Key="Text.Settings.ShowExtensions" xml:space="preserve">Tampilkan ekstensi nama berkas</x:String>
+  <x:String x:Key="Text.Settings.ShowHidden" xml:space="preserve">Tampilkan berkas tersembunyi</x:String>
+  <x:String x:Key="Text.Settings.StartMinimizedToTray" xml:space="preserve">Mulai dalam keadaan diminimalkan ke area notifikasi</x:String>
+  <x:String x:Key="Text.Settings.StartMinimizedToTrayNote" xml:space="preserve">Kiriha dimulai tanpa menampilkan jendela, diminimalkan ke area notifikasi.</x:String>
+  <x:String x:Key="Text.Settings.Startup" xml:space="preserve">Pemulaian</x:String>
+  <x:String x:Key="Text.Settings.Startup.Behavior" xml:space="preserve">Perilaku saat mulai</x:String>
+  <x:String x:Key="Text.Settings.Startup.PathCaption" xml:space="preserve">Folder yang dibuka di tab baru (kosongkan untuk folder pengguna Anda)</x:String>
+  <x:String x:Key="Text.Settings.Startup.RestoreTabs" xml:space="preserve">Pulihkan tab yang terbuka saat aplikasi ditutup</x:String>
+  <x:String x:Key="Text.Settings.Startup.Subtitle" xml:space="preserve">Kelola pemulaian, integrasi Windows, dan area notifikasi</x:String>
+  <x:String x:Key="Text.Settings.Theme" xml:space="preserve">Tema</x:String>
+  <x:String x:Key="Text.Settings.Theme.Dark" xml:space="preserve">Gelap</x:String>
+  <x:String x:Key="Text.Settings.Theme.Light" xml:space="preserve">Terang</x:String>
+  <x:String x:Key="Text.Settings.Theme.System" xml:space="preserve">Sistem</x:String>
+  <x:String x:Key="Text.Settings.Tray" xml:space="preserve">Area notifikasi</x:String>
+  <x:String x:Key="Text.Settings.TreeDragDisabled" xml:space="preserve">Larang seret dari pohon folder</x:String>
+  <x:String x:Key="Text.Settings.TreeDropDisabled" xml:space="preserve">Larang jatuhkan ke pohon folder</x:String>
+  <x:String x:Key="Text.Settings.Updates" xml:space="preserve">Pembaruan dan info</x:String>
+  <x:String x:Key="Text.Settings.Updates.CheckNow" xml:space="preserve">Periksa pembaruan sekarang</x:String>
+  <x:String x:Key="Text.Settings.Updates.CheckOnStartup" xml:space="preserve">Periksa pembaruan saat mulai</x:String>
+  <x:String x:Key="Text.Settings.Updates.Subtitle" xml:space="preserve">Periksa versi Kiriha dan kelola pembaruan</x:String>
+  <x:String x:Key="Text.Settings.Updates.VersionCard" xml:space="preserve">Versi dan pembaruan</x:String>
+  <x:String x:Key="Text.Settings.Window" xml:space="preserve">Jendela</x:String>
+  <x:String x:Key="Text.Settings.Window.RememberBounds" xml:space="preserve">Ingat ukuran dan posisi jendela</x:String>
+  <x:String x:Key="Text.Settings.Window.RememberBoundsNote" xml:space="preserve">Jika dimatikan, Kiriha akan dibuka dengan ukuran dan posisi bawaan pada kali berikutnya.</x:String>
+  <x:String x:Key="Text.Settings.WindowsIntegration" xml:space="preserve">Integrasi Windows</x:String>
+  <x:String x:Key="Text.Share.FileCount" xml:space="preserve">{0} berkas</x:String>
+  <x:String x:Key="Text.Share.FoldersNotSupported" xml:space="preserve">Folder tidak dapat dibagikan (silakan pilih berkas)</x:String>
+  <x:String x:Key="Text.Share.NoItems" xml:space="preserve">Tidak ada yang bisa dibagikan</x:String>
+  <x:String x:Key="Text.Share.OpenFailed" xml:space="preserve">Tidak dapat membuka panel berbagi</x:String>
+  <x:String x:Key="Text.Share.PrepareFailed" xml:space="preserve">Tidak dapat menyiapkan data untuk dibagikan</x:String>
+  <x:String x:Key="Text.Share.SelectFiles" xml:space="preserve">Pilih berkas yang ingin dibagikan</x:String>
+  <x:String x:Key="Text.Sidebar.Drives" xml:space="preserve">Drive</x:String>
+  <x:String x:Key="Text.Sidebar.QuickAccess" xml:space="preserve">Akses cepat</x:String>
+  <x:String x:Key="Text.Sidebar.RecentFiles" xml:space="preserve">Berkas terbaru</x:String>
+  <x:String x:Key="Text.Sidebar.RecycleBin" xml:space="preserve">Recycle Bin</x:String>
+  <x:String x:Key="Text.Sidebar.RecycleBinTip" xml:space="preserve">Buka Recycle Bin di File Explorer</x:String>
+  <x:String x:Key="Text.Sidebar.ToggleTip" xml:space="preserve">Beralih antara Akses cepat dan pohon folder</x:String>
+  <x:String x:Key="Text.Sidebar.TreeView" xml:space="preserve">Tampilan pohon</x:String>
+  <x:String x:Key="Text.Sort.Ascending" xml:space="preserve">Menaik</x:String>
+  <x:String x:Key="Text.Sort.Descending" xml:space="preserve">Menurun</x:String>
+  <x:String x:Key="Text.Status.Breakdown" xml:space="preserve">({0} folder, {1} berkas)</x:String>
+  <x:String x:Key="Text.Status.ClearSelectionTip" xml:space="preserve">Klik untuk membatalkan pilihan</x:String>
+  <x:String x:Key="Text.Status.DetailsViewTip" xml:space="preserve">Tampilan detail</x:String>
+  <x:String x:Key="Text.Status.FreeSpace" xml:space="preserve">Ruang kosong: {0}</x:String>
+  <x:String x:Key="Text.Status.IconSizeTip" xml:space="preserve">Ukuran ikon</x:String>
+  <x:String x:Key="Text.Status.ItemCount" xml:space="preserve">{0} item</x:String>
+  <x:String x:Key="Text.Status.ItemCountFiltered" xml:space="preserve">{0} item (pencarian: {1})</x:String>
+  <x:String x:Key="Text.Status.ItemsSelected" xml:space="preserve">{0} item dipilih</x:String>
+  <x:String x:Key="Text.Status.LargeIconsTip" xml:space="preserve">Tampilan ikon besar</x:String>
+  <x:String x:Key="Text.Tab.Category" xml:space="preserve">Tab</x:String>
+  <x:String x:Key="Text.Tab.Close" xml:space="preserve">Tutup tab</x:String>
+  <x:String x:Key="Text.Tab.CloseBelow" xml:space="preserve">Tutup tab di bawah</x:String>
+  <x:String x:Key="Text.Tab.CloseOthers" xml:space="preserve">Tutup tab lain</x:String>
+  <x:String x:Key="Text.Tab.Duplicate" xml:space="preserve">Gandakan tab</x:String>
+  <x:String x:Key="Text.Tab.MoreActions" xml:space="preserve">Tindakan tab lainnya</x:String>
+  <x:String x:Key="Text.Tab.New" xml:space="preserve">Tab baru</x:String>
+  <x:String x:Key="Text.Tab.NewBelow" xml:space="preserve">Buka tab baru di bawah</x:String>
+  <x:String x:Key="Text.Tab.NewTip" xml:space="preserve">Tab baru (Ctrl+T)</x:String>
+  <x:String x:Key="Text.Tab.Pin" xml:space="preserve">Sematkan tab</x:String>
+  <x:String x:Key="Text.Tab.Pinned" xml:space="preserve">Tab tersemat</x:String>
+  <x:String x:Key="Text.Tab.RecentlyClosed" xml:space="preserve">Tab yang baru ditutup</x:String>
+  <x:String x:Key="Text.Tab.Reopen" xml:space="preserve">Buka lagi tab yang ditutup</x:String>
+  <x:String x:Key="Text.Tab.Unpin" xml:space="preserve">Lepas sematan tab</x:String>
+  <x:String x:Key="Text.TabAction.CloseDuplicates" xml:space="preserve">Tutup tab ganda untuk folder yang sama</x:String>
+  <x:String x:Key="Text.TabAction.CloseLeft" xml:space="preserve">Tutup tab di atas</x:String>
+  <x:String x:Key="Text.TabAction.CloseUnpinned" xml:space="preserve">Tutup semua tab yang tidak disematkan</x:String>
+  <x:String x:Key="Text.TabAction.CopyAllPaths" xml:space="preserve">Salin jalur semua tab</x:String>
+  <x:String x:Key="Text.TabAction.CopyMarkdown" xml:space="preserve">Salin tab sebagai tautan Markdown</x:String>
+  <x:String x:Key="Text.TabAction.CopyTitle" xml:space="preserve">Salin nama tab</x:String>
+  <x:String x:Key="Text.TabAction.CopyUri" xml:space="preserve">Salin tab sebagai URI file</x:String>
+  <x:String x:Key="Text.TabAction.MoveFirst" xml:space="preserve">Pindahkan tab ke paling atas</x:String>
+  <x:String x:Key="Text.TabAction.MoveLast" xml:space="preserve">Pindahkan tab ke paling bawah</x:String>
+  <x:String x:Key="Text.TabAction.OpenParent" xml:space="preserve">Buka folder induk di tab baru</x:String>
+  <x:String x:Key="Text.TabAction.PinAll" xml:space="preserve">Sematkan semua tab</x:String>
+  <x:String x:Key="Text.TabAction.PinLeft" xml:space="preserve">Sematkan tab di atas</x:String>
+  <x:String x:Key="Text.TabAction.PinRight" xml:space="preserve">Sematkan tab di bawah</x:String>
+  <x:String x:Key="Text.TabAction.ReloadAll" xml:space="preserve">Muat ulang semua tab</x:String>
+  <x:String x:Key="Text.TabAction.ReloadLeft" xml:space="preserve">Muat ulang tab di atas</x:String>
+  <x:String x:Key="Text.TabAction.ReloadRight" xml:space="preserve">Muat ulang tab di bawah</x:String>
+  <x:String x:Key="Text.TabAction.Reverse" xml:space="preserve">Balik urutan tab</x:String>
+  <x:String x:Key="Text.TabAction.SortByName" xml:space="preserve">Urutkan tab menurut nama</x:String>
+  <x:String x:Key="Text.TabAction.SortByPath" xml:space="preserve">Urutkan tab menurut jalur</x:String>
+  <x:String x:Key="Text.TabAction.UnpinAll" xml:space="preserve">Lepas sematan semua tab</x:String>
+  <x:String x:Key="Text.Toast.PathCopied" xml:space="preserve">Jalur disalin: {0}</x:String>
+  <x:String x:Key="Text.Tooltip.Modified" xml:space="preserve">Tanggal diubah: {0}</x:String>
+  <x:String x:Key="Text.Tooltip.Size" xml:space="preserve">Ukuran: {0}</x:String>
+  <x:String x:Key="Text.Tooltip.Type" xml:space="preserve">Jenis: {0}</x:String>
+  <x:String x:Key="Text.Tray.Exit" xml:space="preserve">Keluar</x:String>
+  <x:String x:Key="Text.Tray.Open" xml:space="preserve">Buka Kiriha</x:String>
+  <x:String x:Key="Text.Tree.Loading" xml:space="preserve">Memuat...</x:String>
+  <x:String x:Key="Text.Tree.MyComputer" xml:space="preserve">Komputer Saya</x:String>
+  <x:String x:Key="Text.Tree.MyDocuments" xml:space="preserve">Dokumen Saya</x:String>
+  <x:String x:Key="Text.Type.ExtFile" xml:space="preserve">Berkas {0}</x:String>
+  <x:String x:Key="Text.Type.File" xml:space="preserve">Berkas</x:String>
+  <x:String x:Key="Text.Type.FileFolder" xml:space="preserve">Folder berkas</x:String>
+  <x:String x:Key="Text.Type.LocalDisk" xml:space="preserve">Disk lokal</x:String>
+  <x:String x:Key="Text.Type.LocalDiskFormat" xml:space="preserve">Disk lokal ({0})</x:String>
+  <x:String x:Key="Text.Video.Unavailable" xml:space="preserve">Video ini tidak dapat diputar (tidak ada codec yang cocok)</x:String>
+  <x:String x:Key="Text.Video.PlayPauseTip" xml:space="preserve">Putar / jeda (Spasi)</x:String>
+  <x:String x:Key="Text.Video.MuteTip" xml:space="preserve">Bisukan</x:String>
+  <x:String x:Key="Text.Video.VolumeTip" xml:space="preserve">Volume</x:String>
+  <x:String x:Key="Text.Video.LoopTip" xml:space="preserve">Ulangi</x:String>
+  <x:String x:Key="Text.Video.RateTip" xml:space="preserve">Kecepatan pemutaran</x:String>
+  <x:String x:Key="Text.Update.AvailableHeader" xml:space="preserve">Versi baru tersedia</x:String>
+  <x:String x:Key="Text.Update.Checking" xml:space="preserve">Memeriksa pembaruan...</x:String>
+  <x:String x:Key="Text.Update.DownloadAndInstall" xml:space="preserve">Unduh dan pasang</x:String>
+  <x:String x:Key="Text.Update.ErrorHeader" xml:space="preserve">Tidak dapat memeriksa pembaruan</x:String>
+  <x:String x:Key="Text.Update.IgnoreThisVersion" xml:space="preserve">Lewati versi ini</x:String>
+  <x:String x:Key="Text.Update.Title" xml:space="preserve">Pembaruan perangkat lunak</x:String>
+  <x:String x:Key="Text.Update.UpToDate" xml:space="preserve">Anda sudah memakai versi terbaru</x:String>
+  <x:String x:Key="Text.View.Compact" xml:space="preserve">Tampilan ringkas</x:String>
+  <x:String x:Key="Text.View.Details" xml:space="preserve">Detail</x:String>
+  <x:String x:Key="Text.View.ExtraLarge" xml:space="preserve">Ikon sangat besar</x:String>
+  <x:String x:Key="Text.View.FileExtensions" xml:space="preserve">Ekstensi nama berkas</x:String>
+  <x:String x:Key="Text.View.HiddenFiles" xml:space="preserve">Item tersembunyi</x:String>
+  <x:String x:Key="Text.View.ItemCheckBoxes" xml:space="preserve">Kotak centang item</x:String>
+  <x:String x:Key="Text.View.Large" xml:space="preserve">Ikon besar</x:String>
+  <x:String x:Key="Text.View.List" xml:space="preserve">Daftar</x:String>
+  <x:String x:Key="Text.View.Medium" xml:space="preserve">Ikon sedang</x:String>
+  <x:String x:Key="Text.View.NavigationPane" xml:space="preserve">Panel navigasi</x:String>
+  <x:String x:Key="Text.View.PreviewPane" xml:space="preserve">Panel pratinjau</x:String>
+  <x:String x:Key="Text.View.Small" xml:space="preserve">Ikon kecil</x:String>
+  <x:String x:Key="Text.View.StatusBar" xml:space="preserve">Bilah status</x:String>
+</ResourceDictionary>

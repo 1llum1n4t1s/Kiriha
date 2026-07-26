@@ -1,0 +1,353 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:String x:Key="Text.A11y.OpenSubfolders" xml:space="preserve">顯示子資料夾</x:String>
+  <x:String x:Key="Text.A11y.ResizeVerticalTabs" xml:space="preserve">調整垂直分頁列寬度</x:String>
+  <x:String x:Key="Text.A11y.SwitchToTree" xml:space="preserve">切換到樹狀檢視</x:String>
+  <x:String x:Key="Text.A11y.ToggleSidebar" xml:space="preserve">顯示或隱藏側邊欄</x:String>
+  <x:String x:Key="Text.A11y.VerticalTabs" xml:space="preserve">垂直分頁</x:String>
+  <x:String x:Key="Text.Address.Copy" xml:space="preserve">複製位址</x:String>
+  <x:String x:Key="Text.Address.Edit" xml:space="preserve">編輯位址</x:String>
+  <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">加入目前的資料夾</x:String>
+  <x:String x:Key="Text.Bookmarks.AddFolderMenu" xml:space="preserve">新增資料夾...</x:String>
+  <x:String x:Key="Text.Bookmarks.AddFolderTitle" xml:space="preserve">新增資料夾</x:String>
+  <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">將資料夾拖曳到這裡即可加入書籤</x:String>
+  <x:String x:Key="Text.Bookmarks.Hide" xml:space="preserve">隱藏書籤列</x:String>
+  <x:String x:Key="Text.Bookmarks.NewFolderName" xml:space="preserve">新增資料夾</x:String>
+  <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">重新命名...</x:String>
+  <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">重新命名書籤</x:String>
+  <x:String x:Key="Text.Bookmarks.SortByName" xml:space="preserve">依名稱排序</x:String>
+  <x:String x:Key="Text.Bookmarks.SortByPath" xml:space="preserve">依路徑排序</x:String>
+  <x:String x:Key="Text.Caption.MaximizeRestore" xml:space="preserve">最大化或還原</x:String>
+  <x:String x:Key="Text.Caption.Minimize" xml:space="preserve">最小化</x:String>
+  <x:String x:Key="Text.Clipboard.Copied" xml:space="preserve">已複製 {0} 個項目</x:String>
+  <x:String x:Key="Text.Clipboard.CopiedToClipboard" xml:space="preserve">已複製到剪貼簿</x:String>
+  <x:String x:Key="Text.Clipboard.CopyFailed" xml:space="preserve">無法複製到剪貼簿</x:String>
+  <x:String x:Key="Text.Clipboard.Cut" xml:space="preserve">已剪下 {0} 個項目</x:String>
+  <x:String x:Key="Text.Clipboard.VirtualPasteFailed" xml:space="preserve">無法貼上虛擬檔案</x:String>
+  <x:String x:Key="Text.Clipboard.WriteFailed" xml:space="preserve">無法寫入剪貼簿</x:String>
+  <x:String x:Key="Text.Column.AutoFitAll" xml:space="preserve">自動調整所有欄寬</x:String>
+  <x:String x:Key="Text.Column.AutoFitThis" xml:space="preserve">自動調整此欄寬</x:String>
+  <x:String x:Key="Text.Column.Created" xml:space="preserve">建立日期</x:String>
+  <x:String x:Key="Text.Column.Modified" xml:space="preserve">修改日期</x:String>
+  <x:String x:Key="Text.Column.Name" xml:space="preserve">名稱</x:String>
+  <x:String x:Key="Text.Column.Size" xml:space="preserve">大小</x:String>
+  <x:String x:Key="Text.Column.Type" xml:space="preserve">類型</x:String>
+  <x:String x:Key="Text.Command.CopyTip" xml:space="preserve">複製 (Ctrl+C)</x:String>
+  <x:String x:Key="Text.Command.Cut" xml:space="preserve">剪下</x:String>
+  <x:String x:Key="Text.Command.CutTip" xml:space="preserve">剪下 (Ctrl+X)</x:String>
+  <x:String x:Key="Text.Command.DeleteTip" xml:space="preserve">刪除 (Delete)</x:String>
+  <x:String x:Key="Text.Command.More" xml:space="preserve">查看更多</x:String>
+  <x:String x:Key="Text.Command.NewFolder" xml:space="preserve">新增資料夾</x:String>
+  <x:String x:Key="Text.Command.Options" xml:space="preserve">選項</x:String>
+  <x:String x:Key="Text.Command.Paste" xml:space="preserve">貼上</x:String>
+  <x:String x:Key="Text.Command.PasteTip" xml:space="preserve">貼上 (Ctrl+V)</x:String>
+  <x:String x:Key="Text.Command.Rename" xml:space="preserve">重新命名</x:String>
+  <x:String x:Key="Text.Command.RenameTip" xml:space="preserve">重新命名 (F2)</x:String>
+  <x:String x:Key="Text.Command.Share" xml:space="preserve">共用</x:String>
+  <x:String x:Key="Text.Command.SidebarTip" xml:space="preserve">顯示/隱藏側邊欄（快速存取 / 樹狀檢視）</x:String>
+  <x:String x:Key="Text.Command.Sort" xml:space="preserve">排序</x:String>
+  <x:String x:Key="Text.Command.View" xml:space="preserve">檢視</x:String>
+  <x:String x:Key="Text.Common.AddToBookmarks" xml:space="preserve">加入書籤</x:String>
+  <x:String x:Key="Text.Common.Cancel" xml:space="preserve">取消</x:String>
+  <x:String x:Key="Text.Common.Close" xml:space="preserve">關閉</x:String>
+  <x:String x:Key="Text.Common.Copy" xml:space="preserve">複製</x:String>
+  <x:String x:Key="Text.Common.CopyPath" xml:space="preserve">複製路徑</x:String>
+  <x:String x:Key="Text.Common.Delete" xml:space="preserve">刪除</x:String>
+  <x:String x:Key="Text.Common.Open" xml:space="preserve">開啟</x:String>
+  <x:String x:Key="Text.Common.OpenInExplorer" xml:space="preserve">在檔案總管中開啟</x:String>
+  <x:String x:Key="Text.Common.OpenInNewTab" xml:space="preserve">在新分頁中開啟</x:String>
+  <x:String x:Key="Text.Common.OpenInTerminal" xml:space="preserve">在終端機中開啟</x:String>
+  <x:String x:Key="Text.Common.PinToQuickAccess" xml:space="preserve">釘選到快速存取</x:String>
+  <x:String x:Key="Text.Common.Properties" xml:space="preserve">內容</x:String>
+  <x:String x:Key="Text.Common.UnpinFromQuickAccess" xml:space="preserve">從快速存取取消釘選</x:String>
+  <x:String x:Key="Text.Drag.Add" xml:space="preserve">加入</x:String>
+  <x:String x:Key="Text.Drag.Copy" xml:space="preserve">複製</x:String>
+  <x:String x:Key="Text.Drag.Dragging" xml:space="preserve">拖曳中</x:String>
+  <x:String x:Key="Text.Drag.File" xml:space="preserve">檔案</x:String>
+  <x:String x:Key="Text.Drag.Folder" xml:space="preserve">資料夾</x:String>
+  <x:String x:Key="Text.Drag.Move" xml:space="preserve">移動</x:String>
+  <x:String x:Key="Text.Drag.OpenInTab" xml:space="preserve">在分頁中開啟</x:String>
+  <x:String x:Key="Text.Drive.FreeOfTotal" xml:space="preserve">{1} 中有 {0} 可用</x:String>
+  <x:String x:Key="Text.Error.AccessDenied" xml:space="preserve">存取被拒</x:String>
+  <x:String x:Key="Text.Error.Code" xml:space="preserve">錯誤 {0}</x:String>
+  <x:String x:Key="Text.Error.CodeWithDesc" xml:space="preserve">錯誤 {0}: {1}</x:String>
+  <x:String x:Key="Text.Error.DiskFull" xml:space="preserve">磁碟空間不足</x:String>
+  <x:String x:Key="Text.Error.FileExists" xml:space="preserve">已有同名的檔案</x:String>
+  <x:String x:Key="Text.Error.InvalidName" xml:space="preserve">檔名包含無效字元</x:String>
+  <x:String x:Key="Text.Error.PathNotFound" xml:space="preserve">找不到路徑</x:String>
+  <x:String x:Key="Text.Error.PathTooLong" xml:space="preserve">路徑太長</x:String>
+  <x:String x:Key="Text.Error.SharingViolation" xml:space="preserve">檔案正由其他處理程序使用</x:String>
+  <x:String x:Key="Text.Error.WriteProtected" xml:space="preserve">媒體有防寫保護</x:String>
+  <x:String x:Key="Text.Exif.Camera" xml:space="preserve">相機</x:String>
+  <x:String x:Key="Text.Exif.CameraMaker" xml:space="preserve">相機製造商</x:String>
+  <x:String x:Key="Text.Exif.DateModified" xml:space="preserve">修改日期</x:String>
+  <x:String x:Key="Text.Exif.DateTaken" xml:space="preserve">拍攝日期</x:String>
+  <x:String x:Key="Text.Exif.Dimensions" xml:space="preserve">尺寸</x:String>
+  <x:String x:Key="Text.Exif.ExposureBias" xml:space="preserve">曝光補償</x:String>
+  <x:String x:Key="Text.Exif.ExposureTime" xml:space="preserve">曝光時間</x:String>
+  <x:String x:Key="Text.Exif.FNumber" xml:space="preserve">光圈值</x:String>
+  <x:String x:Key="Text.Exif.Flash" xml:space="preserve">閃光燈</x:String>
+  <x:String x:Key="Text.Exif.FocalLength" xml:space="preserve">焦距</x:String>
+  <x:String x:Key="Text.Exif.Iso" xml:space="preserve">ISO 感光度</x:String>
+  <x:String x:Key="Text.Exif.Lens" xml:space="preserve">鏡頭</x:String>
+  <x:String x:Key="Text.Exif.Size" xml:space="preserve">大小</x:String>
+  <x:String x:Key="Text.Exif.Type" xml:space="preserve">類型</x:String>
+  <x:String x:Key="Text.FileList.EmptyFolder" xml:space="preserve">這個資料夾是空的。</x:String>
+  <x:String x:Key="Text.Folder.Desktop" xml:space="preserve">桌面</x:String>
+  <x:String x:Key="Text.Folder.Documents" xml:space="preserve">文件</x:String>
+  <x:String x:Key="Text.Folder.Downloads" xml:space="preserve">下載</x:String>
+  <x:String x:Key="Text.Folder.Music" xml:space="preserve">音樂</x:String>
+  <x:String x:Key="Text.Folder.Pictures" xml:space="preserve">圖片</x:String>
+  <x:String x:Key="Text.Folder.Videos" xml:space="preserve">影片</x:String>
+  <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">離開圖庫 (Esc)</x:String>
+  <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">影像資訊</x:String>
+  <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">沒有這張影像的資訊。</x:String>
+  <x:String x:Key="Text.Integration.OpenWithKiriha" xml:space="preserve">以 Kiriha 開啟</x:String>
+  <x:String x:Key="Text.Launch.ExplorerFailed" xml:space="preserve">無法啟動檔案總管: {0}</x:String>
+  <x:String x:Key="Text.Launch.Failed" xml:space="preserve">無法啟動: {0}</x:String>
+  <x:String x:Key="Text.Launch.TerminalFailed" xml:space="preserve">無法啟動終端機: {0}</x:String>
+  <x:String x:Key="Text.License.Activate" xml:space="preserve">啟用</x:String>
+  <x:String x:Key="Text.License.Exit" xml:space="preserve">結束</x:String>
+  <x:String x:Key="Text.License.KeyPlaceholder" xml:space="preserve">以 KIRIHA- 開頭的授權金鑰</x:String>
+  <x:String x:Key="Text.License.Lock.OnlineCheckBody" xml:space="preserve">授權已超過 30 天未進行線上驗證。請連上網際網路後按「重新線上驗證」。</x:String>
+  <x:String x:Key="Text.License.Lock.OnlineCheckTitle" xml:space="preserve">需要進行授權的線上驗證</x:String>
+  <x:String x:Key="Text.License.Lock.TrialExpiredBody" xml:space="preserve">使用 Kiriha 需要已啟用的授權（¥980，一次買斷）。</x:String>
+  <x:String x:Key="Text.License.Lock.TrialExpiredTitle" xml:space="preserve">試用期已結束</x:String>
+  <x:String x:Key="Text.License.Msg.Activated" xml:space="preserve">授權已啟用 🎉 非常感謝！</x:String>
+  <x:String x:Key="Text.License.Msg.CheckOk" xml:space="preserve">驗證完成。感謝您使用 Kiriha！</x:String>
+  <x:String x:Key="Text.License.Msg.Checking" xml:space="preserve">正在線上驗證…</x:String>
+  <x:String x:Key="Text.License.Msg.EnterKey" xml:space="preserve">請輸入購買時核發的授權金鑰。</x:String>
+  <x:String x:Key="Text.License.Msg.InvalidKey" xml:space="preserve">這組授權金鑰不正確。請確認複製時是否有字元遺漏或多餘空白。</x:String>
+  <x:String x:Key="Text.License.Msg.PurchaseFailed" xml:space="preserve">無法開啟購買頁面。請稍後再試。</x:String>
+  <x:String x:Key="Text.License.Msg.PurchaseOpened" xml:space="preserve">已在瀏覽器中開啟購買頁面。請將確認頁面上顯示的授權金鑰貼到上方欄位。</x:String>
+  <x:String x:Key="Text.License.Msg.Revoked" xml:space="preserve">此授權已失效（例如已退款）。請重新購買。</x:String>
+  <x:String x:Key="Text.License.Msg.ServerUnreachable" xml:space="preserve">無法連線到伺服器。請檢查網路連線後再試一次。</x:String>
+  <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">開啟購買頁面（¥980，一次買斷）</x:String>
+  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">購買後，授權金鑰會顯示在付款完成頁面。不需要註冊帳號或密碼。</x:String>
+  <x:String x:Key="Text.License.Recheck" xml:space="preserve">重新線上驗證</x:String>
+  <x:String x:Key="Text.License.Status.Licensed" xml:space="preserve">授權已啟用: {0}</x:String>
+  <x:String x:Key="Text.License.Status.OnlineCheck" xml:space="preserve">需要進行授權的線上驗證（請連上網際網路）</x:String>
+  <x:String x:Key="Text.License.Status.Trial" xml:space="preserve">試用期（剩餘 {0} 天）</x:String>
+  <x:String x:Key="Text.License.Status.TrialExpired" xml:space="preserve">試用期結束（需要授權）</x:String>
+  <x:String x:Key="Text.Menu.About" xml:space="preserve">關於 Kiriha</x:String>
+  <x:String x:Key="Text.Menu.AccessDenied" xml:space="preserve">(無法存取)</x:String>
+  <x:String x:Key="Text.Menu.BookmarksBar" xml:space="preserve">書籤列</x:String>
+  <x:String x:Key="Text.Menu.CheckUpdate" xml:space="preserve">檢查更新</x:String>
+  <x:String x:Key="Text.Menu.Empty" xml:space="preserve">(空的)</x:String>
+  <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">開新視窗</x:String>
+  <x:String x:Key="Text.Menu.NoSubfolders" xml:space="preserve">(沒有子資料夾)</x:String>
+  <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(無)</x:String>
+  <x:String x:Key="Text.Nav.Back" xml:space="preserve">上一頁</x:String>
+  <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">上一頁（按右鍵可看歷程記錄）</x:String>
+  <x:String x:Key="Text.Nav.EditPathTip" xml:space="preserve">按一下以編輯路徑</x:String>
+  <x:String x:Key="Text.Nav.Forward" xml:space="preserve">下一頁</x:String>
+  <x:String x:Key="Text.Nav.ForwardTip" xml:space="preserve">下一頁（按右鍵可看歷程記錄）</x:String>
+  <x:String x:Key="Text.Nav.Home" xml:space="preserve">首頁</x:String>
+  <x:String x:Key="Text.Nav.HomeTip" xml:space="preserve">首頁（Alt+Home / 按右鍵可看常用資料夾）</x:String>
+  <x:String x:Key="Text.Nav.OpenFailed" xml:space="preserve">無法開啟: {0}</x:String>
+  <x:String x:Key="Text.Nav.OpenSettings" xml:space="preserve">開啟設定</x:String>
+  <x:String x:Key="Text.Nav.Refresh" xml:space="preserve">重新整理</x:String>
+  <x:String x:Key="Text.Nav.Settings" xml:space="preserve">設定</x:String>
+  <x:String x:Key="Text.Nav.UpFolder" xml:space="preserve">上一層</x:String>
+  <x:String x:Key="Text.Nav.UpTip" xml:space="preserve">上一層（按右鍵可看上層資料夾）</x:String>
+  <x:String x:Key="Text.New.CreateFailed" xml:space="preserve">無法建立: {0}</x:String>
+  <x:String x:Key="Text.New.FolderName" xml:space="preserve">新增資料夾</x:String>
+  <x:String x:Key="Text.New.ItemName" xml:space="preserve">新增 {0}</x:String>
+  <x:String x:Key="Text.New.UndoFailed" xml:space="preserve">無法復原新增資料夾: {0}</x:String>
+  <x:String x:Key="Text.Op.Copied" xml:space="preserve">已複製 {0} 個項目</x:String>
+  <x:String x:Key="Text.Op.DeleteFailed" xml:space="preserve">刪除失敗（{0}）</x:String>
+  <x:String x:Key="Text.Op.Failed" xml:space="preserve">檔案操作失敗（{0}）</x:String>
+  <x:String x:Key="Text.Op.Moved" xml:space="preserve">已移動 {0} 個項目</x:String>
+  <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">貼上失敗（{0}）</x:String>
+  <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">重新命名失敗（{0}）</x:String>
+  <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">{0} 個檔案  {1}</x:String>
+  <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> 以上</x:String>
+  <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">清空資源回收筒</x:String>
+  <x:String x:Key="Text.Rename.AlreadyExists" xml:space="preserve">已有同名的檔案或資料夾: {0}</x:String>
+  <x:String x:Key="Text.Rename.InvalidChars" xml:space="preserve">檔名包含無效字元: \ / : * ? " &lt; &gt; |</x:String>
+  <x:String x:Key="Text.Rename.RevertedToOriginal" xml:space="preserve">重新命名失敗，已還原成原本的名稱</x:String>
+  <x:String x:Key="Text.Rename.StuckAsTemporary" xml:space="preserve">重新命名失敗，仍保留暫時名稱: {0}</x:String>
+  <x:String x:Key="Text.Search.ClearTip" xml:space="preserve">清除搜尋</x:String>
+  <x:String x:Key="Text.Search.Failed" xml:space="preserve">搜尋失敗: {0}</x:String>
+  <x:String x:Key="Text.Search.Found" xml:space="preserve">找到 {0} 筆結果（含子資料夾）</x:String>
+  <x:String x:Key="Text.Search.Placeholder" xml:space="preserve">搜尋 {0}</x:String>
+  <x:String x:Key="Text.Search.Searching" xml:space="preserve">搜尋中...（含子資料夾）</x:String>
+  <x:String x:Key="Text.Search.Truncated" xml:space="preserve">已在 {0} 筆處停止（達到 1000 筆上限，仍有子資料夾未掃描；縮小搜尋範圍即可看到更多）</x:String>
+  <x:String x:Key="Text.Select.All" xml:space="preserve">全選</x:String>
+  <x:String x:Key="Text.Select.FilesOnly" xml:space="preserve">只選取檔案</x:String>
+  <x:String x:Key="Text.Select.FoldersOnly" xml:space="preserve">只選取資料夾</x:String>
+  <x:String x:Key="Text.Select.Invert" xml:space="preserve">反向選取</x:String>
+  <x:String x:Key="Text.Select.None" xml:space="preserve">取消選取</x:String>
+  <x:String x:Key="Text.Settings.About" xml:space="preserve">關於 Kiriha</x:String>
+  <x:String x:Key="Text.Settings.About.Body" xml:space="preserve">Kiriha 把 Windows 檔案總管的檔案操作，與 Chrome 的分頁、網址列和書籤整合在同一個視窗中。設定會儲存在目前的使用者帳戶下。</x:String>
+  <x:String x:Key="Text.Settings.Acrylic" xml:space="preserve">視窗使用壓克力效果（半透明模糊）</x:String>
+  <x:String x:Key="Text.Settings.DefaultFolderApp" xml:space="preserve">將 Kiriha 設為開啟資料夾和磁碟機的預設應用程式</x:String>
+  <x:String x:Key="Text.Settings.DefaultFolderApp.Off" xml:space="preserve">啟用後，從檔案總管開啟資料夾或磁碟機時會啟動 Kiriha。</x:String>
+  <x:String x:Key="Text.Settings.DefaultFolderApp.On" xml:space="preserve">目前資料夾和磁碟機會在 Kiriha 中開啟。關閉後會恢復先前的行為。</x:String>
+  <x:String x:Key="Text.Settings.Display" xml:space="preserve">外觀</x:String>
+  <x:String x:Key="Text.Settings.Display.Subtitle" xml:space="preserve">調整檔案清單的外觀與 Kiriha 的樣式</x:String>
+  <x:String x:Key="Text.Settings.Explorer" xml:space="preserve">檔案清單</x:String>
+  <x:String x:Key="Text.Settings.ExplorerContextMenu" xml:space="preserve">在檔案總管的右鍵選單中加入「以 Kiriha 開啟」</x:String>
+  <x:String x:Key="Text.Settings.ExplorerContextMenuNote" xml:space="preserve">在資料夾或其內容的空白處按右鍵，即可用 Kiriha 開啟該資料夾。</x:String>
+  <x:String x:Key="Text.Settings.FolderTree" xml:space="preserve">資料夾樹狀圖</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Material" xml:space="preserve">Material Icon Theme</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Note" xml:space="preserve">Material Icon Theme 使用 material-icon-theme（MIT 授權，© Material Extensions）。Windows 圖示組會顯示與檔案總管相同的 Shell 圖示。</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Original" xml:space="preserve">Kiriha 原創圖示</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Windows" xml:space="preserve">Windows Shell 圖示</x:String>
+  <x:String x:Key="Text.Settings.Icons" xml:space="preserve">圖示</x:String>
+  <x:String x:Key="Text.Settings.Language" xml:space="preserve">顯示語言</x:String>
+  <x:String x:Key="Text.Settings.Language.Note" xml:space="preserve">預設會依 Windows 的顯示語言自動選擇。</x:String>
+  <x:String x:Key="Text.Settings.License" xml:space="preserve">授權</x:String>
+  <x:String x:Key="Text.Settings.Maintenance" xml:space="preserve">維護</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.Data" xml:space="preserve">資料與快取</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.OpenLogFolder" xml:space="preserve">開啟記錄檔資料夾</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.ReloadQuickAccess" xml:space="preserve">重新載入快速存取</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.ResetSettings" xml:space="preserve">重設設定</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.Subtitle" xml:space="preserve">管理快取、記錄檔與設定資料</x:String>
+  <x:String x:Key="Text.Settings.MinimizeToTray" xml:space="preserve">最小化到通知區域</x:String>
+  <x:String x:Key="Text.Settings.MinimizeToTrayNote" xml:space="preserve">最小化後 Kiriha 會從工作列消失，可從通知區域的圖示還原。</x:String>
+  <x:String x:Key="Text.Settings.Mouse" xml:space="preserve">滑鼠</x:String>
+  <x:String x:Key="Text.Settings.Mouse.BackgroundDoubleClick" xml:space="preserve">按兩下資料夾空白處時</x:String>
+  <x:String x:Key="Text.Settings.Mouse.BackgroundMiddleClick" xml:space="preserve">在資料夾空白處按下滾輪時</x:String>
+  <x:String x:Key="Text.Settings.Mouse.CloseTab" xml:space="preserve">關閉分頁</x:String>
+  <x:String x:Key="Text.Settings.Mouse.None" xml:space="preserve">不執行任何動作</x:String>
+  <x:String x:Key="Text.Settings.Mouse.Pin" xml:space="preserve">釘選分頁</x:String>
+  <x:String x:Key="Text.Settings.Mouse.Refresh" xml:space="preserve">重新整理</x:String>
+  <x:String x:Key="Text.Settings.Mouse.TabDoubleClick" xml:space="preserve">按兩下分頁時</x:String>
+  <x:String x:Key="Text.Settings.Mouse.TabMiddleClick" xml:space="preserve">在分頁上按下滾輪時</x:String>
+  <x:String x:Key="Text.Settings.Mouse.Up" xml:space="preserve">移到上一層</x:String>
+  <x:String x:Key="Text.Settings.RunAtStartup" xml:space="preserve">開機時啟動 Kiriha</x:String>
+  <x:String x:Key="Text.Settings.RunAtStartupNote" xml:space="preserve">登入時會自動啟動 Kiriha。</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts" xml:space="preserve">快速鍵</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.FileOps" xml:space="preserve">檔案操作</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.FileOpsBody" xml:space="preserve">Ctrl+X / C / V　剪下、複製、貼上　　Delete / Shift+Delete　刪除、永久刪除&#10;F2　重新命名　　Alt+Enter　內容　　Ctrl+Shift+N　新增資料夾　　Alt+P　預覽</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.Navigation" xml:space="preserve">導覽與檢視</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.NavigationBody" xml:space="preserve">Ctrl+L / F4　編輯位址&#10;Ctrl+F / F3　搜尋&#10;Alt+← / →　上一頁與下一頁&#10;Alt+↑　上一層&#10;F5　重新整理 / F11　全螢幕</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.Subtitle" xml:space="preserve">讓操作更快速的鍵盤快速鍵一覽</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.Tabs" xml:space="preserve">分頁</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.TabsBody" xml:space="preserve">Ctrl+T　開新分頁&#10;Ctrl+W　關閉分頁&#10;Ctrl+Shift+T　重新開啟已關閉的分頁&#10;Ctrl+Tab　切換分頁&#10;Ctrl+1..9　選擇指定分頁</x:String>
+  <x:String x:Key="Text.Settings.ShowBookmarksBar" xml:space="preserve">顯示書籤列 (Ctrl+Shift+B)</x:String>
+  <x:String x:Key="Text.Settings.ShowCheckBoxes" xml:space="preserve">顯示項目核取方塊</x:String>
+  <x:String x:Key="Text.Settings.ShowExtensions" xml:space="preserve">顯示副檔名</x:String>
+  <x:String x:Key="Text.Settings.ShowHidden" xml:space="preserve">顯示隱藏檔案</x:String>
+  <x:String x:Key="Text.Settings.StartMinimizedToTray" xml:space="preserve">啟動時最小化到通知區域</x:String>
+  <x:String x:Key="Text.Settings.StartMinimizedToTrayNote" xml:space="preserve">Kiriha 啟動時不顯示視窗，直接最小化到通知區域。</x:String>
+  <x:String x:Key="Text.Settings.Startup" xml:space="preserve">啟動</x:String>
+  <x:String x:Key="Text.Settings.Startup.Behavior" xml:space="preserve">啟動時的行為</x:String>
+  <x:String x:Key="Text.Settings.Startup.PathCaption" xml:space="preserve">新分頁要開啟的資料夾（留白則使用您的使用者資料夾）</x:String>
+  <x:String x:Key="Text.Settings.Startup.RestoreTabs" xml:space="preserve">下次啟動時還原關閉前開啟的分頁</x:String>
+  <x:String x:Key="Text.Settings.Startup.Subtitle" xml:space="preserve">管理啟動方式、Windows 整合與通知區域</x:String>
+  <x:String x:Key="Text.Settings.Theme" xml:space="preserve">佈景主題</x:String>
+  <x:String x:Key="Text.Settings.Theme.Dark" xml:space="preserve">深色</x:String>
+  <x:String x:Key="Text.Settings.Theme.Light" xml:space="preserve">淺色</x:String>
+  <x:String x:Key="Text.Settings.Theme.System" xml:space="preserve">跟隨系統</x:String>
+  <x:String x:Key="Text.Settings.Tray" xml:space="preserve">通知區域</x:String>
+  <x:String x:Key="Text.Settings.TreeDragDisabled" xml:space="preserve">禁止從樹狀圖拖曳</x:String>
+  <x:String x:Key="Text.Settings.TreeDropDisabled" xml:space="preserve">禁止拖放到樹狀圖</x:String>
+  <x:String x:Key="Text.Settings.Updates" xml:space="preserve">更新與資訊</x:String>
+  <x:String x:Key="Text.Settings.Updates.CheckNow" xml:space="preserve">立即檢查更新</x:String>
+  <x:String x:Key="Text.Settings.Updates.CheckOnStartup" xml:space="preserve">啟動時檢查更新</x:String>
+  <x:String x:Key="Text.Settings.Updates.Subtitle" xml:space="preserve">查看 Kiriha 的版本並管理更新</x:String>
+  <x:String x:Key="Text.Settings.Updates.VersionCard" xml:space="preserve">版本與更新</x:String>
+  <x:String x:Key="Text.Settings.Window" xml:space="preserve">視窗</x:String>
+  <x:String x:Key="Text.Settings.Window.RememberBounds" xml:space="preserve">記住視窗的大小和位置</x:String>
+  <x:String x:Key="Text.Settings.Window.RememberBoundsNote" xml:space="preserve">關閉後，下次會以預設的大小和位置啟動。</x:String>
+  <x:String x:Key="Text.Settings.WindowsIntegration" xml:space="preserve">Windows 整合</x:String>
+  <x:String x:Key="Text.Share.FileCount" xml:space="preserve">{0} 個檔案</x:String>
+  <x:String x:Key="Text.Share.FoldersNotSupported" xml:space="preserve">無法共用資料夾（請選取檔案）</x:String>
+  <x:String x:Key="Text.Share.NoItems" xml:space="preserve">沒有可共用的項目</x:String>
+  <x:String x:Key="Text.Share.OpenFailed" xml:space="preserve">無法開啟共用面板</x:String>
+  <x:String x:Key="Text.Share.PrepareFailed" xml:space="preserve">無法準備要共用的資料</x:String>
+  <x:String x:Key="Text.Share.SelectFiles" xml:space="preserve">請選取要共用的檔案</x:String>
+  <x:String x:Key="Text.Sidebar.Drives" xml:space="preserve">磁碟機</x:String>
+  <x:String x:Key="Text.Sidebar.QuickAccess" xml:space="preserve">快速存取</x:String>
+  <x:String x:Key="Text.Sidebar.RecentFiles" xml:space="preserve">最近使用的檔案</x:String>
+  <x:String x:Key="Text.Sidebar.RecycleBin" xml:space="preserve">資源回收筒</x:String>
+  <x:String x:Key="Text.Sidebar.RecycleBinTip" xml:space="preserve">在檔案總管中開啟資源回收筒</x:String>
+  <x:String x:Key="Text.Sidebar.ToggleTip" xml:space="preserve">在快速存取與資料夾樹狀圖之間切換</x:String>
+  <x:String x:Key="Text.Sidebar.TreeView" xml:space="preserve">樹狀檢視</x:String>
+  <x:String x:Key="Text.Sort.Ascending" xml:space="preserve">遞增</x:String>
+  <x:String x:Key="Text.Sort.Descending" xml:space="preserve">遞減</x:String>
+  <x:String x:Key="Text.Status.Breakdown" xml:space="preserve">（資料夾 {0} 個，檔案 {1} 個）</x:String>
+  <x:String x:Key="Text.Status.ClearSelectionTip" xml:space="preserve">按一下以取消選取</x:String>
+  <x:String x:Key="Text.Status.DetailsViewTip" xml:space="preserve">詳細資料檢視</x:String>
+  <x:String x:Key="Text.Status.FreeSpace" xml:space="preserve">可用空間: {0}</x:String>
+  <x:String x:Key="Text.Status.IconSizeTip" xml:space="preserve">圖示大小</x:String>
+  <x:String x:Key="Text.Status.ItemCount" xml:space="preserve">{0} 個項目</x:String>
+  <x:String x:Key="Text.Status.ItemCountFiltered" xml:space="preserve">{0} 個項目（搜尋: {1}）</x:String>
+  <x:String x:Key="Text.Status.ItemsSelected" xml:space="preserve">已選取 {0} 個項目</x:String>
+  <x:String x:Key="Text.Status.LargeIconsTip" xml:space="preserve">大圖示檢視</x:String>
+  <x:String x:Key="Text.Tab.Category" xml:space="preserve">分頁</x:String>
+  <x:String x:Key="Text.Tab.Close" xml:space="preserve">關閉分頁</x:String>
+  <x:String x:Key="Text.Tab.CloseBelow" xml:space="preserve">關閉下方的分頁</x:String>
+  <x:String x:Key="Text.Tab.CloseOthers" xml:space="preserve">關閉其他分頁</x:String>
+  <x:String x:Key="Text.Tab.Duplicate" xml:space="preserve">複製分頁</x:String>
+  <x:String x:Key="Text.Tab.MoreActions" xml:space="preserve">更多分頁操作</x:String>
+  <x:String x:Key="Text.Tab.New" xml:space="preserve">開新分頁</x:String>
+  <x:String x:Key="Text.Tab.NewBelow" xml:space="preserve">在下方開新分頁</x:String>
+  <x:String x:Key="Text.Tab.NewTip" xml:space="preserve">開新分頁 (Ctrl+T)</x:String>
+  <x:String x:Key="Text.Tab.Pin" xml:space="preserve">釘選分頁</x:String>
+  <x:String x:Key="Text.Tab.Pinned" xml:space="preserve">已釘選的分頁</x:String>
+  <x:String x:Key="Text.Tab.RecentlyClosed" xml:space="preserve">最近關閉的分頁</x:String>
+  <x:String x:Key="Text.Tab.Reopen" xml:space="preserve">重新開啟已關閉的分頁</x:String>
+  <x:String x:Key="Text.Tab.Unpin" xml:space="preserve">取消釘選分頁</x:String>
+  <x:String x:Key="Text.TabAction.CloseDuplicates" xml:space="preserve">關閉相同位置的重複分頁</x:String>
+  <x:String x:Key="Text.TabAction.CloseLeft" xml:space="preserve">關閉上方的分頁</x:String>
+  <x:String x:Key="Text.TabAction.CloseUnpinned" xml:space="preserve">關閉所有未釘選的分頁</x:String>
+  <x:String x:Key="Text.TabAction.CopyAllPaths" xml:space="preserve">複製所有分頁的路徑</x:String>
+  <x:String x:Key="Text.TabAction.CopyMarkdown" xml:space="preserve">以 Markdown 連結形式複製分頁</x:String>
+  <x:String x:Key="Text.TabAction.CopyTitle" xml:space="preserve">複製分頁名稱</x:String>
+  <x:String x:Key="Text.TabAction.CopyUri" xml:space="preserve">以 file URI 形式複製分頁</x:String>
+  <x:String x:Key="Text.TabAction.MoveFirst" xml:space="preserve">將分頁移到最前面</x:String>
+  <x:String x:Key="Text.TabAction.MoveLast" xml:space="preserve">將分頁移到最後面</x:String>
+  <x:String x:Key="Text.TabAction.OpenParent" xml:space="preserve">在新分頁中開啟上層資料夾</x:String>
+  <x:String x:Key="Text.TabAction.PinAll" xml:space="preserve">釘選所有分頁</x:String>
+  <x:String x:Key="Text.TabAction.PinLeft" xml:space="preserve">釘選上方的分頁</x:String>
+  <x:String x:Key="Text.TabAction.PinRight" xml:space="preserve">釘選下方的分頁</x:String>
+  <x:String x:Key="Text.TabAction.ReloadAll" xml:space="preserve">重新載入所有分頁</x:String>
+  <x:String x:Key="Text.TabAction.ReloadLeft" xml:space="preserve">重新載入上方的分頁</x:String>
+  <x:String x:Key="Text.TabAction.ReloadRight" xml:space="preserve">重新載入下方的分頁</x:String>
+  <x:String x:Key="Text.TabAction.Reverse" xml:space="preserve">反轉分頁順序</x:String>
+  <x:String x:Key="Text.TabAction.SortByName" xml:space="preserve">依名稱排序分頁</x:String>
+  <x:String x:Key="Text.TabAction.SortByPath" xml:space="preserve">依路徑排序分頁</x:String>
+  <x:String x:Key="Text.TabAction.UnpinAll" xml:space="preserve">取消釘選所有分頁</x:String>
+  <x:String x:Key="Text.Toast.PathCopied" xml:space="preserve">已複製路徑: {0}</x:String>
+  <x:String x:Key="Text.Tooltip.Modified" xml:space="preserve">修改日期: {0}</x:String>
+  <x:String x:Key="Text.Tooltip.Size" xml:space="preserve">大小: {0}</x:String>
+  <x:String x:Key="Text.Tooltip.Type" xml:space="preserve">類型: {0}</x:String>
+  <x:String x:Key="Text.Tray.Exit" xml:space="preserve">結束</x:String>
+  <x:String x:Key="Text.Tray.Open" xml:space="preserve">開啟 Kiriha</x:String>
+  <x:String x:Key="Text.Tree.Loading" xml:space="preserve">載入中...</x:String>
+  <x:String x:Key="Text.Tree.MyComputer" xml:space="preserve">我的電腦</x:String>
+  <x:String x:Key="Text.Tree.MyDocuments" xml:space="preserve">我的文件</x:String>
+  <x:String x:Key="Text.Type.ExtFile" xml:space="preserve">{0} 檔案</x:String>
+  <x:String x:Key="Text.Type.File" xml:space="preserve">檔案</x:String>
+  <x:String x:Key="Text.Type.FileFolder" xml:space="preserve">檔案資料夾</x:String>
+  <x:String x:Key="Text.Type.LocalDisk" xml:space="preserve">本機磁碟</x:String>
+  <x:String x:Key="Text.Type.LocalDiskFormat" xml:space="preserve">本機磁碟 ({0})</x:String>
+  <x:String x:Key="Text.Video.Unavailable" xml:space="preserve">無法播放這個影片（找不到相符的編解碼器）</x:String>
+  <x:String x:Key="Text.Video.PlayPauseTip" xml:space="preserve">播放 / 暫停 (Space)</x:String>
+  <x:String x:Key="Text.Video.MuteTip" xml:space="preserve">靜音</x:String>
+  <x:String x:Key="Text.Video.VolumeTip" xml:space="preserve">音量</x:String>
+  <x:String x:Key="Text.Video.LoopTip" xml:space="preserve">循環播放</x:String>
+  <x:String x:Key="Text.Video.RateTip" xml:space="preserve">播放速度</x:String>
+  <x:String x:Key="Text.Update.AvailableHeader" xml:space="preserve">有新版本可用</x:String>
+  <x:String x:Key="Text.Update.Checking" xml:space="preserve">正在檢查更新...</x:String>
+  <x:String x:Key="Text.Update.DownloadAndInstall" xml:space="preserve">下載並安裝</x:String>
+  <x:String x:Key="Text.Update.ErrorHeader" xml:space="preserve">檢查更新失敗</x:String>
+  <x:String x:Key="Text.Update.IgnoreThisVersion" xml:space="preserve">略過此版本</x:String>
+  <x:String x:Key="Text.Update.Title" xml:space="preserve">軟體更新</x:String>
+  <x:String x:Key="Text.Update.UpToDate" xml:space="preserve">您使用的已是最新版本</x:String>
+  <x:String x:Key="Text.View.Compact" xml:space="preserve">精簡檢視</x:String>
+  <x:String x:Key="Text.View.Details" xml:space="preserve">詳細資料</x:String>
+  <x:String x:Key="Text.View.ExtraLarge" xml:space="preserve">超大圖示</x:String>
+  <x:String x:Key="Text.View.FileExtensions" xml:space="preserve">副檔名</x:String>
+  <x:String x:Key="Text.View.HiddenFiles" xml:space="preserve">隱藏的項目</x:String>
+  <x:String x:Key="Text.View.ItemCheckBoxes" xml:space="preserve">項目核取方塊</x:String>
+  <x:String x:Key="Text.View.Large" xml:space="preserve">大圖示</x:String>
+  <x:String x:Key="Text.View.List" xml:space="preserve">清單</x:String>
+  <x:String x:Key="Text.View.Medium" xml:space="preserve">中圖示</x:String>
+  <x:String x:Key="Text.View.NavigationPane" xml:space="preserve">功能窗格</x:String>
+  <x:String x:Key="Text.View.PreviewPane" xml:space="preserve">預覽窗格</x:String>
+  <x:String x:Key="Text.View.Small" xml:space="preserve">小圖示</x:String>
+  <x:String x:Key="Text.View.StatusBar" xml:space="preserve">狀態列</x:String>
+</ResourceDictionary>

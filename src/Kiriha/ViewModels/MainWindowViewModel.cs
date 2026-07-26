@@ -37,11 +37,19 @@ public partial class MainWindowViewModel : ObservableObject
     public string WindowTitle
         => SelectedTab is { } tab && tab.Title.Length > 0 ? $"{tab.Title} - Kiriha" : "Kiriha";
 
-    partial void OnSelectedTabChanged(TabViewModel? value)
+    /// <summary>選択タブが変わったときの処理をここへ集約する
+    /// （<c>[ObservableProperty]</c> は 1 引数版と 2 引数版の両方を呼ぶため、分けると追いにくい）。
+    ///
+    /// 離れるタブのギャラリー動画は止め、戻ってきたタブは再開する
+    /// （非表示のタブで音が鳴り続けるのを防ぐ）。</summary>
+    partial void OnSelectedTabChanged(TabViewModel? oldValue, TabViewModel? newValue)
     {
         OnPropertyChanged(nameof(WindowTitle));
-        value?.EnsureCurrentPathAvailable();
+        newValue?.EnsureCurrentPathAvailable();
         _ = SyncSidebarTreeToCurrentPathAsync();
+
+        oldValue?.SuspendGalleryVideo();
+        newValue?.ResumeGalleryVideo();
     }
 
     /// <summary>ステータスバーの表示状態（表示メニューで切替）。</summary>
@@ -237,7 +245,7 @@ public partial class MainWindowViewModel : ObservableObject
 
         var root = new Models.FolderTreeNode
         {
-            Name = "デスクトップ",
+            Name = LocalizationService.Text("Text.Folder.Desktop"),
             Path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
             Icon = "🖥",
             Kind = Models.FolderTreeNode.NodeKind.Desktop,
@@ -502,8 +510,8 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     public string OptDefaultFolderAppStatus => OptDefaultFolderApp
-        ? "現在、フォルダーとドライブは Kiriha で開きます。解除すると変更前の動作へ戻します。"
-        : "有効にすると、エクスプローラーでフォルダーやドライブを開いたときに Kiriha が起動します。";
+        ? LocalizationService.Text("Text.Settings.DefaultFolderApp.On")
+        : LocalizationService.Text("Text.Settings.DefaultFolderApp.Off");
 
     /// <summary>設定タブ: 設定を既定値に戻す（固定タブとお気に入りは保持）。</summary>
     [RelayCommand]
@@ -512,7 +520,7 @@ public partial class MainWindowViewModel : ObservableObject
         OptShowHidden = false;
         OptShowExtensions = false;
         OptShowCheckBoxes = false;
-        OptIconSet = IconSetChoices[0].Label;
+        OptIconSet = nameof(FileIconSet.Original);
         OptCheckUpdatesOnStartup = true;
         OptRestoreAllTabs = false;
         OptStartupPath = "";
@@ -610,25 +618,34 @@ public partial class MainWindowViewModel : ObservableObject
         set { Options.ShowCheckBoxes = value; OnPropertyChanged(); }
     }
 
-    /// <summary>設定タブのアイコンセット選択肢（表示ラベルと設定値の対応の唯一の定義）。</summary>
-    private static readonly (string Label, FileIconSet Value)[] IconSetChoices =
-    [
-        ("現在のオリジナルアイコン", FileIconSet.Original),
-        ("マテリアルアイコンテーマ", FileIconSet.Material),
-        ("Windows標準のアイコン", FileIconSet.Windows),
-    ];
-
-    public IReadOnlyList<string> IconSetOptions { get; } = [.. IconSetChoices.Select(c => c.Label)];
-
+    /// <summary>設定タブのアイコンセット選択（表示ラベルは XAML 側の ComboBoxItem、
+    /// ここで扱うのは enum 名の文字列。テーマ設定と同じ Tag 方式）。</summary>
     public string? OptIconSet
     {
-        get => (IconSetChoices.FirstOrDefault(c => c.Value == Options.IconSet).Label
-                ?? IconSetChoices[0].Label);
+        get => Options.IconSet.ToString();
         set
         {
-            var selected = IconSetChoices.FirstOrDefault(c => c.Label == value);
-            if (selected.Label is null || Options.IconSet == selected.Value) return;
-            Options.IconSet = selected.Value;
+            if (!Enum.TryParse<FileIconSet>(value, out var selected) || !Enum.IsDefined(selected)) return;
+            if (Options.IconSet == selected) return;
+            Options.IconSet = selected;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>設定タブ: 表示言語のドロップダウン項目（対応言語の一覧そのもの）。</summary>
+    public IReadOnlyList<Models.Locale> LocaleOptions { get; } = Models.Locale.Supported;
+
+    /// <summary>設定タブ: UI 表示言語。settings.json が空文字（初回インストール直後）のときは
+    /// OS の UI 言語から自動判定した言語が選択済みとして見える。</summary>
+    public Models.Locale? OptLocale
+    {
+        get => Models.Locale.Supported.FirstOrDefault(l => l.Key == LocalizationService.CurrentLocale);
+        set
+        {
+            if (value is null || value.Key == LocalizationService.CurrentLocale) return;
+            _settings.Locale = value.Key;
+            SettingsService.Save(_settings);
+            LocalizationService.SetLocale(value.Key);
             OnPropertyChanged();
         }
     }
@@ -682,6 +699,8 @@ public partial class MainWindowViewModel : ObservableObject
     public MainWindowViewModel()
     {
         _settings = SettingsService.Load();
+        // 表示言語はウィンドウ構築前に確定させる（MainWindow の DynamicResource が初回解決される前）。
+        LocalizationService.SetLocale(_settings.Locale);
         _folderViewSettings = new FolderViewSettingsService();
         Options = new ShellOptions
         {
@@ -820,20 +839,20 @@ public partial class MainWindowViewModel : ObservableObject
 
     public string LicenseStatusText => LicenseService.State switch
     {
-        LicenseState.Licensed => $"ライセンス認証済み: {LicenseService.Email}",
-        LicenseState.Trial => $"試用期間中（残り {LicenseService.TrialDaysLeft} 日）",
-        LicenseState.OnlineCheckRequired => "ライセンスのオンライン確認が必要です（インターネットに接続してください）",
-        _ => "試用期間終了（ライセンス認証が必要です）",
+        LicenseState.Licensed => LocalizationService.Text("Text.License.Status.Licensed", LicenseService.Email),
+        LicenseState.Trial => LocalizationService.Text("Text.License.Status.Trial", LicenseService.TrialDaysLeft),
+        LicenseState.OnlineCheckRequired => LocalizationService.Text("Text.License.Status.OnlineCheck"),
+        _ => LocalizationService.Text("Text.License.Status.TrialExpired"),
     };
 
     /// <summary>ロック画面に出す見出し（状態により文言を変える）。</summary>
     public string LicenseLockTitle => LicenseService.State == LicenseState.OnlineCheckRequired
-        ? "ライセンスのオンライン確認が必要です"
-        : "試用期間が終了しました";
+        ? LocalizationService.Text("Text.License.Lock.OnlineCheckTitle")
+        : LocalizationService.Text("Text.License.Lock.TrialExpiredTitle");
 
     public string LicenseLockDescription => LicenseService.State == LicenseState.OnlineCheckRequired
-        ? "30 日以上オンライン確認ができていません。インターネットに接続して「再確認」を押してください。"
-        : "Kiriha のご利用にはライセンス認証（¥980 買い切り）が必要です。";
+        ? LocalizationService.Text("Text.License.Lock.OnlineCheckBody")
+        : LocalizationService.Text("Text.License.Lock.TrialExpiredBody");
 
     /// <summary>オンライン再確認ボタンの表示（猶予超過ロック時のみ）。</summary>
     public bool IsOnlineCheckRequired => LicenseService.State == LicenseState.OnlineCheckRequired;
@@ -861,18 +880,18 @@ public partial class MainWindowViewModel : ObservableObject
     {
         if (LicenseKeyInput.Trim().Length == 0)
         {
-            LicenseMessage = "購入時に発行されたライセンスキーを入力してください。";
+            LicenseMessage = LocalizationService.Text("Text.License.Msg.EnterKey");
             return;
         }
 
         if (LicenseService.ActivateKey(LicenseKeyInput))
         {
             LicenseKeyInput = "";
-            LicenseMessage = "ライセンス認証が完了しました 🎉 ありがとうございます！";
+            LicenseMessage = LocalizationService.Text("Text.License.Msg.Activated");
         }
         else
         {
-            LicenseMessage = "ライセンスキーが正しくありません。コピーの際に欠けや余分な空白がないかご確認ください。";
+            LicenseMessage = LocalizationService.Text("Text.License.Msg.InvalidKey");
         }
 
         OnLicenseStateChanged();
@@ -882,13 +901,13 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private async Task RecheckLicenseAsync()
     {
-        LicenseMessage = "オンラインで確認しています…";
+        LicenseMessage = LocalizationService.Text("Text.License.Msg.Checking");
         var ok = await LicenseService.CheckRevocationAsync();
         LicenseMessage = LicenseService.State switch
         {
-            LicenseState.Licensed => "確認が完了しました。ご利用ありがとうございます！",
-            _ when !ok => "ライセンスが無効になっています（返金済み等）。再度ご購入ください。",
-            _ => "サーバーに接続できませんでした。ネットワーク接続を確認してもう一度お試しください。",
+            LicenseState.Licensed => LocalizationService.Text("Text.License.Msg.CheckOk"),
+            _ when !ok => LocalizationService.Text("Text.License.Msg.Revoked"),
+            _ => LocalizationService.Text("Text.License.Msg.ServerUnreachable"),
         };
         OnLicenseStateChanged();
     }
@@ -900,12 +919,12 @@ public partial class MainWindowViewModel : ObservableObject
         {
             System.Diagnostics.Process.Start(
                 new System.Diagnostics.ProcessStartInfo(LicenseService.PurchaseUrl) { UseShellExecute = true })?.Dispose();
-            LicenseMessage = "ブラウザーで購入ページを開きました。決済完了ページに表示されるライセンスキーを上の欄に貼り付けてください。";
+            LicenseMessage = LocalizationService.Text("Text.License.Msg.PurchaseOpened");
         }
         catch (Exception ex)
         {
             Logger.LogException("購入ページを開けませんでした", ex);
-            LicenseMessage = "購入ページを開けませんでした。時間をおいてもう一度お試しください。";
+            LicenseMessage = LocalizationService.Text("Text.License.Msg.PurchaseFailed");
         }
     }
 
@@ -1652,7 +1671,7 @@ public partial class MainWindowViewModel : ObservableObject
         {
             // ドライブとごみ箱の Shell アイコンはエクスプローラー同等。Material には対応アイコンが無いため絵文字のまま
             foreach (var drive in drives) Add(drive.Path, drive.Name, isDirectory: true);
-            Add("shell:RecycleBinFolder", "ごみ箱", isDirectory: true);
+            Add("shell:RecycleBinFolder", LocalizationService.Text("Text.Sidebar.RecycleBin"), isDirectory: true);
         }
 
         return icons;
@@ -1670,7 +1689,7 @@ public partial class MainWindowViewModel : ObservableObject
             result.Add(new DriveDisplay(
                 FileSystemService.GetDriveLabel(drive),
                 drive.RootDirectory.FullName,
-                $"空き {Models.FileSystemEntry.FormatSize(drive.AvailableFreeSpace)} / {Models.FileSystemEntry.FormatSize(drive.TotalSize)}"));
+                LocalizationService.Text("Text.Drive.FreeOfTotal", Models.FileSystemEntry.FormatSize(drive.AvailableFreeSpace), Models.FileSystemEntry.FormatSize(drive.TotalSize))));
         }
 
         return result;
@@ -1682,7 +1701,7 @@ public partial class MainWindowViewModel : ObservableObject
         Dictionary<string, Avalonia.Media.IImage> icons,
         bool ownsIcons)
     {
-        SidebarItems.Add(new SidebarHeader { Title = "クイックアクセス" });
+        SidebarItems.Add(new SidebarHeader { Title = LocalizationService.Text("Text.Sidebar.QuickAccess") });
         foreach (var (name, path) in quickAccess.Folders)
         {
             SidebarItems.Add(new SidebarLink
@@ -1698,7 +1717,7 @@ public partial class MainWindowViewModel : ObservableObject
         }
 
         SidebarItems.Add(new SidebarHeader { Title = "PC" });
-        SidebarItems.Add(new SidebarLink { Name = "PC", Path = FileSystemService.ComputerPath, Icon = "🖥", Tooltip = "ドライブ一覧" });
+        SidebarItems.Add(new SidebarLink { Name = "PC", Path = FileSystemService.ComputerPath, Icon = "🖥", Tooltip = LocalizationService.Text("Text.Sidebar.Drives") });
         foreach (var drive in drives)
         {
             SidebarItems.Add(new SidebarLink
@@ -1714,20 +1733,20 @@ public partial class MainWindowViewModel : ObservableObject
 
         SidebarItems.Add(new SidebarLink
         {
-            Name = "ごみ箱",
+            Name = LocalizationService.Text("Text.Sidebar.RecycleBin"),
             Path = "shell:RecycleBinFolder",
             Icon = "🗑",
             IconImage = icons.GetValueOrDefault("shell:RecycleBinFolder"),
             OwnsIconImage = ownsIcons,
             IsShellCommand = true,
-            Tooltip = "ごみ箱をエクスプローラーで開く",
+            Tooltip = LocalizationService.Text("Text.Sidebar.RecycleBinTip"),
         });
 
         // 最近使用したファイル（クイックアクセスの列挙から。エクスプローラーのホーム相当）
         var recent = quickAccess.RecentFiles;
         if (recent.Count > 0)
         {
-            SidebarItems.Add(new SidebarHeader { Title = "最近使用したファイル" });
+            SidebarItems.Add(new SidebarHeader { Title = LocalizationService.Text("Text.Sidebar.RecentFiles") });
             foreach (var (name, path) in recent)
             {
                 SidebarItems.Add(new SidebarLink

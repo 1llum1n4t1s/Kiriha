@@ -1,37 +1,41 @@
 using System.ComponentModel;
+using Kiriha.Services;
 using VelopackUpdateDialog;
 
 namespace Kiriha.Models;
 
-/// <summary>VelopackUpdateDialog.Avalonia が要求する文字列セット（Kiriha は日本語固定）。</summary>
+/// <summary>VelopackUpdateDialog.Avalonia が要求する文字列セット。
+/// 各プロパティは読むたびに現在の言語で解決し、言語切り替え時は
+/// <see cref="LocalizationService.Changed"/> を受けて全プロパティの再取得を通知する。</summary>
 public sealed class KirihaUpdateStrings : IUpdateDialogStrings, INotifyPropertyChanged
 {
     public static KirihaUpdateStrings Instance { get; } = new();
 
     private KirihaUpdateStrings()
     {
+        LocalizationService.Changed += (_, _) => NotifyLocaleChanged();
     }
 
     /// <inheritdoc />
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    /// <summary>言語固定のため通知は使わないが、インターフェース契約として保持する。</summary>
+    /// <summary>プロパティ名 null で「全プロパティが変わった」と通知する（言語切り替え時）。</summary>
     public void NotifyLocaleChanged()
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
 
-    public string Title => "ソフトウェアの更新";
+    public string Title => LocalizationService.Text("Text.Update.Title");
 
-    public string AvailableHeader => "新しいバージョンが利用可能です";
+    public string AvailableHeader => LocalizationService.Text("Text.Update.AvailableHeader");
 
-    public string DownloadAndInstall => "ダウンロードしてインストール";
+    public string DownloadAndInstall => LocalizationService.Text("Text.Update.DownloadAndInstall");
 
-    public string IgnoreThisVersion => "このバージョンをスキップ";
+    public string IgnoreThisVersion => LocalizationService.Text("Text.Update.IgnoreThisVersion");
 
-    public string UpToDateMessage => "お使いのバージョンは最新です";
+    public string UpToDateMessage => LocalizationService.Text("Text.Update.UpToDate");
 
-    public string ErrorHeader => "更新の確認に失敗しました";
+    public string ErrorHeader => LocalizationService.Text("Text.Update.ErrorHeader");
 
-    public string Close => "閉じる";
+    public string Close => LocalizationService.Text("Text.Common.Close");
 
-    public string CheckingMessage => "更新を確認しています...";
+    public string CheckingMessage => LocalizationService.Text("Text.Update.Checking");
 }

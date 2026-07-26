@@ -112,9 +112,9 @@ public partial class App : Application
             IsVisible = false,
         };
 
-        var openItem = new NativeMenuItem("Kiriha を開く");
+        var openItem = new NativeMenuItem(Services.LocalizationService.Text("Text.Tray.Open"));
         openItem.Click += (_, _) => mainWindow.RestoreFromTray();
-        var exitItem = new NativeMenuItem("終了");
+        var exitItem = new NativeMenuItem(Services.LocalizationService.Text("Text.Tray.Exit"));
         exitItem.Click += (_, _) => desktop.Shutdown();
 
         var menu = new NativeMenu();

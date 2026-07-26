@@ -41,7 +41,7 @@ public static class FileSystemService
                     IsDirectory = true,
                     IsDrive = true,
                     MaterialIconKey = "", // MaterialIcon は IsDrive で常に null になるため未使用
-                    SizeTextOverride = $"空き {FileSystemEntry.FormatSize(d.AvailableFreeSpace)} / {FileSystemEntry.FormatSize(d.TotalSize)}",
+                    SizeTextOverride = LocalizationService.Text("Text.Drive.FreeOfTotal", FileSystemEntry.FormatSize(d.AvailableFreeSpace), FileSystemEntry.FormatSize(d.TotalSize)),
                     DriveFormat = TryGetDriveFormat(d),
                     DriveUsedPercent = d.TotalSize > 0
                         ? (d.TotalSize - d.AvailableFreeSpace) * 100.0 / d.TotalSize

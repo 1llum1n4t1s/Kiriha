@@ -79,9 +79,9 @@
             <!-- キャプションボタン（WindowDecorations=BorderOnly のためシステム側は描画されない） -->
             <StackPanel Grid.Column="2" Orientation="Horizontal"
                         HorizontalAlignment="Right" VerticalAlignment="Top">
-                <Button Classes="caption" Content="&#xE921;" Click="Minimize_Click" AutomationProperties.Name="最小化" />
-                <Button Classes="caption" Content="&#xE922;" Click="MaximizeRestore_Click" AutomationProperties.Name="最大化または元に戻す" />
-                <Button Classes="caption close" Content="&#xE8BB;" Click="Close_Click" AutomationProperties.Name="閉じる" />
+                <Button Classes="caption" Content="&#xE921;" Click="Minimize_Click" AutomationProperties.Name="{DynamicResource Text.Caption.Minimize}" />
+                <Button Classes="caption" Content="&#xE922;" Click="MaximizeRestore_Click" AutomationProperties.Name="{DynamicResource Text.Caption.MaximizeRestore}" />
+                <Button Classes="caption close" Content="&#xE8BB;" Click="Close_Click" AutomationProperties.Name="{DynamicResource Text.Common.Close}" />
             </StackPanel>
         </Grid>
 
@@ -95,7 +95,7 @@
                     <Grid RowDefinitions="*,Auto,Auto">
                     <ListBox x:Name="VerticalTabsListBox" Grid.Row="0" Classes="verticaltabs"
                              IsVisible="{Binding !SelectedTab.IsGalleryView}"
-                             AutomationProperties.Name="垂直タブ"
+                             AutomationProperties.Name="{DynamicResource Text.A11y.VerticalTabs}"
                              ItemsSource="{Binding Tabs}"
                              SelectedItem="{Binding SelectedTab}"
                              DragDrop.AllowDrop="True"
@@ -112,29 +112,29 @@
                                       Background="Transparent" ToolTip.Tip="{Binding PathText}">
                                     <Grid.ContextMenu>
                                         <ContextMenu Opened="TabMenu_Opened">
-                                            <MenuItem Header="新しいタブを下に開く" Click="TabNewRight_Click" />
-                                            <MenuItem Header="タブを複製" Click="TabDuplicate_Click"
+                                            <MenuItem Header="{DynamicResource Text.Tab.NewBelow}" Click="TabNewRight_Click" />
+                                            <MenuItem Header="{DynamicResource Text.Tab.Duplicate}" Click="TabDuplicate_Click"
                                                       IsVisible="{Binding IsNormalTab}" />
                                             <Separator />
-                                            <MenuItem Header="タブを固定"
+                                            <MenuItem Header="{DynamicResource Text.Tab.Pin}"
                                                       IsVisible="{Binding !IsPinned}"
                                                       Command="{Binding TogglePinCommand}" />
-                                            <MenuItem Header="タブの固定を解除"
+                                            <MenuItem Header="{DynamicResource Text.Tab.Unpin}"
                                                       IsVisible="{Binding IsPinned}"
                                                       Command="{Binding TogglePinCommand}" />
                                             <Separator />
-                                            <MenuItem Header="タブを閉じる"
+                                            <MenuItem Header="{DynamicResource Text.Tab.Close}"
                                                       Command="{Binding CloseSelfCommand}" />
-                                            <MenuItem Header="下側のタブを閉じる" Click="TabCloseRight_Click" />
-                                            <MenuItem Header="他のタブを閉じる" Click="TabCloseOthers_Click" />
-                                            <MenuItem Header="タブの詳細操作" Tag="tabActions" />
+                                            <MenuItem Header="{DynamicResource Text.Tab.CloseBelow}" Click="TabCloseRight_Click" />
+                                            <MenuItem Header="{DynamicResource Text.Tab.CloseOthers}" Click="TabCloseOthers_Click" />
+                                            <MenuItem Header="{DynamicResource Text.Tab.MoreActions}" Tag="tabActions" />
                                             <Separator />
-                                            <MenuItem Header="閉じたタブを開く" Click="TabReopen_Click"
+                                            <MenuItem Header="{DynamicResource Text.Tab.Reopen}" Click="TabReopen_Click"
                                                       InputGesture="Ctrl+Shift+T" />
-                                            <MenuItem Header="最近閉じたタブ" Tag="recent" />
+                                            <MenuItem Header="{DynamicResource Text.Tab.RecentlyClosed}" Tag="recent" />
                                             <Separator />
-                                            <MenuItem Header="パスのコピー" Click="TabCopyPath_Click" />
-                                            <MenuItem Header="エクスプローラーで開く"
+                                            <MenuItem Header="{DynamicResource Text.Common.CopyPath}" Click="TabCopyPath_Click" />
+                                            <MenuItem Header="{DynamicResource Text.Common.OpenInExplorer}"
                                                       Command="{Binding OpenInExplorerCommand}" />
                                         </ContextMenu>
                                     </Grid.ContextMenu>
@@ -156,10 +156,10 @@
                                                IsVisible="{Binding IsPinned}" FontSize="11"
                                                Margin="0,0,10,0" VerticalAlignment="Center"
                                                Foreground="{DynamicResource TextSecondary}"
-                                               ToolTip.Tip="固定タブ" />
+                                               ToolTip.Tip="{DynamicResource Text.Tab.Pinned}" />
                                     <Button Grid.Column="2" Classes="tabclose" Content="&#xE8BB;"
                                             IsVisible="{Binding !IsPinned}"
-                                            AutomationProperties.Name="タブを閉じる"
+                                            AutomationProperties.Name="{DynamicResource Text.Tab.Close}"
                                             Margin="0,0,8,0" VerticalAlignment="Center"
                                             Command="{Binding CloseSelfCommand}" />
                                 </Grid>
@@ -174,7 +174,7 @@
                         <ScrollViewer VerticalScrollBarVisibility="Auto"
                                       HorizontalScrollBarVisibility="Disabled">
                             <StackPanel Spacing="2">
-                                <TextBlock Text="画像情報" FontSize="11" FontWeight="SemiBold"
+                                <TextBlock Text="{DynamicResource Text.Gallery.ImageInfo}" FontSize="11" FontWeight="SemiBold"
                                            Margin="0,0,0,8"
                                            Foreground="{DynamicResource TextSecondary}" />
                                 <ItemsControl ItemsSource="{Binding SelectedTab.GalleryMetadata}">
@@ -190,7 +190,7 @@
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
-                                <TextBlock Text="この画像の情報はありません。" FontSize="11.5"
+                                <TextBlock Text="{DynamicResource Text.Gallery.NoImageInfo}" FontSize="11.5"
                                            TextWrapping="Wrap"
                                            Foreground="{DynamicResource TextSecondary}"
                                            IsVisible="{Binding SelectedTab.GalleryMetadataEmpty}" />
@@ -202,12 +202,12 @@
                             Classes="verticaltabaction verticalnewtab"
                             Margin="8,4,8,2"
                             Command="{Binding NewTabCommand}"
-                            AutomationProperties.Name="新しいタブ"
-                            ToolTip.Tip="新しいタブ (Ctrl+T)">
+                            AutomationProperties.Name="{DynamicResource Text.Tab.New}"
+                            ToolTip.Tip="{DynamicResource Text.Tab.NewTip}">
                         <Grid ColumnDefinitions="28,*,Auto">
                             <TextBlock Grid.Column="0" Classes="fico" Text="&#xE710;" FontSize="12"
                                        HorizontalAlignment="Center" VerticalAlignment="Center" />
-                            <TextBlock Grid.Column="1" Text="新しいタブ" FontSize="12.5"
+                            <TextBlock Grid.Column="1" Text="{DynamicResource Text.Tab.New}" FontSize="12.5"
                                        Margin="6,0,0,0" VerticalAlignment="Center"
                                        Foreground="{DynamicResource TextPrimary}" />
                             <TextBlock Grid.Column="2" Text="Ctrl+T" FontSize="11.5"
@@ -219,13 +219,13 @@
                     <Button x:Name="SettingsButton" Grid.Row="2"
                             Classes="verticaltabaction verticalnewtab"
                             Margin="8,0,8,10"
-                            AutomationProperties.Name="設定を開く"
+                            AutomationProperties.Name="{DynamicResource Text.Nav.OpenSettings}"
                             Command="{Binding OpenSettingsCommand}"
-                            ToolTip.Tip="設定を開く">
+                            ToolTip.Tip="{DynamicResource Text.Nav.OpenSettings}">
                         <Grid ColumnDefinitions="28,*">
                             <TextBlock Grid.Column="0" Classes="fico" Text="&#xE713;" FontSize="12"
                                        HorizontalAlignment="Center" VerticalAlignment="Center" />
-                            <TextBlock Grid.Column="1" Text="設定" FontSize="12.5"
+                            <TextBlock Grid.Column="1" Text="{DynamicResource Text.Nav.Settings}" FontSize="12.5"
                                        Margin="6,0,0,0" VerticalAlignment="Center"
                                        Foreground="{DynamicResource TextPrimary}" />
                         </Grid>
@@ -234,7 +234,7 @@
                 </Border>
             </Grid>
             <Thumb x:Name="VerticalTabsResizeThumb" Grid.Column="1" Classes="colsplit panesplit"
-                   AutomationProperties.Name="垂直タブバーの幅を変更"
+                   AutomationProperties.Name="{DynamicResource Text.A11y.ResizeVerticalTabs}"
                    DragDelta="VerticalTabsThumb_DragDelta" />
         </Grid>
 
@@ -268,27 +268,27 @@
                               Background="{DynamicResource TabActiveBg}"
                               IsVisible="{Binding !IsGalleryView}">
                             <Button Grid.Column="0" Classes="nav" Content="&#xE72B;" Margin="8,0,0,0"
-                                    Command="{Binding GoBackCommand}" ToolTip.Tip="戻る (右クリックで履歴)"
-                                    AutomationProperties.Name="戻る"
+                                    Command="{Binding GoBackCommand}" ToolTip.Tip="{DynamicResource Text.Nav.BackTip}"
+                                    AutomationProperties.Name="{DynamicResource Text.Nav.Back}"
                                     PointerReleased="NavBack_PointerReleased"
                                     VerticalAlignment="Center" />
                             <Button Grid.Column="1" Classes="nav" Content="&#xE72A;" Margin="2,0,0,0"
-                                    Command="{Binding GoForwardCommand}" ToolTip.Tip="進む (右クリックで履歴)"
-                                    AutomationProperties.Name="進む"
+                                    Command="{Binding GoForwardCommand}" ToolTip.Tip="{DynamicResource Text.Nav.ForwardTip}"
+                                    AutomationProperties.Name="{DynamicResource Text.Nav.Forward}"
                                     PointerReleased="NavForward_PointerReleased"
                                     VerticalAlignment="Center" />
                             <Button Grid.Column="2" Classes="nav" Content="&#xE72C;" Margin="2,0,0,0"
-                                    Command="{Binding RefreshCommand}" ToolTip.Tip="更新"
-                                    AutomationProperties.Name="更新"
+                                    Command="{Binding RefreshCommand}" ToolTip.Tip="{DynamicResource Text.Nav.Refresh}"
+                                    AutomationProperties.Name="{DynamicResource Text.Nav.Refresh}"
                                     VerticalAlignment="Center" />
                             <Button Grid.Column="3" Classes="nav" Content="&#xE74A;" Margin="2,0,0,0"
-                                    Command="{Binding GoUpCommand}" ToolTip.Tip="1 つ上へ (右クリックで祖先一覧)"
-                                    AutomationProperties.Name="1 つ上のフォルダーへ"
+                                    Command="{Binding GoUpCommand}" ToolTip.Tip="{DynamicResource Text.Nav.UpTip}"
+                                    AutomationProperties.Name="{DynamicResource Text.Nav.UpFolder}"
                                     PointerReleased="NavUp_PointerReleased"
                                     VerticalAlignment="Center" />
                             <Button Grid.Column="4" Classes="nav" Content="&#xE80F;" Margin="2,0,0,0"
-                                    Click="Home_Click" ToolTip.Tip="ホーム (Alt+Home / 右クリックでよく使うフォルダー)"
-                                    AutomationProperties.Name="ホーム"
+                                    Click="Home_Click" ToolTip.Tip="{DynamicResource Text.Nav.HomeTip}"
+                                    AutomationProperties.Name="{DynamicResource Text.Nav.Home}"
                                     PointerReleased="Home_PointerReleased"
                                     VerticalAlignment="Center" />
 
@@ -319,7 +319,7 @@
                                                                 PointerReleased="Crumb_PointerReleased" />
                                                         <!-- シェブロンクリックでサブフォルダーのドロップダウン（エクスプローラーと同じ） -->
                                                         <Button Classes="crumb" Padding="2,3" Click="CrumbChevron_Click"
-                                                                AutomationProperties.Name="サブフォルダー一覧を開く">
+                                                                AutomationProperties.Name="{DynamicResource Text.A11y.OpenSubfolders}">
                                                             <TextBlock Classes="fico" Text="&#xE76C;" FontSize="9"
                                                                        Foreground="{DynamicResource TextSecondary}"
                                                                        VerticalAlignment="Center" />
@@ -333,7 +333,7 @@
                                     <!-- 長いパスでも直接入力へ切り替えられる固定クリック領域 -->
                                     <Border Grid.Column="1" Background="Transparent"
                                             IsVisible="{Binding !IsEditingPath}"
-                                            ToolTip.Tip="クリックしてパスを編集" />
+                                            ToolTip.Tip="{DynamicResource Text.Nav.EditPathTip}" />
 
                                     <!-- 直接入力モード -->
                                     <TextBox Grid.ColumnSpan="2" IsVisible="{Binding IsEditingPath}"
@@ -398,7 +398,7 @@
                                     </TextBox>
                                     <Button Grid.Column="2" Classes="tabclose" Content="&#xE8BB;"
                                             Margin="0,0,8,0" VerticalAlignment="Center"
-                                            ToolTip.Tip="検索をクリア" AutomationProperties.Name="検索をクリア"
+                                            ToolTip.Tip="{DynamicResource Text.Search.ClearTip}" AutomationProperties.Name="{DynamicResource Text.Search.ClearTip}"
                                             IsVisible="{Binding SearchText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                                             Click="SearchClear_Click" />
                                 </Grid>
@@ -418,7 +418,7 @@
                                 </MultiBinding>
                             </Border.IsVisible>
                             <Panel>
-                            <TextBlock Text="ここにフォルダーをドラッグするとお気に入りに追加されます"
+                            <TextBlock Text="{DynamicResource Text.Bookmarks.Empty}"
                                        FontSize="11.5" Foreground="{DynamicResource TextSecondary}"
                                        VerticalAlignment="Center" Margin="14,0"
                                        IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).HasNoBookmarks}" />
@@ -459,8 +459,8 @@
                                 IsVisible="{Binding !IsGalleryView}">
                             <StackPanel Orientation="Horizontal" Margin="10,0" Spacing="2">
                                 <Button Classes="cmd cmdicon" Content="&#xE8A0;"
-                                        ToolTip.Tip="サイドバーの表示/非表示（クイックアクセス / ツリー）"
-                                        AutomationProperties.Name="サイドバーの表示切替"
+                                        ToolTip.Tip="{DynamicResource Text.Command.SidebarTip}"
+                                        AutomationProperties.Name="{DynamicResource Text.A11y.ToggleSidebar}"
                                         VerticalAlignment="Center"
                                         Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ToggleSidebarCommand}" />
 
@@ -471,24 +471,24 @@
                                         IsEnabled="{Binding CanCreateNew}">
                                     <StackPanel Orientation="Horizontal" Spacing="6">
                                         <TextBlock Classes="fico" Text="&#xE8F4;" FontSize="14" VerticalAlignment="Center" />
-                                        <TextBlock Text="新規フォルダ作成" VerticalAlignment="Center" />
+                                        <TextBlock Text="{DynamicResource Text.Command.NewFolder}" VerticalAlignment="Center" />
                                     </StackPanel>
                                 </Button>
 
                                 <Border Width="1" Height="20" Background="{DynamicResource Divider}"
                                         VerticalAlignment="Center" Margin="4,0" />
 
-                                <Button Classes="cmd cmdicon" Content="&#xE8C6;" ToolTip.Tip="切り取り (Ctrl+X)" AutomationProperties.Name="切り取り"
+                                <Button Classes="cmd cmdicon" Content="&#xE8C6;" ToolTip.Tip="{DynamicResource Text.Command.CutTip}" AutomationProperties.Name="{DynamicResource Text.Command.Cut}"
                                         VerticalAlignment="Center" Command="{Binding CutCommand}" />
-                                <Button Classes="cmd cmdicon" Content="&#xE8C8;" ToolTip.Tip="コピー (Ctrl+C)" AutomationProperties.Name="コピー"
+                                <Button Classes="cmd cmdicon" Content="&#xE8C8;" ToolTip.Tip="{DynamicResource Text.Command.CopyTip}" AutomationProperties.Name="{DynamicResource Text.Common.Copy}"
                                         VerticalAlignment="Center" Command="{Binding CopyCommand}" />
-                                <Button Classes="cmd cmdicon" Content="&#xE77F;" ToolTip.Tip="貼り付け (Ctrl+V)" AutomationProperties.Name="貼り付け"
+                                <Button Classes="cmd cmdicon" Content="&#xE77F;" ToolTip.Tip="{DynamicResource Text.Command.PasteTip}" AutomationProperties.Name="{DynamicResource Text.Command.Paste}"
                                         VerticalAlignment="Center" Command="{Binding PasteCommand}" />
-                                <Button Classes="cmd cmdicon" Content="&#xE8AC;" ToolTip.Tip="名前の変更 (F2)" AutomationProperties.Name="名前の変更"
+                                <Button Classes="cmd cmdicon" Content="&#xE8AC;" ToolTip.Tip="{DynamicResource Text.Command.RenameTip}" AutomationProperties.Name="{DynamicResource Text.Command.Rename}"
                                         VerticalAlignment="Center" Command="{Binding RenameCommand}" />
-                                <Button Classes="cmd cmdicon" Content="&#xE72D;" ToolTip.Tip="共有" AutomationProperties.Name="共有"
+                                <Button Classes="cmd cmdicon" Content="&#xE72D;" ToolTip.Tip="{DynamicResource Text.Command.Share}" AutomationProperties.Name="{DynamicResource Text.Command.Share}"
                                         VerticalAlignment="Center" Command="{Binding ShareCommand}" />
-                                <Button Classes="cmd cmdicon" Content="&#xE74D;" ToolTip.Tip="削除 (Delete)" AutomationProperties.Name="削除"
+                                <Button Classes="cmd cmdicon" Content="&#xE74D;" ToolTip.Tip="{DynamicResource Text.Command.DeleteTip}" AutomationProperties.Name="{DynamicResource Text.Common.Delete}"
                                         VerticalAlignment="Center" Command="{Binding DeleteCommand}" />
 
                                 <Border Width="1" Height="20" Background="{DynamicResource Divider}"
@@ -497,31 +497,31 @@
                                 <Button Classes="cmd" VerticalAlignment="Center">
                                     <StackPanel Orientation="Horizontal" Spacing="6">
                                         <TextBlock Classes="fico" Text="&#xE8CB;" FontSize="14" VerticalAlignment="Center" />
-                                        <TextBlock Text="並べ替え" VerticalAlignment="Center" />
+                                        <TextBlock Text="{DynamicResource Text.Command.Sort}" VerticalAlignment="Center" />
                                         <TextBlock Classes="fico" Text="&#xE70D;" FontSize="9" VerticalAlignment="Center" />
                                     </StackPanel>
                                     <Button.Flyout>
                                         <MenuFlyout Placement="BottomEdgeAlignedLeft">
-                                            <MenuItem Header="名前" ToggleType="Radio"
+                                            <MenuItem Header="{DynamicResource Text.Column.Name}" ToggleType="Radio"
                                                       IsChecked="{Binding IsSortByName}"
                                                       Command="{Binding SetSortKeyCommand}" CommandParameter="Name" />
-                                            <MenuItem Header="更新日時" ToggleType="Radio"
+                                            <MenuItem Header="{DynamicResource Text.Column.Modified}" ToggleType="Radio"
                                                       IsChecked="{Binding IsSortByModified}"
                                                       Command="{Binding SetSortKeyCommand}" CommandParameter="Modified" />
-                                            <MenuItem Header="作成日時" ToggleType="Radio"
+                                            <MenuItem Header="{DynamicResource Text.Column.Created}" ToggleType="Radio"
                                                       IsChecked="{Binding IsSortByCreated}"
                                                       Command="{Binding SetSortKeyCommand}" CommandParameter="Created" />
-                                            <MenuItem Header="種類" ToggleType="Radio"
+                                            <MenuItem Header="{DynamicResource Text.Column.Type}" ToggleType="Radio"
                                                       IsChecked="{Binding IsSortByType}"
                                                       Command="{Binding SetSortKeyCommand}" CommandParameter="Type" />
-                                            <MenuItem Header="サイズ" ToggleType="Radio"
+                                            <MenuItem Header="{DynamicResource Text.Column.Size}" ToggleType="Radio"
                                                       IsChecked="{Binding IsSortBySize}"
                                                       Command="{Binding SetSortKeyCommand}" CommandParameter="Size" />
                                             <Separator />
-                                            <MenuItem Header="昇順" ToggleType="Radio"
+                                            <MenuItem Header="{DynamicResource Text.Sort.Ascending}" ToggleType="Radio"
                                                       IsChecked="{Binding IsSortAscending}"
                                                       Command="{Binding SetSortAscendingCommand}" CommandParameter="True" />
-                                            <MenuItem Header="降順" ToggleType="Radio"
+                                            <MenuItem Header="{DynamicResource Text.Sort.Descending}" ToggleType="Radio"
                                                       IsChecked="{Binding IsSortDescending}"
                                                       Command="{Binding SetSortAscendingCommand}" CommandParameter="False" />
                                         </MenuFlyout>
@@ -531,86 +531,86 @@
                                 <Button Classes="cmd" VerticalAlignment="Center">
                                     <StackPanel Orientation="Horizontal" Spacing="6">
                                         <TextBlock Classes="fico" Text="&#xE890;" FontSize="14" VerticalAlignment="Center" />
-                                        <TextBlock Text="表示" VerticalAlignment="Center" />
+                                        <TextBlock Text="{DynamicResource Text.Command.View}" VerticalAlignment="Center" />
                                         <TextBlock Classes="fico" Text="&#xE70D;" FontSize="9" VerticalAlignment="Center" />
                                     </StackPanel>
                                     <Button.Flyout>
                                         <MenuFlyout Placement="BottomEdgeAlignedLeft">
-                                            <MenuItem Header="特大アイコン" ToggleType="Radio"
+                                            <MenuItem Header="{DynamicResource Text.View.ExtraLarge}" ToggleType="Radio"
                                                       IsChecked="{Binding IsViewExtraLarge}"
                                                       Command="{Binding SetViewModeCommand}" CommandParameter="ExtraLargeIcons" />
-                                            <MenuItem Header="大アイコン" ToggleType="Radio"
+                                            <MenuItem Header="{DynamicResource Text.View.Large}" ToggleType="Radio"
                                                       IsChecked="{Binding IsViewLarge}"
                                                       Command="{Binding SetViewModeCommand}" CommandParameter="LargeIcons" />
-                                            <MenuItem Header="中アイコン" ToggleType="Radio"
+                                            <MenuItem Header="{DynamicResource Text.View.Medium}" ToggleType="Radio"
                                                       IsChecked="{Binding IsViewMedium}"
                                                       Command="{Binding SetViewModeCommand}" CommandParameter="MediumIcons" />
-                                            <MenuItem Header="小アイコン" ToggleType="Radio"
+                                            <MenuItem Header="{DynamicResource Text.View.Small}" ToggleType="Radio"
                                                       IsChecked="{Binding IsViewSmall}"
                                                       Command="{Binding SetViewModeCommand}" CommandParameter="SmallIcons" />
-                                            <MenuItem Header="一覧" ToggleType="Radio"
+                                            <MenuItem Header="{DynamicResource Text.View.List}" ToggleType="Radio"
                                                       IsChecked="{Binding IsViewList}"
                                                       Command="{Binding SetViewModeCommand}" CommandParameter="List" />
-                                            <MenuItem Header="詳細" ToggleType="Radio"
+                                            <MenuItem Header="{DynamicResource Text.View.Details}" ToggleType="Radio"
                                                       IsChecked="{Binding IsViewDetails}"
                                                       Command="{Binding SetViewModeCommand}" CommandParameter="Details" />
                                             <Separator />
-                                            <MenuItem Header="コンパクトビュー" ToggleType="CheckBox"
+                                            <MenuItem Header="{DynamicResource Text.View.Compact}" ToggleType="CheckBox"
                                                       IsChecked="{Binding IsCompactView}"
                                                       Command="{Binding ToggleCompactViewCommand}" />
                                             <Separator />
-                                            <MenuItem Header="ナビゲーションウィンドウ" ToggleType="CheckBox"
+                                            <MenuItem Header="{DynamicResource Text.View.NavigationPane}" ToggleType="CheckBox"
                                                       IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ShowSidebar}"
                                                       Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ToggleSidebarCommand}" />
-                                            <MenuItem Header="プレビューウィンドウ" ToggleType="CheckBox"
+                                            <MenuItem Header="{DynamicResource Text.View.PreviewPane}" ToggleType="CheckBox"
                                                       InputGesture="Alt+P"
                                                       IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ShowPreviewPane}"
                                                       Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).TogglePreviewPaneCommand}" />
-                                            <MenuItem Header="ステータスバー" ToggleType="CheckBox"
+                                            <MenuItem Header="{DynamicResource Text.View.StatusBar}" ToggleType="CheckBox"
                                                       IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ShowStatusBar}"
                                                       Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ToggleStatusBarCommand}" />
                                             <Separator />
-                                            <MenuItem Header="隠しファイル" ToggleType="CheckBox"
+                                            <MenuItem Header="{DynamicResource Text.View.HiddenFiles}" ToggleType="CheckBox"
                                                       IsChecked="{Binding ShowHidden}"
                                                       Command="{Binding ToggleShowHiddenCommand}" />
-                                            <MenuItem Header="ファイル名拡張子" ToggleType="CheckBox"
+                                            <MenuItem Header="{DynamicResource Text.View.FileExtensions}" ToggleType="CheckBox"
                                                       IsChecked="{Binding ShowExtensions}"
                                                       Command="{Binding ToggleShowExtensionsCommand}" />
-                                            <MenuItem Header="項目チェックボックス" ToggleType="CheckBox"
+                                            <MenuItem Header="{DynamicResource Text.View.ItemCheckBoxes}" ToggleType="CheckBox"
                                                       IsChecked="{Binding ShowCheckBoxes}"
                                                       Command="{Binding ToggleShowCheckBoxesCommand}" />
                                         </MenuFlyout>
                                     </Button.Flyout>
                                 </Button>
 
-                                <Button Classes="cmd cmdicon" Content="&#xE713;" ToolTip.Tip="オプション" AutomationProperties.Name="オプション"
+                                <Button Classes="cmd cmdicon" Content="&#xE713;" ToolTip.Tip="{DynamicResource Text.Command.Options}" AutomationProperties.Name="{DynamicResource Text.Command.Options}"
                                         VerticalAlignment="Center"
                                         Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OpenSettingsCommand}" />
 
-                                <Button Classes="cmd cmdicon" Content="&#xE712;" ToolTip.Tip="もっと見る" AutomationProperties.Name="もっと見る"
+                                <Button Classes="cmd cmdicon" Content="&#xE712;" ToolTip.Tip="{DynamicResource Text.Command.More}" AutomationProperties.Name="{DynamicResource Text.Command.More}"
                                         VerticalAlignment="Center">
                                     <Button.Flyout>
                                         <MenuFlyout Placement="BottomEdgeAlignedLeft">
-                                            <MenuItem Header="すべて選択" Click="SelectAll_Click" InputGesture="Ctrl+A" />
-                                            <MenuItem Header="選択解除" Click="SelectNone_Click" />
-                                            <MenuItem Header="選択の切り替え" Click="SelectInvert_Click" />
-                                            <MenuItem Header="フォルダーだけ選択" Click="SelectFolders_Click" />
-                                            <MenuItem Header="ファイルだけ選択" Click="SelectFiles_Click" />
+                                            <MenuItem Header="{DynamicResource Text.Select.All}" Click="SelectAll_Click" InputGesture="Ctrl+A" />
+                                            <MenuItem Header="{DynamicResource Text.Select.None}" Click="SelectNone_Click" />
+                                            <MenuItem Header="{DynamicResource Text.Select.Invert}" Click="SelectInvert_Click" />
+                                            <MenuItem Header="{DynamicResource Text.Select.FoldersOnly}" Click="SelectFolders_Click" />
+                                            <MenuItem Header="{DynamicResource Text.Select.FilesOnly}" Click="SelectFiles_Click" />
                                             <Separator />
-                                            <MenuItem Header="ターミナルで開く" Command="{Binding OpenTerminalCommand}" />
-                                            <MenuItem Header="エクスプローラーで開く" Command="{Binding OpenInExplorerCommand}" />
-                                            <MenuItem Header="クイックアクセスにピン留め" Click="PinToQuickAccess_Click" />
-                                            <MenuItem Header="お気に入りに追加" Click="AddBookmark_Click" InputGesture="Ctrl+D" />
+                                            <MenuItem Header="{DynamicResource Text.Common.OpenInTerminal}" Command="{Binding OpenTerminalCommand}" />
+                                            <MenuItem Header="{DynamicResource Text.Common.OpenInExplorer}" Command="{Binding OpenInExplorerCommand}" />
+                                            <MenuItem Header="{DynamicResource Text.Common.PinToQuickAccess}" Click="PinToQuickAccess_Click" />
+                                            <MenuItem Header="{DynamicResource Text.Common.AddToBookmarks}" Click="AddBookmark_Click" InputGesture="Ctrl+D" />
                                             <Separator />
-                                            <MenuItem Header="パスのコピー" Click="CopyPath_Click" InputGesture="Ctrl+Shift+C" />
-                                            <MenuItem Header="プロパティ" Command="{Binding ShowPropertiesCommand}" />
-                                            <MenuItem Header="お気に入りバー" ToggleType="CheckBox"
+                                            <MenuItem Header="{DynamicResource Text.Common.CopyPath}" Click="CopyPath_Click" InputGesture="Ctrl+Shift+C" />
+                                            <MenuItem Header="{DynamicResource Text.Common.Properties}" Command="{Binding ShowPropertiesCommand}" />
+                                            <MenuItem Header="{DynamicResource Text.Menu.BookmarksBar}" ToggleType="CheckBox"
                                                       IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ShowBookmarksBar}"
                                                       Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ToggleBookmarksBarCommand}" />
                                             <Separator />
-                                            <MenuItem Header="新しいウィンドウ" Click="NewWindow_Click" InputGesture="Ctrl+N" />
-                                            <MenuItem Header="更新の確認" Click="CheckUpdate_Click" />
-                                            <MenuItem Header="Kiriha について"
+                                            <MenuItem Header="{DynamicResource Text.Menu.NewWindow}" Click="NewWindow_Click" InputGesture="Ctrl+N" />
+                                            <MenuItem Header="{DynamicResource Text.Menu.CheckUpdate}" Click="CheckUpdate_Click" />
+                                            <MenuItem Header="{DynamicResource Text.Menu.About}"
                                                       Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OpenSettingsCommand}" />
                                         </MenuFlyout>
                                     </Button.Flyout>
@@ -637,11 +637,11 @@
                                               HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
                                               CornerRadius="8" FontSize="12"
                                               IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ShowSidebarTree, Mode=TwoWay}"
-                                              AutomationProperties.Name="ツリー表示に切り替え"
-                                              ToolTip.Tip="クイックアクセスとフォルダーツリーを切り替えます">
+                                              AutomationProperties.Name="{DynamicResource Text.A11y.SwitchToTree}"
+                                              ToolTip.Tip="{DynamicResource Text.Sidebar.ToggleTip}">
                                     <StackPanel Orientation="Horizontal" Spacing="6">
                                         <TextBlock Classes="fico" Text="&#xEC0A;" FontSize="12" VerticalAlignment="Center" />
-                                        <TextBlock Text="ツリー表示" VerticalAlignment="Center" />
+                                        <TextBlock Text="{DynamicResource Text.Sidebar.TreeView}" VerticalAlignment="Center" />
                                     </StackPanel>
                                 </ToggleButton>
 
@@ -836,7 +836,7 @@
                                     <Border Width="30" HorizontalAlignment="Right" Background="Transparent"
                                             IsVisible="{Binding IsDetailsView}"
                                             PointerPressed="FileListClearArea_PointerPressed"
-                                            ToolTip.Tip="クリックして選択を解除" />
+                                            ToolTip.Tip="{DynamicResource Text.Status.ClearSelectionTip}" />
 
                                     <!-- 一覧 / 小アイコン表示 -->
                                     <ListBox Classes="files list"
@@ -950,9 +950,19 @@
                                                KeyDown="GalleryImage_KeyDown">
                                             <Image Source="{Binding PreviewBitmap}" Stretch="Uniform" StretchDirection="DownOnly"
                                                    RenderOptions.BitmapInterpolationMode="HighQuality" />
-                                            <!-- 画像プレビューが無いファイルはアイコン + 名前で表示する -->
-                                            <StackPanel IsVisible="{Binding PreviewBitmap, Converter={x:Static ObjectConverters.IsNull}}"
-                                                        HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
+                                            <!-- 動画のフレーム。VideoFrame は 2 枚のビットマップを交互に差し替えて更新される。
+                                                 静止画と違い拡大も許すので StretchDirection は既定（Both）のまま。 -->
+                                            <Image Source="{Binding VideoFrame}" Stretch="Uniform"
+                                                   IsVisible="{Binding IsVideoPreview}"
+                                                   RenderOptions.BitmapInterpolationMode="HighQuality" />
+                                            <!-- 画像プレビューも動画も無いファイルはアイコン + 名前で表示する -->
+                                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
+                                                <StackPanel.IsVisible>
+                                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                                        <Binding Path="!IsVideoPreview" />
+                                                        <Binding Path="PreviewBitmap" Converter="{x:Static ObjectConverters.IsNull}" />
+                                                    </MultiBinding>
+                                                </StackPanel.IsVisible>
                                                 <c:FileIconPresenter Entry="{Binding SelectedEntry}" Owner="{Binding}"
                                                                      IconSize="96" ScaleEmoji="True"
                                                                      HorizontalAlignment="Center" />
@@ -968,11 +978,67 @@
                                                 <Button HorizontalAlignment="Right" VerticalAlignment="Top"
                                                         Width="32" Height="32" CornerRadius="16" Padding="0"
                                                         Background="#66000000" Click="GalleryClose_Click"
-                                                        ToolTip.Tip="ギャラリーを終了 (Esc)">
+                                                        ToolTip.Tip="{DynamicResource Text.Gallery.CloseTip}">
                                                     <TextBlock Classes="fico" Text="&#xE711;" FontSize="13"
                                                                Foreground="#DDDDDD"
                                                                HorizontalAlignment="Center" VerticalAlignment="Center" />
                                                 </Button>
+                                            </Border>
+                                            <!-- 再生できなかった動画（コーデック未導入など）の案内 -->
+                                            <Border IsVisible="{Binding IsVideoUnavailable}"
+                                                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                    Background="#99000000" CornerRadius="8" Padding="18,12">
+                                                <TextBlock Text="{DynamicResource Text.Video.Unavailable}"
+                                                           Foreground="#DDDDDD" FontSize="13"
+                                                           TextWrapping="Wrap" MaxWidth="420" TextAlignment="Center" />
+                                            </Border>
+                                            <!-- 動画の再生コントロール。プレビュー領域の下端に重ねる -->
+                                            <Border Classes="videobar" IsVisible="{Binding IsVideoPreview}"
+                                                    VerticalAlignment="Bottom" HorizontalAlignment="Stretch">
+                                                <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto,Auto,Auto" RowDefinitions="Auto">
+                                                    <Button Grid.Column="0" Classes="videobtn"
+                                                            Command="{Binding ToggleVideoPlaybackCommand}"
+                                                            ToolTip.Tip="{DynamicResource Text.Video.PlayPauseTip}">
+                                                        <Panel>
+                                                            <TextBlock Classes="fico" FontSize="15" Text="&#xE768;"
+                                                                       IsVisible="{Binding !IsVideoPlaying}" />
+                                                            <TextBlock Classes="fico" FontSize="15" Text="&#xE769;"
+                                                                       IsVisible="{Binding IsVideoPlaying}" />
+                                                        </Panel>
+                                                    </Button>
+                                                    <TextBlock Grid.Column="1" Text="{Binding VideoPositionText}"
+                                                               Classes="videotime" Margin="6,0,8,0" />
+                                                    <Slider Grid.Column="2" Classes="videoseek" VerticalAlignment="Center"
+                                                            Minimum="0" Maximum="{Binding VideoDurationSeconds}"
+                                                            Value="{Binding VideoPositionSeconds, Mode=TwoWay}" />
+                                                    <TextBlock Grid.Column="3" Text="{Binding VideoDurationText}"
+                                                               Classes="videotime" Margin="8,0,4,0" />
+                                                    <Button Grid.Column="4" Classes="videobtn"
+                                                            Command="{Binding ToggleVideoMuteCommand}"
+                                                            ToolTip.Tip="{DynamicResource Text.Video.MuteTip}">
+                                                        <Panel>
+                                                            <TextBlock Classes="fico" FontSize="14" Text="&#xE767;"
+                                                                       IsVisible="{Binding !IsVideoMuted}" />
+                                                            <TextBlock Classes="fico" FontSize="14" Text="&#xE74F;"
+                                                                       IsVisible="{Binding IsVideoMuted}" />
+                                                        </Panel>
+                                                    </Button>
+                                                    <Slider Grid.Column="5" Classes="videovolume" VerticalAlignment="Center"
+                                                            Width="82" Minimum="0" Maximum="1"
+                                                            ToolTip.Tip="{DynamicResource Text.Video.VolumeTip}"
+                                                            Value="{Binding VideoVolume, Mode=TwoWay}" />
+                                                    <Button Grid.Column="6" Classes="videobtn"
+                                                            Command="{Binding ToggleVideoLoopCommand}"
+                                                            Classes.active="{Binding IsVideoLooping}"
+                                                            ToolTip.Tip="{DynamicResource Text.Video.LoopTip}">
+                                                        <TextBlock Classes="fico" FontSize="14" Text="&#xE8EE;" />
+                                                    </Button>
+                                                    <Button Grid.Column="7" Classes="videobtn" Width="46"
+                                                            Command="{Binding CycleVideoRateCommand}"
+                                                            ToolTip.Tip="{DynamicResource Text.Video.RateTip}">
+                                                        <TextBlock Text="{Binding VideoRateText}" FontSize="12" />
+                                                    </Button>
+                                                </Grid>
                                             </Border>
                                         </Panel>
                                         <!-- ストリップとプレビューの境界。上下ドラッグでストリップの高さを変える -->
@@ -1021,7 +1087,7 @@
                                     </Grid>
 
                                     <!-- 空フォルダー表示 -->
-                                    <TextBlock Text="このフォルダーは空です。"
+                                    <TextBlock Text="{DynamicResource Text.FileList.EmptyFolder}"
                                                IsVisible="{Binding HasNoEntries}"
                                                IsHitTestVisible="False"
                                                Foreground="{DynamicResource TextSecondary}"
@@ -1097,13 +1163,13 @@
                                             IsVisible="{Binding IsIconsView}"
                                             Focusable="False"
                                             VerticalAlignment="Center"
-                                            ToolTip.Tip="アイコンのサイズ" />
+                                            ToolTip.Tip="{DynamicResource Text.Status.IconSizeTip}" />
                                     <!-- エクスプローラー右下と同じ表示切替ボタン -->
                                     <Button Classes="cmd cmdicon" Width="26" Height="22" FontSize="12"
-                                            Content="&#xE8FD;" ToolTip.Tip="詳細表示" AutomationProperties.Name="詳細表示"
+                                            Content="&#xE8FD;" ToolTip.Tip="{DynamicResource Text.Status.DetailsViewTip}" AutomationProperties.Name="{DynamicResource Text.Status.DetailsViewTip}"
                                             Command="{Binding SetViewModeCommand}" CommandParameter="Details" />
                                     <Button Classes="cmd cmdicon" Width="26" Height="22" FontSize="12"
-                                            Content="&#xE8A9;" ToolTip.Tip="大アイコン表示" AutomationProperties.Name="大アイコン表示"
+                                            Content="&#xE8A9;" ToolTip.Tip="{DynamicResource Text.Status.LargeIconsTip}" AutomationProperties.Name="{DynamicResource Text.Status.LargeIconsTip}"
                                             Command="{Binding SetViewModeCommand}" CommandParameter="LargeIcons" />
                                 </StackPanel>
                             </Grid>
@@ -1141,7 +1207,7 @@
         <StackPanel Orientation="Horizontal" Spacing="9">
             <Border MinWidth="52" Padding="8,4" CornerRadius="9"
                     Background="{DynamicResource AccentBrush}" VerticalAlignment="Center">
-                <TextBlock Text="コピー" FontSize="10.5" FontWeight="SemiBold" Foreground="White"
+                <TextBlock Text="{DynamicResource Text.Common.Copy}" FontSize="10.5" FontWeight="SemiBold" Foreground="White"
                            HorizontalAlignment="Center" />
             </Border>
             <TextBlock x:Name="PathCopyToastText" FontSize="12.5" FontWeight="SemiBold"
@@ -1174,15 +1240,15 @@
                 </StackPanel>
                 <TextBlock FontSize="12" TextWrapping="Wrap"
                            Foreground="{DynamicResource TextSecondary}"
-                           Text="購入すると決済完了ページにライセンスキーが表示されます。アカウント登録やパスワードは不要です。" />
+                           Text="{DynamicResource Text.License.PurchaseNote}" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
-                    <TextBox Width="330" PlaceholderText="KIRIHA- で始まるライセンスキー"
+                    <TextBox Width="330" PlaceholderText="{DynamicResource Text.License.KeyPlaceholder}"
                              Text="{Binding LicenseKeyInput}" />
-                    <Button Classes="cmd" Content="認証する"
+                    <Button Classes="cmd" Content="{DynamicResource Text.License.Activate}"
                             Command="{Binding ActivateLicenseCommand}"
                             BorderBrush="{DynamicResource Divider}" BorderThickness="1" />
                 </StackPanel>
-                <Button Classes="cmd" Content="オンラインで再確認する"
+                <Button Classes="cmd" Content="{DynamicResource Text.License.Recheck}"
                         IsVisible="{Binding IsOnlineCheckRequired}"
                         Command="{Binding RecheckLicenseCommand}"
                         HorizontalAlignment="Left"
@@ -1192,10 +1258,10 @@
                            IsVisible="{Binding LicenseMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                            Text="{Binding LicenseMessage}" />
                 <Grid ColumnDefinitions="Auto,*,Auto">
-                    <Button Grid.Column="0" Classes="cmd" Content="購入ページを開く（¥980 買い切り）"
+                    <Button Grid.Column="0" Classes="cmd" Content="{DynamicResource Text.License.OpenPurchase}"
                             Command="{Binding OpenLicensePurchasePageCommand}"
                             BorderBrush="{DynamicResource Divider}" BorderThickness="1" />
-                    <Button Grid.Column="2" Classes="cmd" Content="終了する" Click="Close_Click"
+                    <Button Grid.Column="2" Classes="cmd" Content="{DynamicResource Text.License.Exit}" Click="Close_Click"
                             BorderBrush="{DynamicResource Divider}" BorderThickness="1" />
                 </Grid>
             </StackPanel>

@@ -1,0 +1,353 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:String x:Key="Text.A11y.OpenSubfolders" xml:space="preserve">하위 폴더 표시</x:String>
+  <x:String x:Key="Text.A11y.ResizeVerticalTabs" xml:space="preserve">세로 탭 표시줄 너비 조정</x:String>
+  <x:String x:Key="Text.A11y.SwitchToTree" xml:space="preserve">트리 보기로 전환</x:String>
+  <x:String x:Key="Text.A11y.ToggleSidebar" xml:space="preserve">사이드바 표시/숨기기</x:String>
+  <x:String x:Key="Text.A11y.VerticalTabs" xml:space="preserve">세로 탭</x:String>
+  <x:String x:Key="Text.Address.Copy" xml:space="preserve">주소 복사</x:String>
+  <x:String x:Key="Text.Address.Edit" xml:space="preserve">주소 편집</x:String>
+  <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">현재 폴더 추가</x:String>
+  <x:String x:Key="Text.Bookmarks.AddFolderMenu" xml:space="preserve">폴더 추가...</x:String>
+  <x:String x:Key="Text.Bookmarks.AddFolderTitle" xml:space="preserve">폴더 추가</x:String>
+  <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">여기로 폴더를 끌어다 놓으면 즐겨찾기에 추가됩니다</x:String>
+  <x:String x:Key="Text.Bookmarks.Hide" xml:space="preserve">즐겨찾기 바 숨기기</x:String>
+  <x:String x:Key="Text.Bookmarks.NewFolderName" xml:space="preserve">새 폴더</x:String>
+  <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">이름 바꾸기...</x:String>
+  <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">즐겨찾기 이름 바꾸기</x:String>
+  <x:String x:Key="Text.Bookmarks.SortByName" xml:space="preserve">이름순 정렬</x:String>
+  <x:String x:Key="Text.Bookmarks.SortByPath" xml:space="preserve">경로순 정렬</x:String>
+  <x:String x:Key="Text.Caption.MaximizeRestore" xml:space="preserve">최대화 또는 이전 크기로</x:String>
+  <x:String x:Key="Text.Caption.Minimize" xml:space="preserve">최소화</x:String>
+  <x:String x:Key="Text.Clipboard.Copied" xml:space="preserve">{0}개 항목을 복사했습니다</x:String>
+  <x:String x:Key="Text.Clipboard.CopiedToClipboard" xml:space="preserve">클립보드에 복사했습니다</x:String>
+  <x:String x:Key="Text.Clipboard.CopyFailed" xml:space="preserve">클립보드에 복사하지 못했습니다</x:String>
+  <x:String x:Key="Text.Clipboard.Cut" xml:space="preserve">{0}개 항목을 잘라냈습니다</x:String>
+  <x:String x:Key="Text.Clipboard.VirtualPasteFailed" xml:space="preserve">가상 파일을 붙여넣지 못했습니다</x:String>
+  <x:String x:Key="Text.Clipboard.WriteFailed" xml:space="preserve">클립보드에 쓰지 못했습니다</x:String>
+  <x:String x:Key="Text.Column.AutoFitAll" xml:space="preserve">모든 열 너비 자동 조정</x:String>
+  <x:String x:Key="Text.Column.AutoFitThis" xml:space="preserve">이 열 너비 자동 조정</x:String>
+  <x:String x:Key="Text.Column.Created" xml:space="preserve">만든 날짜</x:String>
+  <x:String x:Key="Text.Column.Modified" xml:space="preserve">수정한 날짜</x:String>
+  <x:String x:Key="Text.Column.Name" xml:space="preserve">이름</x:String>
+  <x:String x:Key="Text.Column.Size" xml:space="preserve">크기</x:String>
+  <x:String x:Key="Text.Column.Type" xml:space="preserve">유형</x:String>
+  <x:String x:Key="Text.Command.CopyTip" xml:space="preserve">복사 (Ctrl+C)</x:String>
+  <x:String x:Key="Text.Command.Cut" xml:space="preserve">잘라내기</x:String>
+  <x:String x:Key="Text.Command.CutTip" xml:space="preserve">잘라내기 (Ctrl+X)</x:String>
+  <x:String x:Key="Text.Command.DeleteTip" xml:space="preserve">삭제 (Delete)</x:String>
+  <x:String x:Key="Text.Command.More" xml:space="preserve">더 보기</x:String>
+  <x:String x:Key="Text.Command.NewFolder" xml:space="preserve">새 폴더</x:String>
+  <x:String x:Key="Text.Command.Options" xml:space="preserve">옵션</x:String>
+  <x:String x:Key="Text.Command.Paste" xml:space="preserve">붙여넣기</x:String>
+  <x:String x:Key="Text.Command.PasteTip" xml:space="preserve">붙여넣기 (Ctrl+V)</x:String>
+  <x:String x:Key="Text.Command.Rename" xml:space="preserve">이름 바꾸기</x:String>
+  <x:String x:Key="Text.Command.RenameTip" xml:space="preserve">이름 바꾸기 (F2)</x:String>
+  <x:String x:Key="Text.Command.Share" xml:space="preserve">공유</x:String>
+  <x:String x:Key="Text.Command.SidebarTip" xml:space="preserve">사이드바 표시/숨기기 (즐겨찾기 / 트리)</x:String>
+  <x:String x:Key="Text.Command.Sort" xml:space="preserve">정렬</x:String>
+  <x:String x:Key="Text.Command.View" xml:space="preserve">보기</x:String>
+  <x:String x:Key="Text.Common.AddToBookmarks" xml:space="preserve">즐겨찾기에 추가</x:String>
+  <x:String x:Key="Text.Common.Cancel" xml:space="preserve">취소</x:String>
+  <x:String x:Key="Text.Common.Close" xml:space="preserve">닫기</x:String>
+  <x:String x:Key="Text.Common.Copy" xml:space="preserve">복사</x:String>
+  <x:String x:Key="Text.Common.CopyPath" xml:space="preserve">경로 복사</x:String>
+  <x:String x:Key="Text.Common.Delete" xml:space="preserve">삭제</x:String>
+  <x:String x:Key="Text.Common.Open" xml:space="preserve">열기</x:String>
+  <x:String x:Key="Text.Common.OpenInExplorer" xml:space="preserve">파일 탐색기에서 열기</x:String>
+  <x:String x:Key="Text.Common.OpenInNewTab" xml:space="preserve">새 탭에서 열기</x:String>
+  <x:String x:Key="Text.Common.OpenInTerminal" xml:space="preserve">터미널에서 열기</x:String>
+  <x:String x:Key="Text.Common.PinToQuickAccess" xml:space="preserve">즐겨찾기에 고정</x:String>
+  <x:String x:Key="Text.Common.Properties" xml:space="preserve">속성</x:String>
+  <x:String x:Key="Text.Common.UnpinFromQuickAccess" xml:space="preserve">즐겨찾기에서 고정 해제</x:String>
+  <x:String x:Key="Text.Drag.Add" xml:space="preserve">추가</x:String>
+  <x:String x:Key="Text.Drag.Copy" xml:space="preserve">복사</x:String>
+  <x:String x:Key="Text.Drag.Dragging" xml:space="preserve">드래그 중</x:String>
+  <x:String x:Key="Text.Drag.File" xml:space="preserve">파일</x:String>
+  <x:String x:Key="Text.Drag.Folder" xml:space="preserve">폴더</x:String>
+  <x:String x:Key="Text.Drag.Move" xml:space="preserve">이동</x:String>
+  <x:String x:Key="Text.Drag.OpenInTab" xml:space="preserve">탭에서 열기</x:String>
+  <x:String x:Key="Text.Drive.FreeOfTotal" xml:space="preserve">{1} 중 {0} 사용 가능</x:String>
+  <x:String x:Key="Text.Error.AccessDenied" xml:space="preserve">액세스가 거부되었습니다</x:String>
+  <x:String x:Key="Text.Error.Code" xml:space="preserve">오류 {0}</x:String>
+  <x:String x:Key="Text.Error.CodeWithDesc" xml:space="preserve">오류 {0}: {1}</x:String>
+  <x:String x:Key="Text.Error.DiskFull" xml:space="preserve">디스크 공간이 부족합니다</x:String>
+  <x:String x:Key="Text.Error.FileExists" xml:space="preserve">같은 이름의 파일이 이미 있습니다</x:String>
+  <x:String x:Key="Text.Error.InvalidName" xml:space="preserve">파일 이름에 사용할 수 없는 문자가 있습니다</x:String>
+  <x:String x:Key="Text.Error.PathNotFound" xml:space="preserve">경로를 찾을 수 없습니다</x:String>
+  <x:String x:Key="Text.Error.PathTooLong" xml:space="preserve">경로가 너무 깁니다</x:String>
+  <x:String x:Key="Text.Error.SharingViolation" xml:space="preserve">다른 프로세스가 파일을 사용 중입니다</x:String>
+  <x:String x:Key="Text.Error.WriteProtected" xml:space="preserve">미디어가 쓰기 금지되어 있습니다</x:String>
+  <x:String x:Key="Text.Exif.Camera" xml:space="preserve">카메라</x:String>
+  <x:String x:Key="Text.Exif.CameraMaker" xml:space="preserve">카메라 제조업체</x:String>
+  <x:String x:Key="Text.Exif.DateModified" xml:space="preserve">수정한 날짜</x:String>
+  <x:String x:Key="Text.Exif.DateTaken" xml:space="preserve">찍은 날짜</x:String>
+  <x:String x:Key="Text.Exif.Dimensions" xml:space="preserve">크기</x:String>
+  <x:String x:Key="Text.Exif.ExposureBias" xml:space="preserve">노출 보정</x:String>
+  <x:String x:Key="Text.Exif.ExposureTime" xml:space="preserve">노출 시간</x:String>
+  <x:String x:Key="Text.Exif.FNumber" xml:space="preserve">조리개 값</x:String>
+  <x:String x:Key="Text.Exif.Flash" xml:space="preserve">플래시</x:String>
+  <x:String x:Key="Text.Exif.FocalLength" xml:space="preserve">초점 거리</x:String>
+  <x:String x:Key="Text.Exif.Iso" xml:space="preserve">ISO 감도</x:String>
+  <x:String x:Key="Text.Exif.Lens" xml:space="preserve">렌즈</x:String>
+  <x:String x:Key="Text.Exif.Size" xml:space="preserve">크기</x:String>
+  <x:String x:Key="Text.Exif.Type" xml:space="preserve">유형</x:String>
+  <x:String x:Key="Text.FileList.EmptyFolder" xml:space="preserve">이 폴더는 비어 있습니다.</x:String>
+  <x:String x:Key="Text.Folder.Desktop" xml:space="preserve">바탕 화면</x:String>
+  <x:String x:Key="Text.Folder.Documents" xml:space="preserve">문서</x:String>
+  <x:String x:Key="Text.Folder.Downloads" xml:space="preserve">다운로드</x:String>
+  <x:String x:Key="Text.Folder.Music" xml:space="preserve">음악</x:String>
+  <x:String x:Key="Text.Folder.Pictures" xml:space="preserve">사진</x:String>
+  <x:String x:Key="Text.Folder.Videos" xml:space="preserve">비디오</x:String>
+  <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">갤러리 종료 (Esc)</x:String>
+  <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">이미지 정보</x:String>
+  <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">이 이미지의 정보가 없습니다.</x:String>
+  <x:String x:Key="Text.Integration.OpenWithKiriha" xml:space="preserve">Kiriha로 열기</x:String>
+  <x:String x:Key="Text.Launch.ExplorerFailed" xml:space="preserve">파일 탐색기를 시작하지 못했습니다: {0}</x:String>
+  <x:String x:Key="Text.Launch.Failed" xml:space="preserve">시작하지 못했습니다: {0}</x:String>
+  <x:String x:Key="Text.Launch.TerminalFailed" xml:space="preserve">터미널을 시작하지 못했습니다: {0}</x:String>
+  <x:String x:Key="Text.License.Activate" xml:space="preserve">인증</x:String>
+  <x:String x:Key="Text.License.Exit" xml:space="preserve">종료</x:String>
+  <x:String x:Key="Text.License.KeyPlaceholder" xml:space="preserve">KIRIHA- 로 시작하는 라이선스 키</x:String>
+  <x:String x:Key="Text.License.Lock.OnlineCheckBody" xml:space="preserve">30일 넘게 온라인 확인이 되지 않았습니다. 인터넷에 연결한 뒤 「온라인으로 다시 확인」을 눌러 주세요.</x:String>
+  <x:String x:Key="Text.License.Lock.OnlineCheckTitle" xml:space="preserve">라이선스의 온라인 확인이 필요합니다</x:String>
+  <x:String x:Key="Text.License.Lock.TrialExpiredBody" xml:space="preserve">Kiriha를 사용하려면 인증된 라이선스가 필요합니다(¥980, 1회 구매).</x:String>
+  <x:String x:Key="Text.License.Lock.TrialExpiredTitle" xml:space="preserve">체험 기간이 끝났습니다</x:String>
+  <x:String x:Key="Text.License.Msg.Activated" xml:space="preserve">라이선스 인증이 완료되었습니다 🎉 감사합니다!</x:String>
+  <x:String x:Key="Text.License.Msg.CheckOk" xml:space="preserve">확인이 완료되었습니다. Kiriha를 이용해 주셔서 감사합니다!</x:String>
+  <x:String x:Key="Text.License.Msg.Checking" xml:space="preserve">온라인으로 확인하는 중…</x:String>
+  <x:String x:Key="Text.License.Msg.EnterKey" xml:space="preserve">구매 시 발급된 라이선스 키를 입력해 주세요.</x:String>
+  <x:String x:Key="Text.License.Msg.InvalidKey" xml:space="preserve">라이선스 키가 올바르지 않습니다. 복사할 때 빠진 문자나 여분의 공백이 없는지 확인해 주세요.</x:String>
+  <x:String x:Key="Text.License.Msg.PurchaseFailed" xml:space="preserve">구매 페이지를 열지 못했습니다. 잠시 후 다시 시도해 주세요.</x:String>
+  <x:String x:Key="Text.License.Msg.PurchaseOpened" xml:space="preserve">브라우저에서 구매 페이지를 열었습니다. 결제 완료 페이지에 표시된 라이선스 키를 위 칸에 붙여넣어 주세요.</x:String>
+  <x:String x:Key="Text.License.Msg.Revoked" xml:space="preserve">이 라이선스는 더 이상 유효하지 않습니다(환불 등). 다시 구매해 주세요.</x:String>
+  <x:String x:Key="Text.License.Msg.ServerUnreachable" xml:space="preserve">서버에 연결하지 못했습니다. 네트워크 연결을 확인한 뒤 다시 시도해 주세요.</x:String>
+  <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">구매 페이지 열기(¥980, 1회 구매)</x:String>
+  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">구매하면 결제 완료 페이지에 라이선스 키가 표시됩니다. 계정 등록이나 비밀번호는 필요하지 않습니다.</x:String>
+  <x:String x:Key="Text.License.Recheck" xml:space="preserve">온라인으로 다시 확인</x:String>
+  <x:String x:Key="Text.License.Status.Licensed" xml:space="preserve">라이선스 인증됨: {0}</x:String>
+  <x:String x:Key="Text.License.Status.OnlineCheck" xml:space="preserve">라이선스의 온라인 확인이 필요합니다(인터넷에 연결해 주세요)</x:String>
+  <x:String x:Key="Text.License.Status.Trial" xml:space="preserve">체험 기간(남은 기간 {0}일)</x:String>
+  <x:String x:Key="Text.License.Status.TrialExpired" xml:space="preserve">체험 기간 종료(라이선스 인증이 필요합니다)</x:String>
+  <x:String x:Key="Text.Menu.About" xml:space="preserve">Kiriha 정보</x:String>
+  <x:String x:Key="Text.Menu.AccessDenied" xml:space="preserve">(액세스할 수 없음)</x:String>
+  <x:String x:Key="Text.Menu.BookmarksBar" xml:space="preserve">즐겨찾기 바</x:String>
+  <x:String x:Key="Text.Menu.CheckUpdate" xml:space="preserve">업데이트 확인</x:String>
+  <x:String x:Key="Text.Menu.Empty" xml:space="preserve">(비어 있음)</x:String>
+  <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">새 창</x:String>
+  <x:String x:Key="Text.Menu.NoSubfolders" xml:space="preserve">(하위 폴더 없음)</x:String>
+  <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(없음)</x:String>
+  <x:String x:Key="Text.Nav.Back" xml:space="preserve">뒤로</x:String>
+  <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">뒤로(마우스 오른쪽 클릭으로 기록)</x:String>
+  <x:String x:Key="Text.Nav.EditPathTip" xml:space="preserve">클릭하여 경로 편집</x:String>
+  <x:String x:Key="Text.Nav.Forward" xml:space="preserve">앞으로</x:String>
+  <x:String x:Key="Text.Nav.ForwardTip" xml:space="preserve">앞으로(마우스 오른쪽 클릭으로 기록)</x:String>
+  <x:String x:Key="Text.Nav.Home" xml:space="preserve">홈</x:String>
+  <x:String x:Key="Text.Nav.HomeTip" xml:space="preserve">홈(Alt+Home / 마우스 오른쪽 클릭으로 자주 쓰는 폴더)</x:String>
+  <x:String x:Key="Text.Nav.OpenFailed" xml:space="preserve">열지 못했습니다: {0}</x:String>
+  <x:String x:Key="Text.Nav.OpenSettings" xml:space="preserve">설정 열기</x:String>
+  <x:String x:Key="Text.Nav.Refresh" xml:space="preserve">새로 고침</x:String>
+  <x:String x:Key="Text.Nav.Settings" xml:space="preserve">설정</x:String>
+  <x:String x:Key="Text.Nav.UpFolder" xml:space="preserve">한 단계 위로</x:String>
+  <x:String x:Key="Text.Nav.UpTip" xml:space="preserve">한 단계 위로(마우스 오른쪽 클릭으로 상위 폴더)</x:String>
+  <x:String x:Key="Text.New.CreateFailed" xml:space="preserve">만들지 못했습니다: {0}</x:String>
+  <x:String x:Key="Text.New.FolderName" xml:space="preserve">새 폴더</x:String>
+  <x:String x:Key="Text.New.ItemName" xml:space="preserve">새 {0}</x:String>
+  <x:String x:Key="Text.New.UndoFailed" xml:space="preserve">새 폴더 만들기를 취소하지 못했습니다: {0}</x:String>
+  <x:String x:Key="Text.Op.Copied" xml:space="preserve">{0}개 항목을 복사했습니다</x:String>
+  <x:String x:Key="Text.Op.DeleteFailed" xml:space="preserve">삭제하지 못했습니다({0})</x:String>
+  <x:String x:Key="Text.Op.Failed" xml:space="preserve">파일 작업에 실패했습니다({0})</x:String>
+  <x:String x:Key="Text.Op.Moved" xml:space="preserve">{0}개 항목을 이동했습니다</x:String>
+  <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">붙여넣지 못했습니다({0})</x:String>
+  <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">이름을 바꾸지 못했습니다({0})</x:String>
+  <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">파일 {0}개  {1}</x:String>
+  <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> 이상</x:String>
+  <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">휴지통 비우기</x:String>
+  <x:String x:Key="Text.Rename.AlreadyExists" xml:space="preserve">같은 이름의 파일 또는 폴더가 이미 있습니다: {0}</x:String>
+  <x:String x:Key="Text.Rename.InvalidChars" xml:space="preserve">파일 이름에 사용할 수 없는 문자가 있습니다: \ / : * ? " &lt; &gt; |</x:String>
+  <x:String x:Key="Text.Rename.RevertedToOriginal" xml:space="preserve">이름을 바꾸지 못해 원래 이름으로 되돌렸습니다</x:String>
+  <x:String x:Key="Text.Rename.StuckAsTemporary" xml:space="preserve">이름을 바꾸지 못해 임시 이름이 그대로 남아 있습니다: {0}</x:String>
+  <x:String x:Key="Text.Search.ClearTip" xml:space="preserve">검색 지우기</x:String>
+  <x:String x:Key="Text.Search.Failed" xml:space="preserve">검색에 실패했습니다: {0}</x:String>
+  <x:String x:Key="Text.Search.Found" xml:space="preserve">{0}건을 찾았습니다(하위 폴더 포함)</x:String>
+  <x:String x:Key="Text.Search.Placeholder" xml:space="preserve">{0} 검색</x:String>
+  <x:String x:Key="Text.Search.Searching" xml:space="preserve">검색 중...(하위 폴더 포함)</x:String>
+  <x:String x:Key="Text.Search.Truncated" xml:space="preserve">{0}건에서 중단했습니다(상한 1000건에 도달했고 탐색하지 않은 하위 폴더가 있습니다. 검색어를 좁히면 더 볼 수 있습니다)</x:String>
+  <x:String x:Key="Text.Select.All" xml:space="preserve">모두 선택</x:String>
+  <x:String x:Key="Text.Select.FilesOnly" xml:space="preserve">파일만 선택</x:String>
+  <x:String x:Key="Text.Select.FoldersOnly" xml:space="preserve">폴더만 선택</x:String>
+  <x:String x:Key="Text.Select.Invert" xml:space="preserve">선택 반전</x:String>
+  <x:String x:Key="Text.Select.None" xml:space="preserve">선택 해제</x:String>
+  <x:String x:Key="Text.Settings.About" xml:space="preserve">Kiriha 정보</x:String>
+  <x:String x:Key="Text.Settings.About.Body" xml:space="preserve">Kiriha는 Windows 탐색기의 파일 작업과 Chrome의 탭·주소 표시줄·즐겨찾기를 하나의 화면에 모았습니다. 설정은 현재 사용자에게 저장됩니다.</x:String>
+  <x:String x:Key="Text.Settings.Acrylic" xml:space="preserve">창에 아크릴 효과(반투명 흐림) 사용</x:String>
+  <x:String x:Key="Text.Settings.DefaultFolderApp" xml:space="preserve">폴더와 드라이브를 여는 기본 앱을 Kiriha로 설정</x:String>
+  <x:String x:Key="Text.Settings.DefaultFolderApp.Off" xml:space="preserve">사용하면 탐색기에서 폴더나 드라이브를 열 때 Kiriha가 실행됩니다.</x:String>
+  <x:String x:Key="Text.Settings.DefaultFolderApp.On" xml:space="preserve">현재 폴더와 드라이브는 Kiriha에서 열립니다. 해제하면 이전 동작으로 돌아갑니다.</x:String>
+  <x:String x:Key="Text.Settings.Display" xml:space="preserve">모양</x:String>
+  <x:String x:Key="Text.Settings.Display.Subtitle" xml:space="preserve">파일 목록의 모양과 Kiriha의 외관을 조정합니다</x:String>
+  <x:String x:Key="Text.Settings.Explorer" xml:space="preserve">파일 목록</x:String>
+  <x:String x:Key="Text.Settings.ExplorerContextMenu" xml:space="preserve">탐색기 오른쪽 클릭 메뉴에 「Kiriha로 열기」 추가</x:String>
+  <x:String x:Key="Text.Settings.ExplorerContextMenuNote" xml:space="preserve">폴더나 폴더 안 빈 곳을 오른쪽 클릭하면 해당 폴더를 Kiriha로 열 수 있습니다.</x:String>
+  <x:String x:Key="Text.Settings.FolderTree" xml:space="preserve">폴더 트리</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Material" xml:space="preserve">Material Icon Theme</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Note" xml:space="preserve">Material Icon Theme은 material-icon-theme(MIT License, © Material Extensions)을 사용합니다. Windows 기본에서는 탐색기와 같은 Shell 아이콘을 표시합니다.</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Original" xml:space="preserve">Kiriha 오리지널 아이콘</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Windows" xml:space="preserve">Windows 기본 아이콘</x:String>
+  <x:String x:Key="Text.Settings.Icons" xml:space="preserve">아이콘</x:String>
+  <x:String x:Key="Text.Settings.Language" xml:space="preserve">표시 언어</x:String>
+  <x:String x:Key="Text.Settings.Language.Note" xml:space="preserve">기본적으로 Windows의 표시 언어에 따라 자동으로 선택됩니다.</x:String>
+  <x:String x:Key="Text.Settings.License" xml:space="preserve">라이선스</x:String>
+  <x:String x:Key="Text.Settings.Maintenance" xml:space="preserve">유지 관리</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.Data" xml:space="preserve">데이터와 캐시</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.OpenLogFolder" xml:space="preserve">로그 폴더 열기</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.ReloadQuickAccess" xml:space="preserve">즐겨찾기 다시 불러오기</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.ResetSettings" xml:space="preserve">설정 초기화</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.Subtitle" xml:space="preserve">캐시, 로그, 설정 데이터를 관리합니다</x:String>
+  <x:String x:Key="Text.Settings.MinimizeToTray" xml:space="preserve">최소화할 때 알림 영역에 넣기</x:String>
+  <x:String x:Key="Text.Settings.MinimizeToTrayNote" xml:space="preserve">최소화하면 작업 표시줄에서 사라지고 알림 영역 아이콘으로 복원할 수 있습니다.</x:String>
+  <x:String x:Key="Text.Settings.Mouse" xml:space="preserve">마우스</x:String>
+  <x:String x:Key="Text.Settings.Mouse.BackgroundDoubleClick" xml:space="preserve">폴더 빈 곳을 두 번 클릭했을 때</x:String>
+  <x:String x:Key="Text.Settings.Mouse.BackgroundMiddleClick" xml:space="preserve">폴더 빈 곳을 휠 클릭했을 때</x:String>
+  <x:String x:Key="Text.Settings.Mouse.CloseTab" xml:space="preserve">탭 닫기</x:String>
+  <x:String x:Key="Text.Settings.Mouse.None" xml:space="preserve">아무것도 하지 않음</x:String>
+  <x:String x:Key="Text.Settings.Mouse.Pin" xml:space="preserve">탭 고정</x:String>
+  <x:String x:Key="Text.Settings.Mouse.Refresh" xml:space="preserve">새로 고침</x:String>
+  <x:String x:Key="Text.Settings.Mouse.TabDoubleClick" xml:space="preserve">탭을 두 번 클릭했을 때</x:String>
+  <x:String x:Key="Text.Settings.Mouse.TabMiddleClick" xml:space="preserve">탭을 휠 클릭했을 때</x:String>
+  <x:String x:Key="Text.Settings.Mouse.Up" xml:space="preserve">한 단계 위로 이동</x:String>
+  <x:String x:Key="Text.Settings.RunAtStartup" xml:space="preserve">Windows 시작 시 Kiriha 실행</x:String>
+  <x:String x:Key="Text.Settings.RunAtStartupNote" xml:space="preserve">로그인할 때 Kiriha가 자동으로 실행됩니다.</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts" xml:space="preserve">단축키</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.FileOps" xml:space="preserve">파일 작업</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.FileOpsBody" xml:space="preserve">Ctrl+X / C / V　잘라내기·복사·붙여넣기　　Delete / Shift+Delete　삭제·완전 삭제&#10;F2　이름 바꾸기　　Alt+Enter　속성　　Ctrl+Shift+N　새 폴더　　Alt+P　미리 보기</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.Navigation" xml:space="preserve">이동과 보기</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.NavigationBody" xml:space="preserve">Ctrl+L / F4　주소 입력&#10;Ctrl+F / F3　검색&#10;Alt+← / →　뒤로·앞으로&#10;Alt+↑　한 단계 위로&#10;F5　새로 고침 / F11　전체 화면</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.Subtitle" xml:space="preserve">키보드로 빠르게 조작하기 위한 목록입니다</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.Tabs" xml:space="preserve">탭</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.TabsBody" xml:space="preserve">Ctrl+T　새 탭&#10;Ctrl+W　탭 닫기&#10;Ctrl+Shift+T　닫은 탭 다시 열기&#10;Ctrl+Tab　탭 전환&#10;Ctrl+1..9　지정한 탭 선택</x:String>
+  <x:String x:Key="Text.Settings.ShowBookmarksBar" xml:space="preserve">즐겨찾기 바 표시 (Ctrl+Shift+B)</x:String>
+  <x:String x:Key="Text.Settings.ShowCheckBoxes" xml:space="preserve">항목 확인란 표시</x:String>
+  <x:String x:Key="Text.Settings.ShowExtensions" xml:space="preserve">파일 확장명 표시</x:String>
+  <x:String x:Key="Text.Settings.ShowHidden" xml:space="preserve">숨김 파일 표시</x:String>
+  <x:String x:Key="Text.Settings.StartMinimizedToTray" xml:space="preserve">시작할 때 알림 영역에 넣기</x:String>
+  <x:String x:Key="Text.Settings.StartMinimizedToTrayNote" xml:space="preserve">시작 직후 창을 표시하지 않고 알림 영역에 넣은 상태로 시작합니다.</x:String>
+  <x:String x:Key="Text.Settings.Startup" xml:space="preserve">시작</x:String>
+  <x:String x:Key="Text.Settings.Startup.Behavior" xml:space="preserve">시작할 때의 동작</x:String>
+  <x:String x:Key="Text.Settings.Startup.PathCaption" xml:space="preserve">새 탭에서 열 폴더(비워 두면 사용자 폴더)</x:String>
+  <x:String x:Key="Text.Settings.Startup.RestoreTabs" xml:space="preserve">종료할 때 열려 있던 탭을 다음에 복원</x:String>
+  <x:String x:Key="Text.Settings.Startup.Subtitle" xml:space="preserve">시작 방법, Windows 통합, 알림 영역을 관리합니다</x:String>
+  <x:String x:Key="Text.Settings.Theme" xml:space="preserve">테마</x:String>
+  <x:String x:Key="Text.Settings.Theme.Dark" xml:space="preserve">어둡게</x:String>
+  <x:String x:Key="Text.Settings.Theme.Light" xml:space="preserve">밝게</x:String>
+  <x:String x:Key="Text.Settings.Theme.System" xml:space="preserve">시스템</x:String>
+  <x:String x:Key="Text.Settings.Tray" xml:space="preserve">알림 영역</x:String>
+  <x:String x:Key="Text.Settings.TreeDragDisabled" xml:space="preserve">트리에서 드래그 금지</x:String>
+  <x:String x:Key="Text.Settings.TreeDropDisabled" xml:space="preserve">트리로 드롭 금지</x:String>
+  <x:String x:Key="Text.Settings.Updates" xml:space="preserve">업데이트와 정보</x:String>
+  <x:String x:Key="Text.Settings.Updates.CheckNow" xml:space="preserve">지금 업데이트 확인</x:String>
+  <x:String x:Key="Text.Settings.Updates.CheckOnStartup" xml:space="preserve">시작할 때 업데이트 확인</x:String>
+  <x:String x:Key="Text.Settings.Updates.Subtitle" xml:space="preserve">Kiriha의 버전 확인과 업데이트를 관리합니다</x:String>
+  <x:String x:Key="Text.Settings.Updates.VersionCard" xml:space="preserve">버전과 업데이트</x:String>
+  <x:String x:Key="Text.Settings.Window" xml:space="preserve">창</x:String>
+  <x:String x:Key="Text.Settings.Window.RememberBounds" xml:space="preserve">창의 크기와 위치 저장</x:String>
+  <x:String x:Key="Text.Settings.Window.RememberBoundsNote" xml:space="preserve">끄면 다음에는 기본 크기·위치로 시작합니다.</x:String>
+  <x:String x:Key="Text.Settings.WindowsIntegration" xml:space="preserve">Windows 통합</x:String>
+  <x:String x:Key="Text.Share.FileCount" xml:space="preserve">파일 {0}개</x:String>
+  <x:String x:Key="Text.Share.FoldersNotSupported" xml:space="preserve">폴더는 공유할 수 없습니다(파일을 선택해 주세요)</x:String>
+  <x:String x:Key="Text.Share.NoItems" xml:space="preserve">공유할 항목이 없습니다</x:String>
+  <x:String x:Key="Text.Share.OpenFailed" xml:space="preserve">공유 창을 열지 못했습니다</x:String>
+  <x:String x:Key="Text.Share.PrepareFailed" xml:space="preserve">공유할 데이터를 준비하지 못했습니다</x:String>
+  <x:String x:Key="Text.Share.SelectFiles" xml:space="preserve">공유할 파일을 선택해 주세요</x:String>
+  <x:String x:Key="Text.Sidebar.Drives" xml:space="preserve">드라이브 목록</x:String>
+  <x:String x:Key="Text.Sidebar.QuickAccess" xml:space="preserve">즐겨찾기</x:String>
+  <x:String x:Key="Text.Sidebar.RecentFiles" xml:space="preserve">최근 사용한 파일</x:String>
+  <x:String x:Key="Text.Sidebar.RecycleBin" xml:space="preserve">휴지통</x:String>
+  <x:String x:Key="Text.Sidebar.RecycleBinTip" xml:space="preserve">휴지통을 파일 탐색기에서 열기</x:String>
+  <x:String x:Key="Text.Sidebar.ToggleTip" xml:space="preserve">즐겨찾기와 폴더 트리를 전환합니다</x:String>
+  <x:String x:Key="Text.Sidebar.TreeView" xml:space="preserve">트리 보기</x:String>
+  <x:String x:Key="Text.Sort.Ascending" xml:space="preserve">오름차순</x:String>
+  <x:String x:Key="Text.Sort.Descending" xml:space="preserve">내림차순</x:String>
+  <x:String x:Key="Text.Status.Breakdown" xml:space="preserve">(폴더 {0}개, 파일 {1}개)</x:String>
+  <x:String x:Key="Text.Status.ClearSelectionTip" xml:space="preserve">클릭하여 선택 해제</x:String>
+  <x:String x:Key="Text.Status.DetailsViewTip" xml:space="preserve">자세히 보기</x:String>
+  <x:String x:Key="Text.Status.FreeSpace" xml:space="preserve">사용 가능한 공간: {0}</x:String>
+  <x:String x:Key="Text.Status.IconSizeTip" xml:space="preserve">아이콘 크기</x:String>
+  <x:String x:Key="Text.Status.ItemCount" xml:space="preserve">{0}개 항목</x:String>
+  <x:String x:Key="Text.Status.ItemCountFiltered" xml:space="preserve">{0}개 항목(검색: {1})</x:String>
+  <x:String x:Key="Text.Status.ItemsSelected" xml:space="preserve">{0}개 항목 선택됨</x:String>
+  <x:String x:Key="Text.Status.LargeIconsTip" xml:space="preserve">큰 아이콘 보기</x:String>
+  <x:String x:Key="Text.Tab.Category" xml:space="preserve">탭</x:String>
+  <x:String x:Key="Text.Tab.Close" xml:space="preserve">탭 닫기</x:String>
+  <x:String x:Key="Text.Tab.CloseBelow" xml:space="preserve">아래쪽 탭 닫기</x:String>
+  <x:String x:Key="Text.Tab.CloseOthers" xml:space="preserve">다른 탭 닫기</x:String>
+  <x:String x:Key="Text.Tab.Duplicate" xml:space="preserve">탭 복제</x:String>
+  <x:String x:Key="Text.Tab.MoreActions" xml:space="preserve">탭 추가 작업</x:String>
+  <x:String x:Key="Text.Tab.New" xml:space="preserve">새 탭</x:String>
+  <x:String x:Key="Text.Tab.NewBelow" xml:space="preserve">아래에 새 탭 열기</x:String>
+  <x:String x:Key="Text.Tab.NewTip" xml:space="preserve">새 탭 (Ctrl+T)</x:String>
+  <x:String x:Key="Text.Tab.Pin" xml:space="preserve">탭 고정</x:String>
+  <x:String x:Key="Text.Tab.Pinned" xml:space="preserve">고정된 탭</x:String>
+  <x:String x:Key="Text.Tab.RecentlyClosed" xml:space="preserve">최근 닫은 탭</x:String>
+  <x:String x:Key="Text.Tab.Reopen" xml:space="preserve">닫은 탭 다시 열기</x:String>
+  <x:String x:Key="Text.Tab.Unpin" xml:space="preserve">탭 고정 해제</x:String>
+  <x:String x:Key="Text.TabAction.CloseDuplicates" xml:space="preserve">같은 위치의 중복 탭 닫기</x:String>
+  <x:String x:Key="Text.TabAction.CloseLeft" xml:space="preserve">위쪽 탭 닫기</x:String>
+  <x:String x:Key="Text.TabAction.CloseUnpinned" xml:space="preserve">고정되지 않은 탭 모두 닫기</x:String>
+  <x:String x:Key="Text.TabAction.CopyAllPaths" xml:space="preserve">모든 탭의 경로 복사</x:String>
+  <x:String x:Key="Text.TabAction.CopyMarkdown" xml:space="preserve">탭을 Markdown 링크로 복사</x:String>
+  <x:String x:Key="Text.TabAction.CopyTitle" xml:space="preserve">탭 이름 복사</x:String>
+  <x:String x:Key="Text.TabAction.CopyUri" xml:space="preserve">탭을 file URI로 복사</x:String>
+  <x:String x:Key="Text.TabAction.MoveFirst" xml:space="preserve">탭을 맨 앞으로 이동</x:String>
+  <x:String x:Key="Text.TabAction.MoveLast" xml:space="preserve">탭을 맨 뒤로 이동</x:String>
+  <x:String x:Key="Text.TabAction.OpenParent" xml:space="preserve">상위 폴더를 새 탭에서 열기</x:String>
+  <x:String x:Key="Text.TabAction.PinAll" xml:space="preserve">모든 탭 고정</x:String>
+  <x:String x:Key="Text.TabAction.PinLeft" xml:space="preserve">위쪽 탭 고정</x:String>
+  <x:String x:Key="Text.TabAction.PinRight" xml:space="preserve">아래쪽 탭 고정</x:String>
+  <x:String x:Key="Text.TabAction.ReloadAll" xml:space="preserve">모든 탭 새로 고침</x:String>
+  <x:String x:Key="Text.TabAction.ReloadLeft" xml:space="preserve">위쪽 탭 새로 고침</x:String>
+  <x:String x:Key="Text.TabAction.ReloadRight" xml:space="preserve">아래쪽 탭 새로 고침</x:String>
+  <x:String x:Key="Text.TabAction.Reverse" xml:space="preserve">탭 순서 반전</x:String>
+  <x:String x:Key="Text.TabAction.SortByName" xml:space="preserve">탭을 이름순으로 정렬</x:String>
+  <x:String x:Key="Text.TabAction.SortByPath" xml:space="preserve">탭을 경로순으로 정렬</x:String>
+  <x:String x:Key="Text.TabAction.UnpinAll" xml:space="preserve">모든 탭 고정 해제</x:String>
+  <x:String x:Key="Text.Toast.PathCopied" xml:space="preserve">경로를 복사했습니다: {0}</x:String>
+  <x:String x:Key="Text.Tooltip.Modified" xml:space="preserve">수정한 날짜: {0}</x:String>
+  <x:String x:Key="Text.Tooltip.Size" xml:space="preserve">크기: {0}</x:String>
+  <x:String x:Key="Text.Tooltip.Type" xml:space="preserve">유형: {0}</x:String>
+  <x:String x:Key="Text.Tray.Exit" xml:space="preserve">종료</x:String>
+  <x:String x:Key="Text.Tray.Open" xml:space="preserve">Kiriha 열기</x:String>
+  <x:String x:Key="Text.Tree.Loading" xml:space="preserve">불러오는 중...</x:String>
+  <x:String x:Key="Text.Tree.MyComputer" xml:space="preserve">내 컴퓨터</x:String>
+  <x:String x:Key="Text.Tree.MyDocuments" xml:space="preserve">내 문서</x:String>
+  <x:String x:Key="Text.Type.ExtFile" xml:space="preserve">{0} 파일</x:String>
+  <x:String x:Key="Text.Type.File" xml:space="preserve">파일</x:String>
+  <x:String x:Key="Text.Type.FileFolder" xml:space="preserve">파일 폴더</x:String>
+  <x:String x:Key="Text.Type.LocalDisk" xml:space="preserve">로컬 디스크</x:String>
+  <x:String x:Key="Text.Type.LocalDiskFormat" xml:space="preserve">로컬 디스크 ({0})</x:String>
+  <x:String x:Key="Text.Video.Unavailable" xml:space="preserve">이 동영상을 재생할 수 없습니다(일치하는 코덱을 찾지 못했습니다)</x:String>
+  <x:String x:Key="Text.Video.PlayPauseTip" xml:space="preserve">재생 / 일시 중지 (Space)</x:String>
+  <x:String x:Key="Text.Video.MuteTip" xml:space="preserve">음소거</x:String>
+  <x:String x:Key="Text.Video.VolumeTip" xml:space="preserve">볼륨</x:String>
+  <x:String x:Key="Text.Video.LoopTip" xml:space="preserve">반복 재생</x:String>
+  <x:String x:Key="Text.Video.RateTip" xml:space="preserve">재생 속도</x:String>
+  <x:String x:Key="Text.Update.AvailableHeader" xml:space="preserve">새 버전을 사용할 수 있습니다</x:String>
+  <x:String x:Key="Text.Update.Checking" xml:space="preserve">업데이트를 확인하는 중...</x:String>
+  <x:String x:Key="Text.Update.DownloadAndInstall" xml:space="preserve">다운로드하여 설치</x:String>
+  <x:String x:Key="Text.Update.ErrorHeader" xml:space="preserve">업데이트 확인에 실패했습니다</x:String>
+  <x:String x:Key="Text.Update.IgnoreThisVersion" xml:space="preserve">이 버전 건너뛰기</x:String>
+  <x:String x:Key="Text.Update.Title" xml:space="preserve">소프트웨어 업데이트</x:String>
+  <x:String x:Key="Text.Update.UpToDate" xml:space="preserve">사용 중인 버전이 최신입니다</x:String>
+  <x:String x:Key="Text.View.Compact" xml:space="preserve">간단히 보기</x:String>
+  <x:String x:Key="Text.View.Details" xml:space="preserve">자세히</x:String>
+  <x:String x:Key="Text.View.ExtraLarge" xml:space="preserve">아주 큰 아이콘</x:String>
+  <x:String x:Key="Text.View.FileExtensions" xml:space="preserve">파일 확장명</x:String>
+  <x:String x:Key="Text.View.HiddenFiles" xml:space="preserve">숨긴 항목</x:String>
+  <x:String x:Key="Text.View.ItemCheckBoxes" xml:space="preserve">항목 확인란</x:String>
+  <x:String x:Key="Text.View.Large" xml:space="preserve">큰 아이콘</x:String>
+  <x:String x:Key="Text.View.List" xml:space="preserve">목록</x:String>
+  <x:String x:Key="Text.View.Medium" xml:space="preserve">보통 아이콘</x:String>
+  <x:String x:Key="Text.View.NavigationPane" xml:space="preserve">탐색 창</x:String>
+  <x:String x:Key="Text.View.PreviewPane" xml:space="preserve">미리 보기 창</x:String>
+  <x:String x:Key="Text.View.Small" xml:space="preserve">작은 아이콘</x:String>
+  <x:String x:Key="Text.View.StatusBar" xml:space="preserve">상태 표시줄</x:String>
+</ResourceDictionary>

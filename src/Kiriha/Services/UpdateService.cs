@@ -106,7 +106,8 @@ public static class UpdateService
                 finally
                 {
                     autoCts?.Dispose();
-                    (mgr as IDisposable)?.Dispose();
+                    // Velopack の UpdateManager は IDisposable ではないので破棄不要。
+                    // `as IDisposable` で書くと「解放しているつもり」の無言の no-op になるため置かない。
                 }
 
                 Logger.Log($"Velopack 更新チェック完了: manually={manually}");

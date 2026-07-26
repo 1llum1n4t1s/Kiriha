@@ -573,7 +573,7 @@ public partial class MainWindow : Window
         {
             // 他プロセスがクリップボードを掴んでいる場合など。async void なので未捕捉のまま落とさない。
             Logger.LogException("パスのコピーに失敗しました", ex);
-            tab.StatusText = "クリップボードへコピーできませんでした";
+            tab.StatusText = LocalizationService.Text("Text.Clipboard.CopyFailed");
         }
     }
 
@@ -589,7 +589,7 @@ public partial class MainWindow : Window
         Dispatcher.UIThread.Post(() =>
         {
             var box = this.GetVisualDescendants().OfType<TextBox>()
-                .FirstOrDefault(t => t.IsEffectivelyVisible && t.PlaceholderText != "検索");
+                .FirstOrDefault(t => t.IsEffectivelyVisible && !t.Classes.Contains("searchbox"));
             box?.Focus();
             box?.SelectAll();
         });
@@ -601,7 +601,7 @@ public partial class MainWindow : Window
         {
             // クリップボード確保失敗はフォーカス動作を妨げない。async void なので未捕捉のまま落とさない。
             Logger.LogException("現在パスのクリップボードコピーに失敗しました", ex);
-            tab.StatusText = "クリップボードへコピーできませんでした";
+            tab.StatusText = LocalizationService.Text("Text.Clipboard.CopyFailed");
         }
     }
 
@@ -637,12 +637,12 @@ public partial class MainWindow : Window
         var profile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         (string Name, string Path)[] wellKnown =
         [
-            ("デスクトップ", Environment.GetFolderPath(Environment.SpecialFolder.Desktop)),
-            ("ダウンロード", Path.Combine(profile, "Downloads")),
-            ("ドキュメント", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)),
-            ("ピクチャ", Environment.GetFolderPath(Environment.SpecialFolder.MyPictures)),
-            ("ミュージック", Environment.GetFolderPath(Environment.SpecialFolder.MyMusic)),
-            ("ビデオ", Environment.GetFolderPath(Environment.SpecialFolder.MyVideos)),
+            (LocalizationService.Text("Text.Folder.Desktop"), Environment.GetFolderPath(Environment.SpecialFolder.Desktop)),
+            (LocalizationService.Text("Text.Folder.Downloads"), Path.Combine(profile, "Downloads")),
+            (LocalizationService.Text("Text.Folder.Documents"), Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)),
+            (LocalizationService.Text("Text.Folder.Pictures"), Environment.GetFolderPath(Environment.SpecialFolder.MyPictures)),
+            (LocalizationService.Text("Text.Folder.Music"), Environment.GetFolderPath(Environment.SpecialFolder.MyMusic)),
+            (LocalizationService.Text("Text.Folder.Videos"), Environment.GetFolderPath(Environment.SpecialFolder.MyVideos)),
             ("AppData (Roaming)", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)),
             ("AppData (Local)", Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)),
         ];
@@ -703,12 +703,12 @@ public partial class MainWindow : Window
 
         if (targetColumn is not null)
         {
-            var autoFitThis = new MenuItem { Header = "この列の幅を自動調整" };
+            var autoFitThis = new MenuItem { Header = LocalizationService.Text("Text.Column.AutoFitThis") };
             autoFitThis.Click += (_, _) => AutoFitColumn(tab, targetColumn);
             flyout.Items.Add(autoFitThis);
         }
 
-        var autoFitAll = new MenuItem { Header = "すべての列の幅を自動調整" };
+        var autoFitAll = new MenuItem { Header = LocalizationService.Text("Text.Column.AutoFitAll") };
         autoFitAll.Click += (_, _) =>
         {
             foreach (var column in tab.DetailColumns.Where(c => c.IsVisible)) AutoFitColumn(tab, column);
@@ -718,10 +718,10 @@ public partial class MainWindow : Window
 
         (string Header, string Key, bool Checked)[] columns =
         [
-            ("更新日時", SortKeys.Modified, tab.ShowColModified),
-            ("作成日時", SortKeys.Created, tab.ShowColCreated),
-            ("種類", SortKeys.Type, tab.ShowColType),
-            ("サイズ", SortKeys.Size, tab.ShowColSize),
+            (LocalizationService.Text("Text.Column.Modified"), SortKeys.Modified, tab.ShowColModified),
+            (LocalizationService.Text("Text.Column.Created"), SortKeys.Created, tab.ShowColCreated),
+            (LocalizationService.Text("Text.Column.Type"), SortKeys.Type, tab.ShowColType),
+            (LocalizationService.Text("Text.Column.Size"), SortKeys.Size, tab.ShowColSize),
         ];
         foreach (var (header, key, isChecked) in columns)
         {
@@ -876,7 +876,7 @@ public partial class MainWindow : Window
 
         var stem = Path.GetFileNameWithoutExtension(entry.Name);
         var selectionLength = entry.IsDirectory ? entry.Name.Length : stem.Length;
-        var newName = await PromptTextAsync("名前の変更", entry.Name, selectionLength);
+        var newName = await PromptTextAsync(LocalizationService.Text("Text.Command.Rename"), entry.Name, selectionLength);
         if (newName is not null)
         {
             await tab.CommitRenameAsync(entry, newName);
@@ -950,7 +950,7 @@ public partial class MainWindow : Window
         var paths = vm.ClosedTabPaths;
         if (paths.Count == 0)
         {
-            recent.Items.Add(new MenuItem { Header = "(なし)", IsEnabled = false });
+            recent.Items.Add(new MenuItem { Header = LocalizationService.Text("Text.Menu.NoneItem"), IsEnabled = false });
             return;
         }
 
@@ -980,7 +980,7 @@ public partial class MainWindow : Window
         if (text is not null && Clipboard is not null)
         {
             await Clipboard.SetTextAsync(text);
-            tab.StatusText = "クリップボードにコピーしました";
+            tab.StatusText = LocalizationService.Text("Text.Clipboard.CopiedToClipboard");
             return;
         }
         vm.ExecuteTabManagement(action.Id, tab);
@@ -1100,10 +1100,10 @@ public partial class MainWindow : Window
         {
             // タブバー背景の右クリックメニュー
             var flyout = new MenuFlyout();
-            var newTab = new MenuItem { Header = "新しいタブ", InputGesture = new KeyGesture(Key.T, KeyModifiers.Control) };
+            var newTab = new MenuItem { Header = LocalizationService.Text("Text.Tab.New"), InputGesture = new KeyGesture(Key.T, KeyModifiers.Control) };
             newTab.Click += (_, _) => ViewModel?.NewTabCommand.Execute(null);
             flyout.Items.Add(newTab);
-            var reopen = new MenuItem { Header = "閉じたタブを開く", InputGesture = new KeyGesture(Key.T, KeyModifiers.Control | KeyModifiers.Shift) };
+            var reopen = new MenuItem { Header = LocalizationService.Text("Text.Tab.Reopen"), InputGesture = new KeyGesture(Key.T, KeyModifiers.Control | KeyModifiers.Shift) };
             reopen.Click += (_, _) => ViewModel?.ReopenClosedTabCommand.Execute(null);
             flyout.Items.Add(reopen);
             flyout.ShowAt((Control)sender!, showAtPointer: true);
@@ -1254,12 +1254,12 @@ public partial class MainWindow : Window
 
             if (!any)
             {
-                flyout.Items.Add(new MenuItem { Header = "(サブフォルダーなし)", IsEnabled = false });
+                flyout.Items.Add(new MenuItem { Header = LocalizationService.Text("Text.Menu.NoSubfolders"), IsEnabled = false });
             }
         }
         catch
         {
-            flyout.Items.Add(new MenuItem { Header = "(アクセスできません)", IsEnabled = false });
+            flyout.Items.Add(new MenuItem { Header = LocalizationService.Text("Text.Menu.AccessDenied"), IsEnabled = false });
         }
 
         flyout.ShowAt(button);
@@ -1288,7 +1288,7 @@ public partial class MainWindow : Window
         e.Handled = true;
         var flyout = new MenuFlyout();
 
-        var copy = new MenuItem { Header = "アドレスのコピー" };
+        var copy = new MenuItem { Header = LocalizationService.Text("Text.Address.Copy") };
         copy.Click += async (_, _) =>
         {
             if (Clipboard is not null)
@@ -1298,7 +1298,7 @@ public partial class MainWindow : Window
         };
         flyout.Items.Add(copy);
 
-        var edit = new MenuItem { Header = "アドレスの編集", InputGesture = new KeyGesture(Key.L, KeyModifiers.Control) };
+        var edit = new MenuItem { Header = LocalizationService.Text("Text.Address.Edit"), InputGesture = new KeyGesture(Key.L, KeyModifiers.Control) };
         edit.Click += (_, _) => FocusPathBox(tab);
         flyout.Items.Add(edit);
 
@@ -1559,12 +1559,12 @@ public partial class MainWindow : Window
         if (link.IsShellCommand)
         {
             // ごみ箱: 開く / 空にする
-            var openBin = new MenuItem { Header = "開く" };
+            var openBin = new MenuItem { Header = LocalizationService.Text("Text.Common.Open") };
             openBin.Click += (_, _) => TrustedProcessLauncher.Start("explorer.exe", [link.Path],
                 Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
             flyout.Items.Add(openBin);
 
-            var empty = new MenuItem { Header = "ごみ箱を空にする" };
+            var empty = new MenuItem { Header = LocalizationService.Text("Text.RecycleBin.Empty") };
             empty.Click += (_, _) =>
             {
                 if (TryGetPlatformHandle() is { } h)
@@ -1579,13 +1579,13 @@ public partial class MainWindow : Window
             return;
         }
 
-        var openNew = new MenuItem { Header = "新しいタブで開く" };
+        var openNew = new MenuItem { Header = LocalizationService.Text("Text.Common.OpenInNewTab") };
         openNew.Click += (_, _) => ViewModel?.OpenInNewTab(link.Path);
         flyout.Items.Add(openNew);
 
         if (link.IsQuickAccess)
         {
-            var unpin = new MenuItem { Header = "クイックアクセスからピン留めを外す" };
+            var unpin = new MenuItem { Header = LocalizationService.Text("Text.Common.UnpinFromQuickAccess") };
             unpin.Click += (_, _) =>
             {
                 var handle = TryGetPlatformHandle();
@@ -1600,7 +1600,7 @@ public partial class MainWindow : Window
         if (link.Path != FileSystemService.ComputerPath)
         {
             flyout.Items.Add(new Separator());
-            var props = new MenuItem { Header = "プロパティ" };
+            var props = new MenuItem { Header = LocalizationService.Text("Text.Common.Properties") };
             props.Click += (_, _) => FileOperationService.ShowProperties(link.Path);
             flyout.Items.Add(props);
         }
@@ -1634,7 +1634,7 @@ public partial class MainWindow : Window
     {
         if (nodes.Count == 0)
         {
-            items.Add(new MenuItem { Header = "(空)", IsEnabled = false });
+            items.Add(new MenuItem { Header = LocalizationService.Text("Text.Menu.Empty"), IsEnabled = false });
             return;
         }
 
@@ -1689,7 +1689,7 @@ public partial class MainWindow : Window
 
         if (!node.IsFolder && node.Path is { } path)
         {
-            var openNew = new MenuItem { Header = "新しいタブで開く" };
+            var openNew = new MenuItem { Header = LocalizationService.Text("Text.Common.OpenInNewTab") };
             openNew.Click += (_, _) => vm.OpenInNewTab(path);
             flyout.Items.Add(openNew);
             flyout.Items.Add(new Separator());
@@ -1697,10 +1697,10 @@ public partial class MainWindow : Window
 
         if (node.IsFolder)
         {
-            var addChild = new MenuItem { Header = "フォルダを追加..." };
+            var addChild = new MenuItem { Header = LocalizationService.Text("Text.Bookmarks.AddFolderMenu") };
             addChild.Click += async (_, _) =>
             {
-                var name = await PromptTextAsync("フォルダを追加", "新しいフォルダ");
+                var name = await PromptTextAsync(LocalizationService.Text("Text.Bookmarks.AddFolderTitle"), LocalizationService.Text("Text.Bookmarks.NewFolderName"));
                 if (name is not null)
                 {
                     vm.AddBookmarkFolder(name, node);
@@ -1710,10 +1710,10 @@ public partial class MainWindow : Window
             flyout.Items.Add(new Separator());
         }
 
-        var rename = new MenuItem { Header = "名前を変更..." };
+        var rename = new MenuItem { Header = LocalizationService.Text("Text.Bookmarks.RenameMenu") };
         rename.Click += async (_, _) =>
         {
-            var newName = await PromptTextAsync("お気に入りの名前を変更", node.Name);
+            var newName = await PromptTextAsync(LocalizationService.Text("Text.Bookmarks.RenameTitle"), node.Name);
             if (newName is not null)
             {
                 vm.RenameBookmark(node, newName);
@@ -1721,7 +1721,7 @@ public partial class MainWindow : Window
         };
         flyout.Items.Add(rename);
 
-        var remove = new MenuItem { Header = "削除" };
+        var remove = new MenuItem { Header = LocalizationService.Text("Text.Common.Delete") };
         remove.Click += (_, _) => vm.RemoveBookmark(node);
         flyout.Items.Add(remove);
 
@@ -1748,7 +1748,7 @@ public partial class MainWindow : Window
         e.Handled = true;
         var flyout = new MenuFlyout();
 
-        var addCurrent = new MenuItem { Header = "現在のフォルダーを追加" };
+        var addCurrent = new MenuItem { Header = LocalizationService.Text("Text.Bookmarks.AddCurrent") };
         addCurrent.Click += (_, _) =>
         {
             if (vm.SelectedTab is { } tab && tab.CurrentPath != FileSystemService.ComputerPath)
@@ -1758,10 +1758,10 @@ public partial class MainWindow : Window
         };
         flyout.Items.Add(addCurrent);
 
-        var addFolder = new MenuItem { Header = "フォルダを追加..." };
+        var addFolder = new MenuItem { Header = LocalizationService.Text("Text.Bookmarks.AddFolderMenu") };
         addFolder.Click += async (_, _) =>
         {
-            var name = await PromptTextAsync("フォルダを追加", "新しいフォルダ");
+            var name = await PromptTextAsync(LocalizationService.Text("Text.Bookmarks.AddFolderTitle"), LocalizationService.Text("Text.Bookmarks.NewFolderName"));
             if (name is not null)
             {
                 vm.AddBookmarkFolder(name);
@@ -1771,17 +1771,17 @@ public partial class MainWindow : Window
 
         flyout.Items.Add(new Separator());
 
-        var sortName = new MenuItem { Header = "名前順で並べ替え" };
+        var sortName = new MenuItem { Header = LocalizationService.Text("Text.Bookmarks.SortByName") };
         sortName.Click += (_, _) => vm.SortBookmarks(byPath: false);
         flyout.Items.Add(sortName);
 
-        var sortPath = new MenuItem { Header = "パス名順で並べ替え" };
+        var sortPath = new MenuItem { Header = LocalizationService.Text("Text.Bookmarks.SortByPath") };
         sortPath.Click += (_, _) => vm.SortBookmarks(byPath: true);
         flyout.Items.Add(sortPath);
 
         flyout.Items.Add(new Separator());
 
-        var hide = new MenuItem { Header = "お気に入りバーを表示しない" };
+        var hide = new MenuItem { Header = LocalizationService.Text("Text.Bookmarks.Hide") };
         hide.Click += (_, _) => vm.ShowBookmarksBar = false;
         flyout.Items.Add(hide);
 
@@ -1957,6 +1957,17 @@ public partial class MainWindow : Window
             // 左右キーでの画像送り。フォーカスがストリップにあるときは ListBox 標準のキーナビが
             // 担うが、メイン画像をクリックしてこちらにフォーカスが来ると届かなくなるため補う。
             // Alt+← / Alt+→ は履歴の戻る / 進むなので、ここでは消費せず Window.OnKeyDown へ通す。
+            // 動画再生中は Space で再生 / 一時停止、Shift+← / → で 5 秒シーク。
+            // 素の ← / → はファイル送りのままにしたいので、シークには Shift を要求する。
+            case Key.Space when tab.IsVideoPreview:
+                if (tab.ToggleVideoPlaybackCommand.CanExecute(null)) tab.ToggleVideoPlaybackCommand.Execute(null);
+                break;
+            case Key.Left when tab.IsVideoPreview && e.KeyModifiers.HasFlag(KeyModifiers.Shift):
+                tab.SeekVideoBy(-5);
+                break;
+            case Key.Right when tab.IsVideoPreview && e.KeyModifiers.HasFlag(KeyModifiers.Shift):
+                tab.SeekVideoBy(5);
+                break;
             case Key.Left when !alt:
                 tab.MoveGallerySelection(-1);
                 break;
@@ -2322,7 +2333,7 @@ public partial class MainWindow : Window
         {
             var text = tab.CurrentPath == FileSystemService.ComputerPath ? "PC" : tab.CurrentPath;
             await Clipboard.SetTextAsync(text);
-            ShowPathCopyToast($"パスをコピーしました: {text}");
+            ShowPathCopyToast(LocalizationService.Text("Text.Toast.PathCopied", text));
         }
     }
 
@@ -2512,8 +2523,12 @@ public partial class MainWindow : Window
         FileSelectionRectangle.Height = selectionBounds.Height;
         FileSelectionRectangle.IsVisible = true;
 
+        // 実体化済みの行コンテナは ItemsPanel の直接の子なので、そこだけを見る。
+        // GetVisualDescendants() だと行テンプレート内の全要素（詳細表示は 1 行あたり数十個）まで
+        // 再帰列挙することになり、ドラッグ中は毎回のポインター移動でそれが走ってしまう。
+        var containers = listBox.ItemsPanelRoot?.Children ?? [];
         var intersecting = new HashSet<FileSystemEntry>();
-        foreach (var container in listBox.GetVisualDescendants().OfType<ListBoxItem>())
+        foreach (var container in containers.OfType<ListBoxItem>())
         {
             if (!container.IsEffectivelyVisible
                 || container.DataContext is not FileSystemEntry entry

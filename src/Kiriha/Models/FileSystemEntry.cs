@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using Kiriha.Services;
 
 namespace Kiriha.Models;
 
@@ -146,9 +147,9 @@ public partial class FileSystemEntry : ObservableObject
 
     /// <summary>行のツールチップ（秒付き日時などの詳細）。</summary>
     public string RowTooltip
-        => $"{Name}\n種類: {TypeText}"
-           + (Size is { } s ? $"\nサイズ: {FormatSize(s)}" : "")
-           + (Modified is { } m ? $"\n更新日時: {m:yyyy/MM/dd HH:mm:ss}" : "");
+        => $"{Name}\n" + LocalizationService.Text("Text.Tooltip.Type", TypeText)
+           + (Size is { } s ? "\n" + LocalizationService.Text("Text.Tooltip.Size", FormatSize(s)) : "")
+           + (Modified is { } m ? "\n" + LocalizationService.Text("Text.Tooltip.Modified", m.ToString("yyyy/MM/dd HH:mm:ss")) : "");
 
     /// <summary>ドライブのファイルシステム（NTFS 等）。</summary>
     public string? DriveFormat { get; init; }
@@ -157,10 +158,18 @@ public partial class FileSystemEntry : ObservableObject
     {
         get
         {
-            if (IsDrive) return DriveFormat is { Length: > 0 } fmt ? $"ローカル ディスク ({fmt})" : "ローカル ディスク";
-            if (IsDirectory) return "ファイル フォルダー";
+            if (IsDrive)
+            {
+                return DriveFormat is { Length: > 0 } fmt
+                    ? LocalizationService.Text("Text.Type.LocalDiskFormat", fmt)
+                    : LocalizationService.Text("Text.Type.LocalDisk");
+            }
+
+            if (IsDirectory) return LocalizationService.Text("Text.Type.FileFolder");
             var ext = Path.GetExtension(Name);
-            return string.IsNullOrEmpty(ext) ? "ファイル" : $"{ext.TrimStart('.').ToUpperInvariant()} ファイル";
+            return string.IsNullOrEmpty(ext)
+                ? LocalizationService.Text("Text.Type.File")
+                : LocalizationService.Text("Text.Type.ExtFile", ext.TrimStart('.').ToUpperInvariant());
         }
     }
 

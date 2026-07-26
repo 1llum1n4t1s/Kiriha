@@ -129,14 +129,14 @@ internal static partial class FileOperationService
     /// </summary>
     public static string DescribeError(int code) => code switch
     {
-        2 or 3 => "パスが見つかりません",           // ERROR_FILE_NOT_FOUND / ERROR_PATH_NOT_FOUND
-        5 => "アクセスが拒否されました",             // ERROR_ACCESS_DENIED
-        19 => "書き込み禁止です",                    // ERROR_WRITE_PROTECT
-        32 => "他のプロセスが使用中です",            // ERROR_SHARING_VIOLATION
-        80 => "同じ名前のファイルが既に存在します",  // ERROR_FILE_EXISTS
-        112 => "ディスクの空き領域が不足しています", // ERROR_DISK_FULL
-        123 => "ファイル名に使えない文字が含まれています", // ERROR_INVALID_NAME
-        206 => "パスが長すぎます",                   // ERROR_FILENAME_EXCED_RANGE
+        2 or 3 => LocalizationService.Text("Text.Error.PathNotFound"),      // ERROR_FILE_NOT_FOUND / ERROR_PATH_NOT_FOUND
+        5 => LocalizationService.Text("Text.Error.AccessDenied"),           // ERROR_ACCESS_DENIED
+        19 => LocalizationService.Text("Text.Error.WriteProtected"),        // ERROR_WRITE_PROTECT
+        32 => LocalizationService.Text("Text.Error.SharingViolation"),      // ERROR_SHARING_VIOLATION
+        80 => LocalizationService.Text("Text.Error.FileExists"),            // ERROR_FILE_EXISTS
+        112 => LocalizationService.Text("Text.Error.DiskFull"),             // ERROR_DISK_FULL
+        123 => LocalizationService.Text("Text.Error.InvalidName"),          // ERROR_INVALID_NAME
+        206 => LocalizationService.Text("Text.Error.PathTooLong"),          // ERROR_FILENAME_EXCED_RANGE
         _ => string.Empty,
     };
 
@@ -193,6 +193,7 @@ internal static partial class FileOperationService
             return Fail(operationName, initializeResult, destination);
         }
 
+        IFileOperation? operation = null;
         try
         {
             var hr = CoCreateInstance(
@@ -206,7 +207,6 @@ internal static partial class FileOperationService
                 return Fail(operationName, hr, destination);
             }
 
-            IFileOperation operation;
             try
             {
                 operation = (IFileOperation)ComWrappers.GetOrCreateObjectForComInstance(
@@ -250,6 +250,11 @@ internal static partial class FileOperationService
         }
         finally
         {
+            // COM オブジェクトは、この専用 STA スレッドが終わる前に手放す。
+            // 放置すると解放がファイナライザ（MTA）へ回り、生成元のアパートメントが
+            // 既に無い状態で解放されることになる。
+            ReleaseShellItems();
+            ComRelease.Release(operation);
             if (shouldUninitialize)
             {
                 CoUninitialize();
@@ -273,6 +278,11 @@ internal static partial class FileOperationService
     private static int ToErrorCode(int hr)
         => (hr & unchecked((int)0xFFFF0000)) == unchecked((int)0x80070000) ? hr & 0xFFFF : hr;
 
+    /// <summary>1 回の操作で作った IShellItem。操作ごとに専用 STA スレッドが立つので
+    /// スレッド単位で持ち、そのスレッドが終わる前（ExecuteCore の finally）にまとめて解放する。</summary>
+    [ThreadStatic]
+    private static List<IShellItem>? t_shellItems;
+
     private static IShellItem CreateShellItem(string path)
     {
         var hr = SHCreateItemFromParsingName(path, 0, IidIShellItem, out var pointer);
@@ -283,12 +293,30 @@ internal static partial class FileOperationService
 
         try
         {
-            return (IShellItem)ComWrappers.GetOrCreateObjectForComInstance(pointer, CreateObjectFlags.None);
+            var item = (IShellItem)ComWrappers.GetOrCreateObjectForComInstance(pointer, CreateObjectFlags.None);
+            (t_shellItems ??= []).Add(item);
+            return item;
         }
         finally
         {
             Marshal.Release(pointer);
         }
+    }
+
+    /// <summary>このスレッドで作った COM オブジェクトを、CoUninitialize より先に手放す。</summary>
+    private static void ReleaseShellItems()
+    {
+        if (t_shellItems is not { } items)
+        {
+            return;
+        }
+
+        foreach (var item in items)
+        {
+            ComRelease.Release(item);
+        }
+
+        items.Clear();
     }
 
     private const uint CoinitApartmentThreaded = 0x2;

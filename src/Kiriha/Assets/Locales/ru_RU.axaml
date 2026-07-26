@@ -1,0 +1,353 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:String x:Key="Text.A11y.OpenSubfolders" xml:space="preserve">Показать вложенные папки</x:String>
+  <x:String x:Key="Text.A11y.ResizeVerticalTabs" xml:space="preserve">Изменить ширину вертикальной панели вкладок</x:String>
+  <x:String x:Key="Text.A11y.SwitchToTree" xml:space="preserve">Переключиться на дерево папок</x:String>
+  <x:String x:Key="Text.A11y.ToggleSidebar" xml:space="preserve">Показать или скрыть боковую панель</x:String>
+  <x:String x:Key="Text.A11y.VerticalTabs" xml:space="preserve">Вертикальные вкладки</x:String>
+  <x:String x:Key="Text.Address.Copy" xml:space="preserve">Копировать адрес</x:String>
+  <x:String x:Key="Text.Address.Edit" xml:space="preserve">Изменить адрес</x:String>
+  <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">Добавить текущую папку</x:String>
+  <x:String x:Key="Text.Bookmarks.AddFolderMenu" xml:space="preserve">Добавить папку...</x:String>
+  <x:String x:Key="Text.Bookmarks.AddFolderTitle" xml:space="preserve">Добавить папку</x:String>
+  <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">Перетащите сюда папку, чтобы добавить её в закладки</x:String>
+  <x:String x:Key="Text.Bookmarks.Hide" xml:space="preserve">Скрыть панель закладок</x:String>
+  <x:String x:Key="Text.Bookmarks.NewFolderName" xml:space="preserve">Новая папка</x:String>
+  <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">Переименовать...</x:String>
+  <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">Переименовать закладку</x:String>
+  <x:String x:Key="Text.Bookmarks.SortByName" xml:space="preserve">Сортировать по имени</x:String>
+  <x:String x:Key="Text.Bookmarks.SortByPath" xml:space="preserve">Сортировать по пути</x:String>
+  <x:String x:Key="Text.Caption.MaximizeRestore" xml:space="preserve">Развернуть или восстановить</x:String>
+  <x:String x:Key="Text.Caption.Minimize" xml:space="preserve">Свернуть</x:String>
+  <x:String x:Key="Text.Clipboard.Copied" xml:space="preserve">Скопировано объектов: {0}</x:String>
+  <x:String x:Key="Text.Clipboard.CopiedToClipboard" xml:space="preserve">Скопировано в буфер обмена</x:String>
+  <x:String x:Key="Text.Clipboard.CopyFailed" xml:space="preserve">Не удалось скопировать в буфер обмена</x:String>
+  <x:String x:Key="Text.Clipboard.Cut" xml:space="preserve">Вырезано объектов: {0}</x:String>
+  <x:String x:Key="Text.Clipboard.VirtualPasteFailed" xml:space="preserve">Не удалось вставить виртуальный файл</x:String>
+  <x:String x:Key="Text.Clipboard.WriteFailed" xml:space="preserve">Не удалось записать в буфер обмена</x:String>
+  <x:String x:Key="Text.Column.AutoFitAll" xml:space="preserve">Подобрать ширину всех столбцов</x:String>
+  <x:String x:Key="Text.Column.AutoFitThis" xml:space="preserve">Подобрать ширину этого столбца</x:String>
+  <x:String x:Key="Text.Column.Created" xml:space="preserve">Дата создания</x:String>
+  <x:String x:Key="Text.Column.Modified" xml:space="preserve">Дата изменения</x:String>
+  <x:String x:Key="Text.Column.Name" xml:space="preserve">Имя</x:String>
+  <x:String x:Key="Text.Column.Size" xml:space="preserve">Размер</x:String>
+  <x:String x:Key="Text.Column.Type" xml:space="preserve">Тип</x:String>
+  <x:String x:Key="Text.Command.CopyTip" xml:space="preserve">Копировать (Ctrl+C)</x:String>
+  <x:String x:Key="Text.Command.Cut" xml:space="preserve">Вырезать</x:String>
+  <x:String x:Key="Text.Command.CutTip" xml:space="preserve">Вырезать (Ctrl+X)</x:String>
+  <x:String x:Key="Text.Command.DeleteTip" xml:space="preserve">Удалить (Delete)</x:String>
+  <x:String x:Key="Text.Command.More" xml:space="preserve">Показать больше</x:String>
+  <x:String x:Key="Text.Command.NewFolder" xml:space="preserve">Новая папка</x:String>
+  <x:String x:Key="Text.Command.Options" xml:space="preserve">Параметры</x:String>
+  <x:String x:Key="Text.Command.Paste" xml:space="preserve">Вставить</x:String>
+  <x:String x:Key="Text.Command.PasteTip" xml:space="preserve">Вставить (Ctrl+V)</x:String>
+  <x:String x:Key="Text.Command.Rename" xml:space="preserve">Переименовать</x:String>
+  <x:String x:Key="Text.Command.RenameTip" xml:space="preserve">Переименовать (F2)</x:String>
+  <x:String x:Key="Text.Command.Share" xml:space="preserve">Поделиться</x:String>
+  <x:String x:Key="Text.Command.SidebarTip" xml:space="preserve">Показать/скрыть боковую панель (Быстрый доступ / дерево)</x:String>
+  <x:String x:Key="Text.Command.Sort" xml:space="preserve">Сортировка</x:String>
+  <x:String x:Key="Text.Command.View" xml:space="preserve">Вид</x:String>
+  <x:String x:Key="Text.Common.AddToBookmarks" xml:space="preserve">Добавить в закладки</x:String>
+  <x:String x:Key="Text.Common.Cancel" xml:space="preserve">Отмена</x:String>
+  <x:String x:Key="Text.Common.Close" xml:space="preserve">Закрыть</x:String>
+  <x:String x:Key="Text.Common.Copy" xml:space="preserve">Копировать</x:String>
+  <x:String x:Key="Text.Common.CopyPath" xml:space="preserve">Копировать путь</x:String>
+  <x:String x:Key="Text.Common.Delete" xml:space="preserve">Удалить</x:String>
+  <x:String x:Key="Text.Common.Open" xml:space="preserve">Открыть</x:String>
+  <x:String x:Key="Text.Common.OpenInExplorer" xml:space="preserve">Открыть в Проводнике</x:String>
+  <x:String x:Key="Text.Common.OpenInNewTab" xml:space="preserve">Открыть в новой вкладке</x:String>
+  <x:String x:Key="Text.Common.OpenInTerminal" xml:space="preserve">Открыть в Терминале</x:String>
+  <x:String x:Key="Text.Common.PinToQuickAccess" xml:space="preserve">Закрепить в Быстром доступе</x:String>
+  <x:String x:Key="Text.Common.Properties" xml:space="preserve">Свойства</x:String>
+  <x:String x:Key="Text.Common.UnpinFromQuickAccess" xml:space="preserve">Открепить из Быстрого доступа</x:String>
+  <x:String x:Key="Text.Drag.Add" xml:space="preserve">Добавить</x:String>
+  <x:String x:Key="Text.Drag.Copy" xml:space="preserve">Копировать</x:String>
+  <x:String x:Key="Text.Drag.Dragging" xml:space="preserve">Перетаскивание</x:String>
+  <x:String x:Key="Text.Drag.File" xml:space="preserve">Файл</x:String>
+  <x:String x:Key="Text.Drag.Folder" xml:space="preserve">Папка</x:String>
+  <x:String x:Key="Text.Drag.Move" xml:space="preserve">Переместить</x:String>
+  <x:String x:Key="Text.Drag.OpenInTab" xml:space="preserve">Открыть во вкладке</x:String>
+  <x:String x:Key="Text.Drive.FreeOfTotal" xml:space="preserve">{0} свободно из {1}</x:String>
+  <x:String x:Key="Text.Error.AccessDenied" xml:space="preserve">Отказано в доступе</x:String>
+  <x:String x:Key="Text.Error.Code" xml:space="preserve">Ошибка {0}</x:String>
+  <x:String x:Key="Text.Error.CodeWithDesc" xml:space="preserve">Ошибка {0}: {1}</x:String>
+  <x:String x:Key="Text.Error.DiskFull" xml:space="preserve">Недостаточно места на диске</x:String>
+  <x:String x:Key="Text.Error.FileExists" xml:space="preserve">Файл с таким именем уже существует</x:String>
+  <x:String x:Key="Text.Error.InvalidName" xml:space="preserve">Имя файла содержит недопустимые символы</x:String>
+  <x:String x:Key="Text.Error.PathNotFound" xml:space="preserve">Путь не найден</x:String>
+  <x:String x:Key="Text.Error.PathTooLong" xml:space="preserve">Слишком длинный путь</x:String>
+  <x:String x:Key="Text.Error.SharingViolation" xml:space="preserve">Файл используется другим процессом</x:String>
+  <x:String x:Key="Text.Error.WriteProtected" xml:space="preserve">Носитель защищён от записи</x:String>
+  <x:String x:Key="Text.Exif.Camera" xml:space="preserve">Камера</x:String>
+  <x:String x:Key="Text.Exif.CameraMaker" xml:space="preserve">Производитель камеры</x:String>
+  <x:String x:Key="Text.Exif.DateModified" xml:space="preserve">Дата изменения</x:String>
+  <x:String x:Key="Text.Exif.DateTaken" xml:space="preserve">Дата съёмки</x:String>
+  <x:String x:Key="Text.Exif.Dimensions" xml:space="preserve">Размеры</x:String>
+  <x:String x:Key="Text.Exif.ExposureBias" xml:space="preserve">Экспокоррекция</x:String>
+  <x:String x:Key="Text.Exif.ExposureTime" xml:space="preserve">Выдержка</x:String>
+  <x:String x:Key="Text.Exif.FNumber" xml:space="preserve">Диафрагма</x:String>
+  <x:String x:Key="Text.Exif.Flash" xml:space="preserve">Вспышка</x:String>
+  <x:String x:Key="Text.Exif.FocalLength" xml:space="preserve">Фокусное расстояние</x:String>
+  <x:String x:Key="Text.Exif.Iso" xml:space="preserve">Светочувствительность ISO</x:String>
+  <x:String x:Key="Text.Exif.Lens" xml:space="preserve">Объектив</x:String>
+  <x:String x:Key="Text.Exif.Size" xml:space="preserve">Размер</x:String>
+  <x:String x:Key="Text.Exif.Type" xml:space="preserve">Тип</x:String>
+  <x:String x:Key="Text.FileList.EmptyFolder" xml:space="preserve">Эта папка пуста.</x:String>
+  <x:String x:Key="Text.Folder.Desktop" xml:space="preserve">Рабочий стол</x:String>
+  <x:String x:Key="Text.Folder.Documents" xml:space="preserve">Документы</x:String>
+  <x:String x:Key="Text.Folder.Downloads" xml:space="preserve">Загрузки</x:String>
+  <x:String x:Key="Text.Folder.Music" xml:space="preserve">Музыка</x:String>
+  <x:String x:Key="Text.Folder.Pictures" xml:space="preserve">Изображения</x:String>
+  <x:String x:Key="Text.Folder.Videos" xml:space="preserve">Видео</x:String>
+  <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">Выйти из галереи (Esc)</x:String>
+  <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">Сведения об изображении</x:String>
+  <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">Для этого изображения нет сведений.</x:String>
+  <x:String x:Key="Text.Integration.OpenWithKiriha" xml:space="preserve">Открыть с помощью Kiriha</x:String>
+  <x:String x:Key="Text.Launch.ExplorerFailed" xml:space="preserve">Не удалось запустить Проводник: {0}</x:String>
+  <x:String x:Key="Text.Launch.Failed" xml:space="preserve">Не удалось запустить: {0}</x:String>
+  <x:String x:Key="Text.Launch.TerminalFailed" xml:space="preserve">Не удалось запустить Терминал: {0}</x:String>
+  <x:String x:Key="Text.License.Activate" xml:space="preserve">Активировать</x:String>
+  <x:String x:Key="Text.License.Exit" xml:space="preserve">Выйти</x:String>
+  <x:String x:Key="Text.License.KeyPlaceholder" xml:space="preserve">Лицензионный ключ, начинающийся с KIRIHA-</x:String>
+  <x:String x:Key="Text.License.Lock.OnlineCheckBody" xml:space="preserve">Лицензия не проверялась онлайн более 30 дней. Подключитесь к интернету и нажмите «Проверить онлайн ещё раз».</x:String>
+  <x:String x:Key="Text.License.Lock.OnlineCheckTitle" xml:space="preserve">Лицензию нужно проверить онлайн</x:String>
+  <x:String x:Key="Text.License.Lock.TrialExpiredBody" xml:space="preserve">Для работы с Kiriha нужна активированная лицензия (¥980, разовая покупка).</x:String>
+  <x:String x:Key="Text.License.Lock.TrialExpiredTitle" xml:space="preserve">Пробный период закончился</x:String>
+  <x:String x:Key="Text.License.Msg.Activated" xml:space="preserve">Лицензия активирована 🎉 Большое спасибо!</x:String>
+  <x:String x:Key="Text.License.Msg.CheckOk" xml:space="preserve">Проверка завершена. Спасибо, что пользуетесь Kiriha!</x:String>
+  <x:String x:Key="Text.License.Msg.Checking" xml:space="preserve">Проверяем онлайн…</x:String>
+  <x:String x:Key="Text.License.Msg.EnterKey" xml:space="preserve">Введите лицензионный ключ, выданный при покупке.</x:String>
+  <x:String x:Key="Text.License.Msg.InvalidKey" xml:space="preserve">Этот лицензионный ключ недействителен. Проверьте, не потерялись ли символы и не скопировались ли лишние пробелы.</x:String>
+  <x:String x:Key="Text.License.Msg.PurchaseFailed" xml:space="preserve">Не удалось открыть страницу покупки. Повторите попытку позже.</x:String>
+  <x:String x:Key="Text.License.Msg.PurchaseOpened" xml:space="preserve">Страница покупки открыта в браузере. Вставьте в поле выше лицензионный ключ со страницы подтверждения.</x:String>
+  <x:String x:Key="Text.License.Msg.Revoked" xml:space="preserve">Эта лицензия больше недействительна (например, после возврата средств). Пожалуйста, купите её снова.</x:String>
+  <x:String x:Key="Text.License.Msg.ServerUnreachable" xml:space="preserve">Не удалось связаться с сервером. Проверьте подключение к сети и повторите попытку.</x:String>
+  <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">Открыть страницу покупки (¥980, разово)</x:String>
+  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">После покупки лицензионный ключ показывается на странице подтверждения оплаты. Учётная запись и пароль не нужны.</x:String>
+  <x:String x:Key="Text.License.Recheck" xml:space="preserve">Проверить онлайн ещё раз</x:String>
+  <x:String x:Key="Text.License.Status.Licensed" xml:space="preserve">Лицензия активирована: {0}</x:String>
+  <x:String x:Key="Text.License.Status.OnlineCheck" xml:space="preserve">Лицензию нужно проверить онлайн (подключитесь к интернету)</x:String>
+  <x:String x:Key="Text.License.Status.Trial" xml:space="preserve">Пробный период (осталось дней: {0})</x:String>
+  <x:String x:Key="Text.License.Status.TrialExpired" xml:space="preserve">Пробный период закончился (нужна лицензия)</x:String>
+  <x:String x:Key="Text.Menu.About" xml:space="preserve">О программе Kiriha</x:String>
+  <x:String x:Key="Text.Menu.AccessDenied" xml:space="preserve">(Нет доступа)</x:String>
+  <x:String x:Key="Text.Menu.BookmarksBar" xml:space="preserve">Панель закладок</x:String>
+  <x:String x:Key="Text.Menu.CheckUpdate" xml:space="preserve">Проверить обновления</x:String>
+  <x:String x:Key="Text.Menu.Empty" xml:space="preserve">(Пусто)</x:String>
+  <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">Новое окно</x:String>
+  <x:String x:Key="Text.Menu.NoSubfolders" xml:space="preserve">(Нет вложенных папок)</x:String>
+  <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(Нет)</x:String>
+  <x:String x:Key="Text.Nav.Back" xml:space="preserve">Назад</x:String>
+  <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">Назад (правый клик — журнал)</x:String>
+  <x:String x:Key="Text.Nav.EditPathTip" xml:space="preserve">Щёлкните, чтобы изменить путь</x:String>
+  <x:String x:Key="Text.Nav.Forward" xml:space="preserve">Вперёд</x:String>
+  <x:String x:Key="Text.Nav.ForwardTip" xml:space="preserve">Вперёд (правый клик — журнал)</x:String>
+  <x:String x:Key="Text.Nav.Home" xml:space="preserve">Домой</x:String>
+  <x:String x:Key="Text.Nav.HomeTip" xml:space="preserve">Домой (Alt+Home / правый клик — частые папки)</x:String>
+  <x:String x:Key="Text.Nav.OpenFailed" xml:space="preserve">Не удалось открыть: {0}</x:String>
+  <x:String x:Key="Text.Nav.OpenSettings" xml:space="preserve">Открыть параметры</x:String>
+  <x:String x:Key="Text.Nav.Refresh" xml:space="preserve">Обновить</x:String>
+  <x:String x:Key="Text.Nav.Settings" xml:space="preserve">Параметры</x:String>
+  <x:String x:Key="Text.Nav.UpFolder" xml:space="preserve">На уровень вверх</x:String>
+  <x:String x:Key="Text.Nav.UpTip" xml:space="preserve">На уровень вверх (правый клик — родительские папки)</x:String>
+  <x:String x:Key="Text.New.CreateFailed" xml:space="preserve">Не удалось создать: {0}</x:String>
+  <x:String x:Key="Text.New.FolderName" xml:space="preserve">Новая папка</x:String>
+  <x:String x:Key="Text.New.ItemName" xml:space="preserve">Новый {0}</x:String>
+  <x:String x:Key="Text.New.UndoFailed" xml:space="preserve">Не удалось отменить создание новой папки: {0}</x:String>
+  <x:String x:Key="Text.Op.Copied" xml:space="preserve">Скопировано объектов: {0}</x:String>
+  <x:String x:Key="Text.Op.DeleteFailed" xml:space="preserve">Не удалось удалить ({0})</x:String>
+  <x:String x:Key="Text.Op.Failed" xml:space="preserve">Не удалось выполнить файловую операцию ({0})</x:String>
+  <x:String x:Key="Text.Op.Moved" xml:space="preserve">Перемещено объектов: {0}</x:String>
+  <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">Не удалось вставить ({0})</x:String>
+  <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">Не удалось переименовать ({0})</x:String>
+  <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">файлов: {0}  {1}</x:String>
+  <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> или больше</x:String>
+  <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">Очистить Корзину</x:String>
+  <x:String x:Key="Text.Rename.AlreadyExists" xml:space="preserve">Файл или папка с таким именем уже существует: {0}</x:String>
+  <x:String x:Key="Text.Rename.InvalidChars" xml:space="preserve">Имя файла содержит недопустимые символы: \ / : * ? " &lt; &gt; |</x:String>
+  <x:String x:Key="Text.Rename.RevertedToOriginal" xml:space="preserve">Переименовать не удалось, поэтому возвращено исходное имя</x:String>
+  <x:String x:Key="Text.Rename.StuckAsTemporary" xml:space="preserve">Переименовать не удалось, осталось временное имя: {0}</x:String>
+  <x:String x:Key="Text.Search.ClearTip" xml:space="preserve">Очистить поиск</x:String>
+  <x:String x:Key="Text.Search.Failed" xml:space="preserve">Ошибка поиска: {0}</x:String>
+  <x:String x:Key="Text.Search.Found" xml:space="preserve">Найдено результатов: {0} (включая вложенные папки)</x:String>
+  <x:String x:Key="Text.Search.Placeholder" xml:space="preserve">Поиск в {0}</x:String>
+  <x:String x:Key="Text.Search.Searching" xml:space="preserve">Идёт поиск... (включая вложенные папки)</x:String>
+  <x:String x:Key="Text.Search.Truncated" xml:space="preserve">Остановлено на {0} результатах (достигнут предел в 1000, часть вложенных папок не просмотрена; уточните запрос, чтобы увидеть больше)</x:String>
+  <x:String x:Key="Text.Select.All" xml:space="preserve">Выделить всё</x:String>
+  <x:String x:Key="Text.Select.FilesOnly" xml:space="preserve">Выделить только файлы</x:String>
+  <x:String x:Key="Text.Select.FoldersOnly" xml:space="preserve">Выделить только папки</x:String>
+  <x:String x:Key="Text.Select.Invert" xml:space="preserve">Обратить выделение</x:String>
+  <x:String x:Key="Text.Select.None" xml:space="preserve">Снять выделение</x:String>
+  <x:String x:Key="Text.Settings.About" xml:space="preserve">О программе Kiriha</x:String>
+  <x:String x:Key="Text.Settings.About.Body" xml:space="preserve">Kiriha объединяет в одном окне работу с файлами как в Проводнике Windows и вкладки, адресную строку и закладки как в Chrome. Параметры сохраняются для текущего пользователя.</x:String>
+  <x:String x:Key="Text.Settings.Acrylic" xml:space="preserve">Использовать акриловый эффект (полупрозрачное размытие) для окна</x:String>
+  <x:String x:Key="Text.Settings.DefaultFolderApp" xml:space="preserve">Сделать Kiriha приложением по умолчанию для открытия папок и дисков</x:String>
+  <x:String x:Key="Text.Settings.DefaultFolderApp.Off" xml:space="preserve">Если включено, Kiriha запускается каждый раз, когда папка или диск открывается из Проводника.</x:String>
+  <x:String x:Key="Text.Settings.DefaultFolderApp.On" xml:space="preserve">Сейчас папки и диски открываются в Kiriha. При отключении вернётся прежнее поведение.</x:String>
+  <x:String x:Key="Text.Settings.Display" xml:space="preserve">Внешний вид</x:String>
+  <x:String x:Key="Text.Settings.Display.Subtitle" xml:space="preserve">Настройте вид списка файлов и оформление Kiriha</x:String>
+  <x:String x:Key="Text.Settings.Explorer" xml:space="preserve">Список файлов</x:String>
+  <x:String x:Key="Text.Settings.ExplorerContextMenu" xml:space="preserve">Добавить «Открыть с помощью Kiriha» в контекстное меню Проводника</x:String>
+  <x:String x:Key="Text.Settings.ExplorerContextMenuNote" xml:space="preserve">Позволяет открыть папку в Kiriha правым щелчком по папке или по фону её содержимого.</x:String>
+  <x:String x:Key="Text.Settings.FolderTree" xml:space="preserve">Дерево папок</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Material" xml:space="preserve">Material Icon Theme</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Note" xml:space="preserve">Тема Material Icon Theme использует material-icon-theme (лицензия MIT, © Material Extensions). Набор Windows показывает те же значки оболочки, что и Проводник.</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Original" xml:space="preserve">Оригинальные значки Kiriha</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Windows" xml:space="preserve">Значки оболочки Windows</x:String>
+  <x:String x:Key="Text.Settings.Icons" xml:space="preserve">Значки</x:String>
+  <x:String x:Key="Text.Settings.Language" xml:space="preserve">Язык интерфейса</x:String>
+  <x:String x:Key="Text.Settings.Language.Note" xml:space="preserve">По умолчанию язык определяется по языку интерфейса Windows.</x:String>
+  <x:String x:Key="Text.Settings.License" xml:space="preserve">Лицензия</x:String>
+  <x:String x:Key="Text.Settings.Maintenance" xml:space="preserve">Обслуживание</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.Data" xml:space="preserve">Данные и кеш</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.OpenLogFolder" xml:space="preserve">Открыть папку журналов</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.ReloadQuickAccess" xml:space="preserve">Перезагрузить Быстрый доступ</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.ResetSettings" xml:space="preserve">Сбросить параметры</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.Subtitle" xml:space="preserve">Управляйте кешем, журналами и данными параметров</x:String>
+  <x:String x:Key="Text.Settings.MinimizeToTray" xml:space="preserve">Сворачивать в область уведомлений</x:String>
+  <x:String x:Key="Text.Settings.MinimizeToTrayNote" xml:space="preserve">После сворачивания Kiriha исчезает с панели задач и восстанавливается из значка в области уведомлений.</x:String>
+  <x:String x:Key="Text.Settings.Mouse" xml:space="preserve">Мышь</x:String>
+  <x:String x:Key="Text.Settings.Mouse.BackgroundDoubleClick" xml:space="preserve">Двойной щелчок по фону папки</x:String>
+  <x:String x:Key="Text.Settings.Mouse.BackgroundMiddleClick" xml:space="preserve">Щелчок колесом по фону папки</x:String>
+  <x:String x:Key="Text.Settings.Mouse.CloseTab" xml:space="preserve">Закрыть вкладку</x:String>
+  <x:String x:Key="Text.Settings.Mouse.None" xml:space="preserve">Ничего не делать</x:String>
+  <x:String x:Key="Text.Settings.Mouse.Pin" xml:space="preserve">Закрепить вкладку</x:String>
+  <x:String x:Key="Text.Settings.Mouse.Refresh" xml:space="preserve">Обновить</x:String>
+  <x:String x:Key="Text.Settings.Mouse.TabDoubleClick" xml:space="preserve">Двойной щелчок по вкладке</x:String>
+  <x:String x:Key="Text.Settings.Mouse.TabMiddleClick" xml:space="preserve">Щелчок колесом по вкладке</x:String>
+  <x:String x:Key="Text.Settings.Mouse.Up" xml:space="preserve">Перейти на уровень вверх</x:String>
+  <x:String x:Key="Text.Settings.RunAtStartup" xml:space="preserve">Запускать Kiriha вместе с Windows</x:String>
+  <x:String x:Key="Text.Settings.RunAtStartupNote" xml:space="preserve">Kiriha запускается автоматически при входе в систему.</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts" xml:space="preserve">Сочетания клавиш</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.FileOps" xml:space="preserve">Операции с файлами</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.FileOpsBody" xml:space="preserve">Ctrl+X / C / V　Вырезать, копировать, вставить　　Delete / Shift+Delete　Удалить, удалить окончательно&#10;F2　Переименовать　　Alt+Enter　Свойства　　Ctrl+Shift+N　Новая папка　　Alt+P　Просмотр</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.Navigation" xml:space="preserve">Навигация и вид</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.NavigationBody" xml:space="preserve">Ctrl+L / F4　Изменить адрес&#10;Ctrl+F / F3　Поиск&#10;Alt+← / →　Назад и вперёд&#10;Alt+↑　На уровень вверх&#10;F5　Обновить / F11　Полный экран</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.Subtitle" xml:space="preserve">Сочетания клавиш для быстрой работы</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.Tabs" xml:space="preserve">Вкладки</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.TabsBody" xml:space="preserve">Ctrl+T　Новая вкладка&#10;Ctrl+W　Закрыть вкладку&#10;Ctrl+Shift+T　Открыть закрытую вкладку&#10;Ctrl+Tab　Переключение вкладок&#10;Ctrl+1..9　Выбрать нужную вкладку</x:String>
+  <x:String x:Key="Text.Settings.ShowBookmarksBar" xml:space="preserve">Показывать панель закладок (Ctrl+Shift+B)</x:String>
+  <x:String x:Key="Text.Settings.ShowCheckBoxes" xml:space="preserve">Показывать флажки элементов</x:String>
+  <x:String x:Key="Text.Settings.ShowExtensions" xml:space="preserve">Показывать расширения файлов</x:String>
+  <x:String x:Key="Text.Settings.ShowHidden" xml:space="preserve">Показывать скрытые файлы</x:String>
+  <x:String x:Key="Text.Settings.StartMinimizedToTray" xml:space="preserve">Запускаться свёрнутым в область уведомлений</x:String>
+  <x:String x:Key="Text.Settings.StartMinimizedToTrayNote" xml:space="preserve">Kiriha запускается без окна, свёрнутым в область уведомлений.</x:String>
+  <x:String x:Key="Text.Settings.Startup" xml:space="preserve">Запуск</x:String>
+  <x:String x:Key="Text.Settings.Startup.Behavior" xml:space="preserve">Поведение при запуске</x:String>
+  <x:String x:Key="Text.Settings.Startup.PathCaption" xml:space="preserve">Папка, открываемая в новых вкладках (оставьте пустым для папки пользователя)</x:String>
+  <x:String x:Key="Text.Settings.Startup.RestoreTabs" xml:space="preserve">Восстанавливать вкладки, открытые при закрытии</x:String>
+  <x:String x:Key="Text.Settings.Startup.Subtitle" xml:space="preserve">Управляйте запуском, интеграцией с Windows и областью уведомлений</x:String>
+  <x:String x:Key="Text.Settings.Theme" xml:space="preserve">Тема</x:String>
+  <x:String x:Key="Text.Settings.Theme.Dark" xml:space="preserve">Тёмная</x:String>
+  <x:String x:Key="Text.Settings.Theme.Light" xml:space="preserve">Светлая</x:String>
+  <x:String x:Key="Text.Settings.Theme.System" xml:space="preserve">Системная</x:String>
+  <x:String x:Key="Text.Settings.Tray" xml:space="preserve">Область уведомлений</x:String>
+  <x:String x:Key="Text.Settings.TreeDragDisabled" xml:space="preserve">Запретить перетаскивание из дерева</x:String>
+  <x:String x:Key="Text.Settings.TreeDropDisabled" xml:space="preserve">Запретить перетаскивание в дерево</x:String>
+  <x:String x:Key="Text.Settings.Updates" xml:space="preserve">Обновления и сведения</x:String>
+  <x:String x:Key="Text.Settings.Updates.CheckNow" xml:space="preserve">Проверить обновления сейчас</x:String>
+  <x:String x:Key="Text.Settings.Updates.CheckOnStartup" xml:space="preserve">Проверять обновления при запуске</x:String>
+  <x:String x:Key="Text.Settings.Updates.Subtitle" xml:space="preserve">Проверяйте версию Kiriha и управляйте обновлениями</x:String>
+  <x:String x:Key="Text.Settings.Updates.VersionCard" xml:space="preserve">Версия и обновления</x:String>
+  <x:String x:Key="Text.Settings.Window" xml:space="preserve">Окно</x:String>
+  <x:String x:Key="Text.Settings.Window.RememberBounds" xml:space="preserve">Запоминать размер и положение окна</x:String>
+  <x:String x:Key="Text.Settings.Window.RememberBoundsNote" xml:space="preserve">Если выключено, в следующий раз Kiriha откроется с размером и положением по умолчанию.</x:String>
+  <x:String x:Key="Text.Settings.WindowsIntegration" xml:space="preserve">Интеграция с Windows</x:String>
+  <x:String x:Key="Text.Share.FileCount" xml:space="preserve">файлов: {0}</x:String>
+  <x:String x:Key="Text.Share.FoldersNotSupported" xml:space="preserve">Папками поделиться нельзя (выберите файлы)</x:String>
+  <x:String x:Key="Text.Share.NoItems" xml:space="preserve">Нечем поделиться</x:String>
+  <x:String x:Key="Text.Share.OpenFailed" xml:space="preserve">Не удалось открыть панель «Поделиться»</x:String>
+  <x:String x:Key="Text.Share.PrepareFailed" xml:space="preserve">Не удалось подготовить данные для отправки</x:String>
+  <x:String x:Key="Text.Share.SelectFiles" xml:space="preserve">Выберите файлы, которыми хотите поделиться</x:String>
+  <x:String x:Key="Text.Sidebar.Drives" xml:space="preserve">Диски</x:String>
+  <x:String x:Key="Text.Sidebar.QuickAccess" xml:space="preserve">Быстрый доступ</x:String>
+  <x:String x:Key="Text.Sidebar.RecentFiles" xml:space="preserve">Последние файлы</x:String>
+  <x:String x:Key="Text.Sidebar.RecycleBin" xml:space="preserve">Корзина</x:String>
+  <x:String x:Key="Text.Sidebar.RecycleBinTip" xml:space="preserve">Открыть Корзину в Проводнике</x:String>
+  <x:String x:Key="Text.Sidebar.ToggleTip" xml:space="preserve">Переключение между Быстрым доступом и деревом папок</x:String>
+  <x:String x:Key="Text.Sidebar.TreeView" xml:space="preserve">Дерево папок</x:String>
+  <x:String x:Key="Text.Sort.Ascending" xml:space="preserve">По возрастанию</x:String>
+  <x:String x:Key="Text.Sort.Descending" xml:space="preserve">По убыванию</x:String>
+  <x:String x:Key="Text.Status.Breakdown" xml:space="preserve">(папок: {0}, файлов: {1})</x:String>
+  <x:String x:Key="Text.Status.ClearSelectionTip" xml:space="preserve">Щёлкните, чтобы снять выделение</x:String>
+  <x:String x:Key="Text.Status.DetailsViewTip" xml:space="preserve">Таблица</x:String>
+  <x:String x:Key="Text.Status.FreeSpace" xml:space="preserve">Свободно: {0}</x:String>
+  <x:String x:Key="Text.Status.IconSizeTip" xml:space="preserve">Размер значков</x:String>
+  <x:String x:Key="Text.Status.ItemCount" xml:space="preserve">объектов: {0}</x:String>
+  <x:String x:Key="Text.Status.ItemCountFiltered" xml:space="preserve">объектов: {0} (поиск: {1})</x:String>
+  <x:String x:Key="Text.Status.ItemsSelected" xml:space="preserve">Выделено объектов: {0}</x:String>
+  <x:String x:Key="Text.Status.LargeIconsTip" xml:space="preserve">Крупные значки</x:String>
+  <x:String x:Key="Text.Tab.Category" xml:space="preserve">Вкладки</x:String>
+  <x:String x:Key="Text.Tab.Close" xml:space="preserve">Закрыть вкладку</x:String>
+  <x:String x:Key="Text.Tab.CloseBelow" xml:space="preserve">Закрыть вкладки ниже</x:String>
+  <x:String x:Key="Text.Tab.CloseOthers" xml:space="preserve">Закрыть другие вкладки</x:String>
+  <x:String x:Key="Text.Tab.Duplicate" xml:space="preserve">Дублировать вкладку</x:String>
+  <x:String x:Key="Text.Tab.MoreActions" xml:space="preserve">Другие действия с вкладками</x:String>
+  <x:String x:Key="Text.Tab.New" xml:space="preserve">Новая вкладка</x:String>
+  <x:String x:Key="Text.Tab.NewBelow" xml:space="preserve">Открыть новую вкладку ниже</x:String>
+  <x:String x:Key="Text.Tab.NewTip" xml:space="preserve">Новая вкладка (Ctrl+T)</x:String>
+  <x:String x:Key="Text.Tab.Pin" xml:space="preserve">Закрепить вкладку</x:String>
+  <x:String x:Key="Text.Tab.Pinned" xml:space="preserve">Закреплённая вкладка</x:String>
+  <x:String x:Key="Text.Tab.RecentlyClosed" xml:space="preserve">Недавно закрытые вкладки</x:String>
+  <x:String x:Key="Text.Tab.Reopen" xml:space="preserve">Открыть закрытую вкладку</x:String>
+  <x:String x:Key="Text.Tab.Unpin" xml:space="preserve">Открепить вкладку</x:String>
+  <x:String x:Key="Text.TabAction.CloseDuplicates" xml:space="preserve">Закрыть дублирующие вкладки той же папки</x:String>
+  <x:String x:Key="Text.TabAction.CloseLeft" xml:space="preserve">Закрыть вкладки выше</x:String>
+  <x:String x:Key="Text.TabAction.CloseUnpinned" xml:space="preserve">Закрыть все незакреплённые вкладки</x:String>
+  <x:String x:Key="Text.TabAction.CopyAllPaths" xml:space="preserve">Копировать пути всех вкладок</x:String>
+  <x:String x:Key="Text.TabAction.CopyMarkdown" xml:space="preserve">Копировать вкладку как ссылку Markdown</x:String>
+  <x:String x:Key="Text.TabAction.CopyTitle" xml:space="preserve">Копировать имя вкладки</x:String>
+  <x:String x:Key="Text.TabAction.CopyUri" xml:space="preserve">Копировать вкладку как file URI</x:String>
+  <x:String x:Key="Text.TabAction.MoveFirst" xml:space="preserve">Переместить вкладку в начало</x:String>
+  <x:String x:Key="Text.TabAction.MoveLast" xml:space="preserve">Переместить вкладку в конец</x:String>
+  <x:String x:Key="Text.TabAction.OpenParent" xml:space="preserve">Открыть родительскую папку в новой вкладке</x:String>
+  <x:String x:Key="Text.TabAction.PinAll" xml:space="preserve">Закрепить все вкладки</x:String>
+  <x:String x:Key="Text.TabAction.PinLeft" xml:space="preserve">Закрепить вкладки выше</x:String>
+  <x:String x:Key="Text.TabAction.PinRight" xml:space="preserve">Закрепить вкладки ниже</x:String>
+  <x:String x:Key="Text.TabAction.ReloadAll" xml:space="preserve">Обновить все вкладки</x:String>
+  <x:String x:Key="Text.TabAction.ReloadLeft" xml:space="preserve">Обновить вкладки выше</x:String>
+  <x:String x:Key="Text.TabAction.ReloadRight" xml:space="preserve">Обновить вкладки ниже</x:String>
+  <x:String x:Key="Text.TabAction.Reverse" xml:space="preserve">Обратить порядок вкладок</x:String>
+  <x:String x:Key="Text.TabAction.SortByName" xml:space="preserve">Сортировать вкладки по имени</x:String>
+  <x:String x:Key="Text.TabAction.SortByPath" xml:space="preserve">Сортировать вкладки по пути</x:String>
+  <x:String x:Key="Text.TabAction.UnpinAll" xml:space="preserve">Открепить все вкладки</x:String>
+  <x:String x:Key="Text.Toast.PathCopied" xml:space="preserve">Путь скопирован: {0}</x:String>
+  <x:String x:Key="Text.Tooltip.Modified" xml:space="preserve">Дата изменения: {0}</x:String>
+  <x:String x:Key="Text.Tooltip.Size" xml:space="preserve">Размер: {0}</x:String>
+  <x:String x:Key="Text.Tooltip.Type" xml:space="preserve">Тип: {0}</x:String>
+  <x:String x:Key="Text.Tray.Exit" xml:space="preserve">Выход</x:String>
+  <x:String x:Key="Text.Tray.Open" xml:space="preserve">Открыть Kiriha</x:String>
+  <x:String x:Key="Text.Tree.Loading" xml:space="preserve">Загрузка...</x:String>
+  <x:String x:Key="Text.Tree.MyComputer" xml:space="preserve">Мой компьютер</x:String>
+  <x:String x:Key="Text.Tree.MyDocuments" xml:space="preserve">Мои документы</x:String>
+  <x:String x:Key="Text.Type.ExtFile" xml:space="preserve">Файл {0}</x:String>
+  <x:String x:Key="Text.Type.File" xml:space="preserve">Файл</x:String>
+  <x:String x:Key="Text.Type.FileFolder" xml:space="preserve">Папка с файлами</x:String>
+  <x:String x:Key="Text.Type.LocalDisk" xml:space="preserve">Локальный диск</x:String>
+  <x:String x:Key="Text.Type.LocalDiskFormat" xml:space="preserve">Локальный диск ({0})</x:String>
+  <x:String x:Key="Text.Video.Unavailable" xml:space="preserve">Это видео не удалось воспроизвести (не найден подходящий кодек)</x:String>
+  <x:String x:Key="Text.Video.PlayPauseTip" xml:space="preserve">Воспроизвести / пауза (Пробел)</x:String>
+  <x:String x:Key="Text.Video.MuteTip" xml:space="preserve">Выключить звук</x:String>
+  <x:String x:Key="Text.Video.VolumeTip" xml:space="preserve">Громкость</x:String>
+  <x:String x:Key="Text.Video.LoopTip" xml:space="preserve">Повтор</x:String>
+  <x:String x:Key="Text.Video.RateTip" xml:space="preserve">Скорость воспроизведения</x:String>
+  <x:String x:Key="Text.Update.AvailableHeader" xml:space="preserve">Доступна новая версия</x:String>
+  <x:String x:Key="Text.Update.Checking" xml:space="preserve">Проверка обновлений...</x:String>
+  <x:String x:Key="Text.Update.DownloadAndInstall" xml:space="preserve">Скачать и установить</x:String>
+  <x:String x:Key="Text.Update.ErrorHeader" xml:space="preserve">Не удалось проверить обновления</x:String>
+  <x:String x:Key="Text.Update.IgnoreThisVersion" xml:space="preserve">Пропустить эту версию</x:String>
+  <x:String x:Key="Text.Update.Title" xml:space="preserve">Обновление программы</x:String>
+  <x:String x:Key="Text.Update.UpToDate" xml:space="preserve">У вас последняя версия</x:String>
+  <x:String x:Key="Text.View.Compact" xml:space="preserve">Компактный вид</x:String>
+  <x:String x:Key="Text.View.Details" xml:space="preserve">Таблица</x:String>
+  <x:String x:Key="Text.View.ExtraLarge" xml:space="preserve">Огромные значки</x:String>
+  <x:String x:Key="Text.View.FileExtensions" xml:space="preserve">Расширения файлов</x:String>
+  <x:String x:Key="Text.View.HiddenFiles" xml:space="preserve">Скрытые элементы</x:String>
+  <x:String x:Key="Text.View.ItemCheckBoxes" xml:space="preserve">Флажки элементов</x:String>
+  <x:String x:Key="Text.View.Large" xml:space="preserve">Крупные значки</x:String>
+  <x:String x:Key="Text.View.List" xml:space="preserve">Список</x:String>
+  <x:String x:Key="Text.View.Medium" xml:space="preserve">Обычные значки</x:String>
+  <x:String x:Key="Text.View.NavigationPane" xml:space="preserve">Область переходов</x:String>
+  <x:String x:Key="Text.View.PreviewPane" xml:space="preserve">Область просмотра</x:String>
+  <x:String x:Key="Text.View.Small" xml:space="preserve">Мелкие значки</x:String>
+  <x:String x:Key="Text.View.StatusBar" xml:space="preserve">Строка состояния</x:String>
+</ResourceDictionary>

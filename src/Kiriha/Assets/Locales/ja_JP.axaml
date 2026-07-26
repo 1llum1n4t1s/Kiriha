@@ -1,0 +1,353 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:String x:Key="Text.A11y.OpenSubfolders" xml:space="preserve">サブフォルダー一覧を開く</x:String>
+  <x:String x:Key="Text.A11y.ResizeVerticalTabs" xml:space="preserve">垂直タブバーの幅を変更</x:String>
+  <x:String x:Key="Text.A11y.SwitchToTree" xml:space="preserve">ツリー表示に切り替え</x:String>
+  <x:String x:Key="Text.A11y.ToggleSidebar" xml:space="preserve">サイドバーの表示切替</x:String>
+  <x:String x:Key="Text.A11y.VerticalTabs" xml:space="preserve">垂直タブ</x:String>
+  <x:String x:Key="Text.Address.Copy" xml:space="preserve">アドレスのコピー</x:String>
+  <x:String x:Key="Text.Address.Edit" xml:space="preserve">アドレスの編集</x:String>
+  <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">現在のフォルダーを追加</x:String>
+  <x:String x:Key="Text.Bookmarks.AddFolderMenu" xml:space="preserve">フォルダを追加...</x:String>
+  <x:String x:Key="Text.Bookmarks.AddFolderTitle" xml:space="preserve">フォルダを追加</x:String>
+  <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">ここにフォルダーをドラッグするとお気に入りに追加されます</x:String>
+  <x:String x:Key="Text.Bookmarks.Hide" xml:space="preserve">お気に入りバーを表示しない</x:String>
+  <x:String x:Key="Text.Bookmarks.NewFolderName" xml:space="preserve">新しいフォルダ</x:String>
+  <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">名前を変更...</x:String>
+  <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">お気に入りの名前を変更</x:String>
+  <x:String x:Key="Text.Bookmarks.SortByName" xml:space="preserve">名前順で並べ替え</x:String>
+  <x:String x:Key="Text.Bookmarks.SortByPath" xml:space="preserve">パス名順で並べ替え</x:String>
+  <x:String x:Key="Text.Caption.MaximizeRestore" xml:space="preserve">最大化または元に戻す</x:String>
+  <x:String x:Key="Text.Caption.Minimize" xml:space="preserve">最小化</x:String>
+  <x:String x:Key="Text.Clipboard.Copied" xml:space="preserve">{0} 個の項目をコピーしました</x:String>
+  <x:String x:Key="Text.Clipboard.CopiedToClipboard" xml:space="preserve">クリップボードにコピーしました</x:String>
+  <x:String x:Key="Text.Clipboard.CopyFailed" xml:space="preserve">クリップボードへコピーできませんでした</x:String>
+  <x:String x:Key="Text.Clipboard.Cut" xml:space="preserve">{0} 個の項目を切り取りました</x:String>
+  <x:String x:Key="Text.Clipboard.VirtualPasteFailed" xml:space="preserve">仮想ファイルを貼り付けられませんでした</x:String>
+  <x:String x:Key="Text.Clipboard.WriteFailed" xml:space="preserve">クリップボードへ書き込めませんでした</x:String>
+  <x:String x:Key="Text.Column.AutoFitAll" xml:space="preserve">すべての列の幅を自動調整</x:String>
+  <x:String x:Key="Text.Column.AutoFitThis" xml:space="preserve">この列の幅を自動調整</x:String>
+  <x:String x:Key="Text.Column.Created" xml:space="preserve">作成日時</x:String>
+  <x:String x:Key="Text.Column.Modified" xml:space="preserve">更新日時</x:String>
+  <x:String x:Key="Text.Column.Name" xml:space="preserve">名前</x:String>
+  <x:String x:Key="Text.Column.Size" xml:space="preserve">サイズ</x:String>
+  <x:String x:Key="Text.Column.Type" xml:space="preserve">種類</x:String>
+  <x:String x:Key="Text.Command.CopyTip" xml:space="preserve">コピー (Ctrl+C)</x:String>
+  <x:String x:Key="Text.Command.Cut" xml:space="preserve">切り取り</x:String>
+  <x:String x:Key="Text.Command.CutTip" xml:space="preserve">切り取り (Ctrl+X)</x:String>
+  <x:String x:Key="Text.Command.DeleteTip" xml:space="preserve">削除 (Delete)</x:String>
+  <x:String x:Key="Text.Command.More" xml:space="preserve">もっと見る</x:String>
+  <x:String x:Key="Text.Command.NewFolder" xml:space="preserve">新規フォルダ作成</x:String>
+  <x:String x:Key="Text.Command.Options" xml:space="preserve">オプション</x:String>
+  <x:String x:Key="Text.Command.Paste" xml:space="preserve">貼り付け</x:String>
+  <x:String x:Key="Text.Command.PasteTip" xml:space="preserve">貼り付け (Ctrl+V)</x:String>
+  <x:String x:Key="Text.Command.Rename" xml:space="preserve">名前の変更</x:String>
+  <x:String x:Key="Text.Command.RenameTip" xml:space="preserve">名前の変更 (F2)</x:String>
+  <x:String x:Key="Text.Command.Share" xml:space="preserve">共有</x:String>
+  <x:String x:Key="Text.Command.SidebarTip" xml:space="preserve">サイドバーの表示/非表示（クイックアクセス / ツリー）</x:String>
+  <x:String x:Key="Text.Command.Sort" xml:space="preserve">並べ替え</x:String>
+  <x:String x:Key="Text.Command.View" xml:space="preserve">表示</x:String>
+  <x:String x:Key="Text.Common.AddToBookmarks" xml:space="preserve">お気に入りに追加</x:String>
+  <x:String x:Key="Text.Common.Cancel" xml:space="preserve">キャンセル</x:String>
+  <x:String x:Key="Text.Common.Close" xml:space="preserve">閉じる</x:String>
+  <x:String x:Key="Text.Common.Copy" xml:space="preserve">コピー</x:String>
+  <x:String x:Key="Text.Common.CopyPath" xml:space="preserve">パスのコピー</x:String>
+  <x:String x:Key="Text.Common.Delete" xml:space="preserve">削除</x:String>
+  <x:String x:Key="Text.Common.Open" xml:space="preserve">開く</x:String>
+  <x:String x:Key="Text.Common.OpenInExplorer" xml:space="preserve">エクスプローラーで開く</x:String>
+  <x:String x:Key="Text.Common.OpenInNewTab" xml:space="preserve">新しいタブで開く</x:String>
+  <x:String x:Key="Text.Common.OpenInTerminal" xml:space="preserve">ターミナルで開く</x:String>
+  <x:String x:Key="Text.Common.PinToQuickAccess" xml:space="preserve">クイックアクセスにピン留め</x:String>
+  <x:String x:Key="Text.Common.Properties" xml:space="preserve">プロパティ</x:String>
+  <x:String x:Key="Text.Common.UnpinFromQuickAccess" xml:space="preserve">クイックアクセスからピン留めを外す</x:String>
+  <x:String x:Key="Text.Drag.Add" xml:space="preserve">追加</x:String>
+  <x:String x:Key="Text.Drag.Copy" xml:space="preserve">コピー</x:String>
+  <x:String x:Key="Text.Drag.Dragging" xml:space="preserve">ドラッグ中</x:String>
+  <x:String x:Key="Text.Drag.File" xml:space="preserve">ファイル</x:String>
+  <x:String x:Key="Text.Drag.Folder" xml:space="preserve">フォルダー</x:String>
+  <x:String x:Key="Text.Drag.Move" xml:space="preserve">移動</x:String>
+  <x:String x:Key="Text.Drag.OpenInTab" xml:space="preserve">タブで開く</x:String>
+  <x:String x:Key="Text.Drive.FreeOfTotal" xml:space="preserve">空き {0} / {1}</x:String>
+  <x:String x:Key="Text.Error.AccessDenied" xml:space="preserve">アクセスが拒否されました</x:String>
+  <x:String x:Key="Text.Error.Code" xml:space="preserve">エラー {0}</x:String>
+  <x:String x:Key="Text.Error.CodeWithDesc" xml:space="preserve">エラー {0}: {1}</x:String>
+  <x:String x:Key="Text.Error.DiskFull" xml:space="preserve">ディスクの空き領域が不足しています</x:String>
+  <x:String x:Key="Text.Error.FileExists" xml:space="preserve">同じ名前のファイルが既に存在します</x:String>
+  <x:String x:Key="Text.Error.InvalidName" xml:space="preserve">ファイル名に使えない文字が含まれています</x:String>
+  <x:String x:Key="Text.Error.PathNotFound" xml:space="preserve">パスが見つかりません</x:String>
+  <x:String x:Key="Text.Error.PathTooLong" xml:space="preserve">パスが長すぎます</x:String>
+  <x:String x:Key="Text.Error.SharingViolation" xml:space="preserve">他のプロセスが使用中です</x:String>
+  <x:String x:Key="Text.Error.WriteProtected" xml:space="preserve">書き込み禁止です</x:String>
+  <x:String x:Key="Text.Exif.Camera" xml:space="preserve">カメラ</x:String>
+  <x:String x:Key="Text.Exif.CameraMaker" xml:space="preserve">カメラメーカー</x:String>
+  <x:String x:Key="Text.Exif.DateModified" xml:space="preserve">更新日時</x:String>
+  <x:String x:Key="Text.Exif.DateTaken" xml:space="preserve">撮影日時</x:String>
+  <x:String x:Key="Text.Exif.Dimensions" xml:space="preserve">寸法</x:String>
+  <x:String x:Key="Text.Exif.ExposureBias" xml:space="preserve">露出補正</x:String>
+  <x:String x:Key="Text.Exif.ExposureTime" xml:space="preserve">露出時間</x:String>
+  <x:String x:Key="Text.Exif.FNumber" xml:space="preserve">F 値</x:String>
+  <x:String x:Key="Text.Exif.Flash" xml:space="preserve">フラッシュ</x:String>
+  <x:String x:Key="Text.Exif.FocalLength" xml:space="preserve">焦点距離</x:String>
+  <x:String x:Key="Text.Exif.Iso" xml:space="preserve">ISO 感度</x:String>
+  <x:String x:Key="Text.Exif.Lens" xml:space="preserve">レンズ</x:String>
+  <x:String x:Key="Text.Exif.Size" xml:space="preserve">サイズ</x:String>
+  <x:String x:Key="Text.Exif.Type" xml:space="preserve">種類</x:String>
+  <x:String x:Key="Text.FileList.EmptyFolder" xml:space="preserve">このフォルダーは空です。</x:String>
+  <x:String x:Key="Text.Folder.Desktop" xml:space="preserve">デスクトップ</x:String>
+  <x:String x:Key="Text.Folder.Documents" xml:space="preserve">ドキュメント</x:String>
+  <x:String x:Key="Text.Folder.Downloads" xml:space="preserve">ダウンロード</x:String>
+  <x:String x:Key="Text.Folder.Music" xml:space="preserve">ミュージック</x:String>
+  <x:String x:Key="Text.Folder.Pictures" xml:space="preserve">ピクチャ</x:String>
+  <x:String x:Key="Text.Folder.Videos" xml:space="preserve">ビデオ</x:String>
+  <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">ギャラリーを終了 (Esc)</x:String>
+  <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">画像情報</x:String>
+  <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">この画像の情報はありません。</x:String>
+  <x:String x:Key="Text.Integration.OpenWithKiriha" xml:space="preserve">Kiriha で開く</x:String>
+  <x:String x:Key="Text.Launch.ExplorerFailed" xml:space="preserve">エクスプローラーを起動できませんでした: {0}</x:String>
+  <x:String x:Key="Text.Launch.Failed" xml:space="preserve">起動できませんでした: {0}</x:String>
+  <x:String x:Key="Text.Launch.TerminalFailed" xml:space="preserve">ターミナルを起動できませんでした: {0}</x:String>
+  <x:String x:Key="Text.License.Activate" xml:space="preserve">認証する</x:String>
+  <x:String x:Key="Text.License.Exit" xml:space="preserve">終了する</x:String>
+  <x:String x:Key="Text.License.KeyPlaceholder" xml:space="preserve">KIRIHA- で始まるライセンスキー</x:String>
+  <x:String x:Key="Text.License.Lock.OnlineCheckBody" xml:space="preserve">30 日以上オンライン確認ができていません。インターネットに接続して「再確認」を押してください。</x:String>
+  <x:String x:Key="Text.License.Lock.OnlineCheckTitle" xml:space="preserve">ライセンスのオンライン確認が必要です</x:String>
+  <x:String x:Key="Text.License.Lock.TrialExpiredBody" xml:space="preserve">Kiriha のご利用にはライセンス認証（¥980 買い切り）が必要です。</x:String>
+  <x:String x:Key="Text.License.Lock.TrialExpiredTitle" xml:space="preserve">試用期間が終了しました</x:String>
+  <x:String x:Key="Text.License.Msg.Activated" xml:space="preserve">ライセンス認証が完了しました 🎉 ありがとうございます！</x:String>
+  <x:String x:Key="Text.License.Msg.CheckOk" xml:space="preserve">確認が完了しました。ご利用ありがとうございます！</x:String>
+  <x:String x:Key="Text.License.Msg.Checking" xml:space="preserve">オンラインで確認しています…</x:String>
+  <x:String x:Key="Text.License.Msg.EnterKey" xml:space="preserve">購入時に発行されたライセンスキーを入力してください。</x:String>
+  <x:String x:Key="Text.License.Msg.InvalidKey" xml:space="preserve">ライセンスキーが正しくありません。コピーの際に欠けや余分な空白がないかご確認ください。</x:String>
+  <x:String x:Key="Text.License.Msg.PurchaseFailed" xml:space="preserve">購入ページを開けませんでした。時間をおいてもう一度お試しください。</x:String>
+  <x:String x:Key="Text.License.Msg.PurchaseOpened" xml:space="preserve">ブラウザーで購入ページを開きました。決済完了ページに表示されるライセンスキーを上の欄に貼り付けてください。</x:String>
+  <x:String x:Key="Text.License.Msg.Revoked" xml:space="preserve">ライセンスが無効になっています（返金済み等）。再度ご購入ください。</x:String>
+  <x:String x:Key="Text.License.Msg.ServerUnreachable" xml:space="preserve">サーバーに接続できませんでした。ネットワーク接続を確認してもう一度お試しください。</x:String>
+  <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">購入ページを開く（¥980 買い切り）</x:String>
+  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">購入すると決済完了ページにライセンスキーが表示されます。アカウント登録やパスワードは不要です。</x:String>
+  <x:String x:Key="Text.License.Recheck" xml:space="preserve">オンラインで再確認する</x:String>
+  <x:String x:Key="Text.License.Status.Licensed" xml:space="preserve">ライセンス認証済み: {0}</x:String>
+  <x:String x:Key="Text.License.Status.OnlineCheck" xml:space="preserve">ライセンスのオンライン確認が必要です（インターネットに接続してください）</x:String>
+  <x:String x:Key="Text.License.Status.Trial" xml:space="preserve">試用期間中（残り {0} 日）</x:String>
+  <x:String x:Key="Text.License.Status.TrialExpired" xml:space="preserve">試用期間終了（ライセンス認証が必要です）</x:String>
+  <x:String x:Key="Text.Menu.About" xml:space="preserve">Kiriha について</x:String>
+  <x:String x:Key="Text.Menu.AccessDenied" xml:space="preserve">(アクセスできません)</x:String>
+  <x:String x:Key="Text.Menu.BookmarksBar" xml:space="preserve">お気に入りバー</x:String>
+  <x:String x:Key="Text.Menu.CheckUpdate" xml:space="preserve">更新の確認</x:String>
+  <x:String x:Key="Text.Menu.Empty" xml:space="preserve">(空)</x:String>
+  <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">新しいウィンドウ</x:String>
+  <x:String x:Key="Text.Menu.NoSubfolders" xml:space="preserve">(サブフォルダーなし)</x:String>
+  <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(なし)</x:String>
+  <x:String x:Key="Text.Nav.Back" xml:space="preserve">戻る</x:String>
+  <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">戻る (右クリックで履歴)</x:String>
+  <x:String x:Key="Text.Nav.EditPathTip" xml:space="preserve">クリックしてパスを編集</x:String>
+  <x:String x:Key="Text.Nav.Forward" xml:space="preserve">進む</x:String>
+  <x:String x:Key="Text.Nav.ForwardTip" xml:space="preserve">進む (右クリックで履歴)</x:String>
+  <x:String x:Key="Text.Nav.Home" xml:space="preserve">ホーム</x:String>
+  <x:String x:Key="Text.Nav.HomeTip" xml:space="preserve">ホーム (Alt+Home / 右クリックでよく使うフォルダー)</x:String>
+  <x:String x:Key="Text.Nav.OpenFailed" xml:space="preserve">開けませんでした: {0}</x:String>
+  <x:String x:Key="Text.Nav.OpenSettings" xml:space="preserve">設定を開く</x:String>
+  <x:String x:Key="Text.Nav.Refresh" xml:space="preserve">更新</x:String>
+  <x:String x:Key="Text.Nav.Settings" xml:space="preserve">設定</x:String>
+  <x:String x:Key="Text.Nav.UpFolder" xml:space="preserve">1 つ上のフォルダーへ</x:String>
+  <x:String x:Key="Text.Nav.UpTip" xml:space="preserve">1 つ上へ (右クリックで祖先一覧)</x:String>
+  <x:String x:Key="Text.New.CreateFailed" xml:space="preserve">作成できませんでした: {0}</x:String>
+  <x:String x:Key="Text.New.FolderName" xml:space="preserve">新しいフォルダー</x:String>
+  <x:String x:Key="Text.New.ItemName" xml:space="preserve">新規 {0}</x:String>
+  <x:String x:Key="Text.New.UndoFailed" xml:space="preserve">新規フォルダーの作成を取り消せませんでした: {0}</x:String>
+  <x:String x:Key="Text.Op.Copied" xml:space="preserve">{0} 個の項目をコピーしました</x:String>
+  <x:String x:Key="Text.Op.DeleteFailed" xml:space="preserve">削除に失敗しました（{0}）</x:String>
+  <x:String x:Key="Text.Op.Failed" xml:space="preserve">ファイル操作に失敗しました（{0}）</x:String>
+  <x:String x:Key="Text.Op.Moved" xml:space="preserve">{0} 個の項目を移動しました</x:String>
+  <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">貼り付けに失敗しました（{0}）</x:String>
+  <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">名前を変更できませんでした（{0}）</x:String>
+  <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">{0} 個のファイル  {1}</x:String>
+  <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> 以上</x:String>
+  <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">ごみ箱を空にする</x:String>
+  <x:String x:Key="Text.Rename.AlreadyExists" xml:space="preserve">同じ名前のファイルまたはフォルダーが既に存在します: {0}</x:String>
+  <x:String x:Key="Text.Rename.InvalidChars" xml:space="preserve">ファイル名に使えない文字が含まれています: \ / : * ? " &lt; &gt; |</x:String>
+  <x:String x:Key="Text.Rename.RevertedToOriginal" xml:space="preserve">名前を変更できなかったため、元の名前へ戻しました</x:String>
+  <x:String x:Key="Text.Rename.StuckAsTemporary" xml:space="preserve">名前を変更できませんでした。一時名のまま残っています: {0}</x:String>
+  <x:String x:Key="Text.Search.ClearTip" xml:space="preserve">検索をクリア</x:String>
+  <x:String x:Key="Text.Search.Failed" xml:space="preserve">検索に失敗しました: {0}</x:String>
+  <x:String x:Key="Text.Search.Found" xml:space="preserve">{0} 件見つかりました (サブフォルダー含む)</x:String>
+  <x:String x:Key="Text.Search.Placeholder" xml:space="preserve">{0}の検索</x:String>
+  <x:String x:Key="Text.Search.Searching" xml:space="preserve">検索中... (サブフォルダーを含む)</x:String>
+  <x:String x:Key="Text.Search.Truncated" xml:space="preserve">{0} 件で打ち切りました (上限 1000 件到達、未走査のサブフォルダーがあります。検索語を絞ると続きを確認できます)</x:String>
+  <x:String x:Key="Text.Select.All" xml:space="preserve">すべて選択</x:String>
+  <x:String x:Key="Text.Select.FilesOnly" xml:space="preserve">ファイルだけ選択</x:String>
+  <x:String x:Key="Text.Select.FoldersOnly" xml:space="preserve">フォルダーだけ選択</x:String>
+  <x:String x:Key="Text.Select.Invert" xml:space="preserve">選択の切り替え</x:String>
+  <x:String x:Key="Text.Select.None" xml:space="preserve">選択解除</x:String>
+  <x:String x:Key="Text.Settings.About" xml:space="preserve">Kiriha について</x:String>
+  <x:String x:Key="Text.Settings.About.Body" xml:space="preserve">Windows Explorerのファイル操作と、Chromeのタブ・アドレスバー・お気に入り操作を一つの画面にまとめています。設定は現在のユーザーに保存されます。</x:String>
+  <x:String x:Key="Text.Settings.Acrylic" xml:space="preserve">ウィンドウにアクリル効果（半透明ぼかし）を使う</x:String>
+  <x:String x:Key="Text.Settings.DefaultFolderApp" xml:space="preserve">フォルダーとドライブを開く既定のアプリを Kiriha にする</x:String>
+  <x:String x:Key="Text.Settings.DefaultFolderApp.Off" xml:space="preserve">有効にすると、エクスプローラーでフォルダーやドライブを開いたときに Kiriha が起動します。</x:String>
+  <x:String x:Key="Text.Settings.DefaultFolderApp.On" xml:space="preserve">現在、フォルダーとドライブは Kiriha で開きます。解除すると変更前の動作へ戻します。</x:String>
+  <x:String x:Key="Text.Settings.Display" xml:space="preserve">表示</x:String>
+  <x:String x:Key="Text.Settings.Display.Subtitle" xml:space="preserve">ファイル一覧の見え方とKirihaの外観を調整します</x:String>
+  <x:String x:Key="Text.Settings.Explorer" xml:space="preserve">エクスプローラー表示</x:String>
+  <x:String x:Key="Text.Settings.ExplorerContextMenu" xml:space="preserve">エクスプローラーの右クリックメニューに「Kiriha で開く」を追加する</x:String>
+  <x:String x:Key="Text.Settings.ExplorerContextMenuNote" xml:space="preserve">フォルダーやフォルダー内の背景を右クリックしたときに、そのフォルダーを Kiriha で開けます。</x:String>
+  <x:String x:Key="Text.Settings.FolderTree" xml:space="preserve">フォルダーツリー</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Material" xml:space="preserve">マテリアルアイコンテーマ</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Note" xml:space="preserve">マテリアルアイコンテーマでは material-icon-theme（MIT License, © Material Extensions）を使用します。Windows標準では、エクスプローラーと同じShellアイコンを表示します。</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Original" xml:space="preserve">現在のオリジナルアイコン</x:String>
+  <x:String x:Key="Text.Settings.IconSet.Windows" xml:space="preserve">Windows標準のアイコン</x:String>
+  <x:String x:Key="Text.Settings.Icons" xml:space="preserve">アイコン</x:String>
+  <x:String x:Key="Text.Settings.Language" xml:space="preserve">表示言語</x:String>
+  <x:String x:Key="Text.Settings.Language.Note" xml:space="preserve">初期状態では、Windows の表示言語から自動で選ばれます。</x:String>
+  <x:String x:Key="Text.Settings.License" xml:space="preserve">ライセンス</x:String>
+  <x:String x:Key="Text.Settings.Maintenance" xml:space="preserve">メンテナンス</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.Data" xml:space="preserve">データとキャッシュ</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.OpenLogFolder" xml:space="preserve">ログフォルダーを開く</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.ReloadQuickAccess" xml:space="preserve">クイックアクセスを再読み込み</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.ResetSettings" xml:space="preserve">設定をリセット</x:String>
+  <x:String x:Key="Text.Settings.Maintenance.Subtitle" xml:space="preserve">キャッシュ、ログ、設定データを管理します</x:String>
+  <x:String x:Key="Text.Settings.MinimizeToTray" xml:space="preserve">最小化時にタスクトレイに格納する</x:String>
+  <x:String x:Key="Text.Settings.MinimizeToTrayNote" xml:space="preserve">最小化するとタスクバーから消え、タスクトレイのアイコンから復元できます。</x:String>
+  <x:String x:Key="Text.Settings.Mouse" xml:space="preserve">マウス操作</x:String>
+  <x:String x:Key="Text.Settings.Mouse.BackgroundDoubleClick" xml:space="preserve">フォルダーの背景をダブルクリックしたとき</x:String>
+  <x:String x:Key="Text.Settings.Mouse.BackgroundMiddleClick" xml:space="preserve">フォルダーの背景をマウスホイールクリックしたとき</x:String>
+  <x:String x:Key="Text.Settings.Mouse.CloseTab" xml:space="preserve">タブを閉じる</x:String>
+  <x:String x:Key="Text.Settings.Mouse.None" xml:space="preserve">何もしない</x:String>
+  <x:String x:Key="Text.Settings.Mouse.Pin" xml:space="preserve">タブをピン留め</x:String>
+  <x:String x:Key="Text.Settings.Mouse.Refresh" xml:space="preserve">最新の情報に更新</x:String>
+  <x:String x:Key="Text.Settings.Mouse.TabDoubleClick" xml:space="preserve">タブをダブルクリックしたとき</x:String>
+  <x:String x:Key="Text.Settings.Mouse.TabMiddleClick" xml:space="preserve">タブをマウスホイールクリックしたとき</x:String>
+  <x:String x:Key="Text.Settings.Mouse.Up" xml:space="preserve">上の階層に移動</x:String>
+  <x:String x:Key="Text.Settings.RunAtStartup" xml:space="preserve">Windows のスタートアップに登録する</x:String>
+  <x:String x:Key="Text.Settings.RunAtStartupNote" xml:space="preserve">サインイン時に Kiriha を自動で起動します。</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts" xml:space="preserve">ショートカット</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.FileOps" xml:space="preserve">ファイル操作</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.FileOpsBody" xml:space="preserve">Ctrl+X / C / V　切り取り・コピー・貼り付け　　Delete / Shift+Delete　削除・完全削除&#10;F2　名前の変更　　Alt+Enter　プロパティ　　Ctrl+Shift+N　新しいフォルダー　　Alt+P　プレビュー</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.Navigation" xml:space="preserve">移動と表示</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.NavigationBody" xml:space="preserve">Ctrl+L / F4　アドレス入力&#10;Ctrl+F / F3　検索&#10;Alt+← / →　戻る・進む&#10;Alt+↑　1つ上へ&#10;F5　更新 / F11　全画面</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.Subtitle" xml:space="preserve">キーボードで素早く操作するための一覧です</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.Tabs" xml:space="preserve">タブ</x:String>
+  <x:String x:Key="Text.Settings.Shortcuts.TabsBody" xml:space="preserve">Ctrl+T　新しいタブ&#10;Ctrl+W　タブを閉じる&#10;Ctrl+Shift+T　閉じたタブを開く&#10;Ctrl+Tab　タブを切り替える&#10;Ctrl+1..9　指定タブを選択</x:String>
+  <x:String x:Key="Text.Settings.ShowBookmarksBar" xml:space="preserve">お気に入りバーを表示する (Ctrl+Shift+B)</x:String>
+  <x:String x:Key="Text.Settings.ShowCheckBoxes" xml:space="preserve">項目チェックボックスを表示する</x:String>
+  <x:String x:Key="Text.Settings.ShowExtensions" xml:space="preserve">ファイル名拡張子を表示する</x:String>
+  <x:String x:Key="Text.Settings.ShowHidden" xml:space="preserve">隠しファイルを表示する</x:String>
+  <x:String x:Key="Text.Settings.StartMinimizedToTray" xml:space="preserve">起動時にタスクトレイに格納する</x:String>
+  <x:String x:Key="Text.Settings.StartMinimizedToTrayNote" xml:space="preserve">起動直後はウィンドウを表示せず、タスクトレイに格納した状態で開始します。</x:String>
+  <x:String x:Key="Text.Settings.Startup" xml:space="preserve">起動</x:String>
+  <x:String x:Key="Text.Settings.Startup.Behavior" xml:space="preserve">起動時の動作</x:String>
+  <x:String x:Key="Text.Settings.Startup.PathCaption" xml:space="preserve">新しいタブで開くフォルダー（空欄でユーザーフォルダー）</x:String>
+  <x:String x:Key="Text.Settings.Startup.RestoreTabs" xml:space="preserve">終了時に開いていたタブを次回復元する</x:String>
+  <x:String x:Key="Text.Settings.Startup.Subtitle" xml:space="preserve">起動方法、Windows統合、タスクトレイを管理します</x:String>
+  <x:String x:Key="Text.Settings.Theme" xml:space="preserve">テーマ</x:String>
+  <x:String x:Key="Text.Settings.Theme.Dark" xml:space="preserve">ダーク</x:String>
+  <x:String x:Key="Text.Settings.Theme.Light" xml:space="preserve">ライト</x:String>
+  <x:String x:Key="Text.Settings.Theme.System" xml:space="preserve">システム</x:String>
+  <x:String x:Key="Text.Settings.Tray" xml:space="preserve">タスクトレイ</x:String>
+  <x:String x:Key="Text.Settings.TreeDragDisabled" xml:space="preserve">ツリーからのドラッグを禁止する</x:String>
+  <x:String x:Key="Text.Settings.TreeDropDisabled" xml:space="preserve">ツリーへのドロップを禁止する</x:String>
+  <x:String x:Key="Text.Settings.Updates" xml:space="preserve">更新と情報</x:String>
+  <x:String x:Key="Text.Settings.Updates.CheckNow" xml:space="preserve">今すぐ更新を確認</x:String>
+  <x:String x:Key="Text.Settings.Updates.CheckOnStartup" xml:space="preserve">起動時に更新を確認する</x:String>
+  <x:String x:Key="Text.Settings.Updates.Subtitle" xml:space="preserve">Kirihaのバージョン確認とアップデートを管理します</x:String>
+  <x:String x:Key="Text.Settings.Updates.VersionCard" xml:space="preserve">バージョンと更新</x:String>
+  <x:String x:Key="Text.Settings.Window" xml:space="preserve">ウィンドウ</x:String>
+  <x:String x:Key="Text.Settings.Window.RememberBounds" xml:space="preserve">ウィンドウのサイズと位置を保存する</x:String>
+  <x:String x:Key="Text.Settings.Window.RememberBoundsNote" xml:space="preserve">OFF にすると、次回は既定のサイズ・位置で起動します。</x:String>
+  <x:String x:Key="Text.Settings.WindowsIntegration" xml:space="preserve">Windows 統合</x:String>
+  <x:String x:Key="Text.Share.FileCount" xml:space="preserve">{0} 個のファイル</x:String>
+  <x:String x:Key="Text.Share.FoldersNotSupported" xml:space="preserve">フォルダーは共有できません（ファイルを選択してください）</x:String>
+  <x:String x:Key="Text.Share.NoItems" xml:space="preserve">共有する項目がありません</x:String>
+  <x:String x:Key="Text.Share.OpenFailed" xml:space="preserve">共有シートを開けませんでした</x:String>
+  <x:String x:Key="Text.Share.PrepareFailed" xml:space="preserve">共有データを準備できませんでした</x:String>
+  <x:String x:Key="Text.Share.SelectFiles" xml:space="preserve">共有するファイルを選択してください</x:String>
+  <x:String x:Key="Text.Sidebar.Drives" xml:space="preserve">ドライブ一覧</x:String>
+  <x:String x:Key="Text.Sidebar.QuickAccess" xml:space="preserve">クイックアクセス</x:String>
+  <x:String x:Key="Text.Sidebar.RecentFiles" xml:space="preserve">最近使用したファイル</x:String>
+  <x:String x:Key="Text.Sidebar.RecycleBin" xml:space="preserve">ごみ箱</x:String>
+  <x:String x:Key="Text.Sidebar.RecycleBinTip" xml:space="preserve">ごみ箱をエクスプローラーで開く</x:String>
+  <x:String x:Key="Text.Sidebar.ToggleTip" xml:space="preserve">クイックアクセスとフォルダーツリーを切り替えます</x:String>
+  <x:String x:Key="Text.Sidebar.TreeView" xml:space="preserve">ツリー表示</x:String>
+  <x:String x:Key="Text.Sort.Ascending" xml:space="preserve">昇順</x:String>
+  <x:String x:Key="Text.Sort.Descending" xml:space="preserve">降順</x:String>
+  <x:String x:Key="Text.Status.Breakdown" xml:space="preserve">(フォルダー {0}、ファイル {1})</x:String>
+  <x:String x:Key="Text.Status.ClearSelectionTip" xml:space="preserve">クリックして選択を解除</x:String>
+  <x:String x:Key="Text.Status.DetailsViewTip" xml:space="preserve">詳細表示</x:String>
+  <x:String x:Key="Text.Status.FreeSpace" xml:space="preserve">空き領域: {0}</x:String>
+  <x:String x:Key="Text.Status.IconSizeTip" xml:space="preserve">アイコンのサイズ</x:String>
+  <x:String x:Key="Text.Status.ItemCount" xml:space="preserve">{0} 個の項目</x:String>
+  <x:String x:Key="Text.Status.ItemCountFiltered" xml:space="preserve">{0} 個の項目 (検索: {1})</x:String>
+  <x:String x:Key="Text.Status.ItemsSelected" xml:space="preserve">{0} 個の項目を選択</x:String>
+  <x:String x:Key="Text.Status.LargeIconsTip" xml:space="preserve">大アイコン表示</x:String>
+  <x:String x:Key="Text.Tab.Category" xml:space="preserve">タブ</x:String>
+  <x:String x:Key="Text.Tab.Close" xml:space="preserve">タブを閉じる</x:String>
+  <x:String x:Key="Text.Tab.CloseBelow" xml:space="preserve">下側のタブを閉じる</x:String>
+  <x:String x:Key="Text.Tab.CloseOthers" xml:space="preserve">他のタブを閉じる</x:String>
+  <x:String x:Key="Text.Tab.Duplicate" xml:space="preserve">タブを複製</x:String>
+  <x:String x:Key="Text.Tab.MoreActions" xml:space="preserve">タブの詳細操作</x:String>
+  <x:String x:Key="Text.Tab.New" xml:space="preserve">新しいタブ</x:String>
+  <x:String x:Key="Text.Tab.NewBelow" xml:space="preserve">新しいタブを下に開く</x:String>
+  <x:String x:Key="Text.Tab.NewTip" xml:space="preserve">新しいタブ (Ctrl+T)</x:String>
+  <x:String x:Key="Text.Tab.Pin" xml:space="preserve">タブを固定</x:String>
+  <x:String x:Key="Text.Tab.Pinned" xml:space="preserve">固定タブ</x:String>
+  <x:String x:Key="Text.Tab.RecentlyClosed" xml:space="preserve">最近閉じたタブ</x:String>
+  <x:String x:Key="Text.Tab.Reopen" xml:space="preserve">閉じたタブを開く</x:String>
+  <x:String x:Key="Text.Tab.Unpin" xml:space="preserve">タブの固定を解除</x:String>
+  <x:String x:Key="Text.TabAction.CloseDuplicates" xml:space="preserve">同じ場所の重複タブを閉じる</x:String>
+  <x:String x:Key="Text.TabAction.CloseLeft" xml:space="preserve">上側のタブを閉じる</x:String>
+  <x:String x:Key="Text.TabAction.CloseUnpinned" xml:space="preserve">固定されていないタブをすべて閉じる</x:String>
+  <x:String x:Key="Text.TabAction.CopyAllPaths" xml:space="preserve">すべてのタブのパスをコピー</x:String>
+  <x:String x:Key="Text.TabAction.CopyMarkdown" xml:space="preserve">タブを Markdown リンクとしてコピー</x:String>
+  <x:String x:Key="Text.TabAction.CopyTitle" xml:space="preserve">タブ名をコピー</x:String>
+  <x:String x:Key="Text.TabAction.CopyUri" xml:space="preserve">タブを file URI としてコピー</x:String>
+  <x:String x:Key="Text.TabAction.MoveFirst" xml:space="preserve">タブを先頭へ移動</x:String>
+  <x:String x:Key="Text.TabAction.MoveLast" xml:space="preserve">タブを末尾へ移動</x:String>
+  <x:String x:Key="Text.TabAction.OpenParent" xml:space="preserve">親フォルダーを新しいタブで開く</x:String>
+  <x:String x:Key="Text.TabAction.PinAll" xml:space="preserve">すべてのタブを固定</x:String>
+  <x:String x:Key="Text.TabAction.PinLeft" xml:space="preserve">上側のタブを固定</x:String>
+  <x:String x:Key="Text.TabAction.PinRight" xml:space="preserve">下側のタブを固定</x:String>
+  <x:String x:Key="Text.TabAction.ReloadAll" xml:space="preserve">すべてのタブを再読み込み</x:String>
+  <x:String x:Key="Text.TabAction.ReloadLeft" xml:space="preserve">上側のタブを再読み込み</x:String>
+  <x:String x:Key="Text.TabAction.ReloadRight" xml:space="preserve">下側のタブを再読み込み</x:String>
+  <x:String x:Key="Text.TabAction.Reverse" xml:space="preserve">タブの並び順を反転</x:String>
+  <x:String x:Key="Text.TabAction.SortByName" xml:space="preserve">タブを名前順に並べ替え</x:String>
+  <x:String x:Key="Text.TabAction.SortByPath" xml:space="preserve">タブをパス順に並べ替え</x:String>
+  <x:String x:Key="Text.TabAction.UnpinAll" xml:space="preserve">すべてのタブの固定を解除</x:String>
+  <x:String x:Key="Text.Toast.PathCopied" xml:space="preserve">パスをコピーしました: {0}</x:String>
+  <x:String x:Key="Text.Tooltip.Modified" xml:space="preserve">更新日時: {0}</x:String>
+  <x:String x:Key="Text.Tooltip.Size" xml:space="preserve">サイズ: {0}</x:String>
+  <x:String x:Key="Text.Tooltip.Type" xml:space="preserve">種類: {0}</x:String>
+  <x:String x:Key="Text.Tray.Exit" xml:space="preserve">終了</x:String>
+  <x:String x:Key="Text.Tray.Open" xml:space="preserve">Kiriha を開く</x:String>
+  <x:String x:Key="Text.Tree.Loading" xml:space="preserve">読み込み中...</x:String>
+  <x:String x:Key="Text.Tree.MyComputer" xml:space="preserve">マイ コンピュータ</x:String>
+  <x:String x:Key="Text.Tree.MyDocuments" xml:space="preserve">マイ ドキュメント</x:String>
+  <x:String x:Key="Text.Type.ExtFile" xml:space="preserve">{0} ファイル</x:String>
+  <x:String x:Key="Text.Type.File" xml:space="preserve">ファイル</x:String>
+  <x:String x:Key="Text.Type.FileFolder" xml:space="preserve">ファイル フォルダー</x:String>
+  <x:String x:Key="Text.Type.LocalDisk" xml:space="preserve">ローカル ディスク</x:String>
+  <x:String x:Key="Text.Type.LocalDiskFormat" xml:space="preserve">ローカル ディスク ({0})</x:String>
+  <x:String x:Key="Text.Video.Unavailable" xml:space="preserve">この動画は再生できません（対応するコーデックが見つかりませんでした）</x:String>
+  <x:String x:Key="Text.Video.PlayPauseTip" xml:space="preserve">再生 / 一時停止 (Space)</x:String>
+  <x:String x:Key="Text.Video.MuteTip" xml:space="preserve">ミュート</x:String>
+  <x:String x:Key="Text.Video.VolumeTip" xml:space="preserve">音量</x:String>
+  <x:String x:Key="Text.Video.LoopTip" xml:space="preserve">ループ再生</x:String>
+  <x:String x:Key="Text.Video.RateTip" xml:space="preserve">再生速度</x:String>
+  <x:String x:Key="Text.Update.AvailableHeader" xml:space="preserve">新しいバージョンが利用可能です</x:String>
+  <x:String x:Key="Text.Update.Checking" xml:space="preserve">更新を確認しています...</x:String>
+  <x:String x:Key="Text.Update.DownloadAndInstall" xml:space="preserve">ダウンロードしてインストール</x:String>
+  <x:String x:Key="Text.Update.ErrorHeader" xml:space="preserve">更新の確認に失敗しました</x:String>
+  <x:String x:Key="Text.Update.IgnoreThisVersion" xml:space="preserve">このバージョンをスキップ</x:String>
+  <x:String x:Key="Text.Update.Title" xml:space="preserve">ソフトウェアの更新</x:String>
+  <x:String x:Key="Text.Update.UpToDate" xml:space="preserve">お使いのバージョンは最新です</x:String>
+  <x:String x:Key="Text.View.Compact" xml:space="preserve">コンパクトビュー</x:String>
+  <x:String x:Key="Text.View.Details" xml:space="preserve">詳細</x:String>
+  <x:String x:Key="Text.View.ExtraLarge" xml:space="preserve">特大アイコン</x:String>
+  <x:String x:Key="Text.View.FileExtensions" xml:space="preserve">ファイル名拡張子</x:String>
+  <x:String x:Key="Text.View.HiddenFiles" xml:space="preserve">隠しファイル</x:String>
+  <x:String x:Key="Text.View.ItemCheckBoxes" xml:space="preserve">項目チェックボックス</x:String>
+  <x:String x:Key="Text.View.Large" xml:space="preserve">大アイコン</x:String>
+  <x:String x:Key="Text.View.List" xml:space="preserve">一覧</x:String>
+  <x:String x:Key="Text.View.Medium" xml:space="preserve">中アイコン</x:String>
+  <x:String x:Key="Text.View.NavigationPane" xml:space="preserve">ナビゲーションウィンドウ</x:String>
+  <x:String x:Key="Text.View.PreviewPane" xml:space="preserve">プレビューウィンドウ</x:String>
+  <x:String x:Key="Text.View.Small" xml:space="preserve">小アイコン</x:String>
+  <x:String x:Key="Text.View.StatusBar" xml:space="preserve">ステータスバー</x:String>
+</ResourceDictionary>

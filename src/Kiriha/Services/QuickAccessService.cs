@@ -112,42 +112,59 @@ internal static partial class QuickAccessService
         var root = (IShellItem)wrappers.GetOrCreateObjectForComInstance(rootPtr, CreateObjectFlags.None);
         Marshal.Release(rootPtr);
 
-        hr = root.BindToHandler(0, BhidEnumItems, IidIEnumShellItems, out var enumPtr);
-        if (hr < 0 || enumPtr == 0)
+        // 列挙で作った RCW は、この専用 STA スレッドが生きているうちに手放す
+        IEnumShellItems? enumItems = null;
+        try
         {
-            Logger.Log($"クイックアクセスの列挙に失敗（BindToHandler hr=0x{hr:X8}）。フォールバック表示に切り替えます", LogLevel.Warning);
-            return;
+            hr = root.BindToHandler(0, BhidEnumItems, IidIEnumShellItems, out var enumPtr);
+            if (hr < 0 || enumPtr == 0)
+            {
+                Logger.Log($"クイックアクセスの列挙に失敗（BindToHandler hr=0x{hr:X8}）。フォールバック表示に切り替えます", LogLevel.Warning);
+                return;
+            }
+
+            enumItems = (IEnumShellItems)wrappers.GetOrCreateObjectForComInstance(enumPtr, CreateObjectFlags.None);
+            Marshal.Release(enumPtr);
+
+            // 重複排除はリスト線形照合だと O(m²) になるため HashSet で行う（フォルダーとファイルで別集合）
+            var seenFolders = new HashSet<string>(WindowsPathIdentity.Instance);
+            var seenRecent = new HashSet<string>(WindowsPathIdentity.Instance);
+
+            while (enumItems.Next(1, out var itemPtr, out var fetched) == 0 && fetched == 1 && itemPtr != 0)
+            {
+                var item = (IShellItem)wrappers.GetOrCreateObjectForComInstance(itemPtr, CreateObjectFlags.None);
+                Marshal.Release(itemPtr);
+
+                try
+                {
+                    // クイックアクセスの列挙にはフォルダーと「最近使用したファイル」が混ざる
+                    var path = GetDisplayName(item, SigdnFilesysPath);
+                    if (path is null)
+                    {
+                        continue;
+                    }
+
+                    var (target, seen) = Directory.Exists(path)
+                        ? (folders, seenFolders)
+                        : File.Exists(path) ? (recent, seenRecent) : (null, null);
+                    if (target is null || seen is null || !seen.Add(path))
+                    {
+                        continue;
+                    }
+
+                    var name = GetDisplayName(item, SigdnNormalDisplay) ?? Path.GetFileName(path);
+                    target.Add((name, path));
+                }
+                finally
+                {
+                    ComRelease.Release(item);
+                }
+            }
         }
-
-        var enumItems = (IEnumShellItems)wrappers.GetOrCreateObjectForComInstance(enumPtr, CreateObjectFlags.None);
-        Marshal.Release(enumPtr);
-
-        // 重複排除はリスト線形照合だと O(m²) になるため HashSet で行う（フォルダーとファイルで別集合）
-        var seenFolders = new HashSet<string>(WindowsPathIdentity.Instance);
-        var seenRecent = new HashSet<string>(WindowsPathIdentity.Instance);
-
-        while (enumItems.Next(1, out var itemPtr, out var fetched) == 0 && fetched == 1 && itemPtr != 0)
+        finally
         {
-            var item = (IShellItem)wrappers.GetOrCreateObjectForComInstance(itemPtr, CreateObjectFlags.None);
-            Marshal.Release(itemPtr);
-
-            // クイックアクセスの列挙にはフォルダーと「最近使用したファイル」が混ざる
-            var path = GetDisplayName(item, SigdnFilesysPath);
-            if (path is null)
-            {
-                continue;
-            }
-
-            var (target, seen) = Directory.Exists(path)
-                ? (folders, seenFolders)
-                : File.Exists(path) ? (recent, seenRecent) : (null, null);
-            if (target is null || seen is null || !seen.Add(path))
-            {
-                continue;
-            }
-
-            var name = GetDisplayName(item, SigdnNormalDisplay) ?? Path.GetFileName(path);
-            target.Add((name, path));
+            ComRelease.Release(enumItems);
+            ComRelease.Release(root);
         }
     }
 
@@ -168,12 +185,12 @@ internal static partial class QuickAccessService
         var profile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         var candidates = new (string Name, string Path)[]
         {
-            ("デスクトップ", Environment.GetFolderPath(Environment.SpecialFolder.Desktop)),
-            ("ダウンロード", Path.Combine(profile, "Downloads")),
-            ("ドキュメント", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)),
-            ("ピクチャ", Environment.GetFolderPath(Environment.SpecialFolder.MyPictures)),
-            ("ミュージック", Environment.GetFolderPath(Environment.SpecialFolder.MyMusic)),
-            ("ビデオ", Environment.GetFolderPath(Environment.SpecialFolder.MyVideos)),
+            (LocalizationService.Text("Text.Folder.Desktop"), Environment.GetFolderPath(Environment.SpecialFolder.Desktop)),
+            (LocalizationService.Text("Text.Folder.Downloads"), Path.Combine(profile, "Downloads")),
+            (LocalizationService.Text("Text.Folder.Documents"), Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)),
+            (LocalizationService.Text("Text.Folder.Pictures"), Environment.GetFolderPath(Environment.SpecialFolder.MyPictures)),
+            (LocalizationService.Text("Text.Folder.Music"), Environment.GetFolderPath(Environment.SpecialFolder.MyMusic)),
+            (LocalizationService.Text("Text.Folder.Videos"), Environment.GetFolderPath(Environment.SpecialFolder.MyVideos)),
         };
 
         foreach (var (name, path) in candidates)

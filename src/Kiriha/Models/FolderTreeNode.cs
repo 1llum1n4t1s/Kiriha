@@ -49,7 +49,7 @@ public sealed partial class FolderTreeNode : ObservableObject
 
     /// <summary>展開矢印を出すためのプレースホルダー。実際の子は展開時に置き換える。</summary>
     public void AddPlaceholder()
-        => Children.Add(new FolderTreeNode { Name = "読み込み中...", Path = "", Icon = "" });
+        => Children.Add(new FolderTreeNode { Name = LocalizationService.Text("Text.Tree.Loading"), Path = "", Icon = "" });
 
     /// <summary>子の列挙を開始し、完了を待てるようにする（初回のみ実列挙、以降は同じ Task を返す）。
     /// UI スレッドから呼ぶこと。</summary>
@@ -96,12 +96,12 @@ public sealed partial class FolderTreeNode : ObservableObject
         var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         if (documents.Length > 0)
         {
-            children.Add(CreateFolderNode(documents, "マイ ドキュメント", "📄"));
+            children.Add(CreateFolderNode(documents, LocalizationService.Text("Text.Tree.MyDocuments"), "📄"));
         }
 
         var computer = new FolderTreeNode
         {
-            Name = "マイ コンピュータ",
+            Name = LocalizationService.Text("Text.Tree.MyComputer"),
             Path = FileSystemService.ComputerPath,
             Icon = "💻",
             Kind = NodeKind.Computer,

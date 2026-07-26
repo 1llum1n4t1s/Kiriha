@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Threading;
+using Kiriha.Services;
 
 namespace Kiriha.Views;
 
@@ -20,8 +21,8 @@ public partial class DragPreviewWindow : Window
     private const int VkControl = 0x11;
 
     private readonly DispatcherTimer _followTimer = new() { Interval = TimeSpan.FromMilliseconds(16) };
-    private string _operationText = "ドラッグ中";
-    private string _resolvedOperationText = "ドラッグ中";
+    private string _operationText = LocalizationService.Text("Text.Drag.Dragging");
+    private string _resolvedOperationText = LocalizationService.Text("Text.Drag.Dragging");
 
     public DragPreviewWindow()
     {
@@ -39,8 +40,8 @@ public partial class DragPreviewWindow : Window
         DragPreviewIcon.Text = entries.All(entry => entry.IsDirectory) ? "📁" : entries.Count > 1 ? "📦" : "📄";
         DragPreviewTitle.Text = string.IsNullOrWhiteSpace(firstName) ? first.Path : firstName;
         DragPreviewDetail.Text = entries.Count == 1
-            ? first.IsDirectory ? "フォルダー" : "ファイル"
-            : $"{entries.Count} 個の項目";
+            ? LocalizationService.Text(first.IsDirectory ? "Text.Drag.Folder" : "Text.Drag.File")
+            : LocalizationService.Text("Text.Status.ItemCount", entries.Count);
         BackCard1.IsVisible = entries.Count > 1;
         BackCard2.IsVisible = entries.Count > 2;
     }
@@ -87,9 +88,9 @@ public partial class DragPreviewWindow : Window
         Position = new PixelPoint(Math.Max(workArea.X, x), Math.Max(workArea.Y, y));
 
         var operation = IsKeyDown(VkControl)
-            ? "コピー"
+            ? LocalizationService.Text("Text.Drag.Copy")
             : IsKeyDown(VkShift)
-                ? "移動"
+                ? LocalizationService.Text("Text.Drag.Move")
                 : _resolvedOperationText;
         if (_operationText != operation)
         {
@@ -101,14 +102,14 @@ public partial class DragPreviewWindow : Window
     public void SetDropOperation(DragDropEffects effect, bool isBookmark, bool isTabOpen = false)
     {
         _resolvedOperationText = isTabOpen
-            ? "タブで開く"
+            ? LocalizationService.Text("Text.Drag.OpenInTab")
             : isBookmark
-                ? "追加"
+                ? LocalizationService.Text("Text.Drag.Add")
                 : effect.HasFlag(DragDropEffects.Copy)
-                    ? "コピー"
+                    ? LocalizationService.Text("Text.Drag.Copy")
                     : effect.HasFlag(DragDropEffects.Move)
-                        ? "移動"
-                        : "ドラッグ中";
+                        ? LocalizationService.Text("Text.Drag.Move")
+                        : LocalizationService.Text("Text.Drag.Dragging");
     }
 
     private static bool IsKeyDown(int virtualKey) => (GetKeyState(virtualKey) & 0x8000) != 0;
