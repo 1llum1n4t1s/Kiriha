@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Kiriha is a Windows desktop file manager (Avalonia UI, .NET 10, native AOT) that intentionally combines two UI vocabularies: **Chrome-inspired vertical tabs / bookmarks / settings**, and **Windows Explorer's** navigation and file behavior (breadcrumb address bar, command bar, shell context menus, quick access, clipboard/DnD semantics). When implementing a feature, the default is "match what Explorer does" unless the feature is inherently tab/browser-shaped (in which case "match what Chrome does").
 
-The desktop app is the only .NET project: `src/Kiriha/Kiriha.csproj` (no test project, no CI config). The repository also contains the local signed-release pipeline in `scripts/release-local.ps1` and the Cloudflare Worker / landing page in `web/`.
+`Kiriha.slnx` holds two .NET projects: the app (`src/Kiriha/Kiriha.csproj`) and its xUnit v3 test project (`tests/Kiriha.Tests/Kiriha.Tests.csproj`). There is no CI config — verification is local. The repository also contains the local signed-release pipeline in `scripts/release-local.ps1` and the Cloudflare Worker / landing page in `web/`.
 
 ## Build & run
 
@@ -14,6 +14,15 @@ The desktop app is the only .NET project: `src/Kiriha/Kiriha.csproj` (no test pr
 dotnet build src/Kiriha/Kiriha.csproj      # or: dotnet build Kiriha.slnx
 dotnet run --project src/Kiriha/Kiriha.csproj
 ```
+
+Tests:
+
+```bash
+dotnet test tests/Kiriha.Tests/Kiriha.Tests.csproj
+dotnet test tests/Kiriha.Tests/Kiriha.Tests.csproj --filter "FullyQualifiedName~LocaleDetectionTests"
+```
+
+**`dotnet build Kiriha.slnx` and `dotnet build <csproj>` write to two different output trees.** `Kiriha.slnx` pins `Platform=x64`, which lands in `bin/x64/<Config>/…`; building a csproj directly (and `dotnet test`, which resolves the assembly the same way) uses `bin/<Config>/…`. So `dotnet build Kiriha.slnx -c Release` followed by `dotnet test … --no-build` silently runs a **stale** assembly from the other tree and can report an outdated pass count. Prefer plain `dotnet test` (let it build); if you use `--no-build`, build the test csproj itself first, not the solution.
 
 Native AOT publish:
 
@@ -27,13 +36,17 @@ From Git Bash, AOT's link step needs vswhere on PATH or it fails:
 export PATH="$PATH:/c/Program Files (x86)/Microsoft Visual Studio/Installer"
 ```
 
-When an explicit release is requested, use the `vava` workflow: `vava.config.json` invokes `scripts/release-local.ps1`, which publishes and signs the x64/ARM64 Velopack artifacts, uploads them to Cloudflare R2, verifies delivery, and prunes obsolete packages. The script has external effects and reads the Cloudflare credential from `C:\Users\IMT\dev\Secret\secrets.json`; do not use it as a normal build or verification command. `web/worker.js` serves both the landing page and R2-hosted update files through `kiriha.nephilim.jp`.
+When an explicit release is requested, use the `vava` workflow: `vava.config.json` invokes `scripts/release-local.ps1`, which publishes and signs the x64/ARM64 Velopack artifacts, uploads them to Cloudflare R2, verifies delivery, and prunes obsolete packages. The script has external effects and reads the Cloudflare credential from `C:\Users\IMT\dev\Secret\secrets.json`; do not use it as a normal build or verification command. `web/worker.js` serves both the landing page and R2-hosted update files through `kiriha.kagayoi.com`.
 
 `TreatWarningsAsErrors` is on (`Directory.Build.props`). `IL3053` is suppressed in the csproj — it's a known false-positive from Velopack's COM interop that ILC misreads as invalid IL; don't "fix" it, it's already handled.
 
 `RestorePackagesWithLockFile` is on, so `src/Kiriha/packages.lock.json` is committed and `dotnet restore` validates against it. Changing a `PackageReference` regenerates the lock file — commit that change together with the csproj edit rather than deleting the lock file.
 
-There are no automated tests. Verification is: build clean (0 warnings), run the Debug exe, and screenshot/exercise the actual UI for anything touching XAML or interaction — a green build does not mean a feature works.
+Verification is: build clean (0 warnings), `dotnet test` green, and — for anything touching XAML or interaction — run the Debug exe and screenshot/exercise the actual UI. The tests deliberately cover only what can be checked without touching real user data or a live UI (pure logic, path/format handling, settings serialization, locale resources); a green build and green tests still do not mean a feature works on screen.
+
+**Tests must never touch the real `%LocalAppData%\Kiriha` or `HKCU\Software\Kiriha`.** `AppStoragePaths.OverrideForTests` redirects both, and `AppStorageScope` (tests/Kiriha.Tests/TestSupport.cs) is the `using`-scoped wrapper that sets and restores them. Because that override is static, every test that touches persistence must join the `AppStorageCollection` xUnit collection so they run serially — parallel runs race on the override and can write to the developer's real settings. `TempDirectory` builds throwaway trees (and strips Hidden/System/ReadOnly on cleanup), and `CultureScope.With` pins a culture on a dedicated thread so it can't leak into other tests through async flow.
+
+`xUnit1051` is suppressed in the test csproj on purpose: the concurrency tests coordinate with `Barrier`/`CountdownEvent`, so honoring a cancellation token would turn a failure into a hang instead of a deterministic assert.
 
 ## Architecture
 
@@ -46,7 +59,15 @@ There are no automated tests. Verification is: build clean (0 warnings), run the
 - `ClipboardFileService` — process-wide cut/copy state (`CutStateChanged` event) so every tab's file list can show the Explorer-style "cut item is translucent" effect, not just the tab that did the cutting.
 - `AppSettings` (Services/SettingsService.cs) — the JSON-serialized (source-generated, AOT-safe) blob persisted to `%LocalAppData%\Kiriha\settings.json`: pinned tabs, bookmarks tree, window bounds, view-mode default, theme, startup path, etc. `MainWindowViewModel` holds the one `AppSettings` instance and writes through `SettingsService.Save` on every relevant mutation — there's no debounce, so don't be surprised by frequent small writes.
 
-**Licensing is a one-time purchase with a signed-key scheme** (Services/LicenseService.cs, no external license library). State machine: `Licensed` / `Trial` (14 days, start date persisted in both `%LocalAppData%\Kiriha\trial.dat` and `HKCU\Software\Kiriha\TrialStart`, earliest wins) / `TrialExpired` / `OnlineCheckRequired` (a valid key whose online revocation check hasn't succeeded for 30 days). Keys are `KIRIHA-<base64url(payload)>.<base64url(sig)>`, ECDSA P-256-signed and verified offline against public keys embedded in `PublicKeysSpki` (an array to allow key rotation — never change the key format itself; the private key lives outside the repo in `dev\Secret\kiriha-license`). Purchase and revocation are served by the Sekisho hub (`sekisho.nephilim.jp`, external dependency); revocation checks fall back to the `kiriha.nephilim.jp/license/check` compat proxy. **There is deliberately no device/seat limit** — one purchase means one key that works on any number of machines, and the only enforcement is per-purchase revocation (a refund invalidates the key on every machine at its next check). The app sends only the purchase ID, no device identifier, so a limit could not be added on the hub alone; don't add one without an explicit decision to change the product. When `TrialExpired`/`OnlineCheckRequired`, `MainWindowViewModel.IsLicenseLocked` becomes true: `MainWindow.axaml` shows a modal lock overlay **and** the main-content Grid is disabled via `IsEnabled="{Binding !IsLicenseLocked}"` — both are required (the overlay only blocks pointer input; control-attached `KeyDown` handlers like `FileList_KeyDown` fire before `Window.OnKeyDown`'s lock guard, so keyboard paths are only blocked by the `IsEnabled` binding). Keep all three in sync when touching lock behavior.
+**The UI ships in 17 languages and the mechanism is copied from the sibling project `Komorebi`** (`../Komorebi` — check there first when extending localization). `Assets/Locales/<key>.axaml` is one `ResourceDictionary` of `x:String` entries per language; `App.axaml` holds *all* of them as keyed `ResourceInclude`s, and `LocalizationService.SetLocale` swaps just the active one into `Application.Resources.MergedDictionaries`. That is what makes every `{DynamicResource Text.*}` in XAML re-resolve instantly on a language change, with no restart.
+
+- **`Models/Locale.Supported` is the single list of languages.** Adding one means: the entry there, a new `Assets/Locales/<key>.axaml`, and a matching `ResourceInclude` in `App.axaml`. Missing any of the three fails either the build or `LocaleResourceTests`.
+- **Every locale file must carry the identical key set** (currently 345) with identical `{0}`/`{1}` placeholder counts. `LocaleResourceTests` enforces both — a key missing from one language would otherwise render as the raw key string in that language only.
+- **Strings built in C#** (status bar, error text, dynamically built shell/context menus, Exif labels, tray menu) go through `LocalizationService.Text(key)` / `Text(key, args)`, which resolves against `Application.Resources` at call time and returns the key itself when unresolved. Values that are computed once and cached must be re-resolved: `ContextAction`, `DetailColumnViewModel`, `KirihaUpdateStrings` and the settings tab's title hold the *key* and either compute on read or subscribe to `LocalizationService.Changed`. Log messages are deliberately left as Japanese literals — they are diagnostics, not UI.
+- **The default is auto-detection, not Japanese.** `AppSettings.Locale` is `""` on a fresh install, and `LocalizationService.MatchLocale` maps `CultureInfo.CurrentUICulture` onto the supported set (zh Hant/TW/HK/MO → `zh_TW`, `fil`/`tl` → `fil_PH`, region variants collapse to the base language, two-letter keys `sa`/`la` match directly, everything else falls back to `en_US`). Only an explicit pick in the settings dropdown writes a concrete key.
+- Because there is no Avalonia `Application` in the test process, `LocalizationService.ResolverOverride` (internal, same spirit as `AppStoragePaths.OverrideForTests`) lets the test assembly's module initializer load `ja_JP.axaml` from disk so tests asserting user-facing Japanese keep working.
+
+**Licensing is a one-time purchase with a signed-key scheme** (Services/LicenseService.cs, no external license library). State machine: `Licensed` / `Trial` (14 days, start date persisted in both `%LocalAppData%\Kiriha\trial.dat` and `HKCU\Software\Kiriha\TrialStart`, earliest wins) / `TrialExpired` / `OnlineCheckRequired` (a valid key whose online revocation check hasn't succeeded for 30 days). Keys are `KIRIHA-<base64url(payload)>.<base64url(sig)>`, ECDSA P-256-signed and verified offline against public keys embedded in `PublicKeysSpki` (an array to allow key rotation — never change the key format itself; the private key lives outside the repo in `dev\Secret\kiriha-license`). Purchase and revocation are served by the Sekisho hub (`sekisho.kagayoi.com`, external dependency); revocation checks fall back to the `kiriha.kagayoi.com/license/check` compat proxy. **There is deliberately no device/seat limit** — one purchase means one key that works on any number of machines, and the only enforcement is per-purchase revocation (a refund invalidates the key on every machine at its next check). The app sends only the purchase ID, no device identifier, so a limit could not be added on the hub alone; don't add one without an explicit decision to change the product. When `TrialExpired`/`OnlineCheckRequired`, `MainWindowViewModel.IsLicenseLocked` becomes true: `MainWindow.axaml` shows a modal lock overlay **and** the main-content Grid is disabled via `IsEnabled="{Binding !IsLicenseLocked}"` — both are required (the overlay only blocks pointer input; control-attached `KeyDown` handlers like `FileList_KeyDown` fire before `Window.OnKeyDown`'s lock guard, so keyboard paths are only blocked by the `IsEnabled` binding). Keep all three in sync when touching lock behavior.
 
 `Program` enforces a **single process** with a named mutex. Later launches forward up to 32 startup arguments through a current-user-only named pipe, and `App` dispatches them to `MainWindowViewModel.OpenShellPaths` on the UI thread. When changing startup or activation behavior, preserve the pending-activation handoff used before the UI handler is registered. For manual launch testing, make sure the process under test is the first Kiriha instance; otherwise the new process exits after notifying the existing window.
 
@@ -91,7 +112,7 @@ There are no automated tests. Verification is: build clean (0 warnings), run the
 
 ## Conventions specific to this repo
 
-- All user-facing strings and code comments are Japanese (see any existing file). Keep new UI text and comments in Japanese to match.
+- Code comments, XML docs, log messages and commit messages are Japanese (see any existing file). Keep writing them in Japanese to match. User-facing strings are the exception: they are no longer literals at all — add a `Text.*` key to every locale file and reference it (see the localization section).
 - No dependency injection container — everything is constructed directly and wired via constructor params / shared instances passed down from `MainWindowViewModel`.
 - For app-supplied helper commands (terminal, PowerShell, cmd, Explorer, editor), use `TrustedProcessLauncher` and argument lists instead of concatenating a command line. Direct `UseShellExecute` remains appropriate when opening the user-selected file itself through its registered shell handler.
 - Avalonia 12's `WindowDecorations="BorderOnly"` is used deliberately so the custom-drawn caption buttons in the tab strip don't double up with OS-drawn ones — if captions ever look doubled, this is the property to check, not a bug in the custom buttons.
