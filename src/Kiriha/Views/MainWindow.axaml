@@ -24,7 +24,8 @@
         <!-- Lhamiel / RealTimeTranslator と同等のアクリル背景（設定 > 表示 でON/OFF）。
              実際にぼかしが乗るには Window.Background 側（TabStripBg）が透明である必要があり、
              ON/OFF の色差し替えは ThemeService.ApplyAcrylicBackgrounds が担う。 -->
-        <ExperimentalAcrylicBorder IsHitTestVisible="False">
+        <ExperimentalAcrylicBorder IsHitTestVisible="False"
+                                   IsVisible="{Binding OptUseAcrylicBackground}">
             <ExperimentalAcrylicBorder.Material>
                 <ExperimentalAcrylicMaterial BackgroundSource="Digger" MaterialOpacity="0.85"
                                              TintColor="{DynamicResource AcrylicTintColor}" TintOpacity="0.9" />
@@ -243,7 +244,7 @@
                     </Grid>
                 </Border>
             </Grid>
-            <Thumb x:Name="VerticalTabsResizeThumb" Grid.Column="1" Classes="colsplit panesplit"
+            <Thumb x:Name="VerticalTabsResizeThumb" Grid.Column="1" Classes="tabsplit"
                    AutomationProperties.Name="{DynamicResource Text.A11y.ResizeVerticalTabs}"
                    DragDelta="VerticalTabsThumb_DragDelta" />
         </Grid>

@@ -136,16 +136,16 @@ public static class ThemeService
     //  ACCENT_ENABLE_ACRYLICBLURBEHIND 経路ではほとんど効かない。0.85→0.97 に上げても
     //  実測で 1 段しか変わらなかったため、濃さの調整はこちらのアルファで行う。）
 
-    /// <summary>コンテンツ部の不透明度（読みやすさ優先で最も濃い）。</summary>
-    private const byte ContentAlpha = 0xF2;
+    /// <summary>コンテンツ部の不透明度（文字を読む面なので最も濃い）。</summary>
+    private const byte ContentAlpha = 0xE6;
 
     /// <summary>クロム部（サイドバー/アドレスバー/ステータスバー）の不透明度。</summary>
-    private const byte ChromeAlpha = 0xEC;
+    private const byte ChromeAlpha = 0xDB;
 
     /// <summary>ぼかしの上に敷くテーマ色の膜の不透明度。タブストリップや垂直タブの背後など、
     /// 面が乗らない場所の濃さはこれで決まる。0 にすると壁紙のぼかしがそのまま出て、
-    /// 不透明な面と明らかに色が違って見える。</summary>
-    private const byte ScrimAlpha = 0xF0;
+    /// 不透明な面と明らかに色が違って見えるので、テーマの色味は残る程度に留める。</summary>
+    private const byte ScrimAlpha = 0xC7;
 
     private static void ApplyAcrylicBackgrounds(Application app)
     {

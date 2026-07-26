@@ -261,9 +261,22 @@
                 </ControlTemplate>
             </Setter>
         </Style>
-        <!-- 垂直タブ / クイックアクセスの両境界は、同じ5pxヒット領域の中央に同じ1px線を描く。 -->
+        <!-- クイックアクセス境界は、5pxヒット領域の中央に1px線を描く。 -->
         <Style Selector="Thumb.panesplit">
             <Setter Property="Width" Value="5" />
+        </Style>
+        <!-- 垂直タブ列の境界は線を描かない。ウィンドウ地とコンテンツの島の境目には
+             島自身の輪郭線が既にあり、そこへ更に1px線を足すと二重線に見えるため。
+             掴む幅（5px）とカーソルはそのまま残す。 -->
+        <Style Selector="Thumb.tabsplit">
+            <Setter Property="Width" Value="5" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Cursor" Value="SizeWestEast" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="Transparent" />
+                </ControlTemplate>
+            </Setter>
         </Style>
         <!-- 行の高さ変更用の Thumb（ギャラリーのサムネイルストリップ境界など） -->
         <Style Selector="Thumb.rowsplit">
