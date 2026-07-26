@@ -16,6 +16,10 @@ internal sealed class FolderViewSettings
 
     public bool SortAscending { get; set; } = true;
 
+    /// <summary>詳細表示の列幅（キーは DetailColumnViewModel.Key）。
+    /// 未保存のフォルダーでは空で、その場合は設定の既定幅を使う。</summary>
+    public Dictionary<string, double> ColumnWidths { get; set; } = [];
+
     public long UpdatedUtcTicks { get; set; }
 }
 
@@ -333,7 +337,12 @@ internal sealed class FolderViewSettingsService : IDisposable
         => left.ViewMode == right.ViewMode
            && left.IconSize.Equals(right.IconSize)
            && left.SortKey == right.SortKey
-           && left.SortAscending == right.SortAscending;
+           && left.SortAscending == right.SortAscending
+           && HasSameColumnWidths(left.ColumnWidths, right.ColumnWidths);
+
+    private static bool HasSameColumnWidths(Dictionary<string, double> left, Dictionary<string, double> right)
+        => left.Count == right.Count
+           && left.All(pair => right.TryGetValue(pair.Key, out var width) && width.Equals(pair.Value));
 
     private static FolderViewSettings Clone(FolderViewSettings source)
         => new()
@@ -343,6 +352,8 @@ internal sealed class FolderViewSettingsService : IDisposable
             IconSize = source.IconSize,
             SortKey = source.SortKey,
             SortAscending = source.SortAscending,
+            // 旧形式（列幅を持たない）や手書きの null を読み込んでも落ちないよう空辞書へ寄せる。
+            ColumnWidths = source.ColumnWidths is null ? [] : new Dictionary<string, double>(source.ColumnWidths),
             UpdatedUtcTicks = source.UpdatedUtcTicks,
         };
 }

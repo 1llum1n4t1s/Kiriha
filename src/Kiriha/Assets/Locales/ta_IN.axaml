@@ -112,7 +112,10 @@
   <x:String x:Key="Text.Launch.Failed" xml:space="preserve">தொடங்க முடியவில்லை: {0}</x:String>
   <x:String x:Key="Text.Launch.TerminalFailed" xml:space="preserve">டெர்மினலைத் தொடங்க முடியவில்லை: {0}</x:String>
   <x:String x:Key="Text.License.Activate" xml:space="preserve">செயல்படுத்து</x:String>
+  <x:String x:Key="Text.License.CodePlaceholder" xml:space="preserve">6 இலக்க குறியீடு</x:String>
+  <x:String x:Key="Text.License.EmailPlaceholder" xml:space="preserve">வாங்கும்போது பயன்படுத்திய மின்னஞ்சல்</x:String>
   <x:String x:Key="Text.License.Exit" xml:space="preserve">வெளியேறு</x:String>
+  <x:String x:Key="Text.License.KeyFallback" xml:space="preserve">உரிம விசையை நேரடியாக உள்ளிடவும்</x:String>
   <x:String x:Key="Text.License.KeyPlaceholder" xml:space="preserve">KIRIHA- என்று தொடங்கும் உரிமக் குறியீடு</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckBody" xml:space="preserve">உரிமம் 30 நாட்களுக்கு மேலாக ஆன்லைனில் சரிபார்க்கப்படவில்லை. இணையத்துடன் இணைத்து “மீண்டும் ஆன்லைனில் சரிபார்” என்பதை அழுத்தவும்.</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckTitle" xml:space="preserve">உரிமத்தை ஆன்லைனில் சரிபார்க்க வேண்டும்</x:String>
@@ -121,15 +124,26 @@
   <x:String x:Key="Text.License.Msg.Activated" xml:space="preserve">உரிமம் செயல்படுத்தப்பட்டது 🎉 மிக்க நன்றி!</x:String>
   <x:String x:Key="Text.License.Msg.CheckOk" xml:space="preserve">சரிபார்ப்பு முடிந்தது. Kiriha ஐப் பயன்படுத்தியதற்கு நன்றி!</x:String>
   <x:String x:Key="Text.License.Msg.Checking" xml:space="preserve">ஆன்லைனில் சரிபார்க்கிறது…</x:String>
+  <x:String x:Key="Text.License.Msg.CodeSent" xml:space="preserve">உறுதிப்படுத்தல் குறியீட்டை மின்னஞ்சலில் அனுப்பியுள்ளோம். பெற்ற 6 இலக்கங்களை உள்ளிடவும்.</x:String>
+  <x:String x:Key="Text.License.Msg.CodeTooSoon" xml:space="preserve">அதிக முறை கோரப்பட்டது. சுமார் 30 வினாடிகள் காத்திருந்து மீண்டும் முயற்சிக்கவும்.</x:String>
+  <x:String x:Key="Text.License.Msg.EnterCode" xml:space="preserve">மின்னஞ்சலில் வந்த 6 இலக்க குறியீட்டை உள்ளிடவும்.</x:String>
+  <x:String x:Key="Text.License.Msg.EnterEmail" xml:space="preserve">வாங்கும்போது பயன்படுத்திய மின்னஞ்சல் முகவரியை உள்ளிடவும்.</x:String>
   <x:String x:Key="Text.License.Msg.EnterKey" xml:space="preserve">கொள்முதலின்போது வழங்கப்பட்ட உரிமக் குறியீட்டை உள்ளிடவும்.</x:String>
+  <x:String x:Key="Text.License.Msg.InvalidCode" xml:space="preserve">குறியீடு தவறானது அல்லது காலாவதியானது. புதிய குறியீட்டை அனுப்பவும்.</x:String>
   <x:String x:Key="Text.License.Msg.InvalidKey" xml:space="preserve">இந்த உரிமக் குறியீடு சரியில்லை. நகலெடுக்கும்போது எழுத்துகள் விடுபட்டதா அல்லது கூடுதல் இடைவெளி வந்ததா எனப் பாருங்கள்.</x:String>
+  <x:String x:Key="Text.License.Msg.NoPurchase" xml:space="preserve">இந்த மின்னஞ்சல் முகவரிக்கான கொள்முதல் காணப்படவில்லை. வாங்கும்போது பயன்படுத்திய முகவரியைச் சரிபார்க்கவும்.</x:String>
   <x:String x:Key="Text.License.Msg.PurchaseFailed" xml:space="preserve">கொள்முதல் பக்கத்தைத் திறக்க முடியவில்லை. சிறிது நேரம் கழித்து மீண்டும் முயலவும்.</x:String>
-  <x:String x:Key="Text.License.Msg.PurchaseOpened" xml:space="preserve">உலாவியில் கொள்முதல் பக்கம் திறக்கப்பட்டது. உறுதிப்படுத்தல் பக்கத்தில் காட்டப்படும் உரிமக் குறியீட்டை மேலே ஒட்டவும்.</x:String>
+  <x:String x:Key="Text.License.Msg.PurchaseOpened" xml:space="preserve">உலாவியில் கொள்முதல் பக்கம் திறக்கப்பட்டது. முடிந்ததும், மேலே உள்ள மின்னஞ்சல் புலத்தில் இருந்து செயல்படுத்தலாம்.</x:String>
   <x:String x:Key="Text.License.Msg.Revoked" xml:space="preserve">இந்த உரிமம் இனி செல்லாது (எடுத்துக்காட்டாக, பணம் திரும்பப்பெறப்பட்டது). மீண்டும் வாங்கவும்.</x:String>
+  <x:String x:Key="Text.License.Msg.Sending" xml:space="preserve">உறுதிப்படுத்தல் குறியீடு அனுப்பப்படுகிறது…</x:String>
   <x:String x:Key="Text.License.Msg.ServerUnreachable" xml:space="preserve">சேவையகத்தை அணுக முடியவில்லை. உங்கள் இணைய இணைப்பைச் சரிபார்த்து மீண்டும் முயலவும்.</x:String>
+  <x:String x:Key="Text.License.Msg.Verifying" xml:space="preserve">சரிபார்க்கிறது…</x:String>
   <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">கொள்முதல் பக்கத்தைத் திற (¥980, ஒரு முறை)</x:String>
-  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">வாங்கிய பிறகு, கட்டண உறுதிப்படுத்தல் பக்கத்தில் உரிமக் குறியீடு காட்டப்படும். கணக்கோ கடவுச்சொல்லோ தேவையில்லை.</x:String>
+  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">கணக்கு பதிவு அல்லது கடவுச்சொல் தேவையில்லை. ¥980 ஒரே முறை கொள்முதல், கணினிகளின் எண்ணிக்கையில் வரம்பு இல்லை.</x:String>
   <x:String x:Key="Text.License.Recheck" xml:space="preserve">மீண்டும் ஆன்லைனில் சரிபார்</x:String>
+  <x:String x:Key="Text.License.RecoverNote" xml:space="preserve">வாங்கும்போது பயன்படுத்திய மின்னஞ்சலுக்கு உறுதிப்படுத்தல் குறியீட்டை அனுப்புவோம். உரிம விசை தேவையில்லை.</x:String>
+  <x:String x:Key="Text.License.ResendCode" xml:space="preserve">குறியீட்டை மீண்டும் அனுப்பு</x:String>
+  <x:String x:Key="Text.License.SendCode" xml:space="preserve">குறியீட்டை அனுப்பு</x:String>
   <x:String x:Key="Text.License.Status.Licensed" xml:space="preserve">உரிமம் செயல்படுத்தப்பட்டது: {0}</x:String>
   <x:String x:Key="Text.License.Status.OnlineCheck" xml:space="preserve">உரிமத்தை ஆன்லைனில் சரிபார்க்க வேண்டும் (இணையத்துடன் இணைக்கவும்)</x:String>
   <x:String x:Key="Text.License.Status.Trial" xml:space="preserve">சோதனைக் காலம் ({0} நாட்கள் மீதம்)</x:String>
@@ -189,6 +203,13 @@
   <x:String x:Key="Text.Settings.DefaultFolderApp" xml:space="preserve">கோப்புறைகளையும் இயக்ககங்களையும் திறக்க Kiriha ஐ இயல்புநிலை பயன்பாடாக அமை</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.Off" xml:space="preserve">இயக்கினால், எக்ஸ்ப்ளோரரில் கோப்புறை அல்லது இயக்ககத்தைத் திறக்கும்போது Kiriha தொடங்கும்.</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.On" xml:space="preserve">தற்போது கோப்புறைகளும் இயக்ககங்களும் Kiriha இல் திறக்கின்றன. முடக்கினால் முந்தைய நடத்தை மீட்கப்படும்.</x:String>
+  <x:String x:Key="Text.Settings.DefaultView" xml:space="preserve">கோப்புறையின் இயல்புநிலைக் காட்சி</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.Mode" xml:space="preserve">காட்சி முறை</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.Note" xml:space="preserve">காட்சி முறையைச் சேமிக்காத கோப்புறைகள் இந்த அமைப்புடன் திறக்கும். ஒரு கோப்புறையில் காட்சி முறையையோ வரிசையையோ மாற்றினால், அது அந்தக் கோப்புறைக்கு மட்டும் நினைவில் வைக்கப்படும்.</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.Reset" xml:space="preserve">ஒவ்வொரு கோப்புறையின் காட்சி அமைப்புகளை மீட்டமை</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.ResetDone" xml:space="preserve">ஒவ்வொரு கோப்புறையின் காட்சி அமைப்புகள் நீக்கப்பட்டன.</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.ResetNote" xml:space="preserve">ஒவ்வொரு கோப்புறையிலும் நினைவில் வைத்த காட்சி முறை, வரிசை, நெடுவரிசை அகலம் அனைத்தையும் நீக்கி, மேலே உள்ள இயல்புநிலைக்குத் திரும்பும்.</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.Sort" xml:space="preserve">வரிசைப்படுத்தல்</x:String>
   <x:String x:Key="Text.Settings.Display" xml:space="preserve">தோற்றம்</x:String>
   <x:String x:Key="Text.Settings.Display.Subtitle" xml:space="preserve">கோப்புப் பட்டியலின் தோற்றத்தையும் Kiriha இன் வடிவமைப்பையும் சரிசெய்யுங்கள்</x:String>
   <x:String x:Key="Text.Settings.Explorer" xml:space="preserve">கோப்புப் பட்டியல்</x:String>

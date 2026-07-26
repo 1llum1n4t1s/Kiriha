@@ -112,7 +112,10 @@
   <x:String x:Key="Text.Launch.Failed" xml:space="preserve">आरम्भः न शक्यते: {0}</x:String>
   <x:String x:Key="Text.Launch.TerminalFailed" xml:space="preserve">आदेशपटलं न आरब्धम्: {0}</x:String>
   <x:String x:Key="Text.License.Activate" xml:space="preserve">सक्रियं कुरु</x:String>
+  <x:String x:Key="Text.License.CodePlaceholder" xml:space="preserve">षड्अङ्कसङ्केतः</x:String>
+  <x:String x:Key="Text.License.EmailPlaceholder" xml:space="preserve">क्रयकाले प्रयुक्तं विद्युत्पत्रम्</x:String>
   <x:String x:Key="Text.License.Exit" xml:space="preserve">निर्गच्छ</x:String>
+  <x:String x:Key="Text.License.KeyFallback" xml:space="preserve">अनुज्ञाकुञ्चिकां साक्षात् लिखतु</x:String>
   <x:String x:Key="Text.License.KeyPlaceholder" xml:space="preserve">KIRIHA- इत्यनेन आरभमाणा अनुज्ञाकुञ्चिका</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckBody" xml:space="preserve">त्रिंशद्दिनेभ्यः अधिकं यावत् अनुज्ञापत्रं जालमाध्यमेन न परीक्षितम्। अन्तर्जालेन संयोज्य “पुनः जालमाध्यमेन परीक्षय” इति नुद।</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckTitle" xml:space="preserve">अनुज्ञापत्रस्य जालपरीक्षा आवश्यका</x:String>
@@ -121,15 +124,26 @@
   <x:String x:Key="Text.License.Msg.Activated" xml:space="preserve">अनुज्ञापत्रं सक्रियं जातम् 🎉 बहु धन्यवादाः!</x:String>
   <x:String x:Key="Text.License.Msg.CheckOk" xml:space="preserve">परीक्षा समाप्ता। Kiriha इत्यस्य उपयोगाय धन्यवादाः!</x:String>
   <x:String x:Key="Text.License.Msg.Checking" xml:space="preserve">जालमाध्यमेन परीक्ष्यते…</x:String>
+  <x:String x:Key="Text.License.Msg.CodeSent" xml:space="preserve">सत्यापनसङ्केतः विद्युत्पत्रेण प्रेषितः। प्राप्तान् षड् अङ्कान् लिखतु।</x:String>
+  <x:String x:Key="Text.License.Msg.CodeTooSoon" xml:space="preserve">अतिशीघ्रं पुनः याचितम्। त्रिंशत्सेकण्ड्-पर्यन्तं प्रतीक्ष्य पुनः प्रयततु।</x:String>
+  <x:String x:Key="Text.License.Msg.EnterCode" xml:space="preserve">विद्युत्पत्रे प्राप्तं षड्अङ्कसङ्केतं लिखतु।</x:String>
+  <x:String x:Key="Text.License.Msg.EnterEmail" xml:space="preserve">क्रयकाले प्रयुक्तं विद्युत्पत्राभिलेखं लिखतु।</x:String>
   <x:String x:Key="Text.License.Msg.EnterKey" xml:space="preserve">क्रयकाले दत्तां अनुज्ञाकुञ्चिकां प्रविशय।</x:String>
+  <x:String x:Key="Text.License.Msg.InvalidCode" xml:space="preserve">सङ्केतः अशुद्धः अथवा कालातीतः। पुनः नूतनं सङ्केतं प्रेषयतु।</x:String>
   <x:String x:Key="Text.License.Msg.InvalidKey" xml:space="preserve">इयम् अनुज्ञाकुञ्चिका न सम्यक्। प्रतिलेखनकाले किमपि अक्षरं लुप्तं वा अधिकम् अवकाशः आगतः इति पश्य।</x:String>
+  <x:String x:Key="Text.License.Msg.NoPurchase" xml:space="preserve">अस्य विद्युत्पत्रस्य कृते क्रयः न प्राप्तः। क्रयकाले प्रयुक्तम् अभिलेखं परीक्षतु।</x:String>
   <x:String x:Key="Text.License.Msg.PurchaseFailed" xml:space="preserve">क्रयपृष्ठं न उद्घाटितम्। कञ्चित्कालं यावत् प्रतीक्ष्य पुनः प्रयत्नं कुरु।</x:String>
-  <x:String x:Key="Text.License.Msg.PurchaseOpened" xml:space="preserve">जालदर्शके क्रयपृष्ठम् उद्घाटितम्। पुष्टिपृष्ठे दृश्यमानाम् अनुज्ञाकुञ्चिकाम् उपरि लेपय।</x:String>
+  <x:String x:Key="Text.License.Msg.PurchaseOpened" xml:space="preserve">अन्वेषके क्रयपृष्ठम् उद्घाटितम्। क्रये समाप्ते उपरि स्थिते विद्युत्पत्रक्षेत्रे प्रमाणीकरणं कर्तुं शक्यते।</x:String>
   <x:String x:Key="Text.License.Msg.Revoked" xml:space="preserve">इदम् अनुज्ञापत्रं न वैधम् (यथा धनप्रत्यर्पणम्)। पुनः क्रीणीहि।</x:String>
+  <x:String x:Key="Text.License.Msg.Sending" xml:space="preserve">सत्यापनसङ्केतः प्रेष्यते…</x:String>
   <x:String x:Key="Text.License.Msg.ServerUnreachable" xml:space="preserve">सेवकः न प्राप्तः। जालसंयोगं परीक्ष्य पुनः प्रयत्नं कुरु।</x:String>
+  <x:String x:Key="Text.License.Msg.Verifying" xml:space="preserve">सत्यापनं क्रियते…</x:String>
   <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">क्रयपृष्ठम् उद्घाटय (¥980, एकवारम्)</x:String>
-  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">क्रयानन्तरं मूल्यपुष्टिपृष्ठे अनुज्ञाकुञ्चिका दृश्यते। लेखा वा गुप्तशब्दः न आवश्यकः।</x:String>
+  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">लेखा-पञ्जीकरणं गुप्तशब्दो वा न आवश्यकः। ¥980 एकवारं क्रयः, गणकयन्त्राणां संख्यायां सीमा नास्ति।</x:String>
   <x:String x:Key="Text.License.Recheck" xml:space="preserve">पुनः जालमाध्यमेन परीक्षय</x:String>
+  <x:String x:Key="Text.License.RecoverNote" xml:space="preserve">क्रयकाले प्रयुक्ताय विद्युत्पत्राय सत्यापनसङ्केतं प्रेषयिष्यामः। अनुज्ञाकुञ्चिका न आवश्यका।</x:String>
+  <x:String x:Key="Text.License.ResendCode" xml:space="preserve">सङ्केतं पुनः प्रेषयतु</x:String>
+  <x:String x:Key="Text.License.SendCode" xml:space="preserve">सङ्केतं प्रेषयतु</x:String>
   <x:String x:Key="Text.License.Status.Licensed" xml:space="preserve">अनुज्ञापत्रं सक्रियम्: {0}</x:String>
   <x:String x:Key="Text.License.Status.OnlineCheck" xml:space="preserve">अनुज्ञापत्रस्य जालपरीक्षा आवश्यका (अन्तर्जालेन संयोजय)</x:String>
   <x:String x:Key="Text.License.Status.Trial" xml:space="preserve">परीक्षाकालः (शिष्टाः {0} दिनानि)</x:String>
@@ -189,6 +203,13 @@
   <x:String x:Key="Text.Settings.DefaultFolderApp" xml:space="preserve">कोष्ठानां चालकानां च उद्घाटनाय Kiriha इत्येतत् प्रामाणिकम् अनुप्रयोगं कुरु</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.Off" xml:space="preserve">सक्रिये सति, सञ्चिकादर्शकात् कोष्ठं वा चालकं उद्घाटयति चेत् Kiriha आरभते।</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.On" xml:space="preserve">सम्प्रति कोष्ठानि चालकाश्च Kiriha इत्यत्र उद्घाट्यन्ते। निष्क्रिये सति पूर्वव्यवहारः पुनरागच्छति।</x:String>
+  <x:String x:Key="Text.Settings.DefaultView" xml:space="preserve">पुटिकायाः पूर्वनिर्धारितं दर्शनम्</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.Mode" xml:space="preserve">दर्शनप्रकारः</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.Note" xml:space="preserve">यासु पुटिकासु दर्शनप्रकारः न सञ्चितः, ताः एतैः विकल्पैः उद्घाट्यन्ते। पुटिकायां दर्शनप्रकारः क्रमः वा परिवर्त्यते चेत् तत् तस्यै एव पुटिकायै स्मर्यते।</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.Reset" xml:space="preserve">प्रतिपुटिकादर्शनविकल्पान् पुनःस्थापयतु</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.ResetDone" xml:space="preserve">प्रतिपुटिकादर्शनविकल्पाः अपाकृताः।</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.ResetNote" xml:space="preserve">प्रतिपुटिकं स्मृतान् दर्शनप्रकारान् क्रमान् स्तम्भविस्तारांश्च सर्वान् अपाकरोति, उपरिस्थं पूर्वनिर्धारितं च प्रत्यानयति।</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.Sort" xml:space="preserve">क्रमीकरणम्</x:String>
   <x:String x:Key="Text.Settings.Display" xml:space="preserve">दर्शनम्</x:String>
   <x:String x:Key="Text.Settings.Display.Subtitle" xml:space="preserve">सञ्चिकासूच्याः दर्शनं Kiriha इत्यस्य रूपं च समायोजय</x:String>
   <x:String x:Key="Text.Settings.Explorer" xml:space="preserve">सञ्चिकासूची</x:String>

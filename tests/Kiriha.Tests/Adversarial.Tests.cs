@@ -467,6 +467,48 @@ public class FolderViewSettingsServiceChaosTests
     }
 
     /// @severity=high
+    /// @description 列幅はフォルダーごとに記憶する。旧バージョンが書いた ColumnWidths 無しの
+    /// エントリや、手書きの null が混ざっていても落ちずに空として扱えること。
+    [Fact]
+    public void 列幅を持たない旧形式の設定でも読み書きできること()
+    {
+        using var scope = new AppStorageScope();
+        File.WriteAllText(
+            scope.FolderViewsPath,
+            """
+            {"Folders":[
+              {"Path":"C:/old","ViewMode":"Details","IconSize":28,"SortKey":"Name","SortAscending":true,"UpdatedUtcTicks":100},
+              {"Path":"C:/null","ViewMode":"Details","IconSize":28,"SortKey":"Name","SortAscending":true,"ColumnWidths":null,"UpdatedUtcTicks":100}
+            ]}
+            """);
+
+        using var service = new FolderViewSettingsService();
+
+        Assert.True(service.TryGet(@"C:\old", out var old));
+        Assert.Empty(old.ColumnWidths);
+        Assert.True(service.TryGet(@"C:\null", out var nulled));
+        Assert.Empty(nulled.ColumnWidths);
+
+        // 列幅だけが違う設定も「変更あり」として保存対象になること（幅の変更が捨てられない）。
+        service.Set(@"C:\old", new FolderViewSettings
+        {
+            ViewMode = "Details",
+            IconSize = 28,
+            SortKey = "Name",
+            SortAscending = true,
+            ColumnWidths = new Dictionary<string, double> { ["Name"] = 420 },
+        });
+        service.Flush();
+
+        Assert.True(service.TryGet(@"C:\old", out var updated));
+        Assert.Equal(420, updated.ColumnWidths["Name"]);
+
+        var reloaded = TestFolderView.ReadStore(scope.FolderViewsPath).Folders
+            .Single(folder => folder.Path == @"C:\old");
+        Assert.Equal(420, reloaded.ColumnWidths["Name"]);
+    }
+
+    /// @severity=high
     /// @description 区切り文字統一の強化以前に C:/work と C:\work の両方が記録されていた場合、
     /// 読み込み時に同じキーへ畳まれる。保存は新しい順に並ぶため素朴に代入すると古い方が勝ってしまう。
     /// 更新日時が新しいエントリが残ること。

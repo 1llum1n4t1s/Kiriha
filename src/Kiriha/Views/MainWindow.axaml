@@ -724,8 +724,14 @@
 
                             <Grid Grid.Column="2" RowDefinitions="Auto,*">
                                 <!-- 詳細表示のカラムヘッダー（クリックでソート / Thumb で幅変更） -->
-                                <ItemsControl Grid.Row="0" ItemsSource="{Binding DetailColumns}"
+                                <!-- 行と一緒に横スクロールさせるため、ヘッダーは一覧のスクロール量だけ
+                                     RenderTransform でずらす（DetailsList_ScrollChanged）。ClipToBounds が
+                                     無いと、ずらした分がペインの外側へはみ出して描かれる。 -->
+                                <ItemsControl Grid.Row="0"
+                                              ItemsSource="{Binding DetailColumns}"
                                               Margin="12,2,0,2" Background="Transparent"
+                                              ClipToBounds="True"
+                                              RenderTransform="{Binding DetailHeaderTransform}"
                                               PointerReleased="ColumnHeader_PointerReleased"
                                               IsVisible="{Binding IsDetailsView}">
                                     <ItemsControl.ItemsPanel>
@@ -760,6 +766,8 @@
                                     <!-- 詳細表示 -->
                                     <ListBox Classes="files details"
                                              Margin="0,0,8,0"
+                                             ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                             ScrollViewer.ScrollChanged="DetailsList_ScrollChanged"
                                              IsVisible="{Binding IsDetailsView}"
                                              ItemsSource="{Binding Entries}"
                                              SelectedItem="{Binding SelectedEntry}"
@@ -1047,13 +1055,15 @@
                                                             AutomationProperties.Name="{DynamicResource Text.Gallery.Zoom}"
                                                             ToolTip.Tip="{DynamicResource Text.Gallery.ZoomTip}"
                                                             Value="{Binding GalleryZoom, Mode=TwoWay}" />
-                                                    <TextBlock Text="{Binding GalleryZoomText}" Classes="videotime"
-                                                               Width="46" TextAlignment="Right" Margin="6,0,4,0" />
-                                                    <Button Classes="videobtn" Width="52"
+                                                    <!-- 倍率の表示そのものを「押すと 100% に戻る」ボタンにする。
+                                                         現在の倍率と 100% ボタンが並んでいると、どちらが現在値なのか
+                                                         読み取れないため、1 つにまとめてある（等倍のときは押せない）。 -->
+                                                    <Button Classes="videobtn" Width="58" Margin="4,0,0,0"
                                                             Command="{Binding ResetGalleryZoomCommand}"
+                                                            IsEnabled="{Binding CanResetGalleryView}"
                                                             AutomationProperties.Name="{DynamicResource Text.Gallery.ZoomReset}"
                                                             ToolTip.Tip="{DynamicResource Text.Gallery.ZoomReset}">
-                                                        <TextBlock Text="100%" FontSize="11.5" />
+                                                        <TextBlock Text="{Binding GalleryZoomText}" FontSize="12" />
                                                     </Button>
                                                 </StackPanel>
 
@@ -1307,8 +1317,35 @@
                 </StackPanel>
                 <TextBlock FontSize="12" TextWrapping="Wrap"
                            Foreground="{DynamicResource TextSecondary}"
-                           Text="{DynamicResource Text.License.PurchaseNote}" />
+                           Text="{DynamicResource Text.License.RecoverNote}" />
+                <!-- 設定タブと同じ導線（メールアドレス + 6 桁コード）。片方だけ直すと
+                     ロック中の利用者がキーを持っていないと詰むので、両方を揃えて保つ。 -->
                 <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBox Width="280" PlaceholderText="{DynamicResource Text.License.EmailPlaceholder}"
+                             Text="{Binding LicenseEmailInput}" />
+                    <Button Classes="cmd" Content="{DynamicResource Text.License.SendCode}"
+                            Command="{Binding SendLicenseCodeCommand}"
+                            IsEnabled="{Binding !IsLicenseBusy}"
+                            BorderBrush="{DynamicResource Divider}" BorderThickness="1" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding IsLicenseCodeSent}">
+                    <TextBox Width="150" MaxLength="6"
+                             PlaceholderText="{DynamicResource Text.License.CodePlaceholder}"
+                             Text="{Binding LicenseCodeInput}" />
+                    <Button Classes="cmd" Content="{DynamicResource Text.License.Activate}"
+                            Command="{Binding RedeemLicenseCodeCommand}"
+                            IsEnabled="{Binding !IsLicenseBusy}"
+                            BorderBrush="{DynamicResource Divider}" BorderThickness="1" />
+                    <Button Classes="cmd" Content="{DynamicResource Text.License.ResendCode}"
+                            Command="{Binding SendLicenseCodeCommand}"
+                            IsEnabled="{Binding !IsLicenseBusy}"
+                            BorderBrush="{DynamicResource Divider}" BorderThickness="1" />
+                </StackPanel>
+                <Button Classes="cmd" Content="{DynamicResource Text.License.KeyFallback}"
+                        Command="{Binding ToggleLicenseKeyEntryCommand}"
+                        HorizontalAlignment="Left" Background="Transparent" BorderThickness="0" />
+                <StackPanel Orientation="Horizontal" Spacing="8"
+                            IsVisible="{Binding IsLicenseKeyEntryVisible}">
                     <TextBox Width="330" PlaceholderText="{DynamicResource Text.License.KeyPlaceholder}"
                              Text="{Binding LicenseKeyInput}" />
                     <Button Classes="cmd" Content="{DynamicResource Text.License.Activate}"

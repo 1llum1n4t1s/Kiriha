@@ -112,7 +112,10 @@
   <x:String x:Key="Text.Launch.Failed" xml:space="preserve">起動できませんでした: {0}</x:String>
   <x:String x:Key="Text.Launch.TerminalFailed" xml:space="preserve">ターミナルを起動できませんでした: {0}</x:String>
   <x:String x:Key="Text.License.Activate" xml:space="preserve">認証する</x:String>
+  <x:String x:Key="Text.License.CodePlaceholder" xml:space="preserve">6 桁の確認コード</x:String>
+  <x:String x:Key="Text.License.EmailPlaceholder" xml:space="preserve">購入時のメールアドレス</x:String>
   <x:String x:Key="Text.License.Exit" xml:space="preserve">終了する</x:String>
+  <x:String x:Key="Text.License.KeyFallback" xml:space="preserve">ライセンスキーを直接入力する</x:String>
   <x:String x:Key="Text.License.KeyPlaceholder" xml:space="preserve">KIRIHA- で始まるライセンスキー</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckBody" xml:space="preserve">30 日以上オンライン確認ができていません。インターネットに接続して「再確認」を押してください。</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckTitle" xml:space="preserve">ライセンスのオンライン確認が必要です</x:String>
@@ -121,15 +124,26 @@
   <x:String x:Key="Text.License.Msg.Activated" xml:space="preserve">ライセンス認証が完了しました 🎉 ありがとうございます！</x:String>
   <x:String x:Key="Text.License.Msg.CheckOk" xml:space="preserve">確認が完了しました。ご利用ありがとうございます！</x:String>
   <x:String x:Key="Text.License.Msg.Checking" xml:space="preserve">オンラインで確認しています…</x:String>
+  <x:String x:Key="Text.License.Msg.CodeSent" xml:space="preserve">確認コードをメールで送りました。届いた 6 桁の数字を入力してください。</x:String>
+  <x:String x:Key="Text.License.Msg.CodeTooSoon" xml:space="preserve">送信の間隔が短すぎます。30 秒ほど待ってからもう一度お試しください。</x:String>
+  <x:String x:Key="Text.License.Msg.EnterCode" xml:space="preserve">メールに届いた 6 桁のコードを入力してください。</x:String>
+  <x:String x:Key="Text.License.Msg.EnterEmail" xml:space="preserve">購入時のメールアドレスを入力してください。</x:String>
   <x:String x:Key="Text.License.Msg.EnterKey" xml:space="preserve">購入時に発行されたライセンスキーを入力してください。</x:String>
+  <x:String x:Key="Text.License.Msg.InvalidCode" xml:space="preserve">コードが違うか、有効期限が切れています。もう一度コードを送ってください。</x:String>
   <x:String x:Key="Text.License.Msg.InvalidKey" xml:space="preserve">ライセンスキーが正しくありません。コピーの際に欠けや余分な空白がないかご確認ください。</x:String>
+  <x:String x:Key="Text.License.Msg.NoPurchase" xml:space="preserve">このメールアドレスでのご購入が見つかりませんでした。購入時のアドレスをご確認ください。</x:String>
   <x:String x:Key="Text.License.Msg.PurchaseFailed" xml:space="preserve">購入ページを開けませんでした。時間をおいてもう一度お試しください。</x:String>
-  <x:String x:Key="Text.License.Msg.PurchaseOpened" xml:space="preserve">ブラウザーで購入ページを開きました。決済完了ページに表示されるライセンスキーを上の欄に貼り付けてください。</x:String>
+  <x:String x:Key="Text.License.Msg.PurchaseOpened" xml:space="preserve">ブラウザーで購入ページを開きました。購入が終わったら、上のメールアドレス欄から認証できます。</x:String>
   <x:String x:Key="Text.License.Msg.Revoked" xml:space="preserve">ライセンスが無効になっています（返金済み等）。再度ご購入ください。</x:String>
+  <x:String x:Key="Text.License.Msg.Sending" xml:space="preserve">確認コードを送っています…</x:String>
   <x:String x:Key="Text.License.Msg.ServerUnreachable" xml:space="preserve">サーバーに接続できませんでした。ネットワーク接続を確認してもう一度お試しください。</x:String>
+  <x:String x:Key="Text.License.Msg.Verifying" xml:space="preserve">確認しています…</x:String>
   <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">購入ページを開く（¥980 買い切り）</x:String>
-  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">購入すると決済完了ページにライセンスキーが表示されます。アカウント登録やパスワードは不要です。</x:String>
+  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">アカウント登録やパスワードは不要です。¥980 の買い切りで、使える台数に制限はありません。</x:String>
   <x:String x:Key="Text.License.Recheck" xml:space="preserve">オンラインで再確認する</x:String>
+  <x:String x:Key="Text.License.RecoverNote" xml:space="preserve">購入時のメールアドレスに確認コードを送ります。ライセンスキーの入力は不要です。</x:String>
+  <x:String x:Key="Text.License.ResendCode" xml:space="preserve">コードを再送</x:String>
+  <x:String x:Key="Text.License.SendCode" xml:space="preserve">確認コードを送る</x:String>
   <x:String x:Key="Text.License.Status.Licensed" xml:space="preserve">ライセンス認証済み: {0}</x:String>
   <x:String x:Key="Text.License.Status.OnlineCheck" xml:space="preserve">ライセンスのオンライン確認が必要です（インターネットに接続してください）</x:String>
   <x:String x:Key="Text.License.Status.Trial" xml:space="preserve">試用期間中（残り {0} 日）</x:String>
@@ -189,6 +203,13 @@
   <x:String x:Key="Text.Settings.DefaultFolderApp" xml:space="preserve">フォルダーとドライブを開く既定のアプリを Kiriha にする</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.Off" xml:space="preserve">有効にすると、エクスプローラーでフォルダーやドライブを開いたときに Kiriha が起動します。</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.On" xml:space="preserve">現在、フォルダーとドライブは Kiriha で開きます。解除すると変更前の動作へ戻します。</x:String>
+  <x:String x:Key="Text.Settings.DefaultView" xml:space="preserve">フォルダーの既定表示</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.Mode" xml:space="preserve">表示方法</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.Note" xml:space="preserve">表示方法を保存していないフォルダーは、この設定で開きます。フォルダーで表示方法や並べ替えを変えると、そのフォルダーだけ個別に記憶されます。</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.Reset" xml:space="preserve">フォルダーごとの表示設定をリセット</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.ResetDone" xml:space="preserve">フォルダーごとの表示設定を削除しました。</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.ResetNote" xml:space="preserve">各フォルダーで記憶した表示方法・並べ替え・列幅をすべて削除し、上の既定に戻します。</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.Sort" xml:space="preserve">並べ替え</x:String>
   <x:String x:Key="Text.Settings.Display" xml:space="preserve">表示</x:String>
   <x:String x:Key="Text.Settings.Display.Subtitle" xml:space="preserve">ファイル一覧の見え方とKirihaの外観を調整します</x:String>
   <x:String x:Key="Text.Settings.Explorer" xml:space="preserve">エクスプローラー表示</x:String>

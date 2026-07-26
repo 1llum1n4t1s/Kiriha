@@ -1369,7 +1369,7 @@ public partial class MainWindow : Window
     {
         if (ViewModel is { } vm)
         {
-            vm.VerticalTabWidth = Math.Round(Math.Clamp(vm.VerticalTabWidth + e.Vector.X, 180, 420));
+            vm.VerticalTabWidth = Math.Round(Math.Clamp(vm.VerticalTabWidth + e.Vector.X, MainWindowViewModel.MinVerticalTabWidth, MainWindowViewModel.MaxVerticalTabWidth));
         }
     }
 
@@ -1814,6 +1814,25 @@ public partial class MainWindow : Window
     }
 
     // ===== 詳細表示のカラム幅変更 =====
+
+    /// <summary>
+    /// 詳細表示を横スクロールしたとき、列ヘッダーを同じ量だけずらして行と揃える。
+    ///
+    /// ヘッダーは一覧の外（別の Grid 行）に置いてあるので、一覧のスクロールには乗らない。
+    /// ヘッダーごと一つの ScrollViewer へ入れる手もあるが、そうすると一覧の縦方向の
+    /// 仮想化スクロールと入れ子になってしまうため、位置合わせだけをここで行う。
+    ///
+    /// ヘッダーは DataTemplate の中にあり x:Name では引けない（NameScope に登録されない）ので、
+    /// ずらす量はタブの ViewModel が持つ Transform へ書き込み、XAML 側がそれをまるごと束縛する。
+    /// </summary>
+    private void DetailsList_ScrollChanged(object? sender, ScrollChangedEventArgs e)
+    {
+        if (sender is Control { DataContext: TabViewModel tab } list
+            && list.FindDescendantOfType<ScrollViewer>() is { } scroll)
+        {
+            tab.SetDetailHeaderOffset(scroll.Offset.X);
+        }
+    }
 
     private void ColumnThumb_DragDelta(object? sender, VectorEventArgs e)
     {

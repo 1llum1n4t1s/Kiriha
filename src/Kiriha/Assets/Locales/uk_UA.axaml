@@ -112,7 +112,10 @@
   <x:String x:Key="Text.Launch.Failed" xml:space="preserve">Не вдалося запустити: {0}</x:String>
   <x:String x:Key="Text.Launch.TerminalFailed" xml:space="preserve">Не вдалося запустити Термінал: {0}</x:String>
   <x:String x:Key="Text.License.Activate" xml:space="preserve">Активувати</x:String>
+  <x:String x:Key="Text.License.CodePlaceholder" xml:space="preserve">6-значний код</x:String>
+  <x:String x:Key="Text.License.EmailPlaceholder" xml:space="preserve">Ел. пошта, указана під час покупки</x:String>
   <x:String x:Key="Text.License.Exit" xml:space="preserve">Вийти</x:String>
+  <x:String x:Key="Text.License.KeyFallback" xml:space="preserve">Ввести ліцензійний ключ</x:String>
   <x:String x:Key="Text.License.KeyPlaceholder" xml:space="preserve">Ліцензійний ключ, що починається з KIRIHA-</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckBody" xml:space="preserve">Ліцензію не перевіряли онлайн понад 30 днів. Підключіться до інтернету й натисніть «Перевірити онлайн ще раз».</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckTitle" xml:space="preserve">Ліцензію потрібно перевірити онлайн</x:String>
@@ -121,15 +124,26 @@
   <x:String x:Key="Text.License.Msg.Activated" xml:space="preserve">Ліцензію активовано 🎉 Щиро дякуємо!</x:String>
   <x:String x:Key="Text.License.Msg.CheckOk" xml:space="preserve">Перевірку завершено. Дякуємо, що користуєтеся Kiriha!</x:String>
   <x:String x:Key="Text.License.Msg.Checking" xml:space="preserve">Перевіряємо онлайн…</x:String>
+  <x:String x:Key="Text.License.Msg.CodeSent" xml:space="preserve">Код підтвердження надіслано на пошту. Введіть отримані 6 цифр.</x:String>
+  <x:String x:Key="Text.License.Msg.CodeTooSoon" xml:space="preserve">Забагато запитів. Зачекайте близько 30 секунд і спробуйте ще раз.</x:String>
+  <x:String x:Key="Text.License.Msg.EnterCode" xml:space="preserve">Введіть 6-значний код із листа.</x:String>
+  <x:String x:Key="Text.License.Msg.EnterEmail" xml:space="preserve">Введіть адресу ел. пошти, указану під час покупки.</x:String>
   <x:String x:Key="Text.License.Msg.EnterKey" xml:space="preserve">Введіть ліцензійний ключ, виданий під час покупки.</x:String>
+  <x:String x:Key="Text.License.Msg.InvalidCode" xml:space="preserve">Код неправильний або прострочений. Надішліть код ще раз.</x:String>
   <x:String x:Key="Text.License.Msg.InvalidKey" xml:space="preserve">Цей ліцензійний ключ недійсний. Перевірте, чи не загубилися символи й чи не скопіювалися зайві пробіли.</x:String>
+  <x:String x:Key="Text.License.Msg.NoPurchase" xml:space="preserve">Покупку з цією адресою ел. пошти не знайдено. Перевірте адресу, указану під час покупки.</x:String>
   <x:String x:Key="Text.License.Msg.PurchaseFailed" xml:space="preserve">Не вдалося відкрити сторінку покупки. Спробуйте пізніше.</x:String>
-  <x:String x:Key="Text.License.Msg.PurchaseOpened" xml:space="preserve">Сторінку покупки відкрито в браузері. Вставте у поле вище ліцензійний ключ зі сторінки підтвердження.</x:String>
+  <x:String x:Key="Text.License.Msg.PurchaseOpened" xml:space="preserve">Сторінку покупки відкрито у браузері. Після покупки активуйте через поле ел. пошти вище.</x:String>
   <x:String x:Key="Text.License.Msg.Revoked" xml:space="preserve">Ця ліцензія більше недійсна (наприклад, після повернення коштів). Придбайте її ще раз.</x:String>
+  <x:String x:Key="Text.License.Msg.Sending" xml:space="preserve">Надсилання коду підтвердження…</x:String>
   <x:String x:Key="Text.License.Msg.ServerUnreachable" xml:space="preserve">Не вдалося зв'язатися із сервером. Перевірте підключення до мережі й спробуйте ще раз.</x:String>
+  <x:String x:Key="Text.License.Msg.Verifying" xml:space="preserve">Перевірка…</x:String>
   <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">Відкрити сторінку покупки (¥980, разово)</x:String>
-  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">Після покупки ліцензійний ключ відображається на сторінці підтвердження оплати. Обліковий запис і пароль не потрібні.</x:String>
+  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">Обліковий запис і пароль не потрібні. Разова покупка за ¥980, без обмеження кількості комп'ютерів.</x:String>
   <x:String x:Key="Text.License.Recheck" xml:space="preserve">Перевірити онлайн ще раз</x:String>
+  <x:String x:Key="Text.License.RecoverNote" xml:space="preserve">Ми надішлемо код підтвердження на адресу, указану під час покупки. Ліцензійний ключ не потрібен.</x:String>
+  <x:String x:Key="Text.License.ResendCode" xml:space="preserve">Надіслати код ще раз</x:String>
+  <x:String x:Key="Text.License.SendCode" xml:space="preserve">Надіслати код</x:String>
   <x:String x:Key="Text.License.Status.Licensed" xml:space="preserve">Ліцензію активовано: {0}</x:String>
   <x:String x:Key="Text.License.Status.OnlineCheck" xml:space="preserve">Ліцензію потрібно перевірити онлайн (підключіться до інтернету)</x:String>
   <x:String x:Key="Text.License.Status.Trial" xml:space="preserve">Пробний період (залишилося днів: {0})</x:String>
@@ -189,6 +203,13 @@
   <x:String x:Key="Text.Settings.DefaultFolderApp" xml:space="preserve">Зробити Kiriha програмою за замовчуванням для відкриття папок і дисків</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.Off" xml:space="preserve">Якщо ввімкнено, Kiriha запускається щоразу, коли папку або диск відкривають із Провідника.</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.On" xml:space="preserve">Зараз папки та диски відкриваються в Kiriha. Якщо вимкнути, повернеться попередня поведінка.</x:String>
+  <x:String x:Key="Text.Settings.DefaultView" xml:space="preserve">Типовий вигляд папок</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.Mode" xml:space="preserve">Вигляд</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.Note" xml:space="preserve">Папки без збереженого вигляду відкриваються з цими налаштуваннями. Якщо змінити вигляд або сортування в папці, це збережеться лише для неї.</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.Reset" xml:space="preserve">Скинути налаштування вигляду для папок</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.ResetDone" xml:space="preserve">Налаштування вигляду для папок видалено.</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.ResetNote" xml:space="preserve">Видаляє вигляд, сортування та ширину стовпців, запам'ятовані для кожної папки, і повертає типові значення вище.</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.Sort" xml:space="preserve">Сортування</x:String>
   <x:String x:Key="Text.Settings.Display" xml:space="preserve">Вигляд</x:String>
   <x:String x:Key="Text.Settings.Display.Subtitle" xml:space="preserve">Налаштуйте вигляд списку файлів і оформлення Kiriha</x:String>
   <x:String x:Key="Text.Settings.Explorer" xml:space="preserve">Список файлів</x:String>

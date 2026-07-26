@@ -31,6 +31,10 @@ public partial class TabViewModel : ObservableObject
     private readonly Stack<string> _forward = new();
     private readonly ShellOptions _options;
     private readonly FolderViewSettingsService? _folderViewSettings;
+
+    /// <summary>設定画面で決めた「フォルダーの既定表示」を取り出す（表示設定を保存していない
+    /// フォルダーへ移ったときに使う）。ドロップ表示用のタブなど、既定を持たない場合は null。</summary>
+    private readonly Func<FolderViewSettings>? _defaultViewSettings;
     private readonly CancellationTokenSource _lifetimeCts = new();
     private CancellationTokenSource? _filterDebounceCts;
     private bool _isDetached;
@@ -112,6 +116,22 @@ public partial class TabViewModel : ObservableObject
     /// <summary>検索ボックスの内容（現在のフォルダー内をインクリメンタル絞り込み）。</summary>
     [ObservableProperty]
     private string _searchText = "";
+
+    /// <summary>
+    /// 詳細表示の列ヘッダーへ掛ける横方向のずらし（一覧の横スクロールに追従させる）。
+    ///
+    /// ヘッダーは一覧の外（別の Grid 行）にあるので一覧のスクロールには乗らない。
+    /// ギャラリーの拡大縮小と同じ理由で、<c>RenderTransform</c> はビジュアルツリーの外に居て
+    /// DataContext を継承しないため、X を個別に Binding しても効かない。ここで組み立てた
+    /// Transform をまるごと渡し、値の更新はコードビハインドから <see cref="SetDetailHeaderOffset"/> で行う。
+    /// </summary>
+    public Transform DetailHeaderTransform { get; }
+
+    private readonly TranslateTransform _detailHeaderTranslate = new();
+
+    /// <summary>一覧の横スクロール量をヘッダーへ反映する（コードビハインドの ScrollChanged から）。</summary>
+    public void SetDetailHeaderOffset(double offsetX)
+        => _detailHeaderTranslate.X = -offsetX;
 
     /// <summary>詳細表示のカラム幅（ヘッダーの Thumb ドラッグで変更）。</summary>
     [ObservableProperty]
@@ -218,7 +238,7 @@ public partial class TabViewModel : ObservableObject
             ? Path.GetExtension(value.Name).ToLowerInvariant()
             : "";
         // 静止画は無劣化回転（保存あり）、動画は表示だけの回転。どちらもボタンは同じ。
-        CanRotateSelected = ExifOrientationService.CanRotate(extension)
+        CanRotateSelected = ImageRotationService.CanRotate(extension)
             || VideoPlaybackSession.IsPlayable(extension);
 
         if (_previewEnabled || IsGalleryView)
@@ -365,10 +385,16 @@ public partial class TabViewModel : ObservableObject
         ApplyGalleryTransform();
         OnPropertyChanged(nameof(IsGalleryZoomed));
         OnPropertyChanged(nameof(GalleryZoomText));
+        OnPropertyChanged(nameof(CanResetGalleryView));
     }
 
-    /// <summary>表示中の倍率（コントロールバーに出す文字列）。</summary>
+    /// <summary>表示中の倍率（コントロールバーに出す文字列）。この表示自体が
+    /// 「押すと 100% へ戻る」ボタンになっている。</summary>
     public string GalleryZoomText => $"{GalleryZoom * 100:0}%";
+
+    /// <summary>等倍・回転なしの状態から動いている（＝リセットに意味がある）。</summary>
+    public bool CanResetGalleryView
+        => Math.Abs(GalleryZoom - 1.0) > 0.005 || GalleryDisplayRotation != 0;
 
     /// <summary>メイン画像領域の大きさが変わったときに呼ぶ（拡大の基準点が領域の中心のため）。</summary>
     public void SetGalleryViewport(Size size)
@@ -434,7 +460,11 @@ public partial class TabViewModel : ObservableObject
     [ObservableProperty]
     private double _galleryDisplayRotation;
 
-    partial void OnGalleryDisplayRotationChanged(double value) => ApplyGalleryTransform();
+    partial void OnGalleryDisplayRotationChanged(double value)
+    {
+        ApplyGalleryTransform();
+        OnPropertyChanged(nameof(CanResetGalleryView));
+    }
 
     /// <summary>等倍より拡大されている（ドラッグでの移動を受け付ける）。</summary>
     public bool IsGalleryZoomed => GalleryZoom > 1.0;
@@ -473,8 +503,9 @@ public partial class TabViewModel : ObservableObject
     [ObservableProperty]
     private bool _canRotateSelected;
 
-    /// <summary>回転（＝Exif の書き込み）を諦めるまでの時間。</summary>
-    private static readonly TimeSpan RotateTimeout = TimeSpan.FromSeconds(10);
+    /// <summary>回転の書き込みを諦めるまでの時間。Exif の書き換えは一瞬で終わるが、
+    /// PNG は画素の並べ替えと再圧縮を挟むため、大きな画像でも間に合う長さにしてある。</summary>
+    private static readonly TimeSpan RotateTimeout = TimeSpan.FromSeconds(60);
 
     [RelayCommand]
     private Task RotateSelectedLeft() => RotateSelectedAsync(clockwise: false);
@@ -482,7 +513,8 @@ public partial class TabViewModel : ObservableObject
     [RelayCommand]
     private Task RotateSelectedRight() => RotateSelectedAsync(clockwise: true);
 
-    /// <summary>Exif の向きだけを書き換えて即座に保存し、表示とサムネイルを作り直す。
+    /// <summary>静止画を無劣化で回転して保存し、表示とサムネイルを作り直す
+    /// （JPEG / TIFF は Exif の向きだけ、PNG は画素の並べ替えと再圧縮）。
     /// 動画はファイルを触らず、表示の向きだけを回す。</summary>
     private async Task RotateSelectedAsync(bool clockwise)
     {
@@ -505,7 +537,7 @@ public partial class TabViewModel : ObservableObject
             // 他プロセス（ウイルス対策等）が oplock を握っていると、書き込み用の open は
             // 例外も出さずに待ち続けることがある。待ちきりにするとコマンドが完了扱いにならず
             // ボタンが二度と押せなくなるため、上限を切って失敗として扱う。
-            rotated = await Task.Run(() => ExifOrientationService.TryRotate(path, clockwise))
+            rotated = await Task.Run(() => ImageRotationService.TryRotate(path, clockwise))
                 .WaitAsync(RotateTimeout);
         }
         catch (TimeoutException)
@@ -536,11 +568,160 @@ public partial class TabViewModel : ObservableObject
     private void ClearPreview()
     {
         _previewCts?.Cancel();
+        ClearPrefetched();
         StopVideo();
         PreviewBitmap?.Dispose();
         PreviewBitmap = null;
         PreviewText = "";
         PreviewInfo = "";
+    }
+
+    // ===== ギャラリーの先読み =====
+    //
+    // ホイールやカーソルで隣の画像へ送るたびにその場でデコードを始めると、1 枚ごとに
+    // 待ちが入る（このマシンの実測で 5MP の PNG が 40 ms 前後、大きい写真ならもっと）。
+    // 表示中の 1 枚を出し終えてから前後 1 枚を裏でデコードしておき、選択が動いたら
+    // 待たずに差し替える。先にデコードを始めてしまうと「今出したい 1 枚」と枠を取り合うので、
+    // 仕込むのは必ず表示が済んだ後にする。
+    //
+    // 保持するのは前後 1 枚ずつだけ。ギャラリー解像度のビットマップは 1 枚で 10MB 前後あり、
+    // 半径を広げるとメモリの伸びが体感の改善に見合わない。
+
+    /// <summary>ギャラリー表示のデコード幅。先読みと本表示で必ず同じ値を使う。</summary>
+    private const int GalleryDecodeWidth = 1920;
+
+    /// <summary>プレビューでデコードを試みるファイルサイズの上限。</summary>
+    private const long PreviewSizeLimit = 64 * 1024 * 1024;
+
+    /// <summary>先読み済みのビットマップ（キーは絶対パス）。取り出した時点で所有権も渡す。</summary>
+    private readonly Dictionary<string, Bitmap> _prefetched = new(StringComparer.OrdinalIgnoreCase);
+
+    private CancellationTokenSource? _prefetchCts;
+
+    /// <summary>先読み済みなら取り出す。取り出したものはキャッシュから外れ、破棄責任は呼び出し側へ移る。</summary>
+    private Bitmap? TakePrefetched(string path)
+    {
+        if (!IsGalleryView)
+        {
+            // プレビューペインはデコード幅が違うので、ギャラリー用の 1 枚は使わない。
+            return null;
+        }
+
+        return _prefetched.Remove(path, out var bitmap) ? bitmap : null;
+    }
+
+    /// <summary>先読みを打ち切り、抱えているビットマップを破棄する。</summary>
+    private void ClearPrefetched()
+    {
+        _prefetchCts?.Cancel();
+        _prefetchCts?.Dispose();
+        _prefetchCts = null;
+
+        foreach (var bitmap in _prefetched.Values)
+        {
+            bitmap.Dispose();
+        }
+
+        _prefetched.Clear();
+    }
+
+    /// <summary>選択中の前後 1 枚を裏でデコードしておく。隣でなくなったものはここで捨てる。</summary>
+    private void PrefetchGalleryNeighbors()
+    {
+        if (!IsGalleryView || SelectedEntry is not { } current)
+        {
+            ClearPrefetched();
+            return;
+        }
+
+        var index = _entries.IndexOf(current);
+        if (index < 0)
+        {
+            ClearPrefetched();
+            return;
+        }
+
+        var targets = new List<FileSystemEntry>(2);
+        foreach (var offset in new[] { -1, 1 })
+        {
+            var neighbor = index + offset;
+            if (neighbor >= 0 && neighbor < _entries.Count && IsPrefetchable(_entries[neighbor]))
+            {
+                targets.Add(_entries[neighbor]);
+            }
+        }
+
+        // 隣から外れた分は抱えていても使われないので、ここで解放する。
+        foreach (var path in _prefetched.Keys.ToList())
+        {
+            if (!targets.Any(entry => string.Equals(entry.FullPath, path, StringComparison.OrdinalIgnoreCase)))
+            {
+                _prefetched[path].Dispose();
+                _prefetched.Remove(path);
+            }
+        }
+
+        var pending = targets.Where(entry => !_prefetched.ContainsKey(entry.FullPath)).ToList();
+        if (pending.Count == 0)
+        {
+            return;
+        }
+
+        var previous = _prefetchCts;
+        var scope = CancellationTokenSource.CreateLinkedTokenSource(_lifetimeCts.Token);
+        _prefetchCts = scope;
+        // linked CTS は _lifetimeCts へコールバック登録が残るため、打ち切ったら必ず破棄する。
+        previous?.Cancel();
+        previous?.Dispose();
+
+        var token = scope.Token;
+        foreach (var entry in pending)
+        {
+            _ = PrefetchAsync(entry.FullPath, scope, token);
+        }
+    }
+
+    /// <summary>この項目をギャラリーの先読み対象にできるか（動画・巨大ファイル・フォルダーは除く）。</summary>
+    private static bool IsPrefetchable(FileSystemEntry entry)
+        => entry is { IsDirectory: false, Size: < PreviewSizeLimit }
+           && ImageExtensions.Contains(Path.GetExtension(entry.Name).ToLowerInvariant());
+
+    private async Task PrefetchAsync(string path, CancellationTokenSource scope, CancellationToken token)
+    {
+        try
+        {
+            // ConfigureAwait(false) を外すと再開が Normal 優先度になり、利用者のクリックより前に
+            // 割り込む（Views/MainWindow.axaml.cs のサムネイル読み込みと同じ理由）。
+            var bitmap = await Task.Run(
+                () => ImageDecodeService.TryDecodeToWidth(path, GalleryDecodeWidth, token), token)
+                .ConfigureAwait(false);
+            if (bitmap is null)
+            {
+                return;
+            }
+
+            Dispatcher.UIThread.Post(
+                () =>
+                {
+                    // 待っている間に世代が変わっていたら（選択が動いた・ギャラリーを出た）捨てる。
+                    if (!ReferenceEquals(scope, _prefetchCts) || _prefetched.ContainsKey(path))
+                    {
+                        bitmap.Dispose();
+                        return;
+                    }
+
+                    _prefetched[path] = bitmap;
+                },
+                DispatcherPriority.Background);
+        }
+        catch (OperationCanceledException)
+        {
+            // 選択が動いただけなので何もしない。
+        }
+        catch (Exception ex)
+        {
+            Logger.Log($"ギャラリーの先読みに失敗: {path} ({ex.Message})", LogLevel.Debug);
+        }
     }
 
     // ===== ギャラリーの動画再生 =====
@@ -970,6 +1151,7 @@ public partial class TabViewModel : ObservableObject
 
         if (entry is null || entry.IsDirectory)
         {
+            ClearPrefetched();
             PreviewBitmap?.Dispose();
             PreviewBitmap = null;
             PreviewText = "";
@@ -999,21 +1181,28 @@ public partial class TabViewModel : ObservableObject
             PreviewBitmap = null;
             PreviewText = "";
             StartVideo(entry);
+            // 動画の隣に静止画が並んでいることは珍しくないので、ここでも先読みは仕込む。
+            PrefetchGalleryNeighbors();
             return;
         }
 
         try
         {
             // ギャラリー表示中は画面いっぱいに出すため高解像度でデコードする
-            var decodeWidth = IsGalleryView ? 1920 : 480;
-            if (ImageExtensions.Contains(ext) && entry.Size is < 64 * 1024 * 1024)
+            var decodeWidth = IsGalleryView ? GalleryDecodeWidth : 480;
+            if (ImageExtensions.Contains(ext) && entry.Size is < PreviewSizeLimit)
             {
-                var bmp = await Task.Run(
-                    () => ImageDecodeService.TryDecodeToWidth(entry.FullPath, decodeWidth, cts.Token), cts.Token);
-                if (cts.IsCancellationRequested)
+                // 先読み済みならデコードを待たずにそのまま出す（ホイール送りの待ち時間が消える）。
+                var bmp = TakePrefetched(entry.FullPath);
+                if (bmp is null)
                 {
-                    bmp?.Dispose();
-                    return;
+                    bmp = await Task.Run(
+                        () => ImageDecodeService.TryDecodeToWidth(entry.FullPath, decodeWidth, cts.Token), cts.Token);
+                    if (cts.IsCancellationRequested)
+                    {
+                        bmp?.Dispose();
+                        return;
+                    }
                 }
 
                 if (bmp is not null)
@@ -1023,6 +1212,8 @@ public partial class TabViewModel : ObservableObject
                     PreviewText = "";
                     // 画像は寸法も表示する
                     PreviewInfo = $"{entry.Name}\n{entry.TypeText}  {entry.SizeText}  {bmp.PixelSize.Width}×{bmp.PixelSize.Height}\n" + LocalizationService.Text("Text.Tooltip.Modified", entry.ModifiedText);
+                    // 表示が済んでから隣を仕込む（今出す 1 枚とデコードを取り合わせない）。
+                    PrefetchGalleryNeighbors();
                     return;
                 }
 
@@ -1411,6 +1602,18 @@ public partial class TabViewModel : ObservableObject
     partial void OnSortAscendingFlagChanged(bool value)
         => SaveFolderViewSettings();
 
+    // 列幅もフォルダーごとに覚える。ヘッダーの Thumb ドラッグ中は高頻度で届くが、
+    // FolderViewSettingsService 側が 750ms の遅延保存でまとめるのでここでは素直に呼ぶ。
+    partial void OnColNameWidthChanged(double value) => SaveFolderViewSettings();
+
+    partial void OnColModifiedWidthChanged(double value) => SaveFolderViewSettings();
+
+    partial void OnColCreatedWidthChanged(double value) => SaveFolderViewSettings();
+
+    partial void OnColTypeWidthChanged(double value) => SaveFolderViewSettings();
+
+    partial void OnColSizeWidthChanged(double value) => SaveFolderViewSettings();
+
     public async Task EnsureThumbnailAsync(FileSystemEntry entry)
     {
         // 安価な判定を先に済ませる。このメソッドは EffectiveViewportChanged から
@@ -1751,14 +1954,17 @@ public partial class TabViewModel : ObservableObject
         FolderViewSettingsService? folderViewSettings,
         FolderViewSettings? initialViewSettings,
         bool isSettingsTab = false,
-        bool isDropPreview = false)
+        bool isDropPreview = false,
+        Func<FolderViewSettings>? defaultViewSettings = null)
     {
         _options = options;
         _folderViewSettings = folderViewSettings;
+        _defaultViewSettings = defaultViewSettings;
         GalleryImageTransform = new TransformGroup
         {
             Children = { _galleryCenter, _galleryRotate, _galleryScale, _galleryPan },
         };
+        DetailHeaderTransform = _detailHeaderTranslate;
         DetailColumns =
         [
             new(this, SortKeys.Name, "Text.Column.Name"),
@@ -2057,13 +2263,18 @@ public partial class TabViewModel : ObservableObject
             return;
         }
 
-        // 「最後に使った表示・並べ替え」(_defaultFolderViewSettings) は新規タブの既定専用。
-        // タブ内の移動で未保存フォルダーへ適用すると直前フォルダーの並べ替えが伝染するため、
-        // 移動時は既定の並べ替え（名前・昇順）へ戻す。表示モードとアイコンサイズは
-        // タブの連続性としてそのまま維持する。初回ナビゲーション（新規タブ / 復元）では
-        // コンストラクターで適用済みの新規タブ既定を保つ。
+        // 表示設定を保存していないフォルダーは、設定画面で決めた既定（表示方法・並べ替え・列幅）に従う。
+        // 直前のフォルダーの状態を持ち越すと「フォルダーごとに覚える」設定と区別が付かなくなるため、
+        // ここで必ず既定へ戻す。初回ナビゲーション（新規タブ / 復元）ではコンストラクターで
+        // 同じ既定を適用済みなので何もしない。
         if (!pathChanged)
         {
+            return;
+        }
+
+        if (_defaultViewSettings?.Invoke() is { } defaults)
+        {
+            ApplyFolderViewSettings(defaults);
             return;
         }
 
@@ -2079,7 +2290,9 @@ public partial class TabViewModel : ObservableObject
         }
     }
 
-    private void ApplyFolderViewSettings(FolderViewSettings settings)
+    /// <summary>フォルダー別の記憶（または設定画面の既定）をこのタブへ流し込む。
+    /// 適用中は保存を止めるので、既定を当てただけでフォルダーの記憶が作られることはない。</summary>
+    internal void ApplyFolderViewSettings(FolderViewSettings settings)
     {
         _isApplyingFolderViewSettings = true;
         try
@@ -2099,10 +2312,30 @@ public partial class TabViewModel : ObservableObject
                 SortKey = settings.SortKey;
                 SortAscendingFlag = settings.SortAscending;
             }
+
+            ApplyColumnWidths(settings.ColumnWidths);
         }
         finally
         {
             _isApplyingFolderViewSettings = false;
+        }
+    }
+
+    /// <summary>保存済みの列幅を反映する。持っていない列は今の幅のままにする
+    /// （新しい列を追加したときに 0 幅で潰れないようにするため）。</summary>
+    private void ApplyColumnWidths(Dictionary<string, double>? widths)
+    {
+        if (widths is null || widths.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var column in DetailColumns)
+        {
+            if (widths.TryGetValue(column.Key, out var width) && width is > 0 and <= 2000)
+            {
+                column.Width = width;
+            }
         }
     }
 
@@ -2120,6 +2353,7 @@ public partial class TabViewModel : ObservableObject
             IconSize = IconSize,
             SortKey = SortKey,
             SortAscending = SortAscendingFlag,
+            ColumnWidths = DetailColumns.ToDictionary(column => column.Key, column => column.Width),
         });
     }
 

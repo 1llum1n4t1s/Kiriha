@@ -253,6 +253,123 @@ public static class LicenseService
         return true;
     }
 
+    // ===== メールアドレス + 確認コードでの認証（機種変更・2 台目） =====
+    //
+    // ライセンスキーは「決済完了ページに 1 度だけ出る文字列」なので、別の PC で使うときに
+    // 手元に無いことが多い。そこで購入時のメールアドレスへ 6 桁コードを送り、コードと引き換えに
+    // hub が同じ署名キーを作り直して返す経路を用意する（利用者はキーを一切見ない）。
+    //
+    // メールアドレスだけで通すことはしない。メールアドレスは秘密ではないので、それ単独を
+    // 認証情報にすると「アドレスを知っている人＝ライセンスを取得できる人」になってしまう。
+    // 「そのメールを受信できる」ことまで確かめて初めて本人とみなす。
+    // 台数の制限は引き続き掛けない（買い切り 1 本で何台でも使える方針）。
+
+    private const string RecoverRequestUrl = $"{BaseUrl}/license/kiriha/recover/request";
+    private const string RecoverRedeemUrl = $"{BaseUrl}/license/kiriha/recover";
+
+    /// <summary>確認コード送信の結果。</summary>
+    public enum RecoveryRequestResult
+    {
+        Sent,
+
+        /// <summary>メールアドレスの形式が正しくない。</summary>
+        InvalidEmail,
+
+        /// <summary>短時間に送りすぎ（サーバー側のクールダウン）。</summary>
+        TooSoon,
+
+        /// <summary>サーバーに到達できない。</summary>
+        Unreachable,
+    }
+
+    /// <summary>確認コード照合の結果。</summary>
+    public enum RecoveryRedeemResult
+    {
+        Activated,
+
+        /// <summary>コードが違う / 期限切れ / 試行回数超過。</summary>
+        InvalidCode,
+
+        /// <summary>そのメールアドレスでの購入が見つからない（返金済みを含む）。</summary>
+        NotPurchased,
+
+        /// <summary>サーバーに到達できない。</summary>
+        Unreachable,
+    }
+
+    /// <summary>購入時のメールアドレスへ確認コードを送るよう hub へ依頼する。</summary>
+    public static async Task<RecoveryRequestResult> RequestRecoveryCodeAsync(
+        string email, CancellationToken ct = default)
+    {
+        try
+        {
+            using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(20) };
+            using var res = await http.PostAsJsonAsync(
+                RecoverRequestUrl,
+                new RecoveryRequest { Email = email.Trim() },
+                LicenseJsonContext.Default.RecoveryRequest,
+                ct);
+
+            return (int)res.StatusCode switch
+            {
+                200 => RecoveryRequestResult.Sent,
+                400 => RecoveryRequestResult.InvalidEmail,
+                429 => RecoveryRequestResult.TooSoon,
+                _ => RecoveryRequestResult.Unreachable,
+            };
+        }
+        catch (Exception ex)
+        {
+            Logger.Log($"確認コードの送信に失敗: {ex.Message}", LogLevel.Debug);
+            return RecoveryRequestResult.Unreachable;
+        }
+    }
+
+    /// <summary>確認コードを hub へ渡し、返ってきた署名キーでそのまま有効化する。</summary>
+    public static async Task<RecoveryRedeemResult> RedeemRecoveryCodeAsync(
+        string email, string code, CancellationToken ct = default)
+    {
+        try
+        {
+            using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
+            using var res = await http.PostAsJsonAsync(
+                RecoverRedeemUrl,
+                new RecoveryRequest { Email = email.Trim(), Code = code.Trim() },
+                LicenseJsonContext.Default.RecoveryRequest,
+                ct);
+
+            if ((int)res.StatusCode == 401)
+            {
+                return RecoveryRedeemResult.InvalidCode;
+            }
+
+            if ((int)res.StatusCode == 404)
+            {
+                return RecoveryRedeemResult.NotPurchased;
+            }
+
+            if (!res.IsSuccessStatusCode)
+            {
+                Logger.Log($"ライセンス復元が HTTP {(int)res.StatusCode}", LogLevel.Warning);
+                return RecoveryRedeemResult.Unreachable;
+            }
+
+            var body = await res.Content.ReadFromJsonAsync(LicenseJsonContext.Default.RecoveryResponse, ct);
+            if (body?.Key is not { Length: > 0 } key)
+            {
+                return RecoveryRedeemResult.Unreachable;
+            }
+
+            // 受け取ったキーも通常の認証と同じく署名検証を通す（サーバーを無条件に信頼しない）。
+            return ActivateKey(key) ? RecoveryRedeemResult.Activated : RecoveryRedeemResult.Unreachable;
+        }
+        catch (Exception ex)
+        {
+            Logger.Log($"ライセンス復元に失敗: {ex.Message}", LogLevel.Debug);
+            return RecoveryRedeemResult.Unreachable;
+        }
+    }
+
     /// <summary>キーの形式と署名を検証する。</summary>
     private static bool TryParseAndVerify(string key, out LicensePayload payload)
     {
@@ -448,9 +565,24 @@ public static class LicenseService
     }
 
     internal sealed record LicenseCheckResponse([property: JsonPropertyName("valid")] bool Valid);
+
+    /// <summary>確認コードの送信・照合に送る本文（code は送信依頼時は null）。</summary>
+    internal sealed class RecoveryRequest
+    {
+        [JsonPropertyName("email")]
+        public string? Email { get; set; }
+
+        [JsonPropertyName("code")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Code { get; set; }
+    }
+
+    internal sealed record RecoveryResponse([property: JsonPropertyName("key")] string? Key);
 }
 
 [JsonSerializable(typeof(LicenseService.PersistedLicense))]
 [JsonSerializable(typeof(LicenseService.LicensePayload))]
 [JsonSerializable(typeof(LicenseService.LicenseCheckResponse))]
+[JsonSerializable(typeof(LicenseService.RecoveryRequest))]
+[JsonSerializable(typeof(LicenseService.RecoveryResponse))]
 internal partial class LicenseJsonContext : JsonSerializerContext;

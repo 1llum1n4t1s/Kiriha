@@ -270,6 +270,13 @@ public partial class MainWindowViewModel : ObservableObject
         _settings.SidebarWidth = value; // 保存自体は終了時の SaveWindowBounds でまとめて行う
     }
 
+    /// <summary>垂直タブバーの幅の下限。ファイル一覧を広く使いたいときのために、
+    /// タブ名がほとんど読めなくなるところまで縮められるようにしてある
+    /// （アイコンと閉じるボタンが並ぶ幅が実質の下限）。</summary>
+    public const double MinVerticalTabWidth = 96;
+
+    public const double MaxVerticalTabWidth = 420;
+
     partial void OnVerticalTabWidthChanged(double value)
     {
         _settings.VerticalTabWidth = value; // 保存自体は終了時の SaveWindowBounds でまとめて行う
@@ -632,6 +639,84 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
+    // ===== フォルダーの既定表示（表示設定を保存していないフォルダーで使う） =====
+    //
+    // フォルダーごとの記憶（folder-views.json）が無いフォルダーは、ここで決めた表示方法と
+    // 並べ替えで開く。以前は「最後に使った表示方法」を自動で既定にしていたが、設定画面から
+    // 明示的に決められるようにしたので、操作に追従して勝手に書き換わらないようにしてある。
+    // 値は ViewMode / SortKeys の名前そのままで、表示ラベルは XAML 側の ComboBoxItem が持つ。
+
+    public string? OptDefaultViewMode
+    {
+        get => _settings.DefaultViewMode;
+        set
+        {
+            if (value is null || !Enum.TryParse<ViewMode>(value, out var mode) || !Enum.IsDefined(mode)) return;
+            if (_settings.DefaultViewMode == value) return;
+            _settings.DefaultViewMode = value;
+            // アイコン系の既定は「最後に使った大きさ」を引き継ぐと意図と食い違うので、
+            // 表示方法を選び直したらプリセットの大きさへ揃える（表示メニューと同じ値）。
+            _settings.DefaultIconSize = mode switch
+            {
+                ViewMode.ExtraLargeIcons => 96,
+                ViewMode.LargeIcons => 56,
+                ViewMode.MediumIcons => 32,
+                _ => _settings.DefaultIconSize,
+            };
+            SettingsService.Save(_settings);
+            OnPropertyChanged();
+        }
+    }
+
+    public string? OptDefaultSortKey
+    {
+        get => _settings.DefaultSortKey;
+        set
+        {
+            if (value is not (SortKeys.Name or SortKeys.Modified or SortKeys.Created or SortKeys.Type or SortKeys.Size)) return;
+            if (_settings.DefaultSortKey == value) return;
+            _settings.DefaultSortKey = value;
+            SettingsService.Save(_settings);
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>昇順 / 降順。ドロップダウンで扱うため bool ではなく文字列で持つ。</summary>
+    public string? OptDefaultSortOrder
+    {
+        get => _settings.DefaultSortAscending ? "Ascending" : "Descending";
+        set
+        {
+            if (value is not ("Ascending" or "Descending")) return;
+            var ascending = value == "Ascending";
+            if (_settings.DefaultSortAscending == ascending) return;
+            _settings.DefaultSortAscending = ascending;
+            SettingsService.Save(_settings);
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>フォルダー別表示設定のリセット結果（設定画面に出す一言）。</summary>
+    [ObservableProperty]
+    private string _folderViewResetMessage = "";
+
+    /// <summary>フォルダーごとに覚えた表示方法・並べ替え・列幅をすべて捨てる。
+    /// 開いているタブにも既定を当て直して、その場で結果が見えるようにする。</summary>
+    [RelayCommand]
+    private void ResetFolderViewSettings()
+    {
+        _folderViewSettings.Clear();
+
+        // 既定を当て直す。ApplyFolderViewSettings は適用中フラグで保存を止めるので、
+        // ここで消したばかりの記憶が書き戻されることはない。
+        foreach (var tab in Tabs.Where(tab => !tab.IsSettingsTab))
+        {
+            tab.ApplyFolderViewSettings(CreateDefaultFolderViewSettings(tab.CurrentPath));
+        }
+
+        FolderViewResetMessage = LocalizationService.Text("Text.Settings.DefaultView.ResetDone");
+    }
+
     /// <summary>設定タブ: 表示言語のドロップダウン項目（対応言語の一覧そのもの）。</summary>
     public IReadOnlyList<Models.Locale> LocaleOptions { get; } = Models.Locale.Supported;
 
@@ -729,7 +814,9 @@ public partial class MainWindowViewModel : ObservableObject
         _showBookmarksBar = _settings.ShowBookmarksBar;
         _showSidebar = _settings.ShowSidebar;
         _sidebarWidth = _settings.SidebarWidth is > 120 and < 600 ? Math.Round(_settings.SidebarWidth) : 230;
-        _verticalTabWidth = _settings.VerticalTabWidth is >= 180 and <= 420 ? Math.Round(_settings.VerticalTabWidth) : 240;
+        _verticalTabWidth = _settings.VerticalTabWidth is >= MinVerticalTabWidth and <= MaxVerticalTabWidth
+            ? Math.Round(_settings.VerticalTabWidth)
+            : 240;
         // 旧バージョンが保存した小数幅はレイアウト丸めで線がぼやけない整数値へ移行する。
         _settings.SidebarWidth = _sidebarWidth;
         _settings.VerticalTabWidth = _verticalTabWidth;
@@ -908,6 +995,102 @@ public partial class MainWindowViewModel : ObservableObject
         OnLicenseStateChanged();
     }
 
+    // ===== メールアドレス + 確認コードでの認証 =====
+    //
+    // 既定の導線はこちら。ライセンスキーは決済完了ページに 1 度出るだけで、別の PC では
+    // 手元に無いことがほとんどなので、購入時のメールアドレスから復元できるようにする。
+    // キーの直接入力は「キーを持っている人」「オフライン環境」のために残す。
+
+    [ObservableProperty]
+    private string _licenseEmailInput = "";
+
+    [ObservableProperty]
+    private string _licenseCodeInput = "";
+
+    /// <summary>確認コードを送信済み（＝コード入力欄を出す）。</summary>
+    [ObservableProperty]
+    private bool _isLicenseCodeSent;
+
+    /// <summary>hub と通信中（ボタンの二度押しを防ぐ）。</summary>
+    [ObservableProperty]
+    private bool _isLicenseBusy;
+
+    /// <summary>ライセンスキーの直接入力欄を出しているか。既定はメール認証なので畳んでおく。</summary>
+    [ObservableProperty]
+    private bool _isLicenseKeyEntryVisible;
+
+    [RelayCommand]
+    private void ToggleLicenseKeyEntry() => IsLicenseKeyEntryVisible = !IsLicenseKeyEntryVisible;
+
+    /// <summary>購入時のメールアドレスへ確認コードを送る。</summary>
+    [RelayCommand]
+    private async Task SendLicenseCodeAsync()
+    {
+        if (LicenseEmailInput.Trim().Length == 0)
+        {
+            LicenseMessage = LocalizationService.Text("Text.License.Msg.EnterEmail");
+            return;
+        }
+
+        IsLicenseBusy = true;
+        LicenseMessage = LocalizationService.Text("Text.License.Msg.Sending");
+        var result = await LicenseService.RequestRecoveryCodeAsync(LicenseEmailInput);
+        IsLicenseBusy = false;
+
+        if (result == LicenseService.RecoveryRequestResult.Sent)
+        {
+            // 送信済みでもアドレスを直したくなることはあるので、入力欄は消さず残す。
+            IsLicenseCodeSent = true;
+        }
+
+        LicenseMessage = LocalizationService.Text(result switch
+        {
+            LicenseService.RecoveryRequestResult.Sent => "Text.License.Msg.CodeSent",
+            LicenseService.RecoveryRequestResult.InvalidEmail => "Text.License.Msg.EnterEmail",
+            LicenseService.RecoveryRequestResult.TooSoon => "Text.License.Msg.CodeTooSoon",
+            _ => "Text.License.Msg.ServerUnreachable",
+        });
+    }
+
+    /// <summary>メールで届いた確認コードで認証する。</summary>
+    [RelayCommand]
+    private async Task RedeemLicenseCodeAsync()
+    {
+        if (LicenseCodeInput.Trim().Length == 0)
+        {
+            LicenseMessage = LocalizationService.Text("Text.License.Msg.EnterCode");
+            return;
+        }
+
+        IsLicenseBusy = true;
+        LicenseMessage = LocalizationService.Text("Text.License.Msg.Verifying");
+        var result = await LicenseService.RedeemRecoveryCodeAsync(LicenseEmailInput, LicenseCodeInput);
+        IsLicenseBusy = false;
+
+        if (result == LicenseService.RecoveryRedeemResult.Activated)
+        {
+            LicenseEmailInput = "";
+            LicenseCodeInput = "";
+            IsLicenseCodeSent = false;
+        }
+        else
+        {
+            // 使い切ったコードは二度と通らないので、入力欄を空けて送り直しへ誘導する。
+            LicenseCodeInput = "";
+            IsLicenseCodeSent = result != LicenseService.RecoveryRedeemResult.InvalidCode;
+        }
+
+        LicenseMessage = LocalizationService.Text(result switch
+        {
+            LicenseService.RecoveryRedeemResult.Activated => "Text.License.Msg.Activated",
+            LicenseService.RecoveryRedeemResult.InvalidCode => "Text.License.Msg.InvalidCode",
+            LicenseService.RecoveryRedeemResult.NotPurchased => "Text.License.Msg.NoPurchase",
+            _ => "Text.License.Msg.ServerUnreachable",
+        });
+
+        OnLicenseStateChanged();
+    }
+
     /// <summary>オフライン猶予超過時のオンライン再確認。</summary>
     [RelayCommand]
     private async Task RecheckLicenseAsync()
@@ -957,7 +1140,8 @@ public partial class MainWindowViewModel : ObservableObject
         var initialViewSettings = _folderViewSettings.TryGet(path, out var savedViewSettings)
             ? savedViewSettings
             : CreateDefaultFolderViewSettings(path);
-        var tab = new TabViewModel(path, Options, _folderViewSettings, initialViewSettings)
+        var tab = new TabViewModel(path, Options, _folderViewSettings, initialViewSettings,
+            defaultViewSettings: () => CreateDefaultFolderViewSettings(""))
         {
             ColNameWidth = _settings.ColNameWidth,
             ColModifiedWidth = _settings.ColModifiedWidth,
@@ -971,6 +1155,10 @@ public partial class MainWindowViewModel : ObservableObject
             IsCompactView = _settings.CompactView,
         };
 
+        // 列幅はオブジェクト初期化子（＝コンストラクター実行後）で全体既定を入れているため、
+        // フォルダーごとに覚えた幅はここで上書きし直す。順序を入れ替えると記憶した幅が消える。
+        tab.ApplyFolderViewSettings(initialViewSettings);
+
         Tabs.Add(tab);
         tab.CloseRequested += (_, _) => CloseTab(tab);
         tab.PinnedNavigationRequested += OpenPinnedNavigationInNewTab;
@@ -980,6 +1168,8 @@ public partial class MainWindowViewModel : ObservableObject
         return tab;
     }
 
+    /// <summary>設定画面で決めた「フォルダーの既定表示」。表示設定を保存していないフォルダーで使う。
+    /// 列幅は設定画面に項目が無いので、直近の幅（AppSettings の Col*Width）を全体の既定として載せる。</summary>
     private FolderViewSettings CreateDefaultFolderViewSettings(string path)
         => new()
         {
@@ -988,6 +1178,14 @@ public partial class MainWindowViewModel : ObservableObject
             IconSize = _settings.DefaultIconSize,
             SortKey = _settings.DefaultSortKey,
             SortAscending = _settings.DefaultSortAscending,
+            ColumnWidths = new Dictionary<string, double>
+            {
+                [SortKeys.Name] = _settings.ColNameWidth,
+                [SortKeys.Modified] = _settings.ColModifiedWidth,
+                [SortKeys.Created] = _settings.ColCreatedWidth,
+                [SortKeys.Type] = _settings.ColTypeWidth,
+                [SortKeys.Size] = _settings.ColSizeWidth,
+            },
         };
 
     private TabViewModel AddSettingsTab(bool pinned)
@@ -1019,24 +1217,14 @@ public partial class MainWindowViewModel : ObservableObject
         {
             OnPropertyChanged(nameof(WindowTitle));
         }
-        else if (e.PropertyName == nameof(TabViewModel.ViewMode))
-        {
-            if (tab.IsApplyingFolderViewSettings) return;
-            // 最後に使った表示モードを新規タブの既定にする
-            _settings.DefaultViewMode = tab.ViewMode.ToString();
-        }
         else if (e.PropertyName == nameof(TabViewModel.IconSize))
         {
             if (tab.IsApplyingFolderViewSettings) return;
-            // マウスホイールで連続発火するため、Col*Width と同様に即時保存はせず終了時にまとめて保存する
+            // アイコンの大きさだけは設定画面に項目が無いので、最後に使った値を既定として引き継ぐ。
+            // マウスホイールで連続発火するため、Col*Width と同様に即時保存はせず終了時にまとめて保存する。
+            // 表示方法と並べ替えの既定は設定画面で明示的に決めるものなので、ここでは追従させない
+            //（追従させると、設定した既定が操作のたびに勝手に書き換わってしまう）。
             _settings.DefaultIconSize = tab.IconSize;
-        }
-        else if (e.PropertyName is nameof(TabViewModel.SortKey) or nameof(TabViewModel.SortAscendingFlag))
-        {
-            if (tab.IsApplyingFolderViewSettings) return;
-            // 最後に使った並べ替えを新規タブの既定にする
-            _settings.DefaultSortKey = tab.SortKey;
-            _settings.DefaultSortAscending = tab.SortAscendingFlag;
         }
         else if (e.PropertyName is nameof(TabViewModel.ColNameWidth) or nameof(TabViewModel.ColModifiedWidth)
                  or nameof(TabViewModel.ColCreatedWidth) or nameof(TabViewModel.ColTypeWidth) or nameof(TabViewModel.ColSizeWidth))

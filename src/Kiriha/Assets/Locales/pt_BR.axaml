@@ -112,7 +112,10 @@
   <x:String x:Key="Text.Launch.Failed" xml:space="preserve">Não foi possível iniciar: {0}</x:String>
   <x:String x:Key="Text.Launch.TerminalFailed" xml:space="preserve">Não foi possível iniciar o Terminal: {0}</x:String>
   <x:String x:Key="Text.License.Activate" xml:space="preserve">Ativar</x:String>
+  <x:String x:Key="Text.License.CodePlaceholder" xml:space="preserve">Código de 6 dígitos</x:String>
+  <x:String x:Key="Text.License.EmailPlaceholder" xml:space="preserve">E-mail usado na compra</x:String>
   <x:String x:Key="Text.License.Exit" xml:space="preserve">Sair</x:String>
+  <x:String x:Key="Text.License.KeyFallback" xml:space="preserve">Inserir uma chave de licença</x:String>
   <x:String x:Key="Text.License.KeyPlaceholder" xml:space="preserve">Chave de licença começando com KIRIHA-</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckBody" xml:space="preserve">A licença não é verificada on-line há mais de 30 dias. Conecte-se à internet e clique em “Verificar novamente on-line”.</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckTitle" xml:space="preserve">A licença precisa ser verificada on-line</x:String>
@@ -121,15 +124,26 @@
   <x:String x:Key="Text.License.Msg.Activated" xml:space="preserve">Sua licença foi ativada 🎉 Muito obrigado!</x:String>
   <x:String x:Key="Text.License.Msg.CheckOk" xml:space="preserve">Verificação concluída. Obrigado por usar o Kiriha!</x:String>
   <x:String x:Key="Text.License.Msg.Checking" xml:space="preserve">Verificando on-line…</x:String>
+  <x:String x:Key="Text.License.Msg.CodeSent" xml:space="preserve">Enviamos um código de confirmação por e-mail. Digite os 6 dígitos recebidos.</x:String>
+  <x:String x:Key="Text.License.Msg.CodeTooSoon" xml:space="preserve">Muitas solicitações. Aguarde cerca de 30 segundos e tente novamente.</x:String>
+  <x:String x:Key="Text.License.Msg.EnterCode" xml:space="preserve">Digite o código de 6 dígitos recebido por e-mail.</x:String>
+  <x:String x:Key="Text.License.Msg.EnterEmail" xml:space="preserve">Digite o e-mail usado na compra.</x:String>
   <x:String x:Key="Text.License.Msg.EnterKey" xml:space="preserve">Digite a chave de licença emitida no momento da compra.</x:String>
+  <x:String x:Key="Text.License.Msg.InvalidCode" xml:space="preserve">O código está incorreto ou expirou. Solicite um novo código.</x:String>
   <x:String x:Key="Text.License.Msg.InvalidKey" xml:space="preserve">Essa chave de licença não é válida. Verifique se não faltam caracteres nem foram copiados espaços extras.</x:String>
+  <x:String x:Key="Text.License.Msg.NoPurchase" xml:space="preserve">Nenhuma compra encontrada para este e-mail. Verifique o endereço usado na compra.</x:String>
   <x:String x:Key="Text.License.Msg.PurchaseFailed" xml:space="preserve">Não foi possível abrir a página de compra. Tente novamente mais tarde.</x:String>
-  <x:String x:Key="Text.License.Msg.PurchaseOpened" xml:space="preserve">A página de compra foi aberta no navegador. Cole acima a chave de licença exibida na página de confirmação.</x:String>
+  <x:String x:Key="Text.License.Msg.PurchaseOpened" xml:space="preserve">A página de compra foi aberta no navegador. Ao concluir, ative pelo campo de e-mail acima.</x:String>
   <x:String x:Key="Text.License.Msg.Revoked" xml:space="preserve">Esta licença não é mais válida (por exemplo, após um reembolso). Compre novamente.</x:String>
+  <x:String x:Key="Text.License.Msg.Sending" xml:space="preserve">Enviando o código de confirmação…</x:String>
   <x:String x:Key="Text.License.Msg.ServerUnreachable" xml:space="preserve">Não foi possível acessar o servidor. Verifique sua conexão de rede e tente de novo.</x:String>
+  <x:String x:Key="Text.License.Msg.Verifying" xml:space="preserve">Verificando…</x:String>
   <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">Abrir a página de compra (¥980, compra única)</x:String>
-  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">Após a compra, sua chave de licença aparece na página de confirmação do pagamento. Não é preciso conta nem senha.</x:String>
+  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">Não é preciso conta nem senha. Compra única de ¥980, sem limite de computadores.</x:String>
   <x:String x:Key="Text.License.Recheck" xml:space="preserve">Verificar novamente on-line</x:String>
+  <x:String x:Key="Text.License.RecoverNote" xml:space="preserve">Enviaremos um código de confirmação para o e-mail usado na compra. Não é preciso a chave de licença.</x:String>
+  <x:String x:Key="Text.License.ResendCode" xml:space="preserve">Reenviar código</x:String>
+  <x:String x:Key="Text.License.SendCode" xml:space="preserve">Enviar código</x:String>
   <x:String x:Key="Text.License.Status.Licensed" xml:space="preserve">Licença ativada: {0}</x:String>
   <x:String x:Key="Text.License.Status.OnlineCheck" xml:space="preserve">A licença precisa ser verificada on-line (conecte-se à internet)</x:String>
   <x:String x:Key="Text.License.Status.Trial" xml:space="preserve">Período de avaliação (faltam {0} dia(s))</x:String>
@@ -189,6 +203,13 @@
   <x:String x:Key="Text.Settings.DefaultFolderApp" xml:space="preserve">Tornar o Kiriha o aplicativo padrão para abrir pastas e unidades</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.Off" xml:space="preserve">Quando ativado, o Kiriha é iniciado sempre que uma pasta ou unidade for aberta no Explorador.</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.On" xml:space="preserve">No momento, pastas e unidades abrem no Kiriha. Ao desativar, o comportamento anterior é restaurado.</x:String>
+  <x:String x:Key="Text.Settings.DefaultView" xml:space="preserve">Exibição padrão das pastas</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.Mode" xml:space="preserve">Exibição</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.Note" xml:space="preserve">Pastas sem exibição salva abrem com estas configurações. Alterar a exibição ou a ordenação dentro de uma pasta salva apenas para aquela pasta.</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.Reset" xml:space="preserve">Redefinir as exibições por pasta</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.ResetDone" xml:space="preserve">As exibições salvas por pasta foram excluídas.</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.ResetNote" xml:space="preserve">Exclui a exibição, a ordenação e a largura das colunas memorizadas em cada pasta e volta aos padrões acima.</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.Sort" xml:space="preserve">Ordenar por</x:String>
   <x:String x:Key="Text.Settings.Display" xml:space="preserve">Aparência</x:String>
   <x:String x:Key="Text.Settings.Display.Subtitle" xml:space="preserve">Ajuste a aparência da lista de arquivos e do Kiriha</x:String>
   <x:String x:Key="Text.Settings.Explorer" xml:space="preserve">Lista de arquivos</x:String>

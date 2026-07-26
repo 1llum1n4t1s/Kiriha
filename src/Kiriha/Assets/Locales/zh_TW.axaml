@@ -112,7 +112,10 @@
   <x:String x:Key="Text.Launch.Failed" xml:space="preserve">無法啟動: {0}</x:String>
   <x:String x:Key="Text.Launch.TerminalFailed" xml:space="preserve">無法啟動終端機: {0}</x:String>
   <x:String x:Key="Text.License.Activate" xml:space="preserve">啟用</x:String>
+  <x:String x:Key="Text.License.CodePlaceholder" xml:space="preserve">6 位數驗證碼</x:String>
+  <x:String x:Key="Text.License.EmailPlaceholder" xml:space="preserve">購買時使用的電子郵件</x:String>
   <x:String x:Key="Text.License.Exit" xml:space="preserve">結束</x:String>
+  <x:String x:Key="Text.License.KeyFallback" xml:space="preserve">改為直接輸入授權金鑰</x:String>
   <x:String x:Key="Text.License.KeyPlaceholder" xml:space="preserve">以 KIRIHA- 開頭的授權金鑰</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckBody" xml:space="preserve">授權已超過 30 天未進行線上驗證。請連上網際網路後按「重新線上驗證」。</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckTitle" xml:space="preserve">需要進行授權的線上驗證</x:String>
@@ -121,15 +124,26 @@
   <x:String x:Key="Text.License.Msg.Activated" xml:space="preserve">授權已啟用 🎉 非常感謝！</x:String>
   <x:String x:Key="Text.License.Msg.CheckOk" xml:space="preserve">驗證完成。感謝您使用 Kiriha！</x:String>
   <x:String x:Key="Text.License.Msg.Checking" xml:space="preserve">正在線上驗證…</x:String>
+  <x:String x:Key="Text.License.Msg.CodeSent" xml:space="preserve">驗證碼已寄出，請輸入收到的 6 位數字。</x:String>
+  <x:String x:Key="Text.License.Msg.CodeTooSoon" xml:space="preserve">要求過於頻繁。請等待約 30 秒後再試。</x:String>
+  <x:String x:Key="Text.License.Msg.EnterCode" xml:space="preserve">請輸入電子郵件中的 6 位數驗證碼。</x:String>
+  <x:String x:Key="Text.License.Msg.EnterEmail" xml:space="preserve">請輸入購買時使用的電子郵件地址。</x:String>
   <x:String x:Key="Text.License.Msg.EnterKey" xml:space="preserve">請輸入購買時核發的授權金鑰。</x:String>
+  <x:String x:Key="Text.License.Msg.InvalidCode" xml:space="preserve">驗證碼不正確或已逾期，請重新寄送驗證碼。</x:String>
   <x:String x:Key="Text.License.Msg.InvalidKey" xml:space="preserve">這組授權金鑰不正確。請確認複製時是否有字元遺漏或多餘空白。</x:String>
+  <x:String x:Key="Text.License.Msg.NoPurchase" xml:space="preserve">找不到使用此電子郵件的購買紀錄，請確認購買時使用的地址。</x:String>
   <x:String x:Key="Text.License.Msg.PurchaseFailed" xml:space="preserve">無法開啟購買頁面。請稍後再試。</x:String>
-  <x:String x:Key="Text.License.Msg.PurchaseOpened" xml:space="preserve">已在瀏覽器中開啟購買頁面。請將確認頁面上顯示的授權金鑰貼到上方欄位。</x:String>
+  <x:String x:Key="Text.License.Msg.PurchaseOpened" xml:space="preserve">已在瀏覽器中開啟購買頁面。購買完成後，可從上方的電子郵件欄進行驗證。</x:String>
   <x:String x:Key="Text.License.Msg.Revoked" xml:space="preserve">此授權已失效（例如已退款）。請重新購買。</x:String>
+  <x:String x:Key="Text.License.Msg.Sending" xml:space="preserve">正在寄送驗證碼…</x:String>
   <x:String x:Key="Text.License.Msg.ServerUnreachable" xml:space="preserve">無法連線到伺服器。請檢查網路連線後再試一次。</x:String>
+  <x:String x:Key="Text.License.Msg.Verifying" xml:space="preserve">正在驗證…</x:String>
   <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">開啟購買頁面（¥980，一次買斷）</x:String>
-  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">購買後，授權金鑰會顯示在付款完成頁面。不需要註冊帳號或密碼。</x:String>
+  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">不需註冊帳號或密碼。¥980 一次買斷，可在任意數量的電腦上使用。</x:String>
   <x:String x:Key="Text.License.Recheck" xml:space="preserve">重新線上驗證</x:String>
+  <x:String x:Key="Text.License.RecoverNote" xml:space="preserve">我們會將驗證碼寄到您購買時使用的電子郵件，不需要輸入授權金鑰。</x:String>
+  <x:String x:Key="Text.License.ResendCode" xml:space="preserve">重新寄送驗證碼</x:String>
+  <x:String x:Key="Text.License.SendCode" xml:space="preserve">寄送驗證碼</x:String>
   <x:String x:Key="Text.License.Status.Licensed" xml:space="preserve">授權已啟用: {0}</x:String>
   <x:String x:Key="Text.License.Status.OnlineCheck" xml:space="preserve">需要進行授權的線上驗證（請連上網際網路）</x:String>
   <x:String x:Key="Text.License.Status.Trial" xml:space="preserve">試用期（剩餘 {0} 天）</x:String>
@@ -189,6 +203,13 @@
   <x:String x:Key="Text.Settings.DefaultFolderApp" xml:space="preserve">將 Kiriha 設為開啟資料夾和磁碟機的預設應用程式</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.Off" xml:space="preserve">啟用後，從檔案總管開啟資料夾或磁碟機時會啟動 Kiriha。</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.On" xml:space="preserve">目前資料夾和磁碟機會在 Kiriha 中開啟。關閉後會恢復先前的行為。</x:String>
+  <x:String x:Key="Text.Settings.DefaultView" xml:space="preserve">資料夾預設檢視</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.Mode" xml:space="preserve">檢視方式</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.Note" xml:space="preserve">尚未儲存檢視方式的資料夾會以此設定開啟。在資料夾中變更檢視方式或排序時，只會為該資料夾單獨記住。</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.Reset" xml:space="preserve">重設每個資料夾的檢視設定</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.ResetDone" xml:space="preserve">已刪除每個資料夾的檢視設定。</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.ResetNote" xml:space="preserve">刪除各資料夾記住的檢視方式、排序與欄寬，並回復為上方的預設值。</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.Sort" xml:space="preserve">排序方式</x:String>
   <x:String x:Key="Text.Settings.Display" xml:space="preserve">外觀</x:String>
   <x:String x:Key="Text.Settings.Display.Subtitle" xml:space="preserve">調整檔案清單的外觀與 Kiriha 的樣式</x:String>
   <x:String x:Key="Text.Settings.Explorer" xml:space="preserve">檔案清單</x:String>

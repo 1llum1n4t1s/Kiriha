@@ -67,6 +67,54 @@
                                             </StackPanel>
                                         </HeaderedContentControl>
 
+                                        <!-- フォルダーごとの記憶が無いフォルダーで使う既定。表示方法と並べ替えは
+                                             ここで明示的に決める（操作に追従して勝手に変わらない）。 -->
+                                        <HeaderedContentControl Classes="settingscard" Header="{DynamicResource Text.Settings.DefaultView}">
+                                            <StackPanel Spacing="10">
+                                                <TextBlock Text="{DynamicResource Text.Settings.DefaultView.Mode}" FontSize="13" />
+                                                <ComboBox Classes="settingsfield" MinWidth="240" HorizontalAlignment="Left"
+                                                          SelectedValue="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptDefaultViewMode}"
+                                                          SelectedValueBinding="{Binding Tag, x:DataType=ComboBoxItem}">
+                                                    <ComboBoxItem Tag="ExtraLargeIcons" Content="{DynamicResource Text.View.ExtraLarge}" />
+                                                    <ComboBoxItem Tag="LargeIcons" Content="{DynamicResource Text.View.Large}" />
+                                                    <ComboBoxItem Tag="MediumIcons" Content="{DynamicResource Text.View.Medium}" />
+                                                    <ComboBoxItem Tag="SmallIcons" Content="{DynamicResource Text.View.Small}" />
+                                                    <ComboBoxItem Tag="List" Content="{DynamicResource Text.View.List}" />
+                                                    <ComboBoxItem Tag="Details" Content="{DynamicResource Text.View.Details}" />
+                                                </ComboBox>
+                                                <TextBlock Text="{DynamicResource Text.Settings.DefaultView.Sort}" FontSize="13" Margin="0,6,0,0" />
+                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                    <ComboBox Classes="settingsfield" MinWidth="180"
+                                                              SelectedValue="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptDefaultSortKey}"
+                                                              SelectedValueBinding="{Binding Tag, x:DataType=ComboBoxItem}">
+                                                        <ComboBoxItem Tag="Name" Content="{DynamicResource Text.Column.Name}" />
+                                                        <ComboBoxItem Tag="Modified" Content="{DynamicResource Text.Column.Modified}" />
+                                                        <ComboBoxItem Tag="Created" Content="{DynamicResource Text.Column.Created}" />
+                                                        <ComboBoxItem Tag="Type" Content="{DynamicResource Text.Column.Type}" />
+                                                        <ComboBoxItem Tag="Size" Content="{DynamicResource Text.Column.Size}" />
+                                                    </ComboBox>
+                                                    <ComboBox Classes="settingsfield" MinWidth="120"
+                                                              SelectedValue="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptDefaultSortOrder}"
+                                                              SelectedValueBinding="{Binding Tag, x:DataType=ComboBoxItem}">
+                                                        <ComboBoxItem Tag="Ascending" Content="{DynamicResource Text.Sort.Ascending}" />
+                                                        <ComboBoxItem Tag="Descending" Content="{DynamicResource Text.Sort.Descending}" />
+                                                    </ComboBox>
+                                                </StackPanel>
+                                                <TextBlock Classes="settingscaption" TextWrapping="Wrap" Margin="0,6,0,0"
+                                                           Text="{DynamicResource Text.Settings.DefaultView.Note}" />
+                                                <Button Classes="cmd" HorizontalAlignment="Left" Margin="0,6,0,0"
+                                                        Content="{DynamicResource Text.Settings.DefaultView.Reset}"
+                                                        Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ResetFolderViewSettingsCommand}"
+                                                        BorderBrush="{DynamicResource Divider}" BorderThickness="1" />
+                                                <TextBlock Classes="settingscaption" TextWrapping="Wrap" Margin="0,4,0,0"
+                                                           Text="{DynamicResource Text.Settings.DefaultView.ResetNote}" />
+                                                <TextBlock FontSize="12" TextWrapping="Wrap"
+                                                           Foreground="{DynamicResource TextSecondary}"
+                                                           IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).FolderViewResetMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                                           Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).FolderViewResetMessage}" />
+                                            </StackPanel>
+                                        </HeaderedContentControl>
+
                                         <HeaderedContentControl Classes="settingscard" Header="{DynamicResource Text.Settings.FolderTree}">
                                             <StackPanel Classes="settingsfields">
                                                 <CheckBox Content="{DynamicResource Text.Settings.TreeDragDisabled}"
@@ -282,8 +330,42 @@
                                                            Foreground="{DynamicResource TextSecondary}"
                                                            IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsNotLicensed}"
                                                            Text="{DynamicResource Text.License.PurchaseNote}" />
+                                                <!-- 既定の導線はメールアドレス + 6 桁コード。ライセンスキーは
+                                                     決済完了ページに 1 度出るだけで、別の PC では手元に無いことが多い。 -->
+                                                <TextBlock FontSize="12" TextWrapping="Wrap"
+                                                           Foreground="{DynamicResource TextSecondary}"
+                                                           IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsNotLicensed}"
+                                                           Text="{DynamicResource Text.License.RecoverNote}" />
                                                 <StackPanel Orientation="Horizontal" Spacing="8"
                                                             IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsNotLicensed}">
+                                                    <TextBox Width="280" PlaceholderText="{DynamicResource Text.License.EmailPlaceholder}"
+                                                             Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).LicenseEmailInput}" />
+                                                    <Button Classes="cmd" Content="{DynamicResource Text.License.SendCode}"
+                                                            Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SendLicenseCodeCommand}"
+                                                            IsEnabled="{Binding !$parent[Window].((vm:MainWindowViewModel)DataContext).IsLicenseBusy}"
+                                                            BorderBrush="{DynamicResource Divider}" BorderThickness="1" />
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Spacing="8"
+                                                            IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsLicenseCodeSent}">
+                                                    <TextBox Width="150" MaxLength="6"
+                                                             PlaceholderText="{DynamicResource Text.License.CodePlaceholder}"
+                                                             Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).LicenseCodeInput}" />
+                                                    <Button Classes="cmd" Content="{DynamicResource Text.License.Activate}"
+                                                            Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).RedeemLicenseCodeCommand}"
+                                                            IsEnabled="{Binding !$parent[Window].((vm:MainWindowViewModel)DataContext).IsLicenseBusy}"
+                                                            BorderBrush="{DynamicResource Divider}" BorderThickness="1" />
+                                                    <Button Classes="cmd" Content="{DynamicResource Text.License.ResendCode}"
+                                                            Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SendLicenseCodeCommand}"
+                                                            IsEnabled="{Binding !$parent[Window].((vm:MainWindowViewModel)DataContext).IsLicenseBusy}"
+                                                            BorderBrush="{DynamicResource Divider}" BorderThickness="1" />
+                                                </StackPanel>
+                                                <!-- キーを持っている人・オフライン環境向けの退避経路。既定では畳んでおく。 -->
+                                                <Button Classes="cmd" Content="{DynamicResource Text.License.KeyFallback}"
+                                                        Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ToggleLicenseKeyEntryCommand}"
+                                                        HorizontalAlignment="Left" Background="Transparent" BorderThickness="0"
+                                                        IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsNotLicensed}" />
+                                                <StackPanel Orientation="Horizontal" Spacing="8"
+                                                            IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsLicenseKeyEntryVisible}">
                                                     <TextBox Width="330" PlaceholderText="{DynamicResource Text.License.KeyPlaceholder}"
                                                              Text="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).LicenseKeyInput}" />
                                                     <Button Classes="cmd" Content="{DynamicResource Text.License.Activate}"

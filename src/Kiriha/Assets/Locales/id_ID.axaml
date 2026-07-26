@@ -112,7 +112,10 @@
   <x:String x:Key="Text.Launch.Failed" xml:space="preserve">Tidak dapat menjalankan: {0}</x:String>
   <x:String x:Key="Text.Launch.TerminalFailed" xml:space="preserve">Tidak dapat menjalankan Terminal: {0}</x:String>
   <x:String x:Key="Text.License.Activate" xml:space="preserve">Aktifkan</x:String>
+  <x:String x:Key="Text.License.CodePlaceholder" xml:space="preserve">Kode 6 digit</x:String>
+  <x:String x:Key="Text.License.EmailPlaceholder" xml:space="preserve">Email yang dipakai saat membeli</x:String>
   <x:String x:Key="Text.License.Exit" xml:space="preserve">Keluar</x:String>
+  <x:String x:Key="Text.License.KeyFallback" xml:space="preserve">Masukkan kunci lisensi saja</x:String>
   <x:String x:Key="Text.License.KeyPlaceholder" xml:space="preserve">Kunci lisensi yang diawali KIRIHA-</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckBody" xml:space="preserve">Lisensi belum diverifikasi secara daring selama lebih dari 30 hari. Sambungkan ke internet lalu tekan “Verifikasi ulang secara daring”.</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckTitle" xml:space="preserve">Lisensi perlu diverifikasi secara daring</x:String>
@@ -121,15 +124,26 @@
   <x:String x:Key="Text.License.Msg.Activated" xml:space="preserve">Lisensi Anda telah diaktifkan 🎉 Terima kasih!</x:String>
   <x:String x:Key="Text.License.Msg.CheckOk" xml:space="preserve">Verifikasi selesai. Terima kasih telah memakai Kiriha!</x:String>
   <x:String x:Key="Text.License.Msg.Checking" xml:space="preserve">Memverifikasi secara daring…</x:String>
+  <x:String x:Key="Text.License.Msg.CodeSent" xml:space="preserve">Kode konfirmasi telah dikirim lewat email. Masukkan 6 digit yang Anda terima.</x:String>
+  <x:String x:Key="Text.License.Msg.CodeTooSoon" xml:space="preserve">Terlalu sering. Tunggu sekitar 30 detik lalu coba lagi.</x:String>
+  <x:String x:Key="Text.License.Msg.EnterCode" xml:space="preserve">Masukkan kode 6 digit dari email.</x:String>
+  <x:String x:Key="Text.License.Msg.EnterEmail" xml:space="preserve">Masukkan alamat email yang Anda pakai saat membeli.</x:String>
   <x:String x:Key="Text.License.Msg.EnterKey" xml:space="preserve">Masukkan kunci lisensi yang diterbitkan saat pembelian.</x:String>
+  <x:String x:Key="Text.License.Msg.InvalidCode" xml:space="preserve">Kode salah atau sudah kedaluwarsa. Silakan kirim kode baru.</x:String>
   <x:String x:Key="Text.License.Msg.InvalidKey" xml:space="preserve">Kunci lisensi tersebut tidak valid. Periksa apakah ada karakter yang terpotong atau spasi berlebih saat menyalin.</x:String>
+  <x:String x:Key="Text.License.Msg.NoPurchase" xml:space="preserve">Pembelian dengan alamat email ini tidak ditemukan. Periksa alamat yang Anda pakai saat membeli.</x:String>
   <x:String x:Key="Text.License.Msg.PurchaseFailed" xml:space="preserve">Tidak dapat membuka halaman pembelian. Coba lagi nanti.</x:String>
-  <x:String x:Key="Text.License.Msg.PurchaseOpened" xml:space="preserve">Halaman pembelian telah terbuka di peramban. Tempelkan kunci lisensi dari halaman konfirmasi ke kolom di atas.</x:String>
+  <x:String x:Key="Text.License.Msg.PurchaseOpened" xml:space="preserve">Halaman pembelian terbuka di browser. Setelah selesai, aktifkan lewat kolom email di atas.</x:String>
   <x:String x:Key="Text.License.Msg.Revoked" xml:space="preserve">Lisensi ini sudah tidak berlaku (misalnya karena pengembalian dana). Silakan beli kembali.</x:String>
+  <x:String x:Key="Text.License.Msg.Sending" xml:space="preserve">Mengirim kode konfirmasi…</x:String>
   <x:String x:Key="Text.License.Msg.ServerUnreachable" xml:space="preserve">Server tidak dapat dihubungi. Periksa koneksi jaringan Anda lalu coba lagi.</x:String>
+  <x:String x:Key="Text.License.Msg.Verifying" xml:space="preserve">Memverifikasi…</x:String>
   <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">Buka halaman pembelian (¥980, sekali beli)</x:String>
-  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">Setelah pembelian, kunci lisensi ditampilkan di halaman konfirmasi pembayaran. Tidak perlu akun maupun kata sandi.</x:String>
+  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">Tidak perlu akun atau kata sandi. Sekali beli ¥980, tanpa batas jumlah komputer.</x:String>
   <x:String x:Key="Text.License.Recheck" xml:space="preserve">Verifikasi ulang secara daring</x:String>
+  <x:String x:Key="Text.License.RecoverNote" xml:space="preserve">Kami akan mengirim kode konfirmasi ke email yang Anda pakai saat membeli. Kunci lisensi tidak diperlukan.</x:String>
+  <x:String x:Key="Text.License.ResendCode" xml:space="preserve">Kirim ulang kode</x:String>
+  <x:String x:Key="Text.License.SendCode" xml:space="preserve">Kirim kode</x:String>
   <x:String x:Key="Text.License.Status.Licensed" xml:space="preserve">Lisensi aktif: {0}</x:String>
   <x:String x:Key="Text.License.Status.OnlineCheck" xml:space="preserve">Lisensi perlu diverifikasi secara daring (sambungkan ke internet)</x:String>
   <x:String x:Key="Text.License.Status.Trial" xml:space="preserve">Masa uji coba (tersisa {0} hari)</x:String>
@@ -189,6 +203,13 @@
   <x:String x:Key="Text.Settings.DefaultFolderApp" xml:space="preserve">Jadikan Kiriha aplikasi bawaan untuk membuka folder dan drive</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.Off" xml:space="preserve">Jika diaktifkan, Kiriha berjalan setiap kali folder atau drive dibuka dari File Explorer.</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.On" xml:space="preserve">Saat ini folder dan drive dibuka di Kiriha. Menonaktifkannya akan memulihkan perilaku sebelumnya.</x:String>
+  <x:String x:Key="Text.Settings.DefaultView" xml:space="preserve">Tampilan folder bawaan</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.Mode" xml:space="preserve">Tampilan</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.Note" xml:space="preserve">Folder yang belum menyimpan tampilan akan dibuka dengan pengaturan ini. Mengubah tampilan atau urutan di dalam folder hanya disimpan untuk folder itu.</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.Reset" xml:space="preserve">Setel ulang tampilan tiap folder</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.ResetDone" xml:space="preserve">Pengaturan tampilan tiap folder telah dihapus.</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.ResetNote" xml:space="preserve">Menghapus tampilan, urutan, dan lebar kolom yang diingat pada setiap folder, lalu kembali ke pengaturan bawaan di atas.</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.Sort" xml:space="preserve">Urutkan menurut</x:String>
   <x:String x:Key="Text.Settings.Display" xml:space="preserve">Tampilan</x:String>
   <x:String x:Key="Text.Settings.Display.Subtitle" xml:space="preserve">Atur tampilan daftar berkas dan gaya Kiriha</x:String>
   <x:String x:Key="Text.Settings.Explorer" xml:space="preserve">Daftar berkas</x:String>

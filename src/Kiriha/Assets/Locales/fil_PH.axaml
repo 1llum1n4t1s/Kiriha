@@ -112,7 +112,10 @@
   <x:String x:Key="Text.Launch.Failed" xml:space="preserve">Hindi masimulan: {0}</x:String>
   <x:String x:Key="Text.Launch.TerminalFailed" xml:space="preserve">Hindi masimulan ang Terminal: {0}</x:String>
   <x:String x:Key="Text.License.Activate" xml:space="preserve">I-activate</x:String>
+  <x:String x:Key="Text.License.CodePlaceholder" xml:space="preserve">6-digit na code</x:String>
+  <x:String x:Key="Text.License.EmailPlaceholder" xml:space="preserve">Email na ginamit sa pagbili</x:String>
   <x:String x:Key="Text.License.Exit" xml:space="preserve">Lumabas</x:String>
+  <x:String x:Key="Text.License.KeyFallback" xml:space="preserve">Maglagay na lang ng license key</x:String>
   <x:String x:Key="Text.License.KeyPlaceholder" xml:space="preserve">License key na nagsisimula sa KIRIHA-</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckBody" xml:space="preserve">Mahigit 30 araw nang hindi na-verify online ang lisensya. Kumonekta sa internet at pindutin ang “I-verify ulit online”.</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckTitle" xml:space="preserve">Kailangang i-verify online ang lisensya</x:String>
@@ -121,15 +124,26 @@
   <x:String x:Key="Text.License.Msg.Activated" xml:space="preserve">Na-activate na ang iyong lisensya 🎉 Maraming salamat!</x:String>
   <x:String x:Key="Text.License.Msg.CheckOk" xml:space="preserve">Tapos na ang pag-verify. Salamat sa paggamit ng Kiriha!</x:String>
   <x:String x:Key="Text.License.Msg.Checking" xml:space="preserve">Nagve-verify online…</x:String>
+  <x:String x:Key="Text.License.Msg.CodeSent" xml:space="preserve">Nagpadala kami ng confirmation code sa email. Ilagay ang 6 na numerong natanggap mo.</x:String>
+  <x:String x:Key="Text.License.Msg.CodeTooSoon" xml:space="preserve">Masyadong madalas. Maghintay ng mga 30 segundo at subukan ulit.</x:String>
+  <x:String x:Key="Text.License.Msg.EnterCode" xml:space="preserve">Ilagay ang 6-digit na code mula sa email.</x:String>
+  <x:String x:Key="Text.License.Msg.EnterEmail" xml:space="preserve">Ilagay ang email address na ginamit mo sa pagbili.</x:String>
   <x:String x:Key="Text.License.Msg.EnterKey" xml:space="preserve">Ilagay ang license key na ibinigay noong bumili ka.</x:String>
+  <x:String x:Key="Text.License.Msg.InvalidCode" xml:space="preserve">Mali o expired na ang code. Magpadala ulit ng bagong code.</x:String>
   <x:String x:Key="Text.License.Msg.InvalidKey" xml:space="preserve">Hindi wasto ang license key na iyan. Tingnan kung may nawalang karakter o sobrang espasyong nakopya.</x:String>
+  <x:String x:Key="Text.License.Msg.NoPurchase" xml:space="preserve">Walang nahanap na pagbili para sa email na ito. Pakisuri ang address na ginamit sa pagbili.</x:String>
   <x:String x:Key="Text.License.Msg.PurchaseFailed" xml:space="preserve">Hindi mabuksan ang pahina ng pagbili. Subukan ulit mamaya.</x:String>
-  <x:String x:Key="Text.License.Msg.PurchaseOpened" xml:space="preserve">Nabuksan sa browser ang pahina ng pagbili. I-paste sa itaas ang license key na makikita sa pahina ng kumpirmasyon.</x:String>
+  <x:String x:Key="Text.License.Msg.PurchaseOpened" xml:space="preserve">Nabuksan ang pahina ng pagbili sa browser. Kapag tapos na, i-activate gamit ang email field sa itaas.</x:String>
   <x:String x:Key="Text.License.Msg.Revoked" xml:space="preserve">Hindi na wasto ang lisensyang ito (halimbawa, na-refund). Mangyaring bumili ulit.</x:String>
+  <x:String x:Key="Text.License.Msg.Sending" xml:space="preserve">Ipinapadala ang confirmation code…</x:String>
   <x:String x:Key="Text.License.Msg.ServerUnreachable" xml:space="preserve">Hindi maabot ang server. Tingnan ang iyong koneksyon sa network at subukan ulit.</x:String>
+  <x:String x:Key="Text.License.Msg.Verifying" xml:space="preserve">Bineberipika…</x:String>
   <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">Buksan ang pahina ng pagbili (¥980, isahang bayad)</x:String>
-  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">Pagkatapos bumili, makikita ang license key sa pahina ng kumpirmasyon ng bayad. Walang kailangang account o password.</x:String>
+  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">Walang kailangang account o password. Isang beses na bayad na ¥980, walang limitasyon sa bilang ng computer.</x:String>
   <x:String x:Key="Text.License.Recheck" xml:space="preserve">I-verify ulit online</x:String>
+  <x:String x:Key="Text.License.RecoverNote" xml:space="preserve">Magpapadala kami ng confirmation code sa email na ginamit mo sa pagbili. Hindi na kailangan ng license key.</x:String>
+  <x:String x:Key="Text.License.ResendCode" xml:space="preserve">Ipadala ulit ang code</x:String>
+  <x:String x:Key="Text.License.SendCode" xml:space="preserve">Ipadala ang code</x:String>
   <x:String x:Key="Text.License.Status.Licensed" xml:space="preserve">Aktibo ang lisensya: {0}</x:String>
   <x:String x:Key="Text.License.Status.OnlineCheck" xml:space="preserve">Kailangang i-verify online ang lisensya (kumonekta sa internet)</x:String>
   <x:String x:Key="Text.License.Status.Trial" xml:space="preserve">Panahon ng pagsubok ({0} araw ang natitira)</x:String>
@@ -189,6 +203,13 @@
   <x:String x:Key="Text.Settings.DefaultFolderApp" xml:space="preserve">Gawing default na app ang Kiriha sa pagbukas ng mga folder at drive</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.Off" xml:space="preserve">Kapag naka-on, tumatakbo ang Kiriha tuwing bubuksan ang folder o drive mula sa File Explorer.</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.On" xml:space="preserve">Sa kasalukuyan, bumubukas sa Kiriha ang mga folder at drive. Kapag ini-off ito, babalik ang dating gawi.</x:String>
+  <x:String x:Key="Text.Settings.DefaultView" xml:space="preserve">Default na view ng folder</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.Mode" xml:space="preserve">View</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.Note" xml:space="preserve">Ang mga folder na walang naka-save na view ay bubuksan gamit ang mga setting na ito. Kapag binago mo ang view o pagkakasunod-sunod sa loob ng isang folder, para lang sa folder na iyon ito naitatago.</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.Reset" xml:space="preserve">I-reset ang mga view kada folder</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.ResetDone" xml:space="preserve">Nabura ang mga naka-save na view kada folder.</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.ResetNote" xml:space="preserve">Buburahin ang view, pagkakasunod-sunod at lapad ng column na naaalala sa bawat folder, at babalik sa mga default sa itaas.</x:String>
+  <x:String x:Key="Text.Settings.DefaultView.Sort" xml:space="preserve">Pag-uri-uriin ayon sa</x:String>
   <x:String x:Key="Text.Settings.Display" xml:space="preserve">Hitsura</x:String>
   <x:String x:Key="Text.Settings.Display.Subtitle" xml:space="preserve">Iakma ang hitsura ng listahan ng file at ng Kiriha</x:String>
   <x:String x:Key="Text.Settings.Explorer" xml:space="preserve">Listahan ng file</x:String>
