@@ -105,6 +105,7 @@
   <x:String x:Key="Text.Gallery.RotateLeft" xml:space="preserve">Putar ke kiri (disimpan tanpa kehilangan kualitas)</x:String>
   <x:String x:Key="Text.Gallery.RotateRight" xml:space="preserve">Putar ke kanan (disimpan tanpa kehilangan kualitas)</x:String>
   <x:String x:Key="Text.Gallery.Zoom" xml:space="preserve">Zoom</x:String>
+  <x:String x:Key="Text.Gallery.ZoomReset" xml:space="preserve">Atur ulang zoom ke 100%</x:String>
   <x:String x:Key="Text.Gallery.ZoomTip" xml:space="preserve">Anda juga dapat memperbesar dengan Ctrl + roda mouse</x:String>
   <x:String x:Key="Text.Integration.OpenWithKiriha" xml:space="preserve">Buka dengan Kiriha</x:String>
   <x:String x:Key="Text.Launch.ExplorerFailed" xml:space="preserve">Tidak dapat menjalankan File Explorer: {0}</x:String>

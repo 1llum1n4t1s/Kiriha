@@ -105,6 +105,7 @@
   <x:String x:Key="Text.Gallery.RotateLeft" xml:space="preserve">左に回転（無劣化で保存）</x:String>
   <x:String x:Key="Text.Gallery.RotateRight" xml:space="preserve">右に回転（無劣化で保存）</x:String>
   <x:String x:Key="Text.Gallery.Zoom" xml:space="preserve">拡大縮小</x:String>
+  <x:String x:Key="Text.Gallery.ZoomReset" xml:space="preserve">拡大縮小を 100% に戻す</x:String>
   <x:String x:Key="Text.Gallery.ZoomTip" xml:space="preserve">Ctrl + マウスホイールでも拡大縮小できます</x:String>
   <x:String x:Key="Text.Integration.OpenWithKiriha" xml:space="preserve">Kiriha で開く</x:String>
   <x:String x:Key="Text.Launch.ExplorerFailed" xml:space="preserve">エクスプローラーを起動できませんでした: {0}</x:String>

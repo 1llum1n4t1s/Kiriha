@@ -105,6 +105,7 @@
   <x:String x:Key="Text.Gallery.RotateLeft" xml:space="preserve">In sinistram vertere (sine damno servatur)</x:String>
   <x:String x:Key="Text.Gallery.RotateRight" xml:space="preserve">In dexteram vertere (sine damno servatur)</x:String>
   <x:String x:Key="Text.Gallery.Zoom" xml:space="preserve">Amplificatio</x:String>
+  <x:String x:Key="Text.Gallery.ZoomReset" xml:space="preserve">Amplificationem ad 100% restituere</x:String>
   <x:String x:Key="Text.Gallery.ZoomTip" xml:space="preserve">Amplificare etiam potes cum Ctrl + rota muris</x:String>
   <x:String x:Key="Text.Integration.OpenWithKiriha" xml:space="preserve">Cum Kiriha aperire</x:String>
   <x:String x:Key="Text.Launch.ExplorerFailed" xml:space="preserve">Explorer incipi non potuit: {0}</x:String>

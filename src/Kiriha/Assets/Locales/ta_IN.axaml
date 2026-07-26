@@ -105,6 +105,7 @@
   <x:String x:Key="Text.Gallery.RotateLeft" xml:space="preserve">இடதுபுறம் சுழற்று (தரம் குறையாமல் சேமிக்கப்படும்)</x:String>
   <x:String x:Key="Text.Gallery.RotateRight" xml:space="preserve">வலதுபுறம் சுழற்று (தரம் குறையாமல் சேமிக்கப்படும்)</x:String>
   <x:String x:Key="Text.Gallery.Zoom" xml:space="preserve">பெரிதாக்கு / சிறிதாக்கு</x:String>
+  <x:String x:Key="Text.Gallery.ZoomReset" xml:space="preserve">பெரிதாக்கலை 100% ஆக மீட்டமை</x:String>
   <x:String x:Key="Text.Gallery.ZoomTip" xml:space="preserve">Ctrl + மவுஸ் சக்கரத்தாலும் பெரிதாக்கலாம்</x:String>
   <x:String x:Key="Text.Integration.OpenWithKiriha" xml:space="preserve">Kiriha மூலம் திற</x:String>
   <x:String x:Key="Text.Launch.ExplorerFailed" xml:space="preserve">கோப்பு எக்ஸ்ப்ளோரரைத் தொடங்க முடியவில்லை: {0}</x:String>

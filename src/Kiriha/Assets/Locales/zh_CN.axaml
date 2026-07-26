@@ -105,6 +105,7 @@
   <x:String x:Key="Text.Gallery.RotateLeft" xml:space="preserve">向左旋转（无损保存）</x:String>
   <x:String x:Key="Text.Gallery.RotateRight" xml:space="preserve">向右旋转（无损保存）</x:String>
   <x:String x:Key="Text.Gallery.Zoom" xml:space="preserve">缩放</x:String>
+  <x:String x:Key="Text.Gallery.ZoomReset" xml:space="preserve">将缩放重置为 100%</x:String>
   <x:String x:Key="Text.Gallery.ZoomTip" xml:space="preserve">也可以使用 Ctrl + 鼠标滚轮缩放</x:String>
   <x:String x:Key="Text.Integration.OpenWithKiriha" xml:space="preserve">用 Kiriha 打开</x:String>
   <x:String x:Key="Text.Launch.ExplorerFailed" xml:space="preserve">无法启动文件资源管理器: {0}</x:String>

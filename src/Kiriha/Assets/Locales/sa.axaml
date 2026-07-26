@@ -105,6 +105,7 @@
   <x:String x:Key="Text.Gallery.RotateLeft" xml:space="preserve">वामतः परिवर्तनम् (अक्षतरूपेण रक्ष्यते)</x:String>
   <x:String x:Key="Text.Gallery.RotateRight" xml:space="preserve">दक्षिणतः परिवर्तनम् (अक्षतरूपेण रक्ष्यते)</x:String>
   <x:String x:Key="Text.Gallery.Zoom" xml:space="preserve">आवर्धनम्</x:String>
+  <x:String x:Key="Text.Gallery.ZoomReset" xml:space="preserve">आवर्धनं 100% इति पुनःस्थापय</x:String>
   <x:String x:Key="Text.Gallery.ZoomTip" xml:space="preserve">Ctrl + मूषकचक्रेण अपि आवर्धनं शक्यते</x:String>
   <x:String x:Key="Text.Integration.OpenWithKiriha" xml:space="preserve">Kiriha द्वारा उद्घाटय</x:String>
   <x:String x:Key="Text.Launch.ExplorerFailed" xml:space="preserve">सञ्चिकादर्शकः न आरब्धः: {0}</x:String>

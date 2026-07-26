@@ -105,6 +105,7 @@
   <x:String x:Key="Text.Gallery.RotateLeft" xml:space="preserve">Iikot pakaliwa (naka-save nang walang kawalan ng kalidad)</x:String>
   <x:String x:Key="Text.Gallery.RotateRight" xml:space="preserve">Iikot pakanan (naka-save nang walang kawalan ng kalidad)</x:String>
   <x:String x:Key="Text.Gallery.Zoom" xml:space="preserve">Zoom</x:String>
+  <x:String x:Key="Text.Gallery.ZoomReset" xml:space="preserve">I-reset ang zoom sa 100%</x:String>
   <x:String x:Key="Text.Gallery.ZoomTip" xml:space="preserve">Maaari ka ring mag-zoom gamit ang Ctrl + gulong ng mouse</x:String>
   <x:String x:Key="Text.Integration.OpenWithKiriha" xml:space="preserve">Buksan gamit ang Kiriha</x:String>
   <x:String x:Key="Text.Launch.ExplorerFailed" xml:space="preserve">Hindi masimulan ang File Explorer: {0}</x:String>

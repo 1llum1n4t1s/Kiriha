@@ -105,6 +105,7 @@
   <x:String x:Key="Text.Gallery.RotateLeft" xml:space="preserve">Rotation à gauche (enregistrée sans perte)</x:String>
   <x:String x:Key="Text.Gallery.RotateRight" xml:space="preserve">Rotation à droite (enregistrée sans perte)</x:String>
   <x:String x:Key="Text.Gallery.Zoom" xml:space="preserve">Zoom</x:String>
+  <x:String x:Key="Text.Gallery.ZoomReset" xml:space="preserve">Réinitialiser le zoom à 100 %</x:String>
   <x:String x:Key="Text.Gallery.ZoomTip" xml:space="preserve">Vous pouvez aussi zoomer avec Ctrl + molette</x:String>
   <x:String x:Key="Text.Integration.OpenWithKiriha" xml:space="preserve">Ouvrir avec Kiriha</x:String>
   <x:String x:Key="Text.Launch.ExplorerFailed" xml:space="preserve">Impossible de démarrer l'Explorateur : {0}</x:String>

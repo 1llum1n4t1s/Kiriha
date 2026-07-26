@@ -45,7 +45,11 @@
                                                         </DataTemplate>
                                                     </ComboBox.ItemTemplate>
                                                 </ComboBox>
+                                                <!-- settingscaption の既定マージンはチェックボックスの下へ潜り込ませる前提
+                                                     （インデント 28・上マージン -4）なので、ドロップダウンの下に置くときは
+                                                     アイコンセットの注記と同じく上余白を戻す（重なり防止）。 -->
                                                 <TextBlock Classes="settingscaption" TextWrapping="Wrap"
+                                                           Margin="0,6,0,0"
                                                            Text="{DynamicResource Text.Settings.Language.Note}" />
                                             </StackPanel>
                                         </HeaderedContentControl>

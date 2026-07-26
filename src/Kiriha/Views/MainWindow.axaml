@@ -174,34 +174,8 @@
                         <ScrollViewer VerticalScrollBarVisibility="Auto"
                                       HorizontalScrollBarVisibility="Disabled">
                             <StackPanel Spacing="2">
-                                <!-- 無劣化回転（Exif の向きだけを書き換えて即保存）。
-                                     向きタグを持てない形式では押せないようにする。 -->
-                                <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,0,10">
-                                    <Button Classes="galleryTool"
-                                            IsEnabled="{Binding SelectedTab.CanRotateSelected}"
-                                            Command="{Binding SelectedTab.RotateSelectedLeftCommand}"
-                                            AutomationProperties.Name="{DynamicResource Text.Gallery.RotateLeft}"
-                                            ToolTip.Tip="{DynamicResource Text.Gallery.RotateLeft}">
-                                        <TextBlock Classes="fico" Text="&#xE80D;" FontSize="14" />
-                                    </Button>
-                                    <Button Classes="galleryTool"
-                                            IsEnabled="{Binding SelectedTab.CanRotateSelected}"
-                                            Command="{Binding SelectedTab.RotateSelectedRightCommand}"
-                                            AutomationProperties.Name="{DynamicResource Text.Gallery.RotateRight}"
-                                            ToolTip.Tip="{DynamicResource Text.Gallery.RotateRight}">
-                                        <TextBlock Classes="fico" Text="&#xE80C;" FontSize="14" />
-                                    </Button>
-                                </StackPanel>
-
-                                <!-- 表示倍率。Ctrl+ホイールと同じ値を触る。 -->
-                                <TextBlock Text="{DynamicResource Text.Gallery.Zoom}" FontSize="11" FontWeight="SemiBold"
-                                           Foreground="{DynamicResource TextSecondary}" />
-                                <Slider Classes="galleryzoom" Margin="0,0,0,12"
-                                        Minimum="0.2" Maximum="8" SmallChange="0.1" LargeChange="0.5"
-                                        AutomationProperties.Name="{DynamicResource Text.Gallery.Zoom}"
-                                        ToolTip.Tip="{DynamicResource Text.Gallery.ZoomTip}"
-                                        Value="{Binding SelectedTab.GalleryZoom, Mode=TwoWay}" />
-
+                                <!-- 回転と拡大縮小の操作は、フィルムストリップの上の共通コントロールバーへ集約した
+                                     （MainWindow.axaml の Border.gallerybar）。ここには Exif 等の情報だけを出す。 -->
                                 <TextBlock Text="{DynamicResource Text.Gallery.ImageInfo}" FontSize="11" FontWeight="SemiBold"
                                            Margin="0,0,0,8"
                                            Foreground="{DynamicResource TextSecondary}" />
@@ -965,7 +939,7 @@
                                     <!-- ギャラリー表示（アイコンサイズスライダー最大時の特別モード）:
                                          1 枚を大きく表示し、下部フィルムストリップで送る。Esc / スライダーで復帰。
                                          ストリップの高さは境界 Thumb で変更でき、全タブ共通で永続化する。 -->
-                                    <Grid IsVisible="{Binding IsGalleryView}" RowDefinitions="*,Auto,Auto" Background="#FF121212">
+                                    <Grid IsVisible="{Binding IsGalleryView}" RowDefinitions="*,Auto,Auto,Auto" Background="#FF121212">
                                         <!-- メイン画像。クリックでフォーカスを受け（Del / F2 等が効く）、
                                              右クリックで通常のファイルと同じ Windows シェルメニューを出す。 -->
                                         <!-- Background を敷かないと画像の外（レターボックス）がヒットテスト対象外になり、
@@ -977,12 +951,16 @@
                                                PointerPressed="GalleryImage_PointerPressed"
                                                PointerMoved="GalleryImage_PointerMoved"
                                                PointerReleased="GalleryImage_PointerReleased"
+                                               PointerExited="GalleryImage_PointerExited"
+                                               SizeChanged="GalleryImage_SizeChanged"
                                                KeyDown="GalleryImage_KeyDown">
                                             <!-- 拡大縮小は RenderTransform で掛ける。レイアウトを動かさないので
                                                  Stretch="Uniform" の「領域に収める」計算をそのまま活かせ、
-                                                 拡大中も下のオーバーレイ（閉じるボタン・再生バー）が動かない。 -->
+                                                 拡大中も下のオーバーレイ（閉じるボタン）が動かない。
+                                                 原点は左上に固定し、「領域の中心を動かさない」平行移動は
+                                                 TabViewModel.ApplyGalleryTransform が計算して足す。 -->
                                             <Panel RenderTransform="{Binding GalleryImageTransform}"
-                                                   RenderTransformOrigin="0.5,0.5">
+                                                   RenderTransformOrigin="0,0">
                                                 <Image Source="{Binding PreviewBitmap}" Stretch="Uniform" StretchDirection="DownOnly"
                                                        RenderOptions.BitmapInterpolationMode="HighQuality" />
                                                 <!-- 動画のフレーム。VideoFrame は 2 枚のビットマップを交互に差し替えて更新される。
@@ -1007,19 +985,20 @@
                                                            TextTrimming="CharacterEllipsis" MaxWidth="520" />
                                             </StackPanel>
                                             <!-- ギャラリー終了（Esc / スライダーでも戻れる）。
-                                                 普段は隠し、右上のこのゾーンへマウスを近づけたときだけフェード表示する -->
-                                            <Border Classes="galleryclosezone" Width="96" Height="96"
+                                                 普段は隠し、メイン画像領域でマウスを動かしている間だけフェード表示する
+                                                 （距離ではなく操作の有無で出す。GalleryImage_PointerMoved 参照）。 -->
+                                            <Button Classes="galleryclose"
+                                                    Classes.shown="{Binding IsGalleryOverlayVisible}"
+                                                    IsHitTestVisible="{Binding IsGalleryOverlayVisible}"
                                                     HorizontalAlignment="Right" VerticalAlignment="Top"
-                                                    Background="Transparent">
-                                                <Button HorizontalAlignment="Right" VerticalAlignment="Top"
-                                                        Width="32" Height="32" CornerRadius="16" Padding="0"
-                                                        Background="#66000000" Click="GalleryClose_Click"
-                                                        ToolTip.Tip="{DynamicResource Text.Gallery.CloseTip}">
-                                                    <TextBlock Classes="fico" Text="&#xE711;" FontSize="13"
-                                                               Foreground="#DDDDDD"
-                                                               HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                                </Button>
-                                            </Border>
+                                                    Margin="12"
+                                                    Click="GalleryClose_Click"
+                                                    AutomationProperties.Name="{DynamicResource Text.Gallery.CloseTip}"
+                                                    ToolTip.Tip="{DynamicResource Text.Gallery.CloseTip}">
+                                                <TextBlock Classes="fico" Text="&#xE711;" FontSize="13"
+                                                           Foreground="#DDDDDD"
+                                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Button>
                                             <!-- 再生できなかった動画（コーデック未導入など）の案内 -->
                                             <Border IsVisible="{Binding IsVideoUnavailable}"
                                                     HorizontalAlignment="Center" VerticalAlignment="Center"
@@ -1028,18 +1007,59 @@
                                                            Foreground="#DDDDDD" FontSize="13"
                                                            TextWrapping="Wrap" MaxWidth="420" TextAlignment="Center" />
                                             </Border>
-                                            <!-- 動画の再生コントロール。プレビュー領域の下端に重ねる。
-                                                 映像に被って邪魔にならないよう、プレビュー領域でマウスを
-                                                 動かしている間だけ出す（GalleryImage_PointerMoved）。 -->
-                                            <Border Classes="videobar"
-                                                    VerticalAlignment="Bottom" HorizontalAlignment="Stretch">
-                                                <Border.IsVisible>
-                                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
-                                                        <Binding Path="IsVideoPreview" />
-                                                        <Binding Path="IsVideoBarVisible" />
-                                                    </MultiBinding>
-                                                </Border.IsVisible>
-                                                <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto,Auto,Auto" RowDefinitions="Auto">
+                                        </Panel>
+
+                                        <!-- 画像・動画で共通のコントロールバー。フィルムストリップとメイン表示の間に置き、
+                                             左に画像の操作（回転・拡大縮小）、右に動画の操作（再生・シーク・音量・速度）を集約する。
+                                             画像へ重ねないので鑑賞の邪魔にならず、マウスを動かさなくても常に操作できる。 -->
+                                        <Border Grid.Row="1" Classes="gallerybar">
+                                            <Grid ColumnDefinitions="Auto,*">
+                                                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="2"
+                                                            VerticalAlignment="Center">
+                                                    <!-- 回転。静止画は無劣化回転（Exif の向きだけを書き換えて即保存）、
+                                                         動画は表示だけを回す（ファイルは書き換えない）。
+                                                         アイコンは Material Icons の rotate_left / rotate_right
+                                                         （Apache-2.0。Assets/MaterialIcons/NOTICE.md 参照）。 -->
+                                                    <Button Classes="videobtn"
+                                                            IsEnabled="{Binding CanRotateSelected}"
+                                                            Command="{Binding RotateSelectedLeftCommand}"
+                                                            AutomationProperties.Name="{DynamicResource Text.Gallery.RotateLeft}"
+                                                            ToolTip.Tip="{DynamicResource Text.Gallery.RotateLeft}">
+                                                        <Path Width="18" Height="18" Stretch="Uniform" Fill="#DDDDDD"
+                                                              Data="M7.11 8.53L5.7 7.11C4.8 8.27 4.24 9.61 4.07 11h2.02c.14-.87.49-1.72 1.02-2.47zM6.09 13H4.07c.17 1.39.72 2.73 1.62 3.89l1.41-1.42c-.52-.75-.87-1.59-1.01-2.47zm1.01 5.32c1.16.9 2.51 1.44 3.9 1.61V17.9c-.87-.15-1.71-.49-2.46-1.03L7.1 18.32zM13 4.07V1L8.45 5.55 13 10V6.09c2.84.48 5 2.94 5 5.91s-2.16 5.43-5 5.91v2.02c3.95-.49 7-3.85 7-7.93s-3.05-7.44-7-7.93z" />
+                                                    </Button>
+                                                    <Button Classes="videobtn"
+                                                            IsEnabled="{Binding CanRotateSelected}"
+                                                            Command="{Binding RotateSelectedRightCommand}"
+                                                            AutomationProperties.Name="{DynamicResource Text.Gallery.RotateRight}"
+                                                            ToolTip.Tip="{DynamicResource Text.Gallery.RotateRight}">
+                                                        <Path Width="18" Height="18" Stretch="Uniform" Fill="#DDDDDD"
+                                                              Data="M15.55 5.55L11 1v3.07C7.06 4.56 4 7.92 4 12s3.05 7.44 7 7.93v-2.02c-2.84-.48-5-2.94-5-5.91s2.16-5.43 5-5.91V10l4.55-4.45zM19.93 11c-.17-1.39-.72-2.73-1.62-3.89l-1.42 1.42c.54.75.88 1.6 1.02 2.47h2.02zM13 17.9v2.02c1.39-.17 2.74-.71 3.9-1.61l-1.44-1.44c-.75.54-1.59.89-2.46 1.03zm3.89-2.42l1.42 1.41c.9-1.16 1.45-2.5 1.62-3.89h-2.02c-.14.87-.48 1.72-1.02 2.48z" />
+                                                    </Button>
+
+                                                    <Border Classes="gallerysep" />
+
+                                                    <!-- 表示倍率。Ctrl+ホイールと同じ値を触る。 -->
+                                                    <TextBlock Classes="fico videotime" Text="&#xE71F;" FontSize="13"
+                                                               Margin="4,0,6,0" />
+                                                    <Slider Classes="galleryzoom" Width="140" VerticalAlignment="Center"
+                                                            Minimum="0.2" Maximum="8" SmallChange="0.1" LargeChange="0.5"
+                                                            AutomationProperties.Name="{DynamicResource Text.Gallery.Zoom}"
+                                                            ToolTip.Tip="{DynamicResource Text.Gallery.ZoomTip}"
+                                                            Value="{Binding GalleryZoom, Mode=TwoWay}" />
+                                                    <TextBlock Text="{Binding GalleryZoomText}" Classes="videotime"
+                                                               Width="46" TextAlignment="Right" Margin="6,0,4,0" />
+                                                    <Button Classes="videobtn" Width="52"
+                                                            Command="{Binding ResetGalleryZoomCommand}"
+                                                            AutomationProperties.Name="{DynamicResource Text.Gallery.ZoomReset}"
+                                                            ToolTip.Tip="{DynamicResource Text.Gallery.ZoomReset}">
+                                                        <TextBlock Text="100%" FontSize="11.5" />
+                                                    </Button>
+                                                </StackPanel>
+
+                                                <Grid Grid.Column="1" Margin="12,0,0,0"
+                                                      IsVisible="{Binding IsVideoPreview}"
+                                                      ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto,Auto,Auto" RowDefinitions="Auto">
                                                     <Button Grid.Column="0" Classes="videobtn"
                                                             Command="{Binding ToggleVideoPlaybackCommand}"
                                                             ToolTip.Tip="{DynamicResource Text.Video.PlayPauseTip}">
@@ -1077,18 +1097,21 @@
                                                             ToolTip.Tip="{DynamicResource Text.Video.LoopTip}">
                                                         <TextBlock Classes="fico" FontSize="14" Text="&#xE8EE;" />
                                                     </Button>
-                                                    <Button Grid.Column="7" Classes="videobtn" Width="46"
-                                                            Command="{Binding CycleVideoRateCommand}"
-                                                            ToolTip.Tip="{DynamicResource Text.Video.RateTip}">
-                                                        <TextBlock Text="{Binding VideoRateText}" FontSize="12" />
-                                                    </Button>
+                                                    <!-- 再生速度は候補から選ぶ（巡回ボタンだと目的の倍率まで押し続ける必要があった）。
+                                                         選んだ倍率は音量・ミュートと同じく settings.json へ保存する。 -->
+                                                    <ComboBox Grid.Column="7" Classes="videorate" Margin="8,0,0,0"
+                                                              ItemsSource="{Binding VideoRateOptions}"
+                                                              SelectedIndex="{Binding VideoRateIndex, Mode=TwoWay}"
+                                                              AutomationProperties.Name="{DynamicResource Text.Video.RateTip}"
+                                                              ToolTip.Tip="{DynamicResource Text.Video.RateTip}" />
                                                 </Grid>
-                                            </Border>
-                                        </Panel>
+                                            </Grid>
+                                        </Border>
+
                                         <!-- ストリップとプレビューの境界。上下ドラッグでストリップの高さを変える -->
-                                        <Thumb Grid.Row="1" Classes="rowsplit"
+                                        <Thumb Grid.Row="2" Classes="rowsplit"
                                                DragDelta="GalleryStripThumb_DragDelta" />
-                                        <ListBox Grid.Row="2" Classes="files gallerystrip"
+                                        <ListBox Grid.Row="3" Classes="files gallerystrip"
                                                  Height="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).GalleryStripHeight}"
                                                  ItemsSource="{Binding Entries}"
                                                  SelectedItem="{Binding SelectedEntry}"

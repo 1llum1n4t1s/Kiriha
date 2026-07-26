@@ -11,3 +11,12 @@
   256×256 にラスタライズしたもの。Avalonia.Svg.Skia（Avalonia 11 系向けビルドしか存在しない）を
   Avalonia 12 の Kiriha で使うと実機でウィンドウが描画されなくなる致命的な非互換があったため、
   実績のある Bitmap 読み込み経路に統一する目的でビルド時変換に切り替えた。
+
+# Material Icons（UI アイコン）
+
+ギャラリーのコントロールバーにある回転ボタンのパスデータは
+[material-design-icons](https://github.com/google/material-design-icons) の
+`rotate_left` / `rotate_right`（`src/image/rotate_*/materialicons/24px.svg`）をそのまま埋め込んだもの。
+
+- ライセンス: Apache License 2.0
+- 埋め込み先: `src/Kiriha/Views/MainWindow.axaml`（`Path.Data` として直書き）

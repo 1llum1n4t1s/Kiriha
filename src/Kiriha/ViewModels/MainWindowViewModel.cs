@@ -69,7 +69,7 @@ public partial class MainWindowViewModel : ObservableObject
     private double _galleryStripHeight = 116;
 
     /// <summary>ストリップ高さに追従するサムネイル一辺のサイズ（枠・余白・スクロールバー分を差し引く）。</summary>
-    public double GalleryThumbSize => Math.Clamp(GalleryStripHeight - 36, 54, 424);
+    public double GalleryThumbSize => Math.Clamp(GalleryStripHeight - 36, 18, 424);
 
     /// <summary>お気に入りバーの表示状態（Ctrl+Shift+B で切替、永続化）。</summary>
     [ObservableProperty]
@@ -736,7 +736,18 @@ public partial class MainWindowViewModel : ObservableObject
         _searchBoxWidth = _settings.SearchBoxWidth is > 120 and < 500 ? _settings.SearchBoxWidth : 200;
         _showPreviewPane = _settings.ShowPreviewPane;
         _previewWidth = _settings.PreviewWidth is >= 180 and <= 600 ? _settings.PreviewWidth : 280;
-        _galleryStripHeight = _settings.GalleryStripHeight is >= 90 and <= 460 ? _settings.GalleryStripHeight : 116;
+        _galleryStripHeight = _settings.GalleryStripHeight is >= 54 and <= 460 ? _settings.GalleryStripHeight : 116;
+
+        // ギャラリー動画の音量・ミュート・速度は全タブ共通かつ次回起動へ持ち越す。
+        // タブ側は AppSettings を持たないので、読み込みと保存の経路をここから渡す。
+        TabViewModel.LoadVideoPreferences(_settings.VideoVolume, _settings.VideoMuted, _settings.VideoRate);
+        TabViewModel.VideoPreferencesChanged = (volume, muted, rate) =>
+        {
+            _settings.VideoVolume = volume;
+            _settings.VideoMuted = muted;
+            _settings.VideoRate = rate;
+            SettingsService.Save(_settings);
+        };
         _showStatusBar = _settings.ShowStatusBar;
         _showSidebarTree = _settings.SidebarShowTree;
         if (_showSidebarTree)

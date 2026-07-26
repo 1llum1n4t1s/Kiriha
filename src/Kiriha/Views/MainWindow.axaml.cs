@@ -11,6 +11,7 @@ using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Kiriha.Controls;
 using Kiriha.Models;
 using Kiriha.Services;
 using Kiriha.ViewModels;
@@ -697,7 +698,7 @@ public partial class MainWindow : Window
         if (ViewModel is { } vm)
         {
             // ストリップは下側なので上ドラッグ（Y マイナス）で拡大
-            vm.GalleryStripHeight = Math.Round(Math.Clamp(vm.GalleryStripHeight - e.Vector.Y, 90, 460));
+            vm.GalleryStripHeight = Math.Round(Math.Clamp(vm.GalleryStripHeight - e.Vector.Y, 54, 460));
         }
     }
 
@@ -1966,18 +1967,15 @@ public partial class MainWindow : Window
         (sender as Control)?.Focus();
         _galleryImageArea = sender as Panel;
 
-        // 拡大中は左ドラッグで見たい場所へ画像を動かせるようにする。
-        // ただし再生バー上での操作（シークのドラッグ等）は画像移動にしない。
-        var onVideoBar = e.Source is Visual source
-            && source.GetSelfAndVisualAncestors().OfType<Border>().Any(b => b.Classes.Contains("videobar"));
-        _galleryPanOrigin = !onVideoBar
-            && e.GetCurrentPoint(this).Properties.IsLeftButtonPressed
+        // 拡大中は左ドラッグで見たい場所へ画像を動かせるようにする（手のひらツール）。
+        _galleryPanOrigin = e.GetCurrentPoint(this).Properties.IsLeftButtonPressed
             && ViewModel?.SelectedTab is { IsSettingsTab: false, IsGalleryZoomed: true }
             ? e.GetPosition(this)
             : null;
+        UpdateGalleryCursor(sender as Control);
     }
 
-    /// <summary>プレビュー領域でのマウス移動。拡大中の画像移動と、動画コントロールの表示起こしを行う。</summary>
+    /// <summary>プレビュー領域でのマウス移動。拡大中の画像移動と、オーバーレイの表示起こしを行う。</summary>
     private void GalleryImage_PointerMoved(object? sender, PointerEventArgs e)
     {
         if (ViewModel?.SelectedTab is not { IsSettingsTab: false } tab)
@@ -2001,16 +1999,46 @@ public partial class MainWindow : Window
             }
         }
 
-        if (tab.IsVideoPreview)
+        // 手のひらカーソルは領域へ入った時点で出す（ドラッグを始めなくても操作方法が分かるように）
+        UpdateGalleryCursor(sender as Control);
+
+        // 閉じるボタンは「近づいたら」ではなく「この領域でマウスを動かしている間」出す。
+        ShowGalleryOverlay(tab);
+    }
+
+    /// <summary>メイン画像領域の大きさを ViewModel へ伝える（拡大の基準点を領域中心にするため）。</summary>
+    private void GalleryImage_SizeChanged(object? sender, SizeChangedEventArgs e)
+    {
+        if ((sender as Control)?.DataContext is TabViewModel tab)
         {
-            ShowVideoBar(tab);
+            tab.SetGalleryViewport(e.NewSize);
         }
     }
 
-    /// <summary>動画のコントロールバーを出し、一定時間マウスが止まったら自動で引っ込める。</summary>
-    private void ShowVideoBar(TabViewModel tab)
+    /// <summary>領域から出たらオーバーレイを畳む（別の場所を操作しているときに残さない）。</summary>
+    private void GalleryImage_PointerExited(object? sender, PointerEventArgs e)
     {
-        tab.IsVideoBarVisible = true;
+        if ((sender as Control)?.DataContext is TabViewModel tab)
+        {
+            tab.IsGalleryOverlayVisible = false;
+        }
+    }
+
+    /// <summary>手のひらツールのカーソル。ドラッグ中は握った手にする。</summary>
+    private void UpdateGalleryCursor(Control? area)
+    {
+        if (area is null)
+        {
+            return;
+        }
+
+        area.Cursor = _galleryPanOrigin is null ? HandCursors.Open : HandCursors.Grabbing;
+    }
+
+    /// <summary>ギャラリーのオーバーレイ（閉じるボタン）を出し、一定時間マウスが止まったら自動で引っ込める。</summary>
+    private void ShowGalleryOverlay(TabViewModel tab)
+    {
+        tab.IsGalleryOverlayVisible = true;
         _videoBarTimer ??= CreateVideoBarTimer();
         _videoBarTimer.Stop();
         _videoBarTimer.Start();
@@ -2027,16 +2055,16 @@ public partial class MainWindow : Window
                 return;
             }
 
-            // バーの上にカーソルを置いたまま（シークしようとして手を止めた等）なら消さない。
-            var bar = _galleryImageArea?.GetVisualDescendants().OfType<Border>()
-                .FirstOrDefault(b => b.Classes.Contains("videobar"));
-            if (bar?.IsPointerOver == true)
+            // 閉じるボタンへ手を伸ばしている最中（ボタン上でカーソルが止まった）なら消さない。
+            var close = _galleryImageArea?.GetVisualDescendants().OfType<Button>()
+                .FirstOrDefault(b => b.Classes.Contains("galleryclose"));
+            if (close?.IsPointerOver == true)
             {
                 timer.Start();
                 return;
             }
 
-            tab.IsVideoBarVisible = false;
+            tab.IsGalleryOverlayVisible = false;
         };
         return timer;
     }
@@ -2100,6 +2128,10 @@ public partial class MainWindow : Window
 
     private void GalleryImage_PointerReleased(object? sender, PointerReleasedEventArgs e)
     {
+        // 手のひらを開いた状態へ戻す（ドラッグ終了）
+        _galleryPanOrigin = null;
+        UpdateGalleryCursor(sender as Control);
+
         // 表示中の画像の右クリックは、通常のファイル右クリックと同じ Windows シェルメニューを出す。
         if (e.InitialPressMouseButton != MouseButton.Right
             || ViewModel?.SelectedTab is not { IsSettingsTab: false } tab

@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using Avalonia;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
@@ -213,8 +214,12 @@ public partial class TabViewModel : ObservableObject
 
     partial void OnSelectedEntryChanged(FileSystemEntry? value)
     {
-        CanRotateSelected = value is { IsDirectory: false }
-            && ExifOrientationService.CanRotate(Path.GetExtension(value.Name).ToLowerInvariant());
+        var extension = value is { IsDirectory: false }
+            ? Path.GetExtension(value.Name).ToLowerInvariant()
+            : "";
+        // 静止画は無劣化回転（保存あり）、動画は表示だけの回転。どちらもボタンは同じ。
+        CanRotateSelected = ExifOrientationService.CanRotate(extension)
+            || VideoPlaybackSession.IsPlayable(extension);
 
         if (_previewEnabled || IsGalleryView)
         {
@@ -318,8 +323,19 @@ public partial class TabViewModel : ObservableObject
     /// <summary>ギャラリー拡大率の上限。</summary>
     public const double GalleryZoomMaximum = 8.0;
 
+    /// <summary>表示領域の中心を原点へ寄せる（回転と拡大をこの原点まわりで掛けるため）。</summary>
+    private readonly TranslateTransform _galleryCenter = new();
+    private readonly RotateTransform _galleryRotate = new();
     private readonly ScaleTransform _galleryScale = new();
     private readonly TranslateTransform _galleryPan = new();
+
+    /// <summary>メイン画像領域の大きさ（コードビハインドの SizeChanged から流し込む）。
+    /// 拡大の基準点を領域の中心へ置くために要る。</summary>
+    private Size _galleryViewport;
+
+    /// <summary>ドラッグで動かした量。中心合わせの補正とは別に持ち、拡大率が変わっても保つ。</summary>
+    private double _galleryPanX;
+    private double _galleryPanY;
 
     /// <summary>メイン画像へ掛ける拡大・平行移動。RenderTransform はビジュアルツリーの外に居て
     /// DataContext を継承しないため、XAML から ScaleX 等を個別に Binding できない。
@@ -339,18 +355,86 @@ public partial class TabViewModel : ObservableObject
             return;
         }
 
-        _galleryScale.ScaleX = clamped;
-        _galleryScale.ScaleY = clamped;
-
         // 縮小側へ戻したら、はみ出しを見るための移動量は意味を失うので戻す。
         if (clamped <= 1.0)
         {
-            _galleryPan.X = 0;
-            _galleryPan.Y = 0;
+            _galleryPanX = 0;
+            _galleryPanY = 0;
         }
 
+        ApplyGalleryTransform();
         OnPropertyChanged(nameof(IsGalleryZoomed));
+        OnPropertyChanged(nameof(GalleryZoomText));
     }
+
+    /// <summary>表示中の倍率（コントロールバーに出す文字列）。</summary>
+    public string GalleryZoomText => $"{GalleryZoom * 100:0}%";
+
+    /// <summary>メイン画像領域の大きさが変わったときに呼ぶ（拡大の基準点が領域の中心のため）。</summary>
+    public void SetGalleryViewport(Size size)
+    {
+        if (_galleryViewport == size)
+        {
+            return;
+        }
+
+        _galleryViewport = size;
+        ApplyGalleryTransform();
+    }
+
+    /// <summary>
+    /// 回転・拡大・移動をまとめて Transform へ反映する。
+    ///
+    /// 基準点は表示領域の中心。<c>RenderTransformOrigin</c> に任せると要素の実寸に依存して
+    /// 左上方向へ広がることがあるため、XAML 側の原点は左上に固定し、ここで
+    /// 「中心へ寄せる → 回す → 拡大する → 中心へ戻す（＋ドラッグ量）」の順に組み立てる。
+    /// </summary>
+    private void ApplyGalleryTransform()
+    {
+        var centerX = _galleryViewport.Width / 2;
+        var centerY = _galleryViewport.Height / 2;
+        var scale = GalleryZoom * RotationFitScale();
+
+        _galleryCenter.X = -centerX;
+        _galleryCenter.Y = -centerY;
+        _galleryRotate.Angle = GalleryDisplayRotation;
+        _galleryScale.ScaleX = scale;
+        _galleryScale.ScaleY = scale;
+        _galleryPan.X = centerX + _galleryPanX;
+        _galleryPan.Y = centerY + _galleryPanY;
+    }
+
+    /// <summary>
+    /// 90 度・270 度回転したときに、回った映像が表示領域へ収まるよう掛ける補正倍率。
+    ///
+    /// 回転は表示領域と同じ大きさのパネルごと回すため、補正しないと横長の映像を縦にしたときに
+    /// 左右がはみ出す。等倍時に実際に描かれている大きさ（Uniform で収めた結果）から算出する。
+    /// </summary>
+    private double RotationFitScale()
+    {
+        if (GalleryDisplayRotation % 180 == 0
+            || _galleryViewport.Width <= 0 || _galleryViewport.Height <= 0)
+        {
+            return 1.0;
+        }
+
+        var source = VideoFrame?.PixelSize ?? PreviewBitmap?.PixelSize;
+        if (source is not { Width: > 0, Height: > 0 } pixels)
+        {
+            return 1.0;
+        }
+
+        var fit = Math.Min(_galleryViewport.Width / pixels.Width, _galleryViewport.Height / pixels.Height);
+        var renderedWidth = pixels.Width * fit;
+        var renderedHeight = pixels.Height * fit;
+        return Math.Min(_galleryViewport.Width / renderedHeight, _galleryViewport.Height / renderedWidth);
+    }
+
+    /// <summary>表示だけの回転角（0 / 90 / 180 / 270）。動画はファイルを書き換えず、ここだけを回す。</summary>
+    [ObservableProperty]
+    private double _galleryDisplayRotation;
+
+    partial void OnGalleryDisplayRotationChanged(double value) => ApplyGalleryTransform();
 
     /// <summary>等倍より拡大されている（ドラッグでの移動を受け付ける）。</summary>
     public bool IsGalleryZoomed => GalleryZoom > 1.0;
@@ -367,16 +451,20 @@ public partial class TabViewModel : ObservableObject
             return;
         }
 
-        _galleryPan.X += deltaX;
-        _galleryPan.Y += deltaY;
+        _galleryPanX += deltaX;
+        _galleryPanY += deltaY;
+        ApplyGalleryTransform();
     }
 
-    /// <summary>拡大率と移動量を初期状態へ戻す。</summary>
+    /// <summary>拡大率と移動量を初期状態（100%）へ戻す。表示だけの回転も戻す。</summary>
+    [RelayCommand]
     public void ResetGalleryZoom()
     {
+        _galleryPanX = 0;
+        _galleryPanY = 0;
+        GalleryDisplayRotation = 0;
         GalleryZoom = 1.0;
-        _galleryPan.X = 0;
-        _galleryPan.Y = 0;
+        ApplyGalleryTransform();
     }
 
     // ===== ギャラリーの無劣化回転 =====
@@ -394,11 +482,19 @@ public partial class TabViewModel : ObservableObject
     [RelayCommand]
     private Task RotateSelectedRight() => RotateSelectedAsync(clockwise: true);
 
-    /// <summary>Exif の向きだけを書き換えて即座に保存し、表示とサムネイルを作り直す。</summary>
+    /// <summary>Exif の向きだけを書き換えて即座に保存し、表示とサムネイルを作り直す。
+    /// 動画はファイルを触らず、表示の向きだけを回す。</summary>
     private async Task RotateSelectedAsync(bool clockwise)
     {
         if (!CanRotateSelected || SelectedEntry is not { IsDirectory: false } entry)
         {
+            return;
+        }
+
+        // 動画は無劣化での回転保存ができない（再エンコードになる）ので、見た目だけ回す。
+        if (IsVideoPreview)
+        {
+            GalleryDisplayRotation = (GalleryDisplayRotation + (clockwise ? 90 : 270)) % 360;
             return;
         }
 
@@ -453,16 +549,32 @@ public partial class TabViewModel : ObservableObject
     // 描画フレーム同期のループで駆動する（StartVideoPump 参照）。フレームは 2 枚のビットマップを
     // 交互に差し替えて Image へ流すので、描画のためにコードビハインドへ降りる必要がない。
     //
-    // 音量・ミュート・ループ・速度は「そのセッション中の既定」として静的に持ち回る。ファイルを
-    // 送るたびに音量が戻ると使いづらいため。settings.json へは保存しない。
+    // 音量・ミュート・速度は全タブ共通の設定として静的に持ち回り、settings.json へも保存する
+    // （起動のたびに音量や速度が既定へ戻ると使いづらいため）。ループだけはファイル単位の一時的な
+    // 指定として扱い、保存しない。
 
     private static double s_videoVolume = 0.7;
     private static bool s_videoMuted;
     private static bool s_videoLooping;
     private static double s_videoRate = 1.0;
 
-    /// <summary>速度切り替えボタンで巡回する倍率。</summary>
-    private static readonly double[] VideoRates = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0];
+    /// <summary>速度ドロップダウンに並べる倍率。</summary>
+    private static readonly double[] VideoRates = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0, 4.0];
+
+    /// <summary>音量・ミュート・速度が変わったときに呼ばれる。永続化は MainWindowViewModel が担う
+    /// （タブは AppSettings を持たないため、保存経路をコールバックで受け取る）。</summary>
+    internal static Action<double, bool, double>? VideoPreferencesChanged;
+
+    /// <summary>保存済みの音量・ミュート・速度を起動時に流し込む。</summary>
+    internal static void LoadVideoPreferences(double volume, bool muted, double rate)
+    {
+        s_videoVolume = double.IsFinite(volume) ? Math.Clamp(volume, 0, 1) : 0.7;
+        s_videoMuted = muted;
+        s_videoRate = VideoRates.Contains(rate) ? rate : 1.0;
+    }
+
+    private static void SaveVideoPreferences()
+        => VideoPreferencesChanged?.Invoke(s_videoVolume, s_videoMuted, s_videoRate);
 
     private VideoPlaybackSession? _video;
 
@@ -478,11 +590,12 @@ public partial class TabViewModel : ObservableObject
     [ObservableProperty]
     private bool _isVideoPreview;
 
-    /// <summary>再生コントロールを今出しているか。動画の上に出しっぱなしだと視聴の邪魔になるので、
-    /// プレビュー領域でマウスを動かしている間だけ true にして、止まったら自動で引っ込める
+    /// <summary>メイン画像に重ねるオーバーレイ（＝ギャラリーを閉じるボタン）を今出しているか。
+    /// 常時出しっぱなしだと鑑賞の邪魔になるので、プレビュー領域でマウスを動かしている間だけ
+    /// true にして、止まったら自動で引っ込める
     /// （表示の起点と自動非表示のタイマーは MainWindow 側が持つ）。</summary>
     [ObservableProperty]
-    private bool _isVideoBarVisible;
+    private bool _isGalleryOverlayVisible;
 
     /// <summary>コーデックが無い等で再生できなかった。</summary>
     [ObservableProperty]
@@ -517,6 +630,7 @@ public partial class TabViewModel : ObservableObject
             s_videoVolume = clamped;
             _video?.SetVolume(clamped);
             OnPropertyChanged();
+            SaveVideoPreferences();
         }
     }
 
@@ -529,6 +643,7 @@ public partial class TabViewModel : ObservableObject
             s_videoMuted = value;
             _video?.SetMuted(value);
             OnPropertyChanged();
+            SaveVideoPreferences();
         }
     }
 
@@ -544,21 +659,47 @@ public partial class TabViewModel : ObservableObject
         }
     }
 
-    /// <summary>再生速度。ボタンで <see cref="VideoRates"/> を巡回する。</summary>
+    /// <summary>再生速度。ドロップダウン（<see cref="VideoRateOptions"/>）から選ぶ。</summary>
     public double VideoRate
     {
         get => s_videoRate;
-        private set
+        set
         {
             if (Math.Abs(s_videoRate - value) < 0.0001) return;
             s_videoRate = value;
             _video?.SetRate(value);
             OnPropertyChanged();
-            OnPropertyChanged(nameof(VideoRateText));
+            OnPropertyChanged(nameof(VideoRateIndex));
+            SaveVideoPreferences();
         }
     }
 
-    public string VideoRateText => $"{VideoRate:0.##}x";
+    /// <summary>速度ドロップダウンの選択肢。ComboBox へ直接流せるよう表示文字列で持つ
+    /// （数値のまま流すとコンパイル済みバインディングで項目テンプレートの型指定が要るため）。</summary>
+    public IReadOnlyList<string> VideoRateOptions => s_videoRateOptions;
+
+    private static readonly string[] s_videoRateOptions = [.. VideoRates.Select(FormatRate)];
+
+    /// <summary>ドロップダウンで選択中の速度（<see cref="VideoRateOptions"/> の添字）。
+    /// ComboBox とは SelectedIndex でつなぐ。SelectedItem（object 型）へ string の
+    /// プロパティを双方向で結ぶと選択が書き戻らなかったため。</summary>
+    public int VideoRateIndex
+    {
+        get
+        {
+            var index = Array.FindIndex(VideoRates, r => Math.Abs(r - VideoRate) < 0.0001);
+            return index >= 0 ? index : Array.IndexOf(VideoRates, 1.0);
+        }
+        set
+        {
+            if (value >= 0 && value < VideoRates.Length)
+            {
+                VideoRate = VideoRates[value];
+            }
+        }
+    }
+
+    private static string FormatRate(double rate) => $"{rate:0.##}x";
 
     /// <summary>再生 / 一時停止の切り替え（Space とボタンの両方から呼ぶ）。</summary>
     [RelayCommand]
@@ -589,14 +730,6 @@ public partial class TabViewModel : ObservableObject
     [RelayCommand]
     private void ToggleVideoLoop() => IsVideoLooping = !IsVideoLooping;
 
-    /// <summary>再生速度を次の候補へ送る。</summary>
-    [RelayCommand]
-    private void CycleVideoRate()
-    {
-        var index = Array.FindIndex(VideoRates, r => Math.Abs(r - VideoRate) < 0.0001);
-        VideoRate = VideoRates[(index + 1) % VideoRates.Length];
-    }
-
     /// <summary>現在位置を相対移動する（Shift+← / →）。</summary>
     public void SeekVideoBy(double deltaSeconds)
     {
@@ -617,9 +750,6 @@ public partial class TabViewModel : ObservableObject
     {
         // セッション（＝Media Engine）は作り直さず、ソースだけ差し替える。
         // 作り直すと前の engine の解放と競合して映像が出ないことがある（VideoPlaybackSession.Open 参照）。
-        // 動画へ入った直後だけはコントロールを見せる（存在に気付けるように）。
-        // 以降はプレビュー領域でマウスを動かしている間だけ出る。
-        IsVideoBarVisible = true;
 
         var session = _video;
         if (session is not null)
@@ -668,7 +798,6 @@ public partial class TabViewModel : ObservableObject
 
         ResetVideoUiState();
         IsVideoPreview = false;
-        IsVideoBarVisible = false;
     }
 
     /// <summary>コントロールバーの表示値を初期状態へ戻す（セッション自体は畳まない）。</summary>
@@ -1626,7 +1755,10 @@ public partial class TabViewModel : ObservableObject
     {
         _options = options;
         _folderViewSettings = folderViewSettings;
-        GalleryImageTransform = new TransformGroup { Children = { _galleryScale, _galleryPan } };
+        GalleryImageTransform = new TransformGroup
+        {
+            Children = { _galleryCenter, _galleryRotate, _galleryScale, _galleryPan },
+        };
         DetailColumns =
         [
             new(this, SortKeys.Name, "Text.Column.Name"),

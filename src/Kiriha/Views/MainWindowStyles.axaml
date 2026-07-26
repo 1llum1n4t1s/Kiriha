@@ -288,7 +288,13 @@
             <Setter Property="Margin" Value="0,-11.6,0,0" />
         </Style>
         <!-- ギャラリーの終了ボタン: 普段は透明で、右上のホバーゾーンに入ったときだけフェード表示する -->
-        <Style Selector="Border.galleryclosezone Button">
+        <!-- ギャラリーを閉じるボタン。メイン画像領域でマウスを動かしている間だけ .shown が付く。 -->
+        <Style Selector="Button.galleryclose">
+            <Setter Property="Width" Value="32" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="CornerRadius" Value="16" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background" Value="#66000000" />
             <Setter Property="Opacity" Value="0" />
             <Setter Property="Transitions">
                 <Transitions>
@@ -296,7 +302,7 @@
                 </Transitions>
             </Setter>
         </Style>
-        <Style Selector="Border.galleryclosezone:pointerover Button">
+        <Style Selector="Button.galleryclose.shown">
             <Setter Property="Opacity" Value="1" />
         </Style>
         <!-- アドレスバーと検索ボックスの間は、リサイズ領域だけを残して区切り線を描かない -->
@@ -583,13 +589,43 @@
 
         <!-- ギャラリーの動画コントロールバー。プレビュー領域へ重ねるため、テーマ配色ではなく
              映像の上で見やすい半透明の暗色で固定する（ギャラリー自体が黒背景固定なのと揃える）。 -->
-        <Style Selector="Border.videobar">
-            <Setter Property="Background" Value="#B3000000" />
+        <!-- ギャラリーの共通コントロールバー（メイン表示とフィルムストリップの間）。
+             画像の回転・拡大縮小と、動画の再生操作をここへ集約している。 -->
+        <Style Selector="Border.gallerybar">
+            <Setter Property="Background" Value="#14FFFFFF" />
+            <Setter Property="Padding" Value="10,6" />
+            <Setter Property="Margin" Value="12,0,12,4" />
             <Setter Property="CornerRadius" Value="10" />
-            <Setter Property="Padding" Value="8,6" />
-            <Setter Property="Margin" Value="12" />
         </Style>
-        <Style Selector="Border.videobar Button.videobtn">
+        <!-- 区切り線（回転と拡大縮小の間） -->
+        <Style Selector="Border.gallerysep">
+            <Setter Property="Width" Value="1" />
+            <Setter Property="Height" Value="20" />
+            <Setter Property="Margin" Value="8,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Background" Value="#33FFFFFF" />
+        </Style>
+        <Style Selector="Border.gallerybar Button.videobtn:disabled">
+            <Setter Property="Opacity" Value="0.35" />
+        </Style>
+        <!-- 再生速度のドロップダウン。暗い背景に合わせる。 -->
+        <Style Selector="ComboBox.videorate">
+            <Setter Property="MinWidth" Value="76" />
+            <Setter Property="Width" Value="76" />
+            <Setter Property="Height" Value="30" />
+            <Setter Property="Padding" Value="8,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Background" Value="#22FFFFFF" />
+            <Setter Property="Foreground" Value="#DDDDDD" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="6" />
+        </Style>
+        <Style Selector="ComboBox.videorate /template/ Border#Background">
+            <Setter Property="Background" Value="#22FFFFFF" />
+        </Style>
+        <Style Selector="Border.gallerybar Button.videobtn">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Foreground" Value="#DDDDDD" />
@@ -600,43 +636,24 @@
             <Setter Property="HorizontalContentAlignment" Value="Center" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>
-        <Style Selector="Border.videobar Button.videobtn:pointerover /template/ ContentPresenter">
+        <Style Selector="Border.gallerybar Button.videobtn:pointerover /template/ ContentPresenter">
             <Setter Property="Background" Value="#33FFFFFF" />
             <Setter Property="TextElement.Foreground" Value="#FFFFFF" />
         </Style>
         <!-- ループ ON はアクセントカラーで示す（トグル状態が一目で分かるように） -->
-        <Style Selector="Border.videobar Button.videobtn.active">
+        <Style Selector="Border.gallerybar Button.videobtn.active">
             <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorLight2}" />
         </Style>
-        <Style Selector="Border.videobar TextBlock.videotime">
+        <Style Selector="Border.gallerybar TextBlock.videotime">
             <Setter Property="Foreground" Value="#DDDDDD" />
             <Setter Property="FontSize" Value="12" />
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
-        <Style Selector="Border.videobar Slider">
+        <Style Selector="Border.gallerybar Slider">
             <Setter Property="MinWidth" Value="0" />
             <Setter Property="Padding" Value="0" />
         </Style>
 
-        <!-- ギャラリー左ペインの操作ボタン（回転）。ここは通常のタブ一覧と同じ場所なので、
-             動画バーと違ってテーマ配色に従わせる。 -->
-        <Style Selector="Button.galleryTool">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
-            <Setter Property="Width" Value="34" />
-            <Setter Property="Height" Value="30" />
-            <Setter Property="Padding" Value="0" />
-            <Setter Property="CornerRadius" Value="6" />
-            <Setter Property="HorizontalContentAlignment" Value="Center" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-        </Style>
-        <Style Selector="Button.galleryTool:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource HoverBg}" />
-        </Style>
-        <Style Selector="Button.galleryTool:disabled">
-            <Setter Property="Opacity" Value="0.35" />
-        </Style>
         <Style Selector="Slider.galleryzoom">
             <Setter Property="MinWidth" Value="0" />
             <Setter Property="Padding" Value="0" />

@@ -90,6 +90,15 @@ public sealed class AppSettings
     /// <summary>ギャラリー表示の下部サムネイルストリップの高さ（Thumb ドラッグで変更、全タブ共通）。</summary>
     public double GalleryStripHeight { get; set; } = 116;
 
+    /// <summary>ギャラリー動画の音量（0.0〜1.0、全タブ共通）。</summary>
+    public double VideoVolume { get; set; } = 0.7;
+
+    /// <summary>ギャラリー動画のミュート状態（全タブ共通）。</summary>
+    public bool VideoMuted { get; set; }
+
+    /// <summary>ギャラリー動画の再生速度（1.0 が等速、全タブ共通）。</summary>
+    public double VideoRate { get; set; } = 1.0;
+
     /// <summary>ステータスバーの表示状態（表示メニューで切替）。</summary>
     public bool ShowStatusBar { get; set; } = true;
 
