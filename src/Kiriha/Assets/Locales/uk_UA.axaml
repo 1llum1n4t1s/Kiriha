@@ -99,8 +99,11 @@
   <x:String x:Key="Text.Folder.Pictures" xml:space="preserve">Зображення</x:String>
   <x:String x:Key="Text.Folder.Videos" xml:space="preserve">Відео</x:String>
   <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">Вийти з галереї (Esc)</x:String>
+  <x:String x:Key="Text.Gallery.FullScreen" xml:space="preserve">Повноекранний режим (F11, Esc — вихід)</x:String>
   <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">Відомості про зображення</x:String>
+  <x:String x:Key="Text.Gallery.Next" xml:space="preserve">Наступне зображення (стрілка вправо)</x:String>
   <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">Для цього зображення немає відомостей.</x:String>
+  <x:String x:Key="Text.Gallery.Previous" xml:space="preserve">Попереднє зображення (стрілка вліво)</x:String>
   <x:String x:Key="Text.Gallery.RotateFailed" xml:space="preserve">Це зображення не можна повернути без втрат.</x:String>
   <x:String x:Key="Text.Gallery.RotateLeft" xml:space="preserve">Повернути ліворуч (зберігається без втрат)</x:String>
   <x:String x:Key="Text.Gallery.RotateRight" xml:space="preserve">Повернути праворуч (зберігається без втрат)</x:String>
@@ -219,6 +222,7 @@
   <x:String x:Key="Text.Settings.ExplorerContextMenu" xml:space="preserve">Додати «Відкрити за допомогою Kiriha» до контекстного меню Провідника</x:String>
   <x:String x:Key="Text.Settings.ExplorerContextMenuNote" xml:space="preserve">Дозволяє відкрити папку в Kiriha, клацнувши правою кнопкою на папці або на фоні її вмісту.</x:String>
   <x:String x:Key="Text.Settings.FolderTree" xml:space="preserve">Дерево папок</x:String>
+  <x:String x:Key="Text.Settings.Gallery" xml:space="preserve">Галерея</x:String>
   <x:String x:Key="Text.Settings.IconSet.Material" xml:space="preserve">Material Icon Theme</x:String>
   <x:String x:Key="Text.Settings.IconSet.Note" xml:space="preserve">Тема Material Icon Theme використовує material-icon-theme (ліцензія MIT, © Material Extensions). Набір Windows показує ті самі значки оболонки, що й Провідник.</x:String>
   <x:String x:Key="Text.Settings.IconSet.Original" xml:space="preserve">Оригінальні значки Kiriha</x:String>
@@ -247,6 +251,12 @@
   <x:String x:Key="Text.Settings.Mouse.Up" xml:space="preserve">Перейти на рівень вище</x:String>
   <x:String x:Key="Text.Settings.RunAtStartup" xml:space="preserve">Запускати Kiriha разом із Windows</x:String>
   <x:String x:Key="Text.Settings.RunAtStartupNote" xml:space="preserve">Kiriha запускається автоматично після входу в систему.</x:String>
+  <x:String x:Key="Text.Settings.Sharpen" xml:space="preserve">Зменшувати розмитість при збільшенні (різкість)</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.High" xml:space="preserve">Сильно</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Low" xml:space="preserve">Слабко</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Max" xml:space="preserve">Максимально (CAS)</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Normal" xml:space="preserve">Стандартно</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Note" xml:space="preserve">Під час збільшення зображень і відео до розміру екрана делікатно підкреслює лише контури (аналог AMD FidelityFX RCAS). Відтворення відео трохи більше навантажує процесор.</x:String>
   <x:String x:Key="Text.Settings.Shortcuts" xml:space="preserve">Комбінації клавіш</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOps" xml:space="preserve">Операції з файлами</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOpsBody" xml:space="preserve">Ctrl+X / C / V　Вирізати, копіювати, вставити　　Delete / Shift+Delete　Видалити, видалити остаточно&#10;F2　Перейменувати　　Alt+Enter　Властивості　　Ctrl+Shift+N　Нова папка　　Alt+P　Перегляд</x:String>

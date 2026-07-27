@@ -99,8 +99,11 @@
   <x:String x:Key="Text.Folder.Pictures" xml:space="preserve">Gambar</x:String>
   <x:String x:Key="Text.Folder.Videos" xml:space="preserve">Video</x:String>
   <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">Keluar dari galeri (Esc)</x:String>
+  <x:String x:Key="Text.Gallery.FullScreen" xml:space="preserve">Layar penuh (F11, Esc untuk keluar)</x:String>
   <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">Informasi gambar</x:String>
+  <x:String x:Key="Text.Gallery.Next" xml:space="preserve">Gambar berikutnya (panah kanan)</x:String>
   <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">Tidak ada informasi untuk gambar ini.</x:String>
+  <x:String x:Key="Text.Gallery.Previous" xml:space="preserve">Gambar sebelumnya (panah kiri)</x:String>
   <x:String x:Key="Text.Gallery.RotateFailed" xml:space="preserve">Gambar ini tidak dapat diputar tanpa kehilangan kualitas.</x:String>
   <x:String x:Key="Text.Gallery.RotateLeft" xml:space="preserve">Putar ke kiri (disimpan tanpa kehilangan kualitas)</x:String>
   <x:String x:Key="Text.Gallery.RotateRight" xml:space="preserve">Putar ke kanan (disimpan tanpa kehilangan kualitas)</x:String>
@@ -219,6 +222,7 @@
   <x:String x:Key="Text.Settings.ExplorerContextMenu" xml:space="preserve">Tambahkan “Buka dengan Kiriha” ke menu konteks File Explorer</x:String>
   <x:String x:Key="Text.Settings.ExplorerContextMenuNote" xml:space="preserve">Memungkinkan membuka folder di Kiriha dengan klik kanan pada folder atau pada latar isinya.</x:String>
   <x:String x:Key="Text.Settings.FolderTree" xml:space="preserve">Pohon folder</x:String>
+  <x:String x:Key="Text.Settings.Gallery" xml:space="preserve">Galeri</x:String>
   <x:String x:Key="Text.Settings.IconSet.Material" xml:space="preserve">Material Icon Theme</x:String>
   <x:String x:Key="Text.Settings.IconSet.Note" xml:space="preserve">Material Icon Theme memakai material-icon-theme (Lisensi MIT, © Material Extensions). Set Windows menampilkan ikon shell yang sama dengan File Explorer.</x:String>
   <x:String x:Key="Text.Settings.IconSet.Original" xml:space="preserve">Ikon asli Kiriha</x:String>
@@ -247,6 +251,12 @@
   <x:String x:Key="Text.Settings.Mouse.Up" xml:space="preserve">Naik satu tingkat</x:String>
   <x:String x:Key="Text.Settings.RunAtStartup" xml:space="preserve">Jalankan Kiriha saat Windows dimulai</x:String>
   <x:String x:Key="Text.Settings.RunAtStartupNote" xml:space="preserve">Kiriha berjalan otomatis saat Anda masuk.</x:String>
+  <x:String x:Key="Text.Settings.Sharpen" xml:space="preserve">Kurangi buram saat diperbesar (penajaman)</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.High" xml:space="preserve">Kuat</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Low" xml:space="preserve">Ringan</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Max" xml:space="preserve">Maksimum (CAS)</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Normal" xml:space="preserve">Standar</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Note" xml:space="preserve">Menegaskan tepi saja, secukupnya, saat gambar dan video diperbesar ke layar (setara AMD FidelityFX RCAS). Pemutaran video sedikit menambah beban CPU.</x:String>
   <x:String x:Key="Text.Settings.Shortcuts" xml:space="preserve">Pintasan</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOps" xml:space="preserve">Operasi berkas</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOpsBody" xml:space="preserve">Ctrl+X / C / V　Potong, salin, tempel　　Delete / Shift+Delete　Hapus, hapus permanen&#10;F2　Ganti nama　　Alt+Enter　Properti　　Ctrl+Shift+N　Folder baru　　Alt+P　Pratinjau</x:String>

@@ -44,7 +44,9 @@
          ヒットテスト（マウス）しか塞げず、フォーカスが残った一覧への Delete / Ctrl+X/V 等の
          コントロール直付け KeyDown ハンドラは Window.OnKeyDown のガードより先に発火するため、
          キーボード経路まで塞ぐにはこの無効化が必要。 -->
-    <Grid RowDefinitions="32,*" ColumnDefinitions="Auto,*"
+    <!-- 先頭行（タイトルバー）の高さは、ギャラリーの全画面表示で 0 に畳む
+         （MainWindow.ApplyGalleryFullScreen が RowDefinitions[0] を書き換える）。 -->
+    <Grid x:Name="RootGrid" RowDefinitions="32,*" ColumnDefinitions="Auto,*"
           IsEnabled="{Binding !IsLicenseLocked}">
 
         <!-- タブのドラッグ中に、掴んだタブがカーソルへ追従して浮くゴースト表示のオーバーレイ。
@@ -70,6 +72,7 @@
         <!-- ===== 垂直タブ専用タイトルバー ===== -->
         <Grid Grid.Row="0" Grid.ColumnSpan="2" ColumnDefinitions="Auto,*,Auto"
               Background="Transparent"
+              IsVisible="{Binding IsGalleryChromeVisible}"
               PointerPressed="TitleBar_PointerPressed"
               DoubleTapped="TitleBar_DoubleTapped">
 
@@ -97,6 +100,7 @@
         <!-- ===== 垂直タブバー ===== -->
         <Grid x:Name="VerticalTabStrip" Grid.Row="1" Grid.Column="0" ColumnDefinitions="*,Auto"
               Width="{Binding VerticalTabWidth}"
+              IsVisible="{Binding IsGalleryChromeVisible}"
               DragDrop.AllowDrop="True">
             <Grid Grid.Column="0" ClipToBounds="True">
                 <!-- ON/OFFともにタイトルバーと同じウィンドウ背景をそのまま見せる。 -->
@@ -183,7 +187,7 @@
                         <ScrollViewer VerticalScrollBarVisibility="Auto"
                                       HorizontalScrollBarVisibility="Disabled">
                             <StackPanel Spacing="2">
-                                <!-- 回転と拡大縮小の操作は、フィルムストリップの上の共通コントロールバーへ集約した
+                                <!-- 回転と拡大縮小の操作は、メイン画像へ重なる共通コントロールバーへ集約した
                                      （MainWindow.axaml の Border.gallerybar）。ここには Exif 等の情報だけを出す。 -->
                                 <TextBlock Text="{DynamicResource Text.Gallery.ImageInfo}" FontSize="11" FontWeight="SemiBold"
                                            Margin="0,0,0,8"
@@ -211,7 +215,7 @@
 
                     <Button x:Name="VerticalNewTabButton" Grid.Row="1"
                             Classes="verticaltabaction verticalnewtab"
-                            Margin="8,4,8,2"
+                            Margin="8,4,3,2"
                             Command="{Binding NewTabCommand}"
                             AutomationProperties.Name="{DynamicResource Text.Tab.New}"
                             ToolTip.Tip="{DynamicResource Text.Tab.NewTip}">
@@ -229,7 +233,7 @@
 
                     <Button x:Name="SettingsButton" Grid.Row="2"
                             Classes="verticaltabaction verticalnewtab"
-                            Margin="8,0,8,10"
+                            Margin="8,0,3,10"
                             AutomationProperties.Name="{DynamicResource Text.Nav.OpenSettings}"
                             Command="{Binding OpenSettingsCommand}"
                             ToolTip.Tip="{DynamicResource Text.Nav.OpenSettings}">
@@ -249,8 +253,10 @@
                    DragDelta="VerticalTabsThumb_DragDelta" />
         </Grid>
 
-        <!-- ===== 選択中タブの中身 ===== -->
-        <ContentControl Grid.Row="1" Grid.Column="1" Margin="6"
+        <!-- ===== 選択中タブの中身 =====
+             左マージンだけ 0。タブ列側の余白 (3) と掴み代の Thumb (5) で 8px の隙間が
+             できており、ここに更に 6 を足すとウィンドウ左端側の 8px と幅が揃わなくなる。 -->
+        <ContentControl Grid.Row="1" Grid.Column="1" Margin="0,6,6,6"
                         Content="{Binding SelectedTab}">
             <ContentControl.ContentTemplate>
                 <DataTemplate x:DataType="vm:TabViewModel">
@@ -271,13 +277,16 @@
 
                     <!-- アドレスバー・コマンドバー行はいずれも Auto（高さは各要素側で指定）。
                          ギャラリー表示で隠したとき行ごと畳むため -->
-                    <Grid RowDefinitions="Auto,Auto,Auto,*,28" Background="{DynamicResource ContentBg}"
+                    <!-- 最終行（ステータスバー）も Auto。高さは要素側の 28 で決め、隠したときは
+                         行ごと畳む（固定 28 にすると、非表示でも下端に空の帯が残る）。 -->
+                    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" Background="{DynamicResource ContentBg}"
                           IsVisible="{Binding IsNormalTab}">
 
-                        <!-- ナビゲーション + アドレスバー（パンくず） + 検索。ギャラリー表示では畳む -->
+                        <!-- ナビゲーション + アドレスバー（パンくず） + 検索。ギャラリー表示でも残し、
+                             全画面表示のときだけ行ごと畳む（見ている場所と戻る手段を常に出しておく）。 -->
                         <Grid Grid.Row="0" Height="48" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto,Auto"
                               Background="{DynamicResource TabActiveBg}"
-                              IsVisible="{Binding !IsGalleryView}">
+                              IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsGalleryChromeVisible}">
                             <Button Grid.Column="0" Classes="nav" Content="&#xE72B;" Margin="8,0,0,0"
                                     Command="{Binding GoBackCommand}" ToolTip.Tip="{DynamicResource Text.Nav.BackTip}"
                                     AutomationProperties.Name="{DynamicResource Text.Nav.Back}"
@@ -956,7 +965,7 @@
                                     <!-- ギャラリー表示（アイコンサイズスライダー最大時の特別モード）:
                                          1 枚を大きく表示し、下部フィルムストリップで送る。Esc / スライダーで復帰。
                                          ストリップの高さは境界 Thumb で変更でき、全タブ共通で永続化する。 -->
-                                    <Grid IsVisible="{Binding IsGalleryView}" RowDefinitions="*,Auto,Auto,Auto" Background="#FF121212">
+                                    <Grid IsVisible="{Binding IsGalleryView}" RowDefinitions="*,Auto,Auto" Background="#FF121212">
                                         <!-- メイン画像。クリックでフォーカスを受け（Del / F2 等が効く）、
                                              右クリックで通常のファイルと同じ Windows シェルメニューを出す。 -->
                                         <!-- Background を敷かないと画像の外（レターボックス）がヒットテスト対象外になり、
@@ -978,7 +987,15 @@
                                                  TabViewModel.ApplyGalleryTransform が計算して足す。 -->
                                             <Panel RenderTransform="{Binding GalleryImageTransform}"
                                                    RenderTransformOrigin="0,0">
-                                                <Image Source="{Binding PreviewBitmap}" Stretch="Uniform" StretchDirection="DownOnly"
+                                                <!-- 鮮鋭化が有効なときは表示サイズちょうどのビットマップが来る。
+                                                     そのときだけ描画先の論理サイズを明示し Stretch=Fill で 1:1 に描く
+                                                     （TabViewModel.ApplyPreviewDisplaySize）。それ以外は Width/Height が
+                                                     NaN＝自動になり、従来どおり Uniform で領域に収まる。 -->
+                                                <Image Source="{Binding PreviewBitmap}"
+                                                       Width="{Binding PreviewDisplayWidth}"
+                                                       Height="{Binding PreviewDisplayHeight}"
+                                                       Stretch="{Binding PreviewStretch}" StretchDirection="DownOnly"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"
                                                        RenderOptions.BitmapInterpolationMode="HighQuality" />
                                                 <!-- 動画のフレーム。VideoFrame は 2 枚のビットマップを交互に差し替えて更新される。
                                                      静止画と違い拡大も許すので StretchDirection は既定（Both）のまま。 -->
@@ -1001,21 +1018,6 @@
                                                            Foreground="#DDDDDD" HorizontalAlignment="Center"
                                                            TextTrimming="CharacterEllipsis" MaxWidth="520" />
                                             </StackPanel>
-                                            <!-- ギャラリー終了（Esc / スライダーでも戻れる）。
-                                                 普段は隠し、メイン画像領域でマウスを動かしている間だけフェード表示する
-                                                 （距離ではなく操作の有無で出す。GalleryImage_PointerMoved 参照）。 -->
-                                            <Button Classes="galleryclose"
-                                                    Classes.shown="{Binding IsGalleryOverlayVisible}"
-                                                    IsHitTestVisible="{Binding IsGalleryOverlayVisible}"
-                                                    HorizontalAlignment="Right" VerticalAlignment="Top"
-                                                    Margin="12"
-                                                    Click="GalleryClose_Click"
-                                                    AutomationProperties.Name="{DynamicResource Text.Gallery.CloseTip}"
-                                                    ToolTip.Tip="{DynamicResource Text.Gallery.CloseTip}">
-                                                <TextBlock Classes="fico" Text="&#xE711;" FontSize="13"
-                                                           Foreground="#DDDDDD"
-                                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                            </Button>
                                             <!-- 再生できなかった動画（コーデック未導入など）の案内 -->
                                             <Border IsVisible="{Binding IsVideoUnavailable}"
                                                     HorizontalAlignment="Center" VerticalAlignment="Center"
@@ -1024,13 +1026,38 @@
                                                            Foreground="#DDDDDD" FontSize="13"
                                                            TextWrapping="Wrap" MaxWidth="420" TextAlignment="Center" />
                                             </Border>
-                                        </Panel>
-
-                                        <!-- 画像・動画で共通のコントロールバー。フィルムストリップとメイン表示の間に置き、
-                                             左に画像の操作（回転・拡大縮小）、右に動画の操作（再生・シーク・音量・速度）を集約する。
-                                             画像へ重ねないので鑑賞の邪魔にならず、マウスを動かさなくても常に操作できる。 -->
-                                        <Border Grid.Row="1" Classes="gallerybar">
-                                            <Grid ColumnDefinitions="Auto,*">
+                                            <!-- 前後の画像へ送る大きめのボタン。コントロールバーと同じく、
+                                                 マウスを動かしている間だけ左右の端にフェード表示する
+                                                 （ホイール・← → キー・フィルムストリップと同じ操作）。 -->
+                                            <Button Classes="gallerynav"
+                                                    Classes.shown="{Binding IsGalleryOverlayVisible}"
+                                                    IsHitTestVisible="{Binding IsGalleryOverlayVisible}"
+                                                    HorizontalAlignment="Left" VerticalAlignment="Center"
+                                                    Margin="14,0,0,0"
+                                                    Click="GalleryPrev_Click"
+                                                    AutomationProperties.Name="{DynamicResource Text.Gallery.Previous}"
+                                                    ToolTip.Tip="{DynamicResource Text.Gallery.Previous}">
+                                                <TextBlock Classes="fico" Text="&#xE76B;" FontSize="26" />
+                                            </Button>
+                                            <Button Classes="gallerynav"
+                                                    Classes.shown="{Binding IsGalleryOverlayVisible}"
+                                                    IsHitTestVisible="{Binding IsGalleryOverlayVisible}"
+                                                    HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                    Margin="0,0,14,0"
+                                                    Click="GalleryNext_Click"
+                                                    AutomationProperties.Name="{DynamicResource Text.Gallery.Next}"
+                                                    ToolTip.Tip="{DynamicResource Text.Gallery.Next}">
+                                                <TextBlock Classes="fico" Text="&#xE76C;" FontSize="26" />
+                                            </Button>
+                                            <!-- ギャラリーの操作を 1 本に集約したコントロールバー。左に画像の操作
+                                                 （回転・拡大縮小）、中央に動画の操作（再生・シーク・音量・速度）、
+                                                 右端に全画面表示とギャラリー終了。メイン画像領域でマウスを動かして
+                                                 いる間だけフェード表示するオーバーレイ（鑑賞中は画像だけが残る）。 -->
+                                        <Border Classes="gallerybar"
+                                                Classes.shown="{Binding IsGalleryOverlayVisible}"
+                                                IsHitTestVisible="{Binding IsGalleryOverlayVisible}"
+                                                VerticalAlignment="Bottom">
+                                            <Grid ColumnDefinitions="Auto,*,Auto">
                                                 <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="2"
                                                             VerticalAlignment="Center">
                                                     <!-- 回転。静止画は無劣化回転（Exif の向きだけを書き換えて即保存）、
@@ -1124,13 +1151,42 @@
                                                               AutomationProperties.Name="{DynamicResource Text.Video.RateTip}"
                                                               ToolTip.Tip="{DynamicResource Text.Video.RateTip}" />
                                                 </Grid>
+
+                                                <!-- 右端は表示そのものの操作（全画面・ギャラリー終了）。画像・動画を問わず出す。 -->
+                                                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="2"
+                                                            Margin="8,0,0,0" VerticalAlignment="Center">
+                                                    <!-- 全画面表示（Esc / F11 / もう一度押すで戻る） -->
+                                                    <Button Classes="videobtn"
+                                                            Click="GalleryFullScreen_Click"
+                                                            AutomationProperties.Name="{DynamicResource Text.Gallery.FullScreen}"
+                                                            ToolTip.Tip="{DynamicResource Text.Gallery.FullScreen}">
+                                                        <Panel>
+                                                            <TextBlock Classes="fico" FontSize="14" Text="&#xE740;"
+                                                                       IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsGalleryChromeVisible}" />
+                                                            <TextBlock Classes="fico" FontSize="14" Text="&#xE73F;"
+                                                                       IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsGalleryFullScreen}" />
+                                                        </Panel>
+                                                    </Button>
+                                                    <!-- ギャラリー終了（Esc / スライダーでも戻れる）。
+                                                         画像へ重ねる独立ボタンは廃止し、他の操作と同じバーへ集約している。 -->
+                                                    <Button Classes="videobtn galleryclose"
+                                                            Click="GalleryClose_Click"
+                                                            AutomationProperties.Name="{DynamicResource Text.Gallery.CloseTip}"
+                                                            ToolTip.Tip="{DynamicResource Text.Gallery.CloseTip}">
+                                                        <TextBlock Classes="fico" FontSize="13" Text="&#xE711;" />
+                                                    </Button>
+                                                </StackPanel>
                                             </Grid>
                                         </Border>
+                                        </Panel>
 
-                                        <!-- ストリップとプレビューの境界。上下ドラッグでストリップの高さを変える -->
-                                        <Thumb Grid.Row="2" Classes="rowsplit"
+                                        <!-- ストリップとプレビューの境界。上下ドラッグでストリップの高さを変える。
+                                             全画面表示中はストリップごと畳む（画像だけを見せる）。 -->
+                                        <Thumb Grid.Row="1" Classes="rowsplit"
+                                               IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsGalleryChromeVisible}"
                                                DragDelta="GalleryStripThumb_DragDelta" />
-                                        <ListBox Grid.Row="3" Classes="files gallerystrip"
+                                        <ListBox Grid.Row="2" Classes="files gallerystrip"
+                                                 IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsGalleryChromeVisible}"
                                                  Height="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).GalleryStripHeight}"
                                                  ItemsSource="{Binding Entries}"
                                                  SelectedItem="{Binding SelectedEntry}"
@@ -1225,9 +1281,15 @@
                         </Grid>
 
                         <!-- ステータスバー（エクスプローラー同等: 項目数 | 選択情報 | 空き領域） -->
-                        <Border Grid.Row="4" Background="{DynamicResource StatusBg}"
-                                IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ShowStatusBar}"
+                        <Border Grid.Row="4" Height="28" Background="{DynamicResource StatusBg}"
                                 BorderBrush="{DynamicResource Divider}" BorderThickness="0,1,0,0">
+                            <!-- ギャラリーの全画面表示中は畳む（画像だけを見せる） -->
+                            <Border.IsVisible>
+                                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                    <Binding Path="$parent[Window].((vm:MainWindowViewModel)DataContext).ShowStatusBar" />
+                                    <Binding Path="$parent[Window].((vm:MainWindowViewModel)DataContext).IsGalleryChromeVisible" />
+                                </MultiBinding>
+                            </Border.IsVisible>
                             <Grid ColumnDefinitions="*,Auto" Margin="14,0">
                                 <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10">
                                     <TextBlock Text="{Binding StatusText}" FontSize="11.5" Foreground="{DynamicResource TextSecondary}"

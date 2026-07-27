@@ -25,8 +25,10 @@ internal static class ImageDecodeService
 
     /// <summary>ファイルをメモリへ読み切ってから指定幅でデコードする。読み取りに失敗したら null。
     /// Skia は Exif の Orientation を見ないため、ここで向きを適用してエクスプローラーの
-    /// サムネイル（シェル経由なので向きが効いている）と表示を揃える。</summary>
-    public static Bitmap? TryDecodeToWidth(string path, int width, CancellationToken token = default)
+    /// サムネイル（シェル経由なので向きが効いている）と表示を揃える。
+    /// <paramref name="sharpen"/> はギャラリーの大画面表示だけで立てる（一覧のサムネイルに
+    /// 掛けても効果が見えないうえ、枚数分の処理時間がそのままスクロールの重さになる）。</summary>
+    public static Bitmap? TryDecodeToWidth(string path, int width, CancellationToken token = default, bool sharpen = false)
     {
         if (TryReadAllBytes(path, token) is not { } bytes)
         {
@@ -36,12 +38,127 @@ internal static class ImageDecodeService
         Bitmap bitmap;
         using (var stream = new MemoryStream(bytes, writable: false))
         {
-            bitmap = Bitmap.DecodeToWidth(stream, width);
+            // 元より大きい幅を要求すると、デコード時に一度引き伸ばした上で描画時にもう一度
+            // 拡大されることになり、ぼけるだけでメモリも余計に食う（横 500px の画像を
+            // 2560 幅で持つと 1 枚 26MB）。元の幅が分かる形式では、それを超えない幅で頼む。
+            var source = TryReadPixelWidth(bytes);
+            var target = source > 0 ? Math.Min(width, source) : width;
+            bitmap = Bitmap.DecodeToWidth(stream, target);
         }
 
         var orientation = ExifOrientationService.ReadOrientation(bytes);
-        return orientation <= 1 ? bitmap : ApplyOrientation(bitmap, orientation);
+        var oriented = orientation <= 1 ? bitmap : ApplyOrientation(bitmap, orientation);
+        return sharpen ? ContrastAdaptiveSharpenService.Apply(oriented) : oriented;
     }
+
+    /// <summary>
+    /// 画像ヘッダーから元の横幅（画素）を読む。デコードせずに済ませたいので、対応するのは
+    /// プレビュー対象の主要な形式（PNG / JPEG / GIF / BMP / WebP）だけ。
+    /// 判別できない形式・壊れたヘッダーでは 0 を返し、呼び出し側は従来どおり指定幅でデコードする。
+    /// </summary>
+    internal static int TryReadPixelWidth(ReadOnlySpan<byte> bytes)
+    {
+        // PNG: 8 バイトの署名 + IHDR。幅はビッグエンディアンで 16 バイト目から。
+        if (bytes.Length >= 24
+            && bytes[0] == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47)
+        {
+            return ReadBigEndian32(bytes[16..20]);
+        }
+
+        // GIF: "GIF8" + 論理画面幅（リトルエンディアン 16bit）
+        if (bytes.Length >= 10
+            && bytes[0] == (byte)'G' && bytes[1] == (byte)'I' && bytes[2] == (byte)'F')
+        {
+            return bytes[6] | (bytes[7] << 8);
+        }
+
+        // BMP: "BM" + BITMAPINFOHEADER の biWidth（リトルエンディアン 32bit）
+        if (bytes.Length >= 26 && bytes[0] == (byte)'B' && bytes[1] == (byte)'M')
+        {
+            return bytes[18] | (bytes[19] << 8) | (bytes[20] << 16) | (bytes[21] << 24);
+        }
+
+        if (bytes.Length >= 30
+            && bytes[0] == (byte)'R' && bytes[1] == (byte)'I' && bytes[2] == (byte)'F' && bytes[3] == (byte)'F'
+            && bytes[8] == (byte)'W' && bytes[9] == (byte)'E' && bytes[10] == (byte)'B' && bytes[11] == (byte)'P')
+        {
+            return ReadWebPWidth(bytes);
+        }
+
+        if (bytes.Length >= 4 && bytes[0] == 0xFF && bytes[1] == 0xD8)
+        {
+            return ReadJpegWidth(bytes);
+        }
+
+        return 0;
+    }
+
+    /// <summary>JPEG のセグメントを辿って SOF（フレーム開始）の横幅を読む。</summary>
+    private static int ReadJpegWidth(ReadOnlySpan<byte> bytes)
+    {
+        var offset = 2;
+        while (offset + 9 < bytes.Length)
+        {
+            if (bytes[offset] != 0xFF)
+            {
+                return 0;
+            }
+
+            var marker = bytes[offset + 1];
+            // スタンドアロンマーカー（長さを持たない）は読み飛ばす
+            if (marker is 0x01 or (>= 0xD0 and <= 0xD9))
+            {
+                offset += 2;
+                continue;
+            }
+
+            var length = (bytes[offset + 2] << 8) | bytes[offset + 3];
+            if (length < 2)
+            {
+                return 0;
+            }
+
+            // SOF0〜SOF15（DHT=C4 / JPG=C8 / DAC=CC を除く）に画素数が入っている
+            if (marker is >= 0xC0 and <= 0xCF && marker is not (0xC4 or 0xC8 or 0xCC))
+            {
+                return (bytes[offset + 7] << 8) | bytes[offset + 8];
+            }
+
+            offset += 2 + length;
+        }
+
+        return 0;
+    }
+
+    /// <summary>WebP の 3 形式（可逆 VP8L / 非可逆 VP8 / 拡張 VP8X）から横幅を読む。</summary>
+    private static int ReadWebPWidth(ReadOnlySpan<byte> bytes)
+    {
+        var chunk = bytes[12..16];
+        if (chunk is [(byte)'V', (byte)'P', (byte)'8', (byte)'X'])
+        {
+            // キャンバス幅 - 1 が 3 バイトのリトルエンディアンで入っている
+            return (bytes[24] | (bytes[25] << 8) | (bytes[26] << 16)) + 1;
+        }
+
+        if (chunk is [(byte)'V', (byte)'P', (byte)'8', (byte)' '])
+        {
+            // フレームヘッダー（3+3 バイト）の後、14bit が横幅
+            return bytes.Length >= 28 ? (bytes[26] | (bytes[27] << 8)) & 0x3FFF : 0;
+        }
+
+        if (chunk is [(byte)'V', (byte)'P', (byte)'8', (byte)'L'])
+        {
+            // 署名 0x2F の後、14bit が横幅 - 1
+            return bytes.Length >= 25 && bytes[20] == 0x2F
+                ? ((bytes[21] | (bytes[22] << 8)) & 0x3FFF) + 1
+                : 0;
+        }
+
+        return 0;
+    }
+
+    private static int ReadBigEndian32(ReadOnlySpan<byte> bytes)
+        => (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
 
     /// <summary>Exif の Orientation（2〜8）に従って画素を並べ替えた新しいビットマップを返す。
     /// 元のビットマップはここで破棄する。</summary>

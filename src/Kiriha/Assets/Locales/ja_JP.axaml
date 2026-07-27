@@ -99,8 +99,11 @@
   <x:String x:Key="Text.Folder.Pictures" xml:space="preserve">ピクチャ</x:String>
   <x:String x:Key="Text.Folder.Videos" xml:space="preserve">ビデオ</x:String>
   <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">ギャラリーを終了 (Esc)</x:String>
+  <x:String x:Key="Text.Gallery.FullScreen" xml:space="preserve">全画面表示 (F11 / Esc で終了)</x:String>
   <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">画像情報</x:String>
+  <x:String x:Key="Text.Gallery.Next" xml:space="preserve">次の画像 (→)</x:String>
   <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">この画像の情報はありません。</x:String>
+  <x:String x:Key="Text.Gallery.Previous" xml:space="preserve">前の画像 (←)</x:String>
   <x:String x:Key="Text.Gallery.RotateFailed" xml:space="preserve">この画像は無劣化で回転できません。</x:String>
   <x:String x:Key="Text.Gallery.RotateLeft" xml:space="preserve">左に回転（無劣化で保存）</x:String>
   <x:String x:Key="Text.Gallery.RotateRight" xml:space="preserve">右に回転（無劣化で保存）</x:String>
@@ -219,6 +222,7 @@
   <x:String x:Key="Text.Settings.ExplorerContextMenu" xml:space="preserve">エクスプローラーの右クリックメニューに「Kiriha で開く」を追加する</x:String>
   <x:String x:Key="Text.Settings.ExplorerContextMenuNote" xml:space="preserve">フォルダーやフォルダー内の背景を右クリックしたときに、そのフォルダーを Kiriha で開けます。</x:String>
   <x:String x:Key="Text.Settings.FolderTree" xml:space="preserve">フォルダーツリー</x:String>
+  <x:String x:Key="Text.Settings.Gallery" xml:space="preserve">ギャラリー表示</x:String>
   <x:String x:Key="Text.Settings.IconSet.Material" xml:space="preserve">マテリアルアイコンテーマ</x:String>
   <x:String x:Key="Text.Settings.IconSet.Note" xml:space="preserve">マテリアルアイコンテーマでは material-icon-theme（MIT License, © Material Extensions）を使用します。Windows標準では、エクスプローラーと同じShellアイコンを表示します。</x:String>
   <x:String x:Key="Text.Settings.IconSet.Original" xml:space="preserve">現在のオリジナルアイコン</x:String>
@@ -247,6 +251,12 @@
   <x:String x:Key="Text.Settings.Mouse.Up" xml:space="preserve">上の階層に移動</x:String>
   <x:String x:Key="Text.Settings.RunAtStartup" xml:space="preserve">Windows のスタートアップに登録する</x:String>
   <x:String x:Key="Text.Settings.RunAtStartupNote" xml:space="preserve">サインイン時に Kiriha を自動で起動します。</x:String>
+  <x:String x:Key="Text.Settings.Sharpen" xml:space="preserve">拡大表示のぼけを抑える（鮮鋭化）</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.High" xml:space="preserve">強め</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Low" xml:space="preserve">弱め</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Max" xml:space="preserve">最強（CAS）</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Normal" xml:space="preserve">標準</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Note" xml:space="preserve">画像と動画を画面に合わせて拡大するときに、輪郭だけを控えめに締めます（AMD FidelityFX の RCAS 相当）。動画では再生中の負荷が少し増えます。</x:String>
   <x:String x:Key="Text.Settings.Shortcuts" xml:space="preserve">ショートカット</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOps" xml:space="preserve">ファイル操作</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOpsBody" xml:space="preserve">Ctrl+X / C / V　切り取り・コピー・貼り付け　　Delete / Shift+Delete　削除・完全削除&#10;F2　名前の変更　　Alt+Enter　プロパティ　　Ctrl+Shift+N　新しいフォルダー　　Alt+P　プレビュー</x:String>

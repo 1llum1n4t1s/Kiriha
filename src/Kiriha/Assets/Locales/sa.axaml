@@ -99,8 +99,11 @@
   <x:String x:Key="Text.Folder.Pictures" xml:space="preserve">चित्राणि</x:String>
   <x:String x:Key="Text.Folder.Videos" xml:space="preserve">चलच्चित्राणि</x:String>
   <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">चित्रशालायाः निर्गच्छ (Esc)</x:String>
+  <x:String x:Key="Text.Gallery.FullScreen" xml:space="preserve">पूर्णपटलम् (F11, Esc इति निर्गमनाय)</x:String>
   <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">चित्रविवरणम्</x:String>
+  <x:String x:Key="Text.Gallery.Next" xml:space="preserve">अग्रिमं चित्रम् (दक्षिणबाणः)</x:String>
   <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">अस्य चित्रस्य विवरणं नास्ति।</x:String>
+  <x:String x:Key="Text.Gallery.Previous" xml:space="preserve">पूर्वं चित्रम् (वामबाणः)</x:String>
   <x:String x:Key="Text.Gallery.RotateFailed" xml:space="preserve">इदं चित्रम् अक्षतरूपेण परिवर्तयितुं न शक्यते।</x:String>
   <x:String x:Key="Text.Gallery.RotateLeft" xml:space="preserve">वामतः परिवर्तनम् (अक्षतरूपेण रक्ष्यते)</x:String>
   <x:String x:Key="Text.Gallery.RotateRight" xml:space="preserve">दक्षिणतः परिवर्तनम् (अक्षतरूपेण रक्ष्यते)</x:String>
@@ -219,6 +222,7 @@
   <x:String x:Key="Text.Settings.ExplorerContextMenu" xml:space="preserve">सञ्चिकादर्शकस्य दक्षिणनुदनसूच्यां “Kiriha द्वारा उद्घाटय” इति योजय</x:String>
   <x:String x:Key="Text.Settings.ExplorerContextMenuNote" xml:space="preserve">कोष्ठे तस्य अन्तः रिक्तस्थाने वा दक्षिणनुदनेन तत् कोष्ठं Kiriha इत्यत्र उद्घाटयितुं शक्यते।</x:String>
   <x:String x:Key="Text.Settings.FolderTree" xml:space="preserve">कोष्ठवृक्षः</x:String>
+  <x:String x:Key="Text.Settings.Gallery" xml:space="preserve">चित्रशाला</x:String>
   <x:String x:Key="Text.Settings.IconSet.Material" xml:space="preserve">Material Icon Theme</x:String>
   <x:String x:Key="Text.Settings.IconSet.Note" xml:space="preserve">Material Icon Theme इत्येतत् material-icon-theme (MIT अनुज्ञा, © Material Extensions) प्रयुङ्क्ते। Windows समूहः सञ्चिकादर्शकस्य एव Shell प्रतीकानि दर्शयति।</x:String>
   <x:String x:Key="Text.Settings.IconSet.Original" xml:space="preserve">Kiriha इत्यस्य मूलप्रतीकानि</x:String>
@@ -247,6 +251,12 @@
   <x:String x:Key="Text.Settings.Mouse.Up" xml:space="preserve">एकं स्तरम् ऊर्ध्वं गच्छ</x:String>
   <x:String x:Key="Text.Settings.RunAtStartup" xml:space="preserve">Windows आरम्भे Kiriha चालय</x:String>
   <x:String x:Key="Text.Settings.RunAtStartupNote" xml:space="preserve">प्रवेशकाले Kiriha स्वयम् आरभते।</x:String>
+  <x:String x:Key="Text.Settings.Sharpen" xml:space="preserve">आवर्धने अस्पष्टतां न्यूनीकरोतु (तैक्ष्ण्यम्)</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.High" xml:space="preserve">प्रबलम्</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Low" xml:space="preserve">मृदु</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Max" xml:space="preserve">परमम् (CAS)</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Normal" xml:space="preserve">सामान्यम्</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Note" xml:space="preserve">यदा चित्राणि चलच्चित्राणि च पटलानुसारम् आवर्ध्यन्ते तदा केवलं रेखाः मृदुतया दृढीक्रियन्ते (AMD FidelityFX RCAS तुल्यम्)। चलच्चित्रेषु संसाधकभारः किञ्चित् वर्धते।</x:String>
   <x:String x:Key="Text.Settings.Shortcuts" xml:space="preserve">कुञ्चिकासङ्केताः</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOps" xml:space="preserve">सञ्चिकाकर्माणि</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOpsBody" xml:space="preserve">Ctrl+X / C / V　छेदनम्, प्रतिलेखनम्, लेपनम्　　Delete / Shift+Delete　अपनयनम्, नित्यापनयनम्&#10;F2　नामपरिवर्तनम्　　Alt+Enter　गुणधर्माः　　Ctrl+Shift+N　नवीनं कोष्ठम्　　Alt+P　पूर्वदर्शनम्</x:String>

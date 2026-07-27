@@ -11,6 +11,11 @@ namespace Kiriha.Services;
 public static partial class WindowsIntegrationService
 {
     private const string AppName = "Kiriha";
+
+    /// <summary>エクスプローラーへ登録する verb 名（レジストリのキー名がそのまま正規 verb になる）。
+    /// Kiriha 自身のシェルメニューからこの項目を取り除くのに <see cref="ShellContextMenuService"/> が使う。</summary>
+    internal const string ContextMenuVerb = AppName;
+
     private static string MenuLabel => LocalizationService.Text("Text.Integration.OpenWithKiriha");
     private const int ShcneAssocChanged = 0x08000000;
     private const uint ShcnfIdList = 0x0000;

@@ -99,8 +99,11 @@
   <x:String x:Key="Text.Folder.Pictures" xml:space="preserve">图片</x:String>
   <x:String x:Key="Text.Folder.Videos" xml:space="preserve">视频</x:String>
   <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">退出画廊 (Esc)</x:String>
+  <x:String x:Key="Text.Gallery.FullScreen" xml:space="preserve">全屏显示 (F11，Esc 退出)</x:String>
   <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">图像信息</x:String>
+  <x:String x:Key="Text.Gallery.Next" xml:space="preserve">下一张图片 (→)</x:String>
   <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">没有此图像的信息。</x:String>
+  <x:String x:Key="Text.Gallery.Previous" xml:space="preserve">上一张图片 (←)</x:String>
   <x:String x:Key="Text.Gallery.RotateFailed" xml:space="preserve">无法无损旋转此图像。</x:String>
   <x:String x:Key="Text.Gallery.RotateLeft" xml:space="preserve">向左旋转（无损保存）</x:String>
   <x:String x:Key="Text.Gallery.RotateRight" xml:space="preserve">向右旋转（无损保存）</x:String>
@@ -219,6 +222,7 @@
   <x:String x:Key="Text.Settings.ExplorerContextMenu" xml:space="preserve">在资源管理器右键菜单中添加“用 Kiriha 打开”</x:String>
   <x:String x:Key="Text.Settings.ExplorerContextMenuNote" xml:space="preserve">右键点击文件夹或其内容的空白处，即可用 Kiriha 打开该文件夹。</x:String>
   <x:String x:Key="Text.Settings.FolderTree" xml:space="preserve">文件夹树</x:String>
+  <x:String x:Key="Text.Settings.Gallery" xml:space="preserve">画廊</x:String>
   <x:String x:Key="Text.Settings.IconSet.Material" xml:space="preserve">Material Icon Theme</x:String>
   <x:String x:Key="Text.Settings.IconSet.Note" xml:space="preserve">Material Icon Theme 使用 material-icon-theme（MIT 许可证，© Material Extensions）。Windows 图标集显示与资源管理器相同的 Shell 图标。</x:String>
   <x:String x:Key="Text.Settings.IconSet.Original" xml:space="preserve">Kiriha 原创图标</x:String>
@@ -247,6 +251,12 @@
   <x:String x:Key="Text.Settings.Mouse.Up" xml:space="preserve">向上一级</x:String>
   <x:String x:Key="Text.Settings.RunAtStartup" xml:space="preserve">开机时启动 Kiriha</x:String>
   <x:String x:Key="Text.Settings.RunAtStartupNote" xml:space="preserve">登录时会自动启动 Kiriha。</x:String>
+  <x:String x:Key="Text.Settings.Sharpen" xml:space="preserve">减少放大时的模糊（锐化）</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.High" xml:space="preserve">强</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Low" xml:space="preserve">弱</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Max" xml:space="preserve">最强 (CAS)</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Normal" xml:space="preserve">标准</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Note" xml:space="preserve">在将图片和视频放大到屏幕尺寸时，仅轻微加强轮廓（相当于 AMD FidelityFX RCAS）。播放视频时 CPU 占用会略有增加。</x:String>
   <x:String x:Key="Text.Settings.Shortcuts" xml:space="preserve">快捷键</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOps" xml:space="preserve">文件操作</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOpsBody" xml:space="preserve">Ctrl+X / C / V　剪切、复制、粘贴　　Delete / Shift+Delete　删除、永久删除&#10;F2　重命名　　Alt+Enter　属性　　Ctrl+Shift+N　新建文件夹　　Alt+P　预览</x:String>

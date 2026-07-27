@@ -4,9 +4,13 @@
         xmlns:m="using:Kiriha.Models"
         xmlns:c="using:Kiriha.Controls">
         <!-- 垂直タブ。色は既存トークンだけを使い、選択状態は濃い面 + アクセント線で明確にする。 -->
+        <!-- 右の余白が 3 なのは、タブとコンテンツの島の間に掴み代の Thumb (5px) が挟まるため。
+             3 + 5 + 島の左マージン 0 = 8 で、ウィンドウ左端からタブまでの 8px と幅が揃う
+             （タブ列の面色はウィンドウ地と同色なので、見た目は左右とも 8px の余白になる）。
+             タブ列下部の 2 ボタンの右マージンと島の Margin も、この 3 / 0 と合わせて動かすこと。 -->
         <Style Selector="ListBox.verticaltabs">
             <Setter Property="Background" Value="Transparent" />
-            <Setter Property="Padding" Value="8,6,8,0" />
+            <Setter Property="Padding" Value="8,6,3,0" />
         </Style>
         <Style Selector="ListBox.verticaltabs ListBoxItem">
             <Setter Property="Padding" Value="0" />
@@ -302,24 +306,6 @@
         <Style Selector="Slider.statuszoom:horizontal /template/ Grid#HorizontalTemplate">
             <Setter Property="Margin" Value="0,-11.6,0,0" />
         </Style>
-        <!-- ギャラリーの終了ボタン: 普段は透明で、右上のホバーゾーンに入ったときだけフェード表示する -->
-        <!-- ギャラリーを閉じるボタン。メイン画像領域でマウスを動かしている間だけ .shown が付く。 -->
-        <Style Selector="Button.galleryclose">
-            <Setter Property="Width" Value="32" />
-            <Setter Property="Height" Value="32" />
-            <Setter Property="CornerRadius" Value="16" />
-            <Setter Property="Padding" Value="0" />
-            <Setter Property="Background" Value="#66000000" />
-            <Setter Property="Opacity" Value="0" />
-            <Setter Property="Transitions">
-                <Transitions>
-                    <DoubleTransition Property="Opacity" Duration="0:0:0.15" />
-                </Transitions>
-            </Setter>
-        </Style>
-        <Style Selector="Button.galleryclose.shown">
-            <Setter Property="Opacity" Value="1" />
-        </Style>
         <!-- アドレスバーと検索ボックスの間は、リサイズ領域だけを残して区切り線を描かない -->
         <Style Selector="Thumb.searchsplit">
             <Setter Property="Width" Value="4" />
@@ -604,15 +590,53 @@
 
         <!-- ギャラリーの動画コントロールバー。プレビュー領域へ重ねるため、テーマ配色ではなく
              映像の上で見やすい半透明の暗色で固定する（ギャラリー自体が黒背景固定なのと揃える）。 -->
-        <!-- ギャラリーの共通コントロールバー（メイン表示とフィルムストリップの間）。
-             画像の回転・拡大縮小と、動画の再生操作をここへ集約している。 -->
-        <!-- 高さは画像の表示領域を削るので、操作できる範囲でできるだけ薄くする
-             （バーの高さ = ボタンの高さ + Padding + Margin）。 -->
+        <!-- ギャラリーの共通コントロールバー（メイン表示の下端へ重ねるオーバーレイ）。
+             画像の回転・拡大縮小、動画の再生操作、全画面表示をここへ集約している。
+             閉じるボタンと同じく、普段は透明でマウスを動かしている間だけ .shown が付く。
+             画像の上に乗るので、背景は映像の上でも読める濃さの半透明にする。 -->
         <Style Selector="Border.gallerybar">
-            <Setter Property="Background" Value="#14FFFFFF" />
-            <Setter Property="Padding" Value="10,1" />
-            <Setter Property="Margin" Value="12,0,12,3" />
+            <Setter Property="Background" Value="#B2000000" />
+            <!-- メイン画像領域は手のひらカーソルなので、バーの上では通常の矢印へ戻す -->
+            <Setter Property="Cursor" Value="Arrow" />
+            <Setter Property="Padding" Value="10,3" />
+            <Setter Property="Margin" Value="12,0,12,6" />
             <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Opacity" Value="0" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.15" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Border.gallerybar.shown">
+            <Setter Property="Opacity" Value="1" />
+        </Style>
+        <!-- 前後送りボタン。画像の左右端に重ねるので、映像の上でも読める半透明の暗色にし、
+             マウスで狙いやすいよう大きめ（幅 56 × 高さ 116）にする。表示のフェードはバーと同じ。 -->
+        <Style Selector="Button.gallerynav">
+            <Setter Property="Width" Value="56" />
+            <Setter Property="Height" Value="116" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Background" Value="#8C000000" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Foreground" Value="#DDDDDD" />
+            <Setter Property="Cursor" Value="Arrow" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Opacity" Value="0" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.15" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Button.gallerynav.shown">
+            <Setter Property="Opacity" Value="1" />
+        </Style>
+        <Style Selector="Button.gallerynav:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#B2000000" />
+            <Setter Property="TextElement.Foreground" Value="#FFFFFF" />
         </Style>
         <!-- 区切り線（回転と拡大縮小の間） -->
         <Style Selector="Border.gallerysep">

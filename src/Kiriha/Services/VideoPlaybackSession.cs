@@ -32,8 +32,14 @@ internal sealed partial class VideoPlaybackSession : IDisposable
     private static readonly string[] PlayableExtensions =
         [".mp4", ".m4v", ".mkv", ".avi", ".mov", ".wmv", ".webm", ".mpg", ".mpeg", ".mts", ".m2ts"];
 
-    /// <summary>フレーム転送先の最大幅。ソフトウェアコピーの負荷を抑えるための上限。</summary>
-    private const int MaxFrameWidth = 1280;
+    /// <summary>フレーム転送先の最大幅。
+    ///
+    /// ここを下げるとソフトウェアコピーは軽くなるが、映像の解像度をそのまま捨てることになる。
+    /// 以前の 1280 では、フル HD の動画を 1280 へ縮めてから画面幅（高 DPI では 2560 前後）へ
+    /// 拡大し直していて、等倍で出せるはずの素材が明確にぼけていた。
+    /// 一般的な高 DPI ノートの物理解像度に合わせて 2560 とし、フル HD は等倍で通す。
+    /// これより大きい 4K 素材だけが縮小の対象になる。</summary>
+    private const int MaxFrameWidth = 2560;
 
     private static readonly StrategyBasedComWrappers ComWrappers = new();
     private static readonly Lock MediaFoundationLock = new();
@@ -56,6 +62,9 @@ internal sealed partial class VideoPlaybackSession : IDisposable
     private nint _wicFramePointer;
     private WriteableBitmap? _frontBuffer;
     private WriteableBitmap? _backBuffer;
+
+    /// <summary>鮮鋭化の入力用に使い回すバッファ（毎フレーム確保しないため）。</summary>
+    private uint[]? _sharpenSource;
     private PixelSize _frameSize;
     private bool _disposed;
 
@@ -508,7 +517,34 @@ internal sealed partial class VideoPlaybackSession : IDisposable
 
         using var framebuffer = _backBuffer.Lock();
         var stride = (uint)framebuffer.RowBytes;
-        return _wicFrame.CopyPixels(0, stride, stride * (uint)_frameSize.Height, framebuffer.Address) >= 0;
+        if (!ContrastAdaptiveSharpenService.Enabled)
+        {
+            return _wicFrame.CopyPixels(0, stride, stride * (uint)_frameSize.Height, framebuffer.Address) >= 0;
+        }
+
+        // 鮮鋭化は元画素を読みながら書くので、転送先へ直接は書けない。一度こちらへ写してから通す。
+        // 毎フレーム確保するとフル HD で 8MB の割り当てが 30 回/秒になるため、バッファは使い回す。
+        var pixels = _frameSize.Width * _frameSize.Height;
+        if (_sharpenSource is null || _sharpenSource.Length < pixels)
+        {
+            _sharpenSource = new uint[pixels];
+        }
+
+        var sourceStride = (uint)(_frameSize.Width * 4);
+        unsafe
+        {
+            fixed (uint* buffer = _sharpenSource)
+            {
+                if (_wicFrame.CopyPixels(0, sourceStride, sourceStride * (uint)_frameSize.Height, (nint)buffer) < 0)
+                {
+                    return false;
+                }
+            }
+        }
+
+        ContrastAdaptiveSharpenService.Apply(
+            _sharpenSource, _frameSize.Width, _frameSize.Height, framebuffer.Address, framebuffer.RowBytes / 4);
+        return true;
     }
 
     /// <summary>メタデータ確定時に映像サイズを確定し、転送先バッファを用意する。</summary>
@@ -577,6 +613,7 @@ internal sealed partial class VideoPlaybackSession : IDisposable
         _backBuffer?.Dispose();
         _frontBuffer = null;
         _backBuffer = null;
+        _sharpenSource = null;
         CurrentFrame = null;
         _frameSize = default;
     }

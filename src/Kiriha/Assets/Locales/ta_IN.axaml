@@ -99,8 +99,11 @@
   <x:String x:Key="Text.Folder.Pictures" xml:space="preserve">படங்கள்</x:String>
   <x:String x:Key="Text.Folder.Videos" xml:space="preserve">வீடியோக்கள்</x:String>
   <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">தொகுப்பிலிருந்து வெளியேறு (Esc)</x:String>
+  <x:String x:Key="Text.Gallery.FullScreen" xml:space="preserve">முழுத்திரை (F11, வெளியேற Esc)</x:String>
   <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">பட தகவல்</x:String>
+  <x:String x:Key="Text.Gallery.Next" xml:space="preserve">அடுத்த படம் (வலது அம்பு)</x:String>
   <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">இந்தப் படத்திற்கான தகவல் இல்லை.</x:String>
+  <x:String x:Key="Text.Gallery.Previous" xml:space="preserve">முந்தைய படம் (இடது அம்பு)</x:String>
   <x:String x:Key="Text.Gallery.RotateFailed" xml:space="preserve">இந்தப் படத்தை தரம் குறையாமல் சுழற்ற முடியாது.</x:String>
   <x:String x:Key="Text.Gallery.RotateLeft" xml:space="preserve">இடதுபுறம் சுழற்று (தரம் குறையாமல் சேமிக்கப்படும்)</x:String>
   <x:String x:Key="Text.Gallery.RotateRight" xml:space="preserve">வலதுபுறம் சுழற்று (தரம் குறையாமல் சேமிக்கப்படும்)</x:String>
@@ -219,6 +222,7 @@
   <x:String x:Key="Text.Settings.ExplorerContextMenu" xml:space="preserve">எக்ஸ்ப்ளோரரின் வலது கிளிக் மெனுவில் “Kiriha மூலம் திற” ஐச் சேர்</x:String>
   <x:String x:Key="Text.Settings.ExplorerContextMenuNote" xml:space="preserve">கோப்புறையின் மீதோ அதன் உள்ளடக்கத்தின் வெற்றிடத்திலோ வலது கிளிக் செய்து அந்தக் கோப்புறையை Kiriha இல் திறக்கலாம்.</x:String>
   <x:String x:Key="Text.Settings.FolderTree" xml:space="preserve">கோப்புறை மரம்</x:String>
+  <x:String x:Key="Text.Settings.Gallery" xml:space="preserve">தொகுப்பு</x:String>
   <x:String x:Key="Text.Settings.IconSet.Material" xml:space="preserve">Material Icon Theme</x:String>
   <x:String x:Key="Text.Settings.IconSet.Note" xml:space="preserve">Material Icon Theme ஆனது material-icon-theme (MIT உரிமம், © Material Extensions) ஐப் பயன்படுத்துகிறது. Windows தொகுப்பு எக்ஸ்ப்ளோரரின் அதே Shell சின்னங்களைக் காட்டும்.</x:String>
   <x:String x:Key="Text.Settings.IconSet.Original" xml:space="preserve">Kiriha இன் அசல் சின்னங்கள்</x:String>
@@ -247,6 +251,12 @@
   <x:String x:Key="Text.Settings.Mouse.Up" xml:space="preserve">ஒரு நிலை மேலே செல்</x:String>
   <x:String x:Key="Text.Settings.RunAtStartup" xml:space="preserve">Windows தொடங்கும்போது Kiriha ஐ இயக்கு</x:String>
   <x:String x:Key="Text.Settings.RunAtStartupNote" xml:space="preserve">உள்நுழையும்போது Kiriha தானாகத் தொடங்கும்.</x:String>
+  <x:String x:Key="Text.Settings.Sharpen" xml:space="preserve">பெரிதாக்கும்போது மங்கலைக் குறை (கூர்மையாக்கம்)</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.High" xml:space="preserve">அதிகம்</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Low" xml:space="preserve">குறைவு</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Max" xml:space="preserve">அதிகபட்சம் (CAS)</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Normal" xml:space="preserve">இயல்பு</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Note" xml:space="preserve">படங்களையும் காணொளிகளையும் திரைக்கு ஏற்ப பெரிதாக்கும்போது விளிம்புகளை மட்டும் மென்மையாக கூர்மையாக்கும் (AMD FidelityFX RCAS நிகர்). காணொளியில் CPU பயன்பாடு சற்று அதிகரிக்கும்.</x:String>
   <x:String x:Key="Text.Settings.Shortcuts" xml:space="preserve">குறுக்குவழிகள்</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOps" xml:space="preserve">கோப்புச் செயல்பாடுகள்</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOpsBody" xml:space="preserve">Ctrl+X / C / V　வெட்டு, நகலெடு, ஒட்டு　　Delete / Shift+Delete　நீக்கு, நிரந்தரமாக நீக்கு&#10;F2　பெயர் மாற்று　　Alt+Enter　பண்புகள்　　Ctrl+Shift+N　புதிய கோப்புறை　　Alt+P　முன்னோட்டம்</x:String>

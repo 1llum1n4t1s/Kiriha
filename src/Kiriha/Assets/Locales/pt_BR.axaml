@@ -99,8 +99,11 @@
   <x:String x:Key="Text.Folder.Pictures" xml:space="preserve">Imagens</x:String>
   <x:String x:Key="Text.Folder.Videos" xml:space="preserve">Vídeos</x:String>
   <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">Sair da galeria (Esc)</x:String>
+  <x:String x:Key="Text.Gallery.FullScreen" xml:space="preserve">Tela cheia (F11, Esc para sair)</x:String>
   <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">Informações da imagem</x:String>
+  <x:String x:Key="Text.Gallery.Next" xml:space="preserve">Próxima imagem (seta direita)</x:String>
   <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">Não há informações disponíveis para esta imagem.</x:String>
+  <x:String x:Key="Text.Gallery.Previous" xml:space="preserve">Imagem anterior (seta esquerda)</x:String>
   <x:String x:Key="Text.Gallery.RotateFailed" xml:space="preserve">Não é possível girar esta imagem sem perdas.</x:String>
   <x:String x:Key="Text.Gallery.RotateLeft" xml:space="preserve">Girar à esquerda (salvo sem perdas)</x:String>
   <x:String x:Key="Text.Gallery.RotateRight" xml:space="preserve">Girar à direita (salvo sem perdas)</x:String>
@@ -219,6 +222,7 @@
   <x:String x:Key="Text.Settings.ExplorerContextMenu" xml:space="preserve">Adicionar “Abrir com o Kiriha” ao menu de contexto do Explorador</x:String>
   <x:String x:Key="Text.Settings.ExplorerContextMenuNote" xml:space="preserve">Permite abrir uma pasta no Kiriha clicando com o botão direito na pasta ou no fundo do seu conteúdo.</x:String>
   <x:String x:Key="Text.Settings.FolderTree" xml:space="preserve">Árvore de pastas</x:String>
+  <x:String x:Key="Text.Settings.Gallery" xml:space="preserve">Galeria</x:String>
   <x:String x:Key="Text.Settings.IconSet.Material" xml:space="preserve">Material Icon Theme</x:String>
   <x:String x:Key="Text.Settings.IconSet.Note" xml:space="preserve">O tema Material Icon Theme usa o material-icon-theme (licença MIT, © Material Extensions). O conjunto do Windows mostra os mesmos ícones do shell do Explorador.</x:String>
   <x:String x:Key="Text.Settings.IconSet.Original" xml:space="preserve">Ícones originais do Kiriha</x:String>
@@ -247,6 +251,12 @@
   <x:String x:Key="Text.Settings.Mouse.Up" xml:space="preserve">Subir um nível</x:String>
   <x:String x:Key="Text.Settings.RunAtStartup" xml:space="preserve">Executar o Kiriha ao iniciar o Windows</x:String>
   <x:String x:Key="Text.Settings.RunAtStartupNote" xml:space="preserve">O Kiriha é iniciado automaticamente ao fazer login.</x:String>
+  <x:String x:Key="Text.Settings.Sharpen" xml:space="preserve">Reduzir o desfoque ao ampliar (nitidez)</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.High" xml:space="preserve">Forte</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Low" xml:space="preserve">Leve</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Max" xml:space="preserve">Máxima (CAS)</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Normal" xml:space="preserve">Padrão</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Note" xml:space="preserve">Reforça apenas as bordas, com moderação, ao ampliar imagens e vídeos para a tela (equivalente ao AMD FidelityFX RCAS). Em vídeo, o uso de CPU aumenta um pouco.</x:String>
   <x:String x:Key="Text.Settings.Shortcuts" xml:space="preserve">Atalhos</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOps" xml:space="preserve">Operações com arquivos</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOpsBody" xml:space="preserve">Ctrl+X / C / V　Recortar, copiar, colar　　Delete / Shift+Delete　Excluir, excluir definitivamente&#10;F2　Renomear　　Alt+Enter　Propriedades　　Ctrl+Shift+N　Nova pasta　　Alt+P　Visualização</x:String>

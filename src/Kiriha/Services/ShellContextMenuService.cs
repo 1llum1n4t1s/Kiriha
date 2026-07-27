@@ -4,6 +4,15 @@ using System.Runtime.InteropServices.Marshalling;
 namespace Kiriha.Services;
 
 /// <summary>
+/// シェルコンテキストメニューの末尾へ足すアプリ独自の項目（区切り線付きで 1 件だけ）。
+/// シェル側の verb ではないので、選択時は <see cref="Invoke"/> をそのまま呼ぶ。
+/// </summary>
+/// <param name="Text">メニューに出す表示名（ローカライズ済みの文字列）。</param>
+/// <param name="Invoke">選択されたときに実行する処理。</param>
+/// <param name="StockIconId">項目の左に出すシェル標準アイコン（SIID_*）。</param>
+internal sealed record ShellMenuExtraItem(string Text, Action Invoke, uint StockIconId);
+
+/// <summary>
 /// Windows 標準のシェルコンテキストメニュー（IContextMenu）を表示する。
 /// Windows 11 の新デザインメニューは Explorer 内部実装で公開 API が無いため、
 /// 機能同一の OS 標準メニュー（「その他のオプションを確認」相当）を使用する。
@@ -16,6 +25,23 @@ internal static partial class ShellContextMenuService
 
     private const uint TpmReturnCmd = 0x0100;
     private const uint TpmRightButton = 0x0002;
+
+    private const uint MfString = 0x0000;
+    private const uint MfSeparator = 0x0800;
+    private const uint MfByPosition = 0x0400;
+    private const uint MiimBitmap = 0x0080;
+
+    private const int SmCxSmIcon = 49;
+    private const int SmCySmIcon = 50;
+    private const uint DiNormal = 0x0003;
+
+    /// <summary>SIID_FOLDER。エクスプローラーと同じ標準のフォルダーアイコン。</summary>
+    public const uint StockIconFolder = 3;
+    private const uint ShgsiIcon = 0x0000_0100;
+    private const uint ShgsiSmallIcon = 0x0000_0001;
+
+    /// <summary>アプリ独自項目のコマンド ID。シェル項目は 1〜0x7FFF を使うので、その外側を割り当てる。</summary>
+    private const int ExtraItemCommandId = 0x8000;
 
     /// <summary>
     /// 指定パスに対してシェル verb を直接実行する（例: "unpinfromhome" = クイックアクセスから外す、
@@ -244,14 +270,15 @@ internal static partial class ShellContextMenuService
     }
 
     /// <summary>指定パスのシェルコンテキストメニューをスクリーン座標 (x, y) に表示する。コマンド実行時 true。</summary>
-    public static bool Show(nint hwnd, string path, int x, int y)
-        => Show(hwnd, [path], x, y);
+    public static bool Show(nint hwnd, string path, int x, int y, ShellMenuExtraItem? extraItem = null)
+        => Show(hwnd, [path], x, y, extraItem);
 
     /// <summary>
     /// 複数パス（同一フォルダー内の複数選択）のシェルコンテキストメニューを表示する。
     /// Explorer と同じく、削除・コピー・送る等の verb は選択全体に対して実行される。
+    /// <paramref name="extraItem"/> を渡すと、区切り線を挟んでアプリ独自の項目を末尾に足す。
     /// </summary>
-    public static bool Show(nint hwnd, IReadOnlyList<string> paths, int x, int y)
+    public static bool Show(nint hwnd, IReadOnlyList<string> paths, int x, int y, ShellMenuExtraItem? extraItem = null)
     {
         var pidls = new List<nint>(paths.Count);
         try
@@ -264,7 +291,7 @@ internal static partial class ShellContextMenuService
                 }
             }
 
-            return pidls.Count > 0 && ShowForPidls(hwnd, pidls, x, y);
+            return pidls.Count > 0 && ShowForPidls(hwnd, pidls, x, y, extraItem);
         }
         finally
         {
@@ -275,7 +302,7 @@ internal static partial class ShellContextMenuService
         }
     }
 
-    private static bool ShowForPidls(nint hwnd, IReadOnlyList<nint> pidls, int x, int y)
+    private static bool ShowForPidls(nint hwnd, IReadOnlyList<nint> pidls, int x, int y, ShellMenuExtraItem? extraItem)
     {
         // シェル拡張（クラウドストレージ・AV 等）の不調で QueryContextMenu が数十秒ブロックすることが
         // あるため、所要時間を計測して遅延時だけ記録する（犯人特定の手掛かりを残す）。
@@ -331,6 +358,8 @@ internal static partial class ShellContextMenuService
             return false;
         }
 
+        // アプリ独自項目のアイコン。メニューを壊した後に解放する（表示中は必要）。
+        var extraBitmap = (nint)0;
         try
         {
             if (menu.QueryContextMenu(hmenu, 0, 1, 0x7FFF, 0) < 0)
@@ -346,12 +375,30 @@ internal static partial class ShellContextMenuService
                     LogLevel.Warning);
             }
 
+            // Kiriha 自身の中で「Kiriha で開く」は無意味なので取り除く（エクスプローラー側には残る）
+            RemoveOwnVerbItems(menu, hmenu);
+
+            // アプリ独自の項目（「エクスプローラーで開く」等）はシェル項目の後ろへ足す。
+            // シェル拡張の項目を押しのけないよう、必ず QueryContextMenu の後に追加する。
+            if (extraItem is not null)
+            {
+                AppendMenu(hmenu, MfSeparator, 0, string.Empty);
+                AppendMenu(hmenu, MfString, (nuint)ExtraItemCommandId, extraItem.Text);
+                extraBitmap = SetMenuItemStockIcon(hmenu, ExtraItemCommandId, extraItem.StockIconId);
+            }
+
             // 前面でないウィンドウからだとメニュー外クリックで閉じなくなるため前面化する
             SetForegroundWindow(hwnd);
             var cmd = TrackPopupMenuEx(hmenu, TpmReturnCmd | TpmRightButton, x, y, hwnd, 0);
             if (cmd <= 0)
             {
                 return false;
+            }
+
+            if (cmd == ExtraItemCommandId && extraItem is not null)
+            {
+                extraItem.Invoke();
+                return true;
             }
 
             unsafe
@@ -404,9 +451,110 @@ internal static partial class ShellContextMenuService
         finally
         {
             DestroyMenu(hmenu);
+            if (extraBitmap != 0)
+            {
+                DeleteObject(extraBitmap);
+            }
+
             // IContextMenu の実体はサードパーティのシェル拡張。GC 任せにせずここで手放す
             ComRelease.Release(menu);
             ComRelease.Release(folder);
+        }
+    }
+
+    /// <summary>
+    /// Kiriha 自身が登録したエクスプローラー用の verb（「Kiriha で開く」）をメニューから取り除く。
+    /// 自分の中で自分を開き直す項目は意味が無いため。判定は表示名ではなく正規 verb 名で行う
+    /// （表示名は 17 言語で変わるが、verb 名はレジストリのキー名で固定）。
+    /// </summary>
+    private static void RemoveOwnVerbItems(IContextMenu menu, nint hmenu)
+    {
+        for (var i = GetMenuItemCount(hmenu) - 1; i >= 0; i--)
+        {
+            var id = GetMenuItemID(hmenu, i);
+            if (id > 0 && IsVerb(menu, id, WindowsIntegrationService.ContextMenuVerb))
+            {
+                DeleteMenu(hmenu, (uint)i, MfByPosition);
+            }
+        }
+    }
+
+    /// <summary>
+    /// メニュー項目の左へシェルの標準アイコンを付ける。戻り値は作成した HBITMAP
+    /// （メニューを破棄した後に <c>DeleteObject</c> する。0 なら付けられなかった）。
+    /// </summary>
+    private static unsafe nint SetMenuItemStockIcon(nint hmenu, int commandId, uint stockIconId)
+    {
+        var bitmap = CreateStockIconBitmap(stockIconId);
+        if (bitmap == 0)
+        {
+            return 0;
+        }
+
+        var info = new MenuItemInfoW
+        {
+            Size = (uint)sizeof(MenuItemInfoW),
+            Mask = MiimBitmap,
+            BitmapItem = bitmap,
+        };
+        if (!SetMenuItemInfo(hmenu, (uint)commandId, false, ref info))
+        {
+            DeleteObject(bitmap);
+            return 0;
+        }
+
+        return bitmap;
+    }
+
+    /// <summary>シェルの標準アイコンを、メニューが扱える 32bpp のビットマップへ描き起こす。</summary>
+    private static unsafe nint CreateStockIconBitmap(uint stockIconId)
+    {
+        var icon = new ShStockIconInfo { Size = (uint)sizeof(ShStockIconInfo) };
+        if (SHGetStockIconInfo(stockIconId, ShgsiIcon | ShgsiSmallIcon, ref icon) < 0 || icon.Icon == 0)
+        {
+            return 0;
+        }
+
+        try
+        {
+            var cx = GetSystemMetrics(SmCxSmIcon);
+            var cy = GetSystemMetrics(SmCySmIcon);
+            var hdc = CreateCompatibleDC(0);
+            if (hdc == 0)
+            {
+                return 0;
+            }
+
+            try
+            {
+                // 高さを負にしてトップダウン DIB にする（アルファ付きのままメニューへ渡せる）
+                var header = new BitmapInfoHeader
+                {
+                    Size = (uint)sizeof(BitmapInfoHeader),
+                    Width = cx,
+                    Height = -cy,
+                    Planes = 1,
+                    BitCount = 32,
+                };
+                var bitmap = CreateDIBSection(hdc, ref header, 0, out _, 0, 0);
+                if (bitmap == 0)
+                {
+                    return 0;
+                }
+
+                var previous = SelectObject(hdc, bitmap);
+                DrawIconEx(hdc, 0, 0, icon.Icon, cx, cy, 0, 0, DiNormal);
+                SelectObject(hdc, previous);
+                return bitmap;
+            }
+            finally
+            {
+                DeleteDC(hdc);
+            }
+        }
+        finally
+        {
+            DestroyIcon(icon.Icon);
         }
     }
 
@@ -452,6 +600,101 @@ internal static partial class ShellContextMenuService
 
     [LibraryImport("user32.dll")]
     private static partial nint CreatePopupMenu();
+
+    [LibraryImport("user32.dll", EntryPoint = "AppendMenuW", StringMarshalling = StringMarshalling.Utf16)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool AppendMenu(nint hMenu, uint flags, nuint idNewItem, string item);
+
+    [LibraryImport("user32.dll")]
+    private static partial int GetMenuItemCount(nint hMenu);
+
+    [LibraryImport("user32.dll")]
+    private static partial int GetMenuItemID(nint hMenu, int pos);
+
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool DeleteMenu(nint hMenu, uint position, uint flags);
+
+    [LibraryImport("user32.dll", EntryPoint = "SetMenuItemInfoW")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool SetMenuItemInfo(nint hMenu, uint item,
+        [MarshalAs(UnmanagedType.Bool)] bool byPosition, ref MenuItemInfoW info);
+
+    [LibraryImport("user32.dll")]
+    private static partial int GetSystemMetrics(int index);
+
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool DrawIconEx(nint hdc, int x, int y, nint icon,
+        int width, int height, uint step, nint brush, uint flags);
+
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool DestroyIcon(nint icon);
+
+    [LibraryImport("gdi32.dll")]
+    private static partial nint CreateCompatibleDC(nint hdc);
+
+    [LibraryImport("gdi32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool DeleteDC(nint hdc);
+
+    [LibraryImport("gdi32.dll")]
+    private static partial nint SelectObject(nint hdc, nint obj);
+
+    [LibraryImport("gdi32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool DeleteObject(nint obj);
+
+    [LibraryImport("gdi32.dll")]
+    private static partial nint CreateDIBSection(nint hdc, ref BitmapInfoHeader header, uint usage,
+        out nint bits, nint section, uint offset);
+
+    [LibraryImport("shell32.dll")]
+    private static partial int SHGetStockIconInfo(uint stockIconId, uint flags, ref ShStockIconInfo info);
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct MenuItemInfoW
+    {
+        public uint Size;
+        public uint Mask;
+        public uint Type;
+        public uint State;
+        public uint Id;
+        public nint SubMenu;
+        public nint BitmapChecked;
+        public nint BitmapUnchecked;
+        public nuint ItemData;
+        public nint TypeData;
+        public uint Cch;
+        public nint BitmapItem;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct BitmapInfoHeader
+    {
+        public uint Size;
+        public int Width;
+        public int Height;
+        public ushort Planes;
+        public ushort BitCount;
+        public uint Compression;
+        public uint SizeImage;
+        public int XPelsPerMeter;
+        public int YPelsPerMeter;
+        public uint ClrUsed;
+        public uint ClrImportant;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private unsafe struct ShStockIconInfo
+    {
+        public uint Size;
+        public nint Icon;
+        public int SysImageIndex;
+        public int IconIndex;
+        public fixed char Path[260];
+    }
 
     [LibraryImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]

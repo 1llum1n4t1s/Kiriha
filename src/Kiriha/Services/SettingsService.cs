@@ -180,6 +180,12 @@ public sealed class AppSettings
     /// <summary>ウィンドウにアクリル（半透明ぼかし）効果を使う（Lhamiel / RealTimeTranslator と同等、設定画面で切替）。</summary>
     public bool UseAcrylicBackground { get; set; } = true;
 
+    /// <summary>ギャラリー表示の画像・動画に RCAS の鮮鋭化を掛ける（拡大時のぼけ対策、既定 ON）。</summary>
+    public bool SharpenGallery { get; set; } = true;
+
+    /// <summary>鮮鋭化の強さ（SharpenStrength の名前。Low / Normal / High）。</summary>
+    public string SharpenStrength { get; set; } = "Normal";
+
     /// <summary>最小化時にタスクバーではなくタスクトレイに格納する（Discord と同等の挙動、既定 OFF）。</summary>
     public bool MinimizeToTray { get; set; }
 

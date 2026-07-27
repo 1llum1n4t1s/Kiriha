@@ -69,6 +69,12 @@ public partial class MainWindow : Window
     /// 閉じたときにこの値で最大化フラグを復元する）。</summary>
     private bool _lastKnownMaximized;
 
+    /// <summary>ギャラリーの全画面表示に入る直前のウィンドウ状態（解除時にここへ戻す）。</summary>
+    private WindowState _preGalleryFullScreenState = WindowState.Normal;
+
+    /// <summary>全画面表示をギャラリー側で始めたか（F11 等で元から全画面だった場合は解除時に戻さない）。</summary>
+    private bool _galleryOwnsFullScreen;
+
     public MainWindow()
     {
         InitializeComponent();
@@ -116,6 +122,12 @@ public partial class MainWindow : Window
                     if (args.PropertyName == nameof(MainWindowViewModel.OptUseAcrylicBackground))
                     {
                         ApplyAcrylicTransparency(vm.OptUseAcrylicBackground);
+                    }
+                    else if (args.PropertyName == nameof(MainWindowViewModel.IsGalleryFullScreen))
+                    {
+                        // 解除経路（Esc・✕・タブ切り替え）が複数あるため、ウィンドウ状態の反映は
+                        // プロパティ側へ一本化する。
+                        ApplyGalleryFullScreen(vm.IsGalleryFullScreen);
                     }
                     else if (args.PropertyName == nameof(MainWindowViewModel.SelectedTab))
                     {
@@ -357,9 +369,18 @@ public partial class MainWindow : Window
                 if (tab is { IsSettingsTab: false } && tab.RenameCommand.CanExecute(null)) tab.RenameCommand.Execute(null);
                 break;
             case Key.F11:
-                WindowState = WindowState == WindowState.FullScreen
-                    ? WindowState.Normal
-                    : WindowState.FullScreen;
+                // ギャラリー表示中はギャラリーの全画面（コントロールをオーバーレイに畳む）を切り替える。
+                if (tab is { IsGalleryView: true } || vm.IsGalleryFullScreen)
+                {
+                    vm.IsGalleryFullScreen = !vm.IsGalleryFullScreen;
+                }
+                else
+                {
+                    WindowState = WindowState == WindowState.FullScreen
+                        ? WindowState.Normal
+                        : WindowState.FullScreen;
+                }
+
                 break;
             case Key.D0 when ctrl:
                 // Ctrl+0 で表示ズームをリセット（詳細表示）
@@ -1958,19 +1979,86 @@ public partial class MainWindow : Window
         }
     }
 
-    /// <summary>ギャラリー表示中の Esc をトンネル段階で拾い、特大アイコン表示へ復帰する。</summary>
+    /// <summary>ギャラリー表示中の Esc をトンネル段階で拾い、全画面表示 → ギャラリーの順に 1 段ずつ抜ける。</summary>
     private void GalleryEscape_KeyDown(object? sender, KeyEventArgs e)
     {
-        if (e.Key == Key.Escape
-            && ViewModel?.SelectedTab is { IsGalleryView: true, IsEditingPath: false } tab
-            && FocusManager?.GetFocusedElement() is not TextBox)
+        if (e.Key != Key.Escape
+            || ViewModel is not { SelectedTab: { IsGalleryView: true, IsEditingPath: false } tab } vm
+            || FocusManager?.GetFocusedElement() is TextBox)
+        {
+            return;
+        }
+
+        if (vm.IsGalleryFullScreen)
+        {
+            // 全画面中の Esc は全画面の解除だけ（ギャラリー自体は続ける）
+            vm.IsGalleryFullScreen = false;
+        }
+        else
         {
             tab.IconSize = 96;
-            e.Handled = true;
+        }
+
+        e.Handled = true;
+    }
+
+    /// <summary>画像の左端に重なる「前の画像へ」ボタン。</summary>
+    private void GalleryPrev_Click(object? sender, RoutedEventArgs e)
+        => MoveGallerySelectionFromOverlay(-1);
+
+    /// <summary>画像の右端に重なる「次の画像へ」ボタン。</summary>
+    private void GalleryNext_Click(object? sender, RoutedEventArgs e)
+        => MoveGallerySelectionFromOverlay(1);
+
+    /// <summary>オーバーレイのボタンからの画像送り。押した直後もオーバーレイを出したままにする
+    /// （連続で押せるように、自動で引っ込むまでの時間も測り直す）。</summary>
+    private void MoveGallerySelectionFromOverlay(int delta)
+    {
+        if (ViewModel?.SelectedTab is not { IsSettingsTab: false } tab)
+        {
+            return;
+        }
+
+        tab.MoveGallerySelection(delta);
+        ShowGalleryOverlay(tab);
+    }
+
+    /// <summary>ギャラリーのコントロールバーの全画面表示ボタン。</summary>
+    private void GalleryFullScreen_Click(object? sender, RoutedEventArgs e)
+    {
+        if (ViewModel is { } vm)
+        {
+            vm.IsGalleryFullScreen = !vm.IsGalleryFullScreen;
         }
     }
 
-    /// <summary>ギャラリー右上の ✕ ボタンでギャラリー表示を終了する。</summary>
+    /// <summary>ギャラリーの全画面表示をウィンドウへ反映する（タイトルバーとタブバーの畳みは XAML 側）。</summary>
+    private void ApplyGalleryFullScreen(bool fullScreen)
+    {
+        // タイトルバーは IsVisible だけでは行の高さ（32px）が残るので、行ごと畳む
+        RootGrid.RowDefinitions[0].Height = new GridLength(fullScreen ? 0 : 32);
+
+        if (fullScreen)
+        {
+            if (WindowState == WindowState.FullScreen)
+            {
+                // F11 で既に全画面だった場合は、解除時に勝手にウィンドウ表示へ戻さない
+                _galleryOwnsFullScreen = false;
+                return;
+            }
+
+            _preGalleryFullScreenState = WindowState;
+            _galleryOwnsFullScreen = true;
+            WindowState = WindowState.FullScreen;
+        }
+        else if (_galleryOwnsFullScreen)
+        {
+            _galleryOwnsFullScreen = false;
+            WindowState = _preGalleryFullScreenState;
+        }
+    }
+
+    /// <summary>コントロールバーの ✕ ボタンでギャラリー表示を終了する。</summary>
     private void GalleryClose_Click(object? sender, RoutedEventArgs e)
     {
         if ((sender as Control)?.DataContext is TabViewModel tab)
@@ -1981,10 +2069,19 @@ public partial class MainWindow : Window
 
     private void GalleryImage_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
+        _galleryImageArea = sender as Panel;
+
+        // オーバーレイ（コントロールバー・閉じるボタン）の上での押下は、そのコントロールの操作。
+        // ここでフォーカスを奪ったり手のひらドラッグを始めたりすると、拡大中にスライダーを
+        // 掴んだだけで画像が動いてしまう。
+        if (IsGalleryOverlaySource(e.Source))
+        {
+            return;
+        }
+
         // メイン画像へフォーカスを移す。以降のキー操作は GalleryImage_KeyDown が直接処理するため、
         // フォーカスさえこのパネルに乗れば、ファイル一覧の外でも Del / F2 などが確実に効く。
         (sender as Control)?.Focus();
-        _galleryImageArea = sender as Panel;
 
         // 拡大中は左ドラッグで見たい場所へ画像を動かせるようにする（手のひらツール）。
         _galleryPanOrigin = e.GetCurrentPoint(this).Properties.IsLeftButtonPressed
@@ -2030,18 +2127,35 @@ public partial class MainWindow : Window
     {
         if ((sender as Control)?.DataContext is TabViewModel tab)
         {
-            tab.SetGalleryViewport(e.NewSize);
+            // 画面の拡大率（125% なら 1.25）も渡す。表示サイズちょうどでデコードするのに要る。
+            tab.SetGalleryViewport(e.NewSize, RenderScaling);
         }
     }
 
     /// <summary>領域から出たらオーバーレイを畳む（別の場所を操作しているときに残さない）。</summary>
     private void GalleryImage_PointerExited(object? sender, PointerEventArgs e)
     {
+        // PointerExited はバブルするため、内側のボタンやコントロールバーから出ただけでも
+        // ここへ届く。領域そのものから出たとき（Source が領域自身）だけ畳む。
+        if (!ReferenceEquals(e.Source, sender))
+        {
+            return;
+        }
+
         if ((sender as Control)?.DataContext is TabViewModel tab)
         {
             tab.IsGalleryOverlayVisible = false;
         }
     }
+
+    /// <summary>イベントの発生元がギャラリーのオーバーレイ（コントロールバー・前後送りボタン）の中か。</summary>
+    private static bool IsGalleryOverlaySource(object? source)
+        => source is Visual visual
+           && visual.GetSelfAndVisualAncestors().OfType<Control>().Any(IsGalleryOverlayControl);
+
+    /// <summary>ギャラリーのオーバーレイ本体（コントロールバー・前後送りボタン）か。</summary>
+    private static bool IsGalleryOverlayControl(Control control)
+        => control.Classes.Contains("gallerybar") || control.Classes.Contains("gallerynav");
 
     /// <summary>手のひらツールのカーソル。ドラッグ中は握った手にする。</summary>
     private void UpdateGalleryCursor(Control? area)
@@ -2074,10 +2188,11 @@ public partial class MainWindow : Window
                 return;
             }
 
-            // 閉じるボタンへ手を伸ばしている最中（ボタン上でカーソルが止まった）なら消さない。
-            var close = _galleryImageArea?.GetVisualDescendants().OfType<Button>()
-                .FirstOrDefault(b => b.Classes.Contains("galleryclose"));
-            if (close?.IsPointerOver == true)
+            // オーバーレイを操作している最中（その上でカーソルが止まった、スライダーを掴んだまま
+            // 動かしていない、前後送りボタンを連打している）なら消さない。
+            var overlays = _galleryImageArea?.GetVisualDescendants().OfType<Control>()
+                .Where(IsGalleryOverlayControl);
+            if (overlays?.Any(c => c.IsPointerOver) == true)
             {
                 timer.Start();
                 return;
@@ -2226,7 +2341,8 @@ public partial class MainWindow : Window
                 if (listBox.SelectedItem is FileSystemEntry sel && TryGetPlatformHandle() is { } handle)
                 {
                     var pt = this.PointToScreen(listBox.TranslatePoint(new Point(80, 80), this) ?? new Point(200, 200));
-                    var invoked = ShellContextMenuService.Show(handle.Handle, sel.FullPath, pt.X, pt.Y);
+                    var invoked = ShellContextMenuService.Show(handle.Handle, sel.FullPath, pt.X, pt.Y,
+                        BuildOpenInExplorerItem(tab, [sel.FullPath]));
                     if (invoked)
                     {
                         RefreshAfterShellOperation(tab);
@@ -3319,11 +3435,37 @@ public partial class MainWindow : Window
             return;
         }
 
-        var invoked = ShellContextMenuService.Show(handle.Handle, paths, screen.X, screen.Y);
+        var invoked = ShellContextMenuService.Show(handle.Handle, paths, screen.X, screen.Y,
+            BuildOpenInExplorerItem(tab, paths));
         if (invoked)
         {
             RefreshAfterShellOperation(tab);
         }
+    }
+
+    /// <summary>
+    /// フォルダーを右クリックしたときだけ足す「エクスプローラーで開く」項目。
+    /// Windows 11 のシェルメニューには同等の項目が無く、Kiriha を既定のフォルダー表示にしていると
+    /// エクスプローラー側で開き直す手段が無くなるため、こちらで補う。
+    /// </summary>
+    private static ShellMenuExtraItem? BuildOpenInExplorerItem(TabViewModel tab, IReadOnlyList<string> paths)
+    {
+        if (paths.Count == 0 || !paths.All(Directory.Exists))
+        {
+            return null;
+        }
+
+        var targets = paths.ToList();
+        return new ShellMenuExtraItem(
+            LocalizationService.Text("Text.Common.OpenInExplorer"),
+            () =>
+            {
+                foreach (var path in targets)
+                {
+                    tab.OpenFolderInExplorer(path);
+                }
+            },
+            ShellContextMenuService.StockIconFolder);
     }
 
     /// <summary>

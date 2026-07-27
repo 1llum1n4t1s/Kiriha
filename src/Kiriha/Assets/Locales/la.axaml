@@ -99,8 +99,11 @@
   <x:String x:Key="Text.Folder.Pictures" xml:space="preserve">Imagines</x:String>
   <x:String x:Key="Text.Folder.Videos" xml:space="preserve">Pelliculae</x:String>
   <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">E pinacotheca exire (Esc)</x:String>
+  <x:String x:Key="Text.Gallery.FullScreen" xml:space="preserve">Plena imago (F11, Esc ad exeundum)</x:String>
   <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">Informatio imaginis</x:String>
+  <x:String x:Key="Text.Gallery.Next" xml:space="preserve">Imago sequens (sagitta dextra)</x:String>
   <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">Nulla informatio de hac imagine praesto est.</x:String>
+  <x:String x:Key="Text.Gallery.Previous" xml:space="preserve">Imago prior (sagitta sinistra)</x:String>
   <x:String x:Key="Text.Gallery.RotateFailed" xml:space="preserve">Haec imago sine damno verti non potest.</x:String>
   <x:String x:Key="Text.Gallery.RotateLeft" xml:space="preserve">In sinistram vertere (sine damno servatur)</x:String>
   <x:String x:Key="Text.Gallery.RotateRight" xml:space="preserve">In dexteram vertere (sine damno servatur)</x:String>
@@ -219,6 +222,7 @@
   <x:String x:Key="Text.Settings.ExplorerContextMenu" xml:space="preserve">«Cum Kiriha aperire» ad menu contextuale Exploratoris addere</x:String>
   <x:String x:Key="Text.Settings.ExplorerContextMenuNote" xml:space="preserve">Permittit plicam in Kiriha aperire dextro clicu in plicam vel in fundum contenti eius.</x:String>
   <x:String x:Key="Text.Settings.FolderTree" xml:space="preserve">Arbor plicarum</x:String>
+  <x:String x:Key="Text.Settings.Gallery" xml:space="preserve">Pinacotheca</x:String>
   <x:String x:Key="Text.Settings.IconSet.Material" xml:space="preserve">Material Icon Theme</x:String>
   <x:String x:Key="Text.Settings.IconSet.Note" xml:space="preserve">Material Icon Theme utitur material-icon-theme (licentia MIT, © Material Extensions). Copia Windows easdem imagunculas Shell quas Explorator ostendit.</x:String>
   <x:String x:Key="Text.Settings.IconSet.Original" xml:space="preserve">Imagunculae propriae Kiriha</x:String>
@@ -247,6 +251,12 @@
   <x:String x:Key="Text.Settings.Mouse.Up" xml:space="preserve">Gradum sursum ire</x:String>
   <x:String x:Key="Text.Settings.RunAtStartup" xml:space="preserve">Kiriha cum Windows incipiente exsequi</x:String>
   <x:String x:Key="Text.Settings.RunAtStartupNote" xml:space="preserve">Kiriha automatice incipit cum in systema ingrederis.</x:String>
+  <x:String x:Key="Text.Settings.Sharpen" xml:space="preserve">Caliginem in amplificando minuere (acuitas)</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.High" xml:space="preserve">Fortis</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Low" xml:space="preserve">Levis</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Max" xml:space="preserve">Maxima (CAS)</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Normal" xml:space="preserve">Solitus</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Note" xml:space="preserve">Cum imagines et pelliculae ad plenam speciem amplificantur, solae orae leniter firmantur (AMD FidelityFX RCAS aequale). In pelliculis onus processoris paulum crescit.</x:String>
   <x:String x:Key="Text.Settings.Shortcuts" xml:space="preserve">Compendia</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOps" xml:space="preserve">Operationes fasciculorum</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOpsBody" xml:space="preserve">Ctrl+X / C / V　Exsecare, exscribere, agglutinare　　Delete / Shift+Delete　Delere, penitus delere&#10;F2　Nomen mutare　　Alt+Enter　Proprietates　　Ctrl+Shift+N　Plica nova　　Alt+P　Praevisio</x:String>

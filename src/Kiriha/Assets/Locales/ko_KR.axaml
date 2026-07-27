@@ -99,8 +99,11 @@
   <x:String x:Key="Text.Folder.Pictures" xml:space="preserve">사진</x:String>
   <x:String x:Key="Text.Folder.Videos" xml:space="preserve">비디오</x:String>
   <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">갤러리 종료 (Esc)</x:String>
+  <x:String x:Key="Text.Gallery.FullScreen" xml:space="preserve">전체 화면 (F11, Esc로 종료)</x:String>
   <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">이미지 정보</x:String>
+  <x:String x:Key="Text.Gallery.Next" xml:space="preserve">다음 이미지 (→)</x:String>
   <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">이 이미지의 정보가 없습니다.</x:String>
+  <x:String x:Key="Text.Gallery.Previous" xml:space="preserve">이전 이미지 (←)</x:String>
   <x:String x:Key="Text.Gallery.RotateFailed" xml:space="preserve">이 이미지는 무손실로 회전할 수 없습니다.</x:String>
   <x:String x:Key="Text.Gallery.RotateLeft" xml:space="preserve">왼쪽으로 회전(무손실 저장)</x:String>
   <x:String x:Key="Text.Gallery.RotateRight" xml:space="preserve">오른쪽으로 회전(무손실 저장)</x:String>
@@ -219,6 +222,7 @@
   <x:String x:Key="Text.Settings.ExplorerContextMenu" xml:space="preserve">탐색기 오른쪽 클릭 메뉴에 「Kiriha로 열기」 추가</x:String>
   <x:String x:Key="Text.Settings.ExplorerContextMenuNote" xml:space="preserve">폴더나 폴더 안 빈 곳을 오른쪽 클릭하면 해당 폴더를 Kiriha로 열 수 있습니다.</x:String>
   <x:String x:Key="Text.Settings.FolderTree" xml:space="preserve">폴더 트리</x:String>
+  <x:String x:Key="Text.Settings.Gallery" xml:space="preserve">갤러리</x:String>
   <x:String x:Key="Text.Settings.IconSet.Material" xml:space="preserve">Material Icon Theme</x:String>
   <x:String x:Key="Text.Settings.IconSet.Note" xml:space="preserve">Material Icon Theme은 material-icon-theme(MIT License, © Material Extensions)을 사용합니다. Windows 기본에서는 탐색기와 같은 Shell 아이콘을 표시합니다.</x:String>
   <x:String x:Key="Text.Settings.IconSet.Original" xml:space="preserve">Kiriha 오리지널 아이콘</x:String>
@@ -247,6 +251,12 @@
   <x:String x:Key="Text.Settings.Mouse.Up" xml:space="preserve">한 단계 위로 이동</x:String>
   <x:String x:Key="Text.Settings.RunAtStartup" xml:space="preserve">Windows 시작 시 Kiriha 실행</x:String>
   <x:String x:Key="Text.Settings.RunAtStartupNote" xml:space="preserve">로그인할 때 Kiriha가 자동으로 실행됩니다.</x:String>
+  <x:String x:Key="Text.Settings.Sharpen" xml:space="preserve">확대 시 흐림 줄이기 (선명하게)</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.High" xml:space="preserve">강하게</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Low" xml:space="preserve">약하게</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Max" xml:space="preserve">최대 (CAS)</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Normal" xml:space="preserve">표준</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Note" xml:space="preserve">이미지와 동영상을 화면에 맞춰 확대할 때 윤곽만 은은하게 다듬습니다 (AMD FidelityFX RCAS 상당). 동영상 재생 시 CPU 사용량이 조금 늘어납니다.</x:String>
   <x:String x:Key="Text.Settings.Shortcuts" xml:space="preserve">단축키</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOps" xml:space="preserve">파일 작업</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOpsBody" xml:space="preserve">Ctrl+X / C / V　잘라내기·복사·붙여넣기　　Delete / Shift+Delete　삭제·완전 삭제&#10;F2　이름 바꾸기　　Alt+Enter　속성　　Ctrl+Shift+N　새 폴더　　Alt+P　미리 보기</x:String>

@@ -196,6 +196,27 @@
                                                           IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptUseAcrylicBackground}" />
                                             </StackPanel>
                                         </HeaderedContentControl>
+
+                                        <HeaderedContentControl Classes="settingscard" Header="{DynamicResource Text.Settings.Gallery}">
+                                            <StackPanel Classes="settingsfields">
+                                                <CheckBox Content="{DynamicResource Text.Settings.Sharpen}"
+                                                          IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptSharpenGallery}" />
+                                                <!-- 強さ。表示はロケール文字列、内部値（settings.json）は英語のまま。 -->
+                                                <ComboBox Classes="settingsfield" MinWidth="200" HorizontalAlignment="Left"
+                                                          Margin="0,8,0,0"
+                                                          IsEnabled="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptSharpenGallery}"
+                                                          SelectedValue="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptSharpenStrength}"
+                                                          SelectedValueBinding="{Binding Tag, x:DataType=ComboBoxItem}">
+                                                    <ComboBoxItem Tag="Low" Content="{DynamicResource Text.Settings.Sharpen.Low}" />
+                                                    <ComboBoxItem Tag="Normal" Content="{DynamicResource Text.Settings.Sharpen.Normal}" />
+                                                    <ComboBoxItem Tag="High" Content="{DynamicResource Text.Settings.Sharpen.High}" />
+                                                    <ComboBoxItem Tag="Max" Content="{DynamicResource Text.Settings.Sharpen.Max}" />
+                                                </ComboBox>
+                                                <TextBlock Classes="settingscaption" Margin="0,6,0,0"
+                                                           TextWrapping="Wrap"
+                                                           Text="{DynamicResource Text.Settings.Sharpen.Note}" />
+                                            </StackPanel>
+                                        </HeaderedContentControl>
                                     </StackPanel>
                                 </ScrollViewer>
                             </TabItem>

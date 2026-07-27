@@ -191,6 +191,21 @@ public partial class TabViewModel : ObservableObject
     [ObservableProperty]
     private Bitmap? _previewBitmap;
 
+    /// <summary>プレビュー画像の伸縮方法。表示サイズちょうどで作った 1 枚は
+    /// <see cref="Stretch.Fill"/> と明示サイズで「描画先＝画素数」に合わせて 1:1 で描く
+    /// （ここで伸縮させると、鮮鋭化した輪郭が描画時の再サンプリングでまた鈍ってしまう）。
+    /// それ以外は従来どおり <see cref="Stretch.Uniform"/> で領域へ収める。</summary>
+    [ObservableProperty]
+    private Stretch _previewStretch = Stretch.Uniform;
+
+    /// <summary>プレビュー画像を描く論理サイズ。NaN は「指定なし（従来どおり領域に収める）」。
+    /// ビットマップの DPI 解釈に頼らず、ここで描画先の大きさを直接決める。</summary>
+    [ObservableProperty]
+    private double _previewDisplayWidth = double.NaN;
+
+    [ObservableProperty]
+    private double _previewDisplayHeight = double.NaN;
+
     /// <summary>プレビューテキスト（テキストファイル選択時の先頭部分）。</summary>
     [ObservableProperty]
     private string _previewText = "";
@@ -386,6 +401,7 @@ public partial class TabViewModel : ObservableObject
         OnPropertyChanged(nameof(IsGalleryZoomed));
         OnPropertyChanged(nameof(GalleryZoomText));
         OnPropertyChanged(nameof(CanResetGalleryView));
+        ScheduleGalleryReloadIfModeChanged();
     }
 
     /// <summary>表示中の倍率（コントロールバーに出す文字列）。この表示自体が
@@ -396,16 +412,150 @@ public partial class TabViewModel : ObservableObject
     public bool CanResetGalleryView
         => Math.Abs(GalleryZoom - 1.0) > 0.005 || GalleryDisplayRotation != 0;
 
-    /// <summary>メイン画像領域の大きさが変わったときに呼ぶ（拡大の基準点が領域の中心のため）。</summary>
-    public void SetGalleryViewport(Size size)
+    /// <summary>画面の拡大率（125% なら 1.25）。表示画素サイズを求めるのに要る。</summary>
+    private double _galleryScaling = 1.0;
+
+    /// <summary>領域サイズが変わったときの再デコードをまとめるタイマー（ドラッグ中に毎回走らせない）。</summary>
+    private DispatcherTimer? _viewportReloadTimer;
+
+    /// <summary>メイン画像領域の大きさが変わったときに呼ぶ（拡大の基準点が領域の中心のため）。
+    /// 表示サイズでデコードし直す必要もあるので、画面の拡大率も一緒に受け取る。</summary>
+    public void SetGalleryViewport(Size size, double scaling)
     {
-        if (_galleryViewport == size)
+        var scalingChanged = Math.Abs(_galleryScaling - scaling) > 0.001;
+        if (_galleryViewport == size && !scalingChanged)
         {
             return;
         }
 
+        // 1px 未満の揺れで再デコードしない（レイアウトの丸めでも SizeChanged は飛ぶ）。
+        var needsReload = scalingChanged
+                          || Math.Abs(_galleryViewport.Width - size.Width) >= 1
+                          || Math.Abs(_galleryViewport.Height - size.Height) >= 1;
+
         _galleryViewport = size;
+        _galleryScaling = scaling > 0 ? scaling : 1.0;
         ApplyGalleryTransform();
+
+        if (!needsReload || !IsDisplaySizedPreview)
+        {
+            return;
+        }
+
+        // ウィンドウのドラッグリサイズ中は毎フレーム飛んでくるので、落ち着いてから 1 回だけ通す。
+        _viewportReloadTimer ??= CreateViewportReloadTimer();
+        _viewportReloadTimer.Stop();
+        _viewportReloadTimer.Start();
+    }
+
+    private DispatcherTimer CreateViewportReloadTimer()
+    {
+        var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(300) };
+        timer.Tick += (_, _) =>
+        {
+            timer.Stop();
+            ReloadGalleryPreview();
+        };
+        return timer;
+    }
+
+    /// <summary>表示サイズちょうどでデコードする経路が有効か
+    /// （＝鮮鋭化 ON・ギャラリー表示・領域サイズが分かっている・等倍表示）。
+    ///
+    /// 拡大中は除く。拡大は <see cref="GalleryImageTransform"/> で掛けるので、表示サイズで
+    /// 作った 1 枚を拡大すると元の解像度より粗くなる。拡大中は元の解像度のまま渡して
+    /// 従来どおり描画側に伸ばしてもらう（等倍へ戻したら作り直す）。</summary>
+    private bool IsDisplaySizedPreview
+        => IsGalleryView
+           && ContrastAdaptiveSharpenService.Enabled
+           && _galleryViewport is { Width: >= 1, Height: >= 1 }
+           && Math.Abs(GalleryZoom - 1.0) < 0.005;
+
+    /// <summary>いま出しているプレビューが表示サイズで作られたものか（拡大の出入りで作り直す判断に使う）。</summary>
+    private bool _displaySizedPreviewActive;
+
+    /// <summary>
+    /// これから出す 1 枚の描き方を決める。表示サイズで作った画像は、描画先の論理サイズを
+    /// 明示して <see cref="Stretch.Fill"/> で描く（画素数と描画先が一致するので実質 1:1 の転送になる）。
+    /// <paramref name="bitmap"/> が null、または表示サイズ経路で作られていない場合は従来どおり領域に収める。
+    /// </summary>
+    private void ApplyPreviewDisplaySize(GalleryImage? image)
+    {
+        _displaySizedPreviewActive = image is { DisplaySized: true } && IsDisplaySizedPreview;
+        if (_displaySizedPreviewActive && image is { } shown)
+        {
+            // ビットマップは 96dpi のまま（論理サイズ＝画素数）なので、画面の倍率で割った値が
+            // 描くべき論理サイズ。Fill と組み合わせると、描画先の物理画素数と画素数が一致する。
+            PreviewDisplayWidth = shown.Bitmap.PixelSize.Width / _galleryScaling;
+            PreviewDisplayHeight = shown.Bitmap.PixelSize.Height / _galleryScaling;
+            PreviewStretch = Stretch.Fill;
+            return;
+        }
+
+        PreviewDisplayWidth = double.NaN;
+        PreviewDisplayHeight = double.NaN;
+        PreviewStretch = Stretch.Uniform;
+    }
+
+    /// <summary>拡大率が等倍を出入りしたら、その状態に合う 1 枚へ作り直す（連続操作はまとめる）。</summary>
+    private void ScheduleGalleryReloadIfModeChanged()
+    {
+        if (!IsGalleryView || IsDisplaySizedPreview == _displaySizedPreviewActive)
+        {
+            return;
+        }
+
+        _viewportReloadTimer ??= CreateViewportReloadTimer();
+        _viewportReloadTimer.Stop();
+        _viewportReloadTimer.Start();
+    }
+
+    /// <summary>
+    /// ギャラリーで実際に画面へ出る画素サイズ。領域に収める倍率（拡大はしない。XAML の
+    /// StretchDirection=DownOnly と同じ）に、画面の拡大率を掛けた大きさになる。
+    /// </summary>
+    private PixelSize? GalleryDisplayPixelSize(PixelSize source)
+    {
+        if (!IsDisplaySizedPreview || source.Width < 1 || source.Height < 1)
+        {
+            return null;
+        }
+
+        var fit = Math.Min(_galleryViewport.Width / source.Width, _galleryViewport.Height / source.Height);
+        var scale = Math.Min(fit, 1.0) * _galleryScaling;
+        var width = (int)Math.Round(source.Width * scale);
+        var height = (int)Math.Round(source.Height * scale);
+        return width >= 2 && height >= 2 ? new PixelSize(width, height) : null;
+    }
+
+    /// <summary>
+    /// ギャラリーへ出す 1 枚をデコードする。鮮鋭化が有効なら「デコード → 表示サイズへ縮小拡大
+    /// → 鮮鋭化」の順に通し、描画時の再サンプリングが要らない状態で返す
+    /// （呼び出し側は <see cref="PreviewStretch"/> を Stretch.None にする）。
+    /// </summary>
+    private GalleryImage? DecodeGalleryBitmap(string path, CancellationToken token)
+    {
+        var bitmap = ImageDecodeService.TryDecodeToWidth(path, GalleryDecodeWidth, token);
+        if (bitmap is null)
+        {
+            return null;
+        }
+
+        if (!ContrastAdaptiveSharpenService.Enabled)
+        {
+            return new GalleryImage(bitmap, DisplaySized: false);
+        }
+
+        // 領域サイズは UI スレッドから書かれる値をそのまま読む。ずれても「1 世代前の
+        // 大きさで作る」だけで、そのときは SetGalleryViewport のタイマーが作り直す。
+        if (GalleryDisplayPixelSize(bitmap.PixelSize) is not { } size)
+        {
+            return new GalleryImage(ContrastAdaptiveSharpenService.Apply(bitmap), DisplaySized: false);
+        }
+
+        var result = ContrastAdaptiveSharpenService.ApplyScaled(bitmap, size);
+        // 縮小拡大に失敗した場合は元の解像度のまま返ってくるので、そのときは従来どおりの描き方にする。
+        return new GalleryImage(result, DisplaySized: result.PixelSize == size);
     }
 
     /// <summary>
@@ -587,19 +737,30 @@ public partial class TabViewModel : ObservableObject
     // 保持するのは前後 1 枚ずつだけ。ギャラリー解像度のビットマップは 1 枚で 10MB 前後あり、
     // 半径を広げるとメモリの伸びが体感の改善に見合わない。
 
-    /// <summary>ギャラリー表示のデコード幅。先読みと本表示で必ず同じ値を使う。</summary>
-    private const int GalleryDecodeWidth = 1920;
+    /// <summary>ギャラリー表示のデコード幅。先読みと本表示で必ず同じ値を使う。
+    ///
+    /// 高 DPI（例: 2560x1440 を 125% 表示）では画面幅そのものが 2560 物理画素あり、
+    /// 1920 でデコードすると等倍で出せる素材まで 1.33 倍に引き伸ばされてぼける。
+    /// 元より大きい幅を要求しても ImageDecodeService 側で元の幅に丸められるので、
+    /// 小さい画像が無駄に大きなビットマップになることはない。</summary>
+    private const int GalleryDecodeWidth = 2560;
 
     /// <summary>プレビューでデコードを試みるファイルサイズの上限。</summary>
     private const long PreviewSizeLimit = 64 * 1024 * 1024;
 
-    /// <summary>先読み済みのビットマップ（キーは絶対パス）。取り出した時点で所有権も渡す。</summary>
-    private readonly Dictionary<string, Bitmap> _prefetched = new(StringComparer.OrdinalIgnoreCase);
+    /// <summary>先読み済みのビットマップ（キーは絶対パス）。取り出した時点で所有権も渡す。
+    /// 「表示サイズで作ったものか」も一緒に持つ（作った当時の状態でしか判断できないため）。</summary>
+    private readonly Dictionary<string, GalleryImage> _prefetched = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>ギャラリーへ出す 1 枚と、それが表示サイズちょうどで作られたかどうか。</summary>
+    /// <param name="Bitmap">表示するビットマップ。</param>
+    /// <param name="DisplaySized">画面に出る画素数で作ってあり、Width / Height 指定で 1:1 に描けるか。</param>
+    private readonly record struct GalleryImage(Bitmap Bitmap, bool DisplaySized);
 
     private CancellationTokenSource? _prefetchCts;
 
     /// <summary>先読み済みなら取り出す。取り出したものはキャッシュから外れ、破棄責任は呼び出し側へ移る。</summary>
-    private Bitmap? TakePrefetched(string path)
+    private GalleryImage? TakePrefetched(string path)
     {
         if (!IsGalleryView)
         {
@@ -607,7 +768,7 @@ public partial class TabViewModel : ObservableObject
             return null;
         }
 
-        return _prefetched.Remove(path, out var bitmap) ? bitmap : null;
+        return _prefetched.Remove(path, out var image) ? image : null;
     }
 
     /// <summary>先読みを打ち切り、抱えているビットマップを破棄する。</summary>
@@ -617,12 +778,25 @@ public partial class TabViewModel : ObservableObject
         _prefetchCts?.Dispose();
         _prefetchCts = null;
 
-        foreach (var bitmap in _prefetched.Values)
+        foreach (var image in _prefetched.Values)
         {
-            bitmap.Dispose();
+            image.Bitmap.Dispose();
         }
 
         _prefetched.Clear();
+    }
+
+    /// <summary>ギャラリーの表示中画像を読み直す（鮮鋭化の ON/OFF を今見ている画像へ反映するため）。
+    /// 先読み済みのビットマップは切り替え前の設定で作られているので一緒に捨てる。</summary>
+    public void ReloadGalleryPreview()
+    {
+        if (!IsGalleryView)
+        {
+            return;
+        }
+
+        ClearPrefetched();
+        UpdatePreview();
     }
 
     /// <summary>選択中の前後 1 枚を裏でデコードしておく。隣でなくなったものはここで捨てる。</summary>
@@ -656,7 +830,7 @@ public partial class TabViewModel : ObservableObject
         {
             if (!targets.Any(entry => string.Equals(entry.FullPath, path, StringComparison.OrdinalIgnoreCase)))
             {
-                _prefetched[path].Dispose();
+                _prefetched[path].Bitmap.Dispose();
                 _prefetched.Remove(path);
             }
         }
@@ -692,10 +866,9 @@ public partial class TabViewModel : ObservableObject
         {
             // ConfigureAwait(false) を外すと再開が Normal 優先度になり、利用者のクリックより前に
             // 割り込む（Views/MainWindow.axaml.cs のサムネイル読み込みと同じ理由）。
-            var bitmap = await Task.Run(
-                () => ImageDecodeService.TryDecodeToWidth(path, GalleryDecodeWidth, token), token)
+            var image = await Task.Run(() => DecodeGalleryBitmap(path, token), token)
                 .ConfigureAwait(false);
-            if (bitmap is null)
+            if (image is not { } decoded)
             {
                 return;
             }
@@ -706,11 +879,11 @@ public partial class TabViewModel : ObservableObject
                     // 待っている間に世代が変わっていたら（選択が動いた・ギャラリーを出た）捨てる。
                     if (!ReferenceEquals(scope, _prefetchCts) || _prefetched.ContainsKey(path))
                     {
-                        bitmap.Dispose();
+                        decoded.Bitmap.Dispose();
                         return;
                     }
 
-                    _prefetched[path] = bitmap;
+                    _prefetched[path] = decoded;
                 },
                 DispatcherPriority.Background);
         }
@@ -1193,21 +1366,29 @@ public partial class TabViewModel : ObservableObject
             if (ImageExtensions.Contains(ext) && entry.Size is < PreviewSizeLimit)
             {
                 // 先読み済みならデコードを待たずにそのまま出す（ホイール送りの待ち時間が消える）。
-                var bmp = TakePrefetched(entry.FullPath);
-                if (bmp is null)
+                var image = TakePrefetched(entry.FullPath);
+                if (image is null)
                 {
-                    bmp = await Task.Run(
-                        () => ImageDecodeService.TryDecodeToWidth(entry.FullPath, decodeWidth, cts.Token), cts.Token);
+                    // ギャラリーは表示サイズで作り込む経路、プレビューペインは従来どおり幅指定だけ。
+                    image = IsGalleryView
+                        ? await Task.Run(() => DecodeGalleryBitmap(entry.FullPath, cts.Token), cts.Token)
+                        : await Task.Run(
+                            () => ImageDecodeService.TryDecodeToWidth(entry.FullPath, decodeWidth, cts.Token),
+                            cts.Token) is { } plain
+                            ? new GalleryImage(plain, DisplaySized: false)
+                            : null;
                     if (cts.IsCancellationRequested)
                     {
-                        bmp?.Dispose();
+                        image?.Bitmap.Dispose();
                         return;
                     }
                 }
 
-                if (bmp is not null)
+                if (image is { } shown)
                 {
+                    var bmp = shown.Bitmap;
                     PreviewBitmap?.Dispose();
+                    ApplyPreviewDisplaySize(shown);
                     PreviewBitmap = bmp;
                     PreviewText = "";
                     // 画像は寸法も表示する
@@ -1227,6 +1408,8 @@ public partial class TabViewModel : ObservableObject
                 if (!cts.IsCancellationRequested && bmp is not null)
                 {
                     PreviewBitmap?.Dispose();
+                    // シェル任せのサムネイルは表示サイズちょうどではないので、従来どおり収める。
+                    ApplyPreviewDisplaySize(null);
                     PreviewBitmap = bmp;
                     PreviewText = "";
                     PreviewInfo = $"{entry.Name}\n{entry.TypeText}  {entry.SizeText}  {bmp.PixelSize.Width}×{bmp.PixelSize.Height}\n" + LocalizationService.Text("Text.Tooltip.Modified", entry.ModifiedText);
@@ -3126,12 +3309,17 @@ public partial class TabViewModel : ObservableObject
     /// <summary>現在のフォルダーをエクスプローラーで開く。</summary>
     [RelayCommand]
     private void OpenInExplorer()
+        => OpenFolderInExplorer(CurrentPath == FileSystemService.ComputerPath ? null : CurrentPath);
+
+    /// <summary>指定フォルダー（null なら PC）をエクスプローラーで開く。
+    /// コンテキストメニューの「エクスプローラーで開く」もここを通る。</summary>
+    public void OpenFolderInExplorer(string? path)
     {
         try
         {
             TrustedProcessLauncher.Start(
                 "explorer.exe",
-                CurrentPath == FileSystemService.ComputerPath ? [] : [CurrentPath],
+                path is null ? [] : [path],
                 Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
         }
         catch (Exception ex)

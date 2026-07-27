@@ -50,6 +50,12 @@ public partial class MainWindowViewModel : ObservableObject
 
         oldValue?.SuspendGalleryVideo();
         newValue?.ResumeGalleryVideo();
+
+        // 全画面はギャラリー表示中だけの状態。別のタブへ移ったら通常のウィンドウへ戻す。
+        if (newValue is not { IsGalleryView: true })
+        {
+            IsGalleryFullScreen = false;
+        }
     }
 
     /// <summary>ステータスバーの表示状態（表示メニューで切替）。</summary>
@@ -70,6 +76,16 @@ public partial class MainWindowViewModel : ObservableObject
 
     /// <summary>ストリップ高さに追従するサムネイル一辺のサイズ（枠・余白・スクロールバー分を差し引く）。</summary>
     public double GalleryThumbSize => Math.Clamp(GalleryStripHeight - 36, 18, 424);
+
+    /// <summary>ギャラリーの全画面表示。画像だけを画面いっぱいに出し、コントロールバーと
+    /// 閉じるボタンはマウスを動かしている間だけオーバーレイで見せる（永続化しない一時的な状態）。</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsGalleryChromeVisible))]
+    private bool _isGalleryFullScreen;
+
+    /// <summary>全画面表示でないこと。フィルムストリップやステータスバーなど、全画面で畳む
+    /// 部品の <c>IsVisible</c> 用（<c>MultiBinding</c> では否定を挟めないため肯定形で持つ）。</summary>
+    public bool IsGalleryChromeVisible => !IsGalleryFullScreen;
 
     /// <summary>お気に入りバーの表示状態（Ctrl+Shift+B で切替、永続化）。</summary>
     [ObservableProperty]
@@ -350,6 +366,49 @@ public partial class MainWindowViewModel : ObservableObject
             OnPropertyChanged();
         }
     }
+
+    /// <summary>設定タブ: ギャラリー表示の鮮鋭化（RCAS）。切り替えたら、見ている画像にも即座に反映する。</summary>
+    public bool OptSharpenGallery
+    {
+        get => _settings.SharpenGallery;
+        set
+        {
+            _settings.SharpenGallery = value;
+            SettingsService.Save(_settings);
+            Services.ContrastAdaptiveSharpenService.Enabled = value;
+            // 動画は次のフレームから変わるが、静止画は表示済みのビットマップが残るので読み直す。
+            foreach (var tab in Tabs)
+            {
+                tab.ReloadGalleryPreview();
+            }
+
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>設定タブ: 鮮鋭化の強さ（Low / Normal / High）。切り替えたら今の画像へも即座に反映する。</summary>
+    public string OptSharpenStrength
+    {
+        get => _settings.SharpenStrength;
+        set
+        {
+            _settings.SharpenStrength = value;
+            SettingsService.Save(_settings);
+            Services.ContrastAdaptiveSharpenService.Strength = ParseSharpenStrength(value);
+            foreach (var tab in Tabs)
+            {
+                tab.ReloadGalleryPreview();
+            }
+
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>設定文字列から強さへ。未知の値（手書きされた settings.json）は標準に倒す。</summary>
+    private static Services.SharpenStrength ParseSharpenStrength(string value)
+        => Enum.TryParse<Services.SharpenStrength>(value, ignoreCase: true, out var parsed)
+            ? parsed
+            : Services.SharpenStrength.Normal;
 
     /// <summary>設定タブ: タブのダブルクリック動作（None / Pin / Close）。</summary>
     public string OptTabDoubleClickAction
@@ -826,6 +885,10 @@ public partial class MainWindowViewModel : ObservableObject
         _previewWidth = _settings.PreviewWidth is >= 180 and <= 600 ? _settings.PreviewWidth : 280;
         _galleryStripHeight = _settings.GalleryStripHeight is >= 54 and <= 460 ? _settings.GalleryStripHeight : 116;
 
+        // 鮮鋭化も全タブ・動画で共通の状態なので、設定の値をサービス側へ反映しておく。
+        Services.ContrastAdaptiveSharpenService.Enabled = _settings.SharpenGallery;
+        Services.ContrastAdaptiveSharpenService.Strength = ParseSharpenStrength(_settings.SharpenStrength);
+
         // ギャラリー動画の音量・ミュート・速度は全タブ共通かつ次回起動へ持ち越す。
         // タブ側は AppSettings を持たないので、読み込みと保存の経路をここから渡す。
         TabViewModel.LoadVideoPreferences(_settings.VideoVolume, _settings.VideoMuted, _settings.VideoRate);
@@ -1227,7 +1290,15 @@ public partial class MainWindowViewModel : ObservableObject
             return;
         }
 
-        if (e.PropertyName == nameof(TabViewModel.IsPinned))
+        if (e.PropertyName == nameof(TabViewModel.IsGalleryView))
+        {
+            // ギャラリーを抜けたら（Esc・✕・スライダー・ホイールのいずれでも）全画面も一緒に解除する
+            if (ReferenceEquals(tab, SelectedTab) && !tab.IsGalleryView)
+            {
+                IsGalleryFullScreen = false;
+            }
+        }
+        else if (e.PropertyName == nameof(TabViewModel.IsPinned))
         {
             ReorderPinned(tab);
             SavePinned();

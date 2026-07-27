@@ -99,8 +99,11 @@
   <x:String x:Key="Text.Folder.Pictures" xml:space="preserve">Mga larawan</x:String>
   <x:String x:Key="Text.Folder.Videos" xml:space="preserve">Mga video</x:String>
   <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">Lumabas sa gallery (Esc)</x:String>
+  <x:String x:Key="Text.Gallery.FullScreen" xml:space="preserve">Buong screen (F11, Esc para lumabas)</x:String>
   <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">Impormasyon ng larawan</x:String>
+  <x:String x:Key="Text.Gallery.Next" xml:space="preserve">Susunod na larawan (kanang arrow)</x:String>
   <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">Walang impormasyong makuha para sa larawang ito.</x:String>
+  <x:String x:Key="Text.Gallery.Previous" xml:space="preserve">Nakaraang larawan (kaliwang arrow)</x:String>
   <x:String x:Key="Text.Gallery.RotateFailed" xml:space="preserve">Hindi maiikot ang larawang ito nang walang kawalan ng kalidad.</x:String>
   <x:String x:Key="Text.Gallery.RotateLeft" xml:space="preserve">Iikot pakaliwa (naka-save nang walang kawalan ng kalidad)</x:String>
   <x:String x:Key="Text.Gallery.RotateRight" xml:space="preserve">Iikot pakanan (naka-save nang walang kawalan ng kalidad)</x:String>
@@ -219,6 +222,7 @@
   <x:String x:Key="Text.Settings.ExplorerContextMenu" xml:space="preserve">Idagdag ang “Buksan gamit ang Kiriha” sa context menu ng File Explorer</x:String>
   <x:String x:Key="Text.Settings.ExplorerContextMenuNote" xml:space="preserve">Nagbibigay-daan na buksan sa Kiriha ang folder sa pamamagitan ng right click sa folder o sa background nito.</x:String>
   <x:String x:Key="Text.Settings.FolderTree" xml:space="preserve">Tree ng folder</x:String>
+  <x:String x:Key="Text.Settings.Gallery" xml:space="preserve">Gallery</x:String>
   <x:String x:Key="Text.Settings.IconSet.Material" xml:space="preserve">Material Icon Theme</x:String>
   <x:String x:Key="Text.Settings.IconSet.Note" xml:space="preserve">Gumagamit ang Material Icon Theme ng material-icon-theme (MIT License, © Material Extensions). Ipinapakita ng Windows set ang parehong shell icon ng File Explorer.</x:String>
   <x:String x:Key="Text.Settings.IconSet.Original" xml:space="preserve">Orihinal na mga icon ng Kiriha</x:String>
@@ -247,6 +251,12 @@
   <x:String x:Key="Text.Settings.Mouse.Up" xml:space="preserve">Umakyat ng isang antas</x:String>
   <x:String x:Key="Text.Settings.RunAtStartup" xml:space="preserve">Patakbuhin ang Kiriha kapag nagsimula ang Windows</x:String>
   <x:String x:Key="Text.Settings.RunAtStartupNote" xml:space="preserve">Awtomatikong tumatakbo ang Kiriha kapag nag-sign in ka.</x:String>
+  <x:String x:Key="Text.Settings.Sharpen" xml:space="preserve">Bawasan ang labo kapag pinalaki (pagpapatalas)</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.High" xml:space="preserve">Malakas</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Low" xml:space="preserve">Mahina</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Max" xml:space="preserve">Pinakamalakas (CAS)</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Normal" xml:space="preserve">Karaniwan</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Note" xml:space="preserve">Bahagyang tinitiim lang ang mga gilid kapag pinalaki ang larawan at video sa screen (katumbas ng AMD FidelityFX RCAS). Bahagyang tumataas ang paggamit ng CPU sa video.</x:String>
   <x:String x:Key="Text.Settings.Shortcuts" xml:space="preserve">Mga shortcut</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOps" xml:space="preserve">Mga operasyon sa file</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOpsBody" xml:space="preserve">Ctrl+X / C / V　I-cut, kopyahin, i-paste　　Delete / Shift+Delete　Tanggalin, tanggalin nang tuluyan&#10;F2　Palitan ang pangalan　　Alt+Enter　Mga katangian　　Ctrl+Shift+N　Bagong folder　　Alt+P　Preview</x:String>
