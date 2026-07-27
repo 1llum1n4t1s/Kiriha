@@ -381,8 +381,8 @@
       },
       "VelopackUpdateDialog.Avalonia": {
         "type": "Transitive",
-        "resolved": "1.0.12",
-        "contentHash": "WnrVPIIl9gWtIn30032Er0oyHI35tU7v5OPpQk7X8HcMdBDrpQnfTRk8yw1qBluwlpvbmR6W2bmj9fOjjGQAdA==",
+        "resolved": "1.0.13",
+        "contentHash": "Kkjlhq0iU01qV7GfciskZdyywSWtWb1DOID6RRiSrUHQ955hoGxdSi1xRko856t+OGdXW502mLMcmGRKDA8u/Q==",
         "dependencies": {
           "Avalonia": "12.1.0",
           "CommunityToolkit.Mvvm": "8.4.2",
@@ -468,7 +468,7 @@
           "Microsoft.Windows.CsWinRT": "[2.3.1, )",
           "PDFtoImage": "[5.2.1, )",
           "SuperLightLogger": "[1.0.10, )",
-          "VelopackUpdateDialog.Avalonia": "[1.0.12, )"
+          "VelopackUpdateDialog.Avalonia": "[1.0.13, )"
         }
       }
     },

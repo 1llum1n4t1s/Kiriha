@@ -45,7 +45,7 @@
     <PackageReference Include="Microsoft.Windows.CsWinRT" Version="2.3.1" />
     <PackageReference Include="PDFtoImage" Version="5.2.1" />
     <PackageReference Include="SuperLightLogger" Version="1.0.10" />
-    <PackageReference Include="VelopackUpdateDialog.Avalonia" Version="1.0.12" />
+    <PackageReference Include="VelopackUpdateDialog.Avalonia" Version="1.0.13" />
   </ItemGroup>
 
   <ItemGroup>

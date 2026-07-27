@@ -106,6 +106,12 @@ public partial class MainWindow : Window
         // トンネル段階で先に拾う。テキスト入力中（検索・パス編集）は各自の Esc 処理を優先する。
         AddHandler(KeyDownEvent, GalleryEscape_KeyDown, RoutingStrategies.Tunnel);
 
+        // ギャラリー中の ↑ / ↓（ガンマ）と Ctrl+← / Ctrl+→（ファイル送り）も同じくトンネル段階で拾う。
+        // コントロールバーのシークスライダーや音量スライダーにフォーカスがあると、
+        // Slider が矢印キーを自前で処理してしまい（＝再生位置が飛ぶ）、
+        // バブル段階の GalleryImage_KeyDown / FileList_KeyDown まで届かないため。
+        AddHandler(KeyDownEvent, GalleryArrows_KeyDown, RoutingStrategies.Tunnel);
+
         // ListBoxItem が選択処理で PointerPressed を Handled 済みにするため、
         // 通常のバブル購読（XAML の PointerPressed="..."）ではタブの並べ替え開始を検知できない。
         // handledEventsToo: true で Handled 後も確実に拾う。
@@ -2063,6 +2069,44 @@ public partial class MainWindow : Window
         e.Handled = true;
     }
 
+    /// <summary>
+    /// ギャラリー中の ↑ / ↓ と Ctrl+← / Ctrl+→ を、どこにフォーカスがあっても同じ動作にする。
+    ///
+    /// バブル段階（GalleryImage_KeyDown / FileList_KeyDown）だけでは、コントロールバーの
+    /// スライダーやボタンにフォーカスがあるときに Slider の既定動作（値の増減＝シーク）が先に
+    /// 消費してしまう。ここで先に確定させる。
+    /// </summary>
+    private void GalleryArrows_KeyDown(object? sender, KeyEventArgs e)
+    {
+        if (ViewModel is not { SelectedTab: { IsGalleryView: true, IsEditingPath: false } tab }
+            || FocusManager?.GetFocusedElement() is TextBox
+            || e.KeyModifiers.HasFlag(KeyModifiers.Alt))
+        {
+            return;
+        }
+
+        var ctrl = e.KeyModifiers.HasFlag(KeyModifiers.Control);
+        switch (e.Key)
+        {
+            case Key.Up when !ctrl && !e.KeyModifiers.HasFlag(KeyModifiers.Shift):
+                tab.AdjustGalleryGamma(1);
+                break;
+            case Key.Down when !ctrl && !e.KeyModifiers.HasFlag(KeyModifiers.Shift):
+                tab.AdjustGalleryGamma(-1);
+                break;
+            case Key.Left when ctrl:
+                tab.MoveGallerySelection(-1);
+                break;
+            case Key.Right when ctrl:
+                tab.MoveGallerySelection(1);
+                break;
+            default:
+                return;
+        }
+
+        e.Handled = true;
+    }
+
     /// <summary>画像の左端に重なる「前の画像へ」ボタン。</summary>
     private void GalleryPrev_Click(object? sender, RoutedEventArgs e)
         => MoveGallerySelectionFromOverlay(-1);
@@ -2321,21 +2365,8 @@ public partial class MainWindow : Window
             case Key.Right when tab.IsVideoPreview && e.KeyModifiers.HasFlag(KeyModifiers.Shift):
                 tab.SeekVideoBy(5);
                 break;
-            // 動画を大きく見ている間は素の ← / → がシークに取られるので、
-            // ファイル送りは Ctrl+← / Ctrl+→ に用意しておく。
-            case Key.Left when ctrl && tab.IsGalleryView:
-                tab.MoveGallerySelection(-1);
-                break;
-            case Key.Right when ctrl && tab.IsGalleryView:
-                tab.MoveGallerySelection(1);
-                break;
-            // ギャラリー中の ↑ / ↓ はガンマ補正（コントロールバーのスライダーと同じ値）。
-            case Key.Up when !ctrl && !alt && tab.IsGalleryView:
-                tab.AdjustGalleryGamma(1);
-                break;
-            case Key.Down when !ctrl && !alt && tab.IsGalleryView:
-                tab.AdjustGalleryGamma(-1);
-                break;
+            // ギャラリー中の ↑ / ↓（ガンマ）と Ctrl+← / Ctrl+→（ファイル送り）は
+            // GalleryArrows_KeyDown がトンネル段階で確定させるので、ここには置かない。
             case Key.Left when !alt && TryHandleGalleryVideoArrow(tab, -1):
                 break;
             case Key.Right when !alt && TryHandleGalleryVideoArrow(tab, 1):
@@ -2416,21 +2447,8 @@ public partial class MainWindow : Window
         var ctrl = e.KeyModifiers.HasFlag(KeyModifiers.Control);
         switch (e.Key)
         {
-            // ギャラリーのフィルムストリップでは、Ctrl+← / Ctrl+→ をファイル送りに割り当てる
-            // （動画を大きく見ている間、素の ← / → はシークに取られるため）。
-            case Key.Left or Key.Right when ctrl
-                                            && listBox.Classes.Contains("gallerystrip")
-                                            && tab.IsGalleryView:
-                tab.MoveGallerySelection(e.Key == Key.Left ? -1 : 1);
-                e.Handled = true;
-                break;
-            // ギャラリー中の ↑ / ↓ はガンマ補正。ストリップは横並びなので標準のキーナビと衝突しない。
-            case Key.Up or Key.Down when !ctrl
-                                         && listBox.Classes.Contains("gallerystrip")
-                                         && tab.IsGalleryView:
-                tab.AdjustGalleryGamma(e.Key == Key.Up ? 1 : -1);
-                e.Handled = true;
-                break;
+            // ギャラリー中の ↑ / ↓（ガンマ）と Ctrl+← / Ctrl+→（ファイル送り）は
+            // GalleryArrows_KeyDown がトンネル段階で確定させるので、ここには置かない。
             // フィルムストリップにフォーカスがあると ListBox 標準のキーナビが選択を動かしてしまう。
             // 動画を大きく見ている間の ← / → はシーク・コマ送りなので、ここで先に消費する。
             case Key.Left or Key.Right when !ctrl
