@@ -100,6 +100,9 @@
   <x:String x:Key="Text.Folder.Videos" xml:space="preserve">Pelliculae</x:String>
   <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">E pinacotheca exire (Esc)</x:String>
   <x:String x:Key="Text.Gallery.FullScreen" xml:space="preserve">Plena imago (F11, Esc ad exeundum)</x:String>
+  <x:String x:Key="Text.Gallery.Gamma" xml:space="preserve">Gamma</x:String>
+  <x:String x:Key="Text.Gallery.GammaReset" xml:space="preserve">Gamma ad 1.00 restituere</x:String>
+  <x:String x:Key="Text.Gallery.GammaTip" xml:space="preserve">Claritatem partium obscurarum temperat (species tantum; plica non mutatur)</x:String>
   <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">Informatio imaginis</x:String>
   <x:String x:Key="Text.Gallery.Next" xml:space="preserve">Imago sequens (sagitta dextra)</x:String>
   <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">Nulla informatio de hac imagine praesto est.</x:String>
@@ -251,12 +254,15 @@
   <x:String x:Key="Text.Settings.Mouse.Up" xml:space="preserve">Gradum sursum ire</x:String>
   <x:String x:Key="Text.Settings.RunAtStartup" xml:space="preserve">Kiriha cum Windows incipiente exsequi</x:String>
   <x:String x:Key="Text.Settings.RunAtStartupNote" xml:space="preserve">Kiriha automatice incipit cum in systema ingrederis.</x:String>
+  <x:String x:Key="Text.Settings.OpenImagesInGallery" xml:space="preserve">Imagines in ipso Kiriha aperire</x:String>
+  <x:String x:Key="Text.Settings.OpenInGallery.Note" xml:space="preserve">Solum ad duplicem ictum intra Kiriha pertinet: plica in pinacotheca per totam scaenam aperitur (plicae RAW quoque pro imaginibus habentur). Consociationes Windows non mutantur.</x:String>
+  <x:String x:Key="Text.Settings.OpenVideosInGallery" xml:space="preserve">Pelliculas in ipso Kiriha aperire</x:String>
   <x:String x:Key="Text.Settings.Sharpen" xml:space="preserve">Caliginem in amplificando minuere (acuitas)</x:String>
   <x:String x:Key="Text.Settings.Sharpen.High" xml:space="preserve">Fortis</x:String>
   <x:String x:Key="Text.Settings.Sharpen.Low" xml:space="preserve">Levis</x:String>
   <x:String x:Key="Text.Settings.Sharpen.Max" xml:space="preserve">Maxima (CAS)</x:String>
   <x:String x:Key="Text.Settings.Sharpen.Normal" xml:space="preserve">Solitus</x:String>
-  <x:String x:Key="Text.Settings.Sharpen.Note" xml:space="preserve">Cum imagines et pelliculae ad plenam speciem amplificantur, solae orae leniter firmantur (AMD FidelityFX RCAS aequale). In pelliculis onus processoris paulum crescit.</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Note" xml:space="preserve">Cum imago vel pellicula ad scaenam amplificatur, solas oras leniter firmat (AMD FidelityFX RCAS aequans). Pellicula dum pingitur in GPU tractatur, ideo lectio vix plus CPU poscit.</x:String>
   <x:String x:Key="Text.Settings.Shortcuts" xml:space="preserve">Compendia</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOps" xml:space="preserve">Operationes fasciculorum</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOpsBody" xml:space="preserve">Ctrl+X / C / V　Exsecare, exscribere, agglutinare　　Delete / Shift+Delete　Delere, penitus delere&#10;F2　Nomen mutare　　Alt+Enter　Proprietates　　Ctrl+Shift+N　Plica nova　　Alt+P　Praevisio</x:String>
@@ -292,6 +298,7 @@
   <x:String x:Key="Text.Settings.Window.RememberBounds" xml:space="preserve">Magnitudinem et locum fenestrae meminisse</x:String>
   <x:String x:Key="Text.Settings.Window.RememberBoundsNote" xml:space="preserve">Si deactivatur, proxime Kiriha magnitudine et loco praedefinitis aperietur.</x:String>
   <x:String x:Key="Text.Settings.WindowsIntegration" xml:space="preserve">Integratio Windows</x:String>
+  <x:String x:Key="Text.Settings.VideoSeekSeconds" xml:space="preserve">Secunda per saltum in pellicula retro vel prorsus</x:String>
   <x:String x:Key="Text.Share.FileCount" xml:space="preserve">Fasciculi {0}</x:String>
   <x:String x:Key="Text.Share.FoldersNotSupported" xml:space="preserve">Plicae communicari non possunt (fasciculos elige)</x:String>
   <x:String x:Key="Text.Share.NoItems" xml:space="preserve">Nihil est quod communicetur</x:String>
@@ -364,6 +371,8 @@
   <x:String x:Key="Text.Type.FileFolder" xml:space="preserve">Plica fasciculorum</x:String>
   <x:String x:Key="Text.Type.LocalDisk" xml:space="preserve">Discus localis</x:String>
   <x:String x:Key="Text.Type.LocalDiskFormat" xml:space="preserve">Discus localis ({0})</x:String>
+  <x:String x:Key="Text.Video.SeekBack" xml:space="preserve">Retro (sagitta sinistra)</x:String>
+  <x:String x:Key="Text.Video.SeekForward" xml:space="preserve">Prorsus (sagitta dextra)</x:String>
   <x:String x:Key="Text.Video.Unavailable" xml:space="preserve">Haec pellicula agi non potest (nullus codec conveniens inventus est)</x:String>
   <x:String x:Key="Text.Video.PlayPauseTip" xml:space="preserve">Agere / intermittere (Space)</x:String>
   <x:String x:Key="Text.Video.MuteTip" xml:space="preserve">Silere</x:String>

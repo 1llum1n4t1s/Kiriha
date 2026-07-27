@@ -100,6 +100,9 @@
   <x:String x:Key="Text.Folder.Videos" xml:space="preserve">चलच्चित्राणि</x:String>
   <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">चित्रशालायाः निर्गच्छ (Esc)</x:String>
   <x:String x:Key="Text.Gallery.FullScreen" xml:space="preserve">पूर्णपटलम् (F11, Esc इति निर्गमनाय)</x:String>
+  <x:String x:Key="Text.Gallery.Gamma" xml:space="preserve">गामासंस्कारः</x:String>
+  <x:String x:Key="Text.Gallery.GammaReset" xml:space="preserve">गामा 1.00 इति प्रत्यानयतु</x:String>
+  <x:String x:Key="Text.Gallery.GammaTip" xml:space="preserve">अन्धकारभागानां प्रकाशं समायोजयति (केवलं दर्शने; सञ्चिका न परिवर्तते)</x:String>
   <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">चित्रविवरणम्</x:String>
   <x:String x:Key="Text.Gallery.Next" xml:space="preserve">अग्रिमं चित्रम् (दक्षिणबाणः)</x:String>
   <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">अस्य चित्रस्य विवरणं नास्ति।</x:String>
@@ -251,12 +254,15 @@
   <x:String x:Key="Text.Settings.Mouse.Up" xml:space="preserve">एकं स्तरम् ऊर्ध्वं गच्छ</x:String>
   <x:String x:Key="Text.Settings.RunAtStartup" xml:space="preserve">Windows आरम्भे Kiriha चालय</x:String>
   <x:String x:Key="Text.Settings.RunAtStartupNote" xml:space="preserve">प्रवेशकाले Kiriha स्वयम् आरभते।</x:String>
+  <x:String x:Key="Text.Settings.OpenImagesInGallery" xml:space="preserve">Kiriha इत्यस्य अन्तः चित्राणि Kiriha द्वारा उद्घाटयतु</x:String>
+  <x:String x:Key="Text.Settings.OpenInGallery.Note" xml:space="preserve">एतत् Kiriha इत्यस्य अन्तः द्विवारक्लिक्-समये एव प्रवर्तते; सञ्चिका पूर्णपटले चित्रशालायां उद्घाट्यते (RAW-सञ्चिकाः अपि चित्राणि इति गण्यन्ते)। Windows इत्यस्य सम्बन्धाः न परिवर्त्यन्ते।</x:String>
+  <x:String x:Key="Text.Settings.OpenVideosInGallery" xml:space="preserve">Kiriha इत्यस्य अन्तः चलच्चित्राणि Kiriha द्वारा उद्घाटयतु</x:String>
   <x:String x:Key="Text.Settings.Sharpen" xml:space="preserve">आवर्धने अस्पष्टतां न्यूनीकरोतु (तैक्ष्ण्यम्)</x:String>
   <x:String x:Key="Text.Settings.Sharpen.High" xml:space="preserve">प्रबलम्</x:String>
   <x:String x:Key="Text.Settings.Sharpen.Low" xml:space="preserve">मृदु</x:String>
   <x:String x:Key="Text.Settings.Sharpen.Max" xml:space="preserve">परमम् (CAS)</x:String>
   <x:String x:Key="Text.Settings.Sharpen.Normal" xml:space="preserve">सामान्यम्</x:String>
-  <x:String x:Key="Text.Settings.Sharpen.Note" xml:space="preserve">यदा चित्राणि चलच्चित्राणि च पटलानुसारम् आवर्ध्यन्ते तदा केवलं रेखाः मृदुतया दृढीक्रियन्ते (AMD FidelityFX RCAS तुल्यम्)। चलच्चित्रेषु संसाधकभारः किञ्चित् वर्धते।</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Note" xml:space="preserve">चित्रं चलच्चित्रं वा पटलानुसारं वर्धयति सति केवलं रेखाः मृदुतया दृढीक्रियन्ते (AMD FidelityFX RCAS सदृशम्)। चलच्चित्रं लेखनकाले GPU द्वारा संसाध्यते, अतः दर्शनसमये CPU-भारः प्रायः न वर्धते।</x:String>
   <x:String x:Key="Text.Settings.Shortcuts" xml:space="preserve">कुञ्चिकासङ्केताः</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOps" xml:space="preserve">सञ्चिकाकर्माणि</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOpsBody" xml:space="preserve">Ctrl+X / C / V　छेदनम्, प्रतिलेखनम्, लेपनम्　　Delete / Shift+Delete　अपनयनम्, नित्यापनयनम्&#10;F2　नामपरिवर्तनम्　　Alt+Enter　गुणधर्माः　　Ctrl+Shift+N　नवीनं कोष्ठम्　　Alt+P　पूर्वदर्शनम्</x:String>
@@ -292,6 +298,7 @@
   <x:String x:Key="Text.Settings.Window.RememberBounds" xml:space="preserve">गवाक्षस्य परिमाणं स्थानं च स्मर</x:String>
   <x:String x:Key="Text.Settings.Window.RememberBoundsNote" xml:space="preserve">निष्क्रिये सति अग्रिमवारं प्रामाणिकपरिमाणेन स्थानेन च आरभते।</x:String>
   <x:String x:Key="Text.Settings.WindowsIntegration" xml:space="preserve">Windows संयोगः</x:String>
+  <x:String x:Key="Text.Settings.VideoSeekSeconds" xml:space="preserve">चलच्चित्रस्य शीघ्रगमने प्रत्यावर्तने च सेकण्डाः</x:String>
   <x:String x:Key="Text.Share.FileCount" xml:space="preserve">{0} सञ्चिकाः</x:String>
   <x:String x:Key="Text.Share.FoldersNotSupported" xml:space="preserve">कोष्ठानि विभाजयितुं न शक्यन्ते (सञ्चिकाः चिनु)</x:String>
   <x:String x:Key="Text.Share.NoItems" xml:space="preserve">विभाजनाय किमपि नास्ति</x:String>
@@ -364,6 +371,8 @@
   <x:String x:Key="Text.Type.FileFolder" xml:space="preserve">सञ्चिकाकोष्ठम्</x:String>
   <x:String x:Key="Text.Type.LocalDisk" xml:space="preserve">स्थानीयं चक्रम्</x:String>
   <x:String x:Key="Text.Type.LocalDiskFormat" xml:space="preserve">स्थानीयं चक्रम् ({0})</x:String>
+  <x:String x:Key="Text.Video.SeekBack" xml:space="preserve">प्रत्यावर्तनम् (वामबाणः)</x:String>
+  <x:String x:Key="Text.Video.SeekForward" xml:space="preserve">शीघ्रगमनम् (दक्षिणबाणः)</x:String>
   <x:String x:Key="Text.Video.Unavailable" xml:space="preserve">इदं चलच्चित्रं न चालयितुं शक्यते (उपयुक्तः कोडेकः न प्राप्तः)</x:String>
   <x:String x:Key="Text.Video.PlayPauseTip" xml:space="preserve">चालय / विरमय (Space)</x:String>
   <x:String x:Key="Text.Video.MuteTip" xml:space="preserve">निःशब्दम्</x:String>

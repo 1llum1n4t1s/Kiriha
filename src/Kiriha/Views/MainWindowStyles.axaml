@@ -378,14 +378,15 @@
         <Style Selector="Border.namecell:pointerover">
             <Setter Property="Background" Value="{DynamicResource HoverBg}" />
         </Style>
-        <!-- ギャラリー表示の下部フィルムストリップ: 正方形サムネイルを角丸で並べる -->
+        <!-- ギャラリー表示の下部フィルムストリップ: 正方形サムネイルを角を丸めずに並べる
+             （選択枠も直角。写真の縁をそのまま見せるため） -->
         <Style Selector="ListBox.gallerystrip">
             <Setter Property="Padding" Value="10,6" />
         </Style>
         <Style Selector="ListBox.gallerystrip ListBoxItem">
             <Setter Property="Padding" Value="3" />
             <Setter Property="Margin" Value="3,0" />
-            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="CornerRadius" Value="0" />
         </Style>
         <Style Selector="ListBox.files.list ListBoxItem">
             <Setter Property="Padding" Value="0" />

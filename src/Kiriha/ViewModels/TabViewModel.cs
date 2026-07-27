@@ -500,7 +500,16 @@ public partial class TabViewModel : ObservableObject
     /// <summary>拡大率が等倍を出入りしたら、その状態に合う 1 枚へ作り直す（連続操作はまとめる）。</summary>
     private void ScheduleGalleryReloadIfModeChanged()
     {
-        if (!IsGalleryView || IsDisplaySizedPreview == _displaySizedPreviewActive)
+        if (IsDisplaySizedPreview != _displaySizedPreviewActive)
+        {
+            ScheduleGalleryReload();
+        }
+    }
+
+    /// <summary>表示中の 1 枚を作り直す。連続操作（リサイズ・スライダー）は最後の 1 回にまとめる。</summary>
+    private void ScheduleGalleryReload()
+    {
+        if (!IsGalleryView)
         {
             return;
         }
@@ -543,17 +552,20 @@ public partial class TabViewModel : ObservableObject
 
         if (!ContrastAdaptiveSharpenService.Enabled)
         {
-            return new GalleryImage(bitmap, DisplaySized: false);
+            return new GalleryImage(GammaAdjustService.Apply(bitmap), DisplaySized: false);
         }
 
         // 領域サイズは UI スレッドから書かれる値をそのまま読む。ずれても「1 世代前の
         // 大きさで作る」だけで、そのときは SetGalleryViewport のタイマーが作り直す。
         if (GalleryDisplayPixelSize(bitmap.PixelSize) is not { } size)
         {
-            return new GalleryImage(ContrastAdaptiveSharpenService.Apply(bitmap), DisplaySized: false);
+            return new GalleryImage(
+                GammaAdjustService.Apply(ContrastAdaptiveSharpenService.Apply(bitmap)),
+                DisplaySized: false);
         }
 
-        var result = ContrastAdaptiveSharpenService.ApplyScaled(bitmap, size);
+        // ガンマは見た目の最終調整なので、鮮鋭化のあとに掛ける（画素数は変わらない）。
+        var result = GammaAdjustService.Apply(ContrastAdaptiveSharpenService.ApplyScaled(bitmap, size));
         // 縮小拡大に失敗した場合は元の解像度のまま返ってくるので、そのときは従来どおりの描き方にする。
         return new GalleryImage(result, DisplaySized: result.PixelSize == size);
     }
@@ -594,7 +606,7 @@ public partial class TabViewModel : ObservableObject
             return 1.0;
         }
 
-        var source = VideoFrame?.PixelSize ?? PreviewBitmap?.PixelSize;
+        var source = VideoFrame?.Size ?? PreviewBitmap?.PixelSize;
         if (source is not { Width: > 0, Height: > 0 } pixels)
         {
             return 1.0;
@@ -795,6 +807,15 @@ public partial class TabViewModel : ObservableObject
             return;
         }
 
+        // 動画は作り直さない。UpdatePreview は同じファイルでも Open からやり直すので
+        // 再生位置が頭へ戻ってしまう。鮮鋭化もガンマも描画時のシェーダーが持っているため、
+        // 「もう一度描き直して」と伝えるだけでよい（一時停止中でも反映される）。
+        if (IsVideoPreview)
+        {
+            VideoRenderRevision++;
+            return;
+        }
+
         ClearPrefetched();
         UpdatePreview();
     }
@@ -957,7 +978,15 @@ public partial class TabViewModel : ObservableObject
 
     /// <summary>いま画面に出すフレーム。</summary>
     [ObservableProperty]
-    private WriteableBitmap? _videoFrame;
+    private VideoFrame? _videoFrame;
+
+    /// <summary>
+    /// 鮮鋭化設定のように、フレームが変わらなくても描き直したいときに増やす値。
+    /// <see cref="Controls.VideoFrameView"/> がこれを見て再描画する
+    /// （一時停止中は新しいフレームが来ないので、これが無いと設定変更が反映されない）。
+    /// </summary>
+    [ObservableProperty]
+    private int _videoRenderRevision;
 
     [ObservableProperty]
     private bool _isVideoPlaying;
@@ -1090,6 +1119,98 @@ public partial class TabViewModel : ObservableObject
         if (_video is null) return;
         _video.Seek(_video.Position + deltaSeconds);
         SyncVideoPosition();
+    }
+
+    /// <summary>早送り・巻き戻しの 1 回あたりの秒数（設定 &gt; 表示 で変更。全タブ共通）。</summary>
+    public static double SeekStepSeconds { get; set; } = 1.0;
+
+    /// <summary>
+    /// 一時停止中のコマ送り幅（秒）。Media Engine には「1 フレーム進める」API が無いので、
+    /// 一般的な 30fps 相当の時間だけ動かす（＝実フレーム境界には合わせない）。
+    /// 一時停止中のシークは EventSeeked で強制的に絵を取り直すので、止まったまま絵だけが変わる。
+    /// </summary>
+    private const double FrameStepSeconds = 1.0 / 30.0;
+
+    /// <summary>コントロールバーの「巻き戻し」。設定の秒数だけ戻す。</summary>
+    [RelayCommand]
+    private void SeekVideoBackward() => SeekVideoBy(-SeekStepSeconds);
+
+    /// <summary>コントロールバーの「早送り」。設定の秒数だけ進める。</summary>
+    [RelayCommand]
+    private void SeekVideoForward() => SeekVideoBy(SeekStepSeconds);
+
+    /// <summary>一時停止中のコマ送り。<paramref name="direction"/> は -1 で戻る、+1 で進む。</summary>
+    public void StepVideoFrame(int direction) => SeekVideoBy(direction * FrameStepSeconds);
+
+    /// <summary>
+    /// ギャラリーで動画を見ているときの ← / → 。再生中は早送り・巻き戻し、
+    /// 一時停止中はコマ送りへ割り当てる（画像送りは filmstrip のクリックとナビボタンで行う）。
+    /// 扱ったら true を返す。
+    /// </summary>
+    public bool TryHandleVideoArrow(int direction)
+    {
+        if (!IsGalleryView || !IsVideoPreview || _video is null)
+        {
+            return false;
+        }
+
+        if (IsVideoPlaying)
+        {
+            SeekVideoBy(direction * SeekStepSeconds);
+        }
+        else
+        {
+            StepVideoFrame(direction);
+        }
+
+        return true;
+    }
+
+    /// <summary>ガンマ補正（1.0 で無変換）。全タブ・静止画・動画で共通。</summary>
+    public double GalleryGamma
+    {
+        get => GammaAdjustService.Gamma;
+        set
+        {
+            var clamped = Math.Clamp(value, GammaAdjustService.Minimum, GammaAdjustService.Maximum);
+            if (Math.Abs(clamped - GammaAdjustService.Gamma) < 0.0005)
+            {
+                return;
+            }
+
+            GammaAdjustService.Gamma = clamped;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(GalleryGammaText));
+            OnPropertyChanged(nameof(CanResetGalleryGamma));
+            // 動画は描画時のシェーダーが持つので、バインディング経由で即座に反映される。
+            // 静止画は作り直しが要るので、スライダーのドラッグ中に何度も走らせないよう
+            // まとめて 1 回だけ通す。
+            ScheduleGalleryReload();
+        }
+    }
+
+    /// <summary>コントロールバーに出すガンマ値。</summary>
+    public string GalleryGammaText => $"γ {GalleryGamma:0.00}";
+
+    /// <summary>ガンマが既定値から動いている（＝リセットに意味がある）。</summary>
+    public bool CanResetGalleryGamma => !GammaAdjustService.IsNeutral;
+
+    /// <summary>ガンマを 1.00 へ戻す。</summary>
+    [RelayCommand]
+    private void ResetGalleryGamma() => GalleryGamma = GammaAdjustService.Neutral;
+
+    /// <summary>キー操作 1 回ぶんのガンマ変化量。スライダーの範囲（0.4〜2.5）を約 40 段で動かす。</summary>
+    private const double GammaKeyStep = 0.05;
+
+    /// <summary>ギャラリーの ↑ / ↓ からガンマを 1 段動かす。</summary>
+    public void AdjustGalleryGamma(int direction)
+    {
+        if (!IsGalleryView)
+        {
+            return;
+        }
+
+        GalleryGamma += direction * GammaKeyStep;
     }
 
     /// <summary>スライダー操作での明示シーク。タイマー由来の更新では走らせない。</summary>
@@ -1401,7 +1522,8 @@ public partial class TabViewModel : ObservableObject
                 // 読み取り自体に失敗した場合（クラウドドライブの瞬断など）は情報表示のみへフォールスルー
             }
 
-            if (ShellImageThumbnailExtensions.Contains(ext))
+            // RAW も「画像」として扱うので、シェル（各社の RAW コーデック）に現像してもらう。
+            if (ShellImageThumbnailExtensions.Contains(ext) || RawThumbnailExtensions.Contains(ext))
             {
                 var bmp = await Task.Run(
                     () => ShellThumbnailService.TryGetThumbnail(entry.FullPath, IsGalleryView ? 1024 : 480), cts.Token);
@@ -2795,6 +2917,39 @@ public partial class TabViewModel : ObservableObject
                 }
             });
         });
+    }
+
+    /// <summary>ギャラリー表示に切り替わるアイコンサイズ（サイズスライダーの上限と同じ値）。</summary>
+    private const double GalleryIconSize = 160;
+
+    /// <summary>
+    /// ギャラリーで画像として扱う拡張子か。通常の画像に加えて、シェルのコーデック任せで
+    /// 表示する新世代フォーマットと各社の RAW も含める。
+    /// </summary>
+    public static bool IsGalleryImage(string path)
+    {
+        var ext = Path.GetExtension(path).ToLowerInvariant();
+        return ImageExtensions.Contains(ext)
+               || ShellImageThumbnailExtensions.Contains(ext)
+               || RawThumbnailExtensions.Contains(ext);
+    }
+
+    /// <summary>ギャラリーで再生できる動画か。</summary>
+    public static bool IsGalleryVideo(string path)
+        => VideoPlaybackSession.IsPlayable(Path.GetExtension(path));
+
+    /// <summary>指定エントリを選んだ状態でギャラリー表示へ入る（全画面化は呼び出し側が行う）。</summary>
+    public void OpenInGallery(FileSystemEntry entry)
+    {
+        SelectedEntry = entry;
+        if (!IsIconsView)
+        {
+            // ViewMode の変更はプリセットのサイズ（96）を書くので、先に済ませてから広げる。
+            ViewMode = ViewMode.ExtraLargeIcons;
+        }
+
+        IconSize = GalleryIconSize;
+        SelectedEntry = entry;
     }
 
     /// <summary>エントリを開く（フォルダーは移動、ファイルは関連付けで起動）。</summary>

@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using Avalonia;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Kiriha.Models;
@@ -56,6 +57,8 @@ public partial class MainWindowViewModel : ObservableObject
         {
             IsGalleryFullScreen = false;
         }
+
+        NotifyGalleryEdgeToEdge();
     }
 
     /// <summary>ステータスバーの表示状態（表示メニューで切替）。</summary>
@@ -86,6 +89,46 @@ public partial class MainWindowViewModel : ObservableObject
     /// <summary>全画面表示でないこと。フィルムストリップやステータスバーなど、全画面で畳む
     /// 部品の <c>IsVisible</c> 用（<c>MultiBinding</c> では否定を挟めないため肯定形で持つ）。</summary>
     public bool IsGalleryChromeVisible => !IsGalleryFullScreen;
+
+    /// <summary>ウィンドウが最大化されている。<c>MainWindow</c> が WindowState の変化ごとに書き込む。</summary>
+    [ObservableProperty]
+    private bool _isWindowMaximized;
+
+    partial void OnIsWindowMaximizedChanged(bool value) => NotifyGalleryEdgeToEdge();
+
+    partial void OnIsGalleryFullScreenChanged(bool value) => NotifyGalleryEdgeToEdge();
+
+    /// <summary>
+    /// ギャラリーを画面の端まで使う。
+    ///
+    /// 通常のコンテンツ島は Chrome ふうに 6px の余白と角丸・1px の輪郭を持つが、
+    /// 画面いっぱいに映像を見たいときはそれがディスプレイの端に走る「枠」に見える
+    /// （OS のウィンドウ枠ではなくアプリが描いているもの）。全画面表示のあいだと、
+    /// 最大化してギャラリーを見ているあいだだけ余白・角丸・輪郭を落とす。
+    /// </summary>
+    public bool IsGalleryEdgeToEdge
+        => IsGalleryFullScreen || (IsWindowMaximized && SelectedTab is { IsGalleryView: true });
+
+    /// <summary>コンテンツ島の外周余白。</summary>
+    public Thickness ContentIslandMargin => IsGalleryEdgeToEdge ? default : new Thickness(0, 6, 6, 6);
+
+    /// <summary>コンテンツ島の角丸。</summary>
+    public CornerRadius ContentIslandCornerRadius => IsGalleryEdgeToEdge ? default : new CornerRadius(10);
+
+    /// <summary>コンテンツ島の輪郭線を出すか。</summary>
+    public bool IsContentIslandOutlineVisible => !IsGalleryEdgeToEdge;
+
+    /// <summary>ギャラリーのメイン画像領域の余白。</summary>
+    public Thickness GalleryImageMargin => IsGalleryEdgeToEdge ? default : new Thickness(18, 18, 18, 6);
+
+    private void NotifyGalleryEdgeToEdge()
+    {
+        OnPropertyChanged(nameof(IsGalleryEdgeToEdge));
+        OnPropertyChanged(nameof(ContentIslandMargin));
+        OnPropertyChanged(nameof(ContentIslandCornerRadius));
+        OnPropertyChanged(nameof(IsContentIslandOutlineVisible));
+        OnPropertyChanged(nameof(GalleryImageMargin));
+    }
 
     /// <summary>お気に入りバーの表示状態（Ctrl+Shift+B で切替、永続化）。</summary>
     [ObservableProperty]
@@ -400,6 +443,44 @@ public partial class MainWindowViewModel : ObservableObject
                 tab.ReloadGalleryPreview();
             }
 
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>設定タブ: 動画の早送り・巻き戻し 1 回あたりの秒数（コントロールバーのボタンと ← / →）。</summary>
+    public double OptVideoSeekSeconds
+    {
+        get => _settings.VideoSeekSeconds;
+        set
+        {
+            var clamped = Math.Clamp(double.IsFinite(value) ? value : 1.0, 0.1, 60.0);
+            _settings.VideoSeekSeconds = clamped;
+            SettingsService.Save(_settings);
+            TabViewModel.SeekStepSeconds = clamped;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>設定タブ: Kiriha 内で画像をダブルクリックしたらギャラリーの全画面表示で開く。</summary>
+    public bool OptOpenImagesInGallery
+    {
+        get => _settings.OpenImagesInGallery;
+        set
+        {
+            _settings.OpenImagesInGallery = value;
+            SettingsService.Save(_settings);
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>設定タブ: Kiriha 内で動画をダブルクリックしたらギャラリーの全画面表示で開く。</summary>
+    public bool OptOpenVideosInGallery
+    {
+        get => _settings.OpenVideosInGallery;
+        set
+        {
+            _settings.OpenVideosInGallery = value;
+            SettingsService.Save(_settings);
             OnPropertyChanged();
         }
     }
@@ -888,6 +969,7 @@ public partial class MainWindowViewModel : ObservableObject
         // 鮮鋭化も全タブ・動画で共通の状態なので、設定の値をサービス側へ反映しておく。
         Services.ContrastAdaptiveSharpenService.Enabled = _settings.SharpenGallery;
         Services.ContrastAdaptiveSharpenService.Strength = ParseSharpenStrength(_settings.SharpenStrength);
+        TabViewModel.SeekStepSeconds = _settings.VideoSeekSeconds is >= 0.1 and <= 60 ? _settings.VideoSeekSeconds : 1.0;
 
         // ギャラリー動画の音量・ミュート・速度は全タブ共通かつ次回起動へ持ち越す。
         // タブ側は AppSettings を持たないので、読み込みと保存の経路をここから渡す。
@@ -1293,9 +1375,15 @@ public partial class MainWindowViewModel : ObservableObject
         if (e.PropertyName == nameof(TabViewModel.IsGalleryView))
         {
             // ギャラリーを抜けたら（Esc・✕・スライダー・ホイールのいずれでも）全画面も一緒に解除する
-            if (ReferenceEquals(tab, SelectedTab) && !tab.IsGalleryView)
+            if (ReferenceEquals(tab, SelectedTab))
             {
-                IsGalleryFullScreen = false;
+                if (!tab.IsGalleryView)
+                {
+                    IsGalleryFullScreen = false;
+                }
+
+                // 最大化中はギャラリーの出入りで余白の有無が変わる
+                NotifyGalleryEdgeToEdge();
             }
         }
         else if (e.PropertyName == nameof(TabViewModel.IsPinned))

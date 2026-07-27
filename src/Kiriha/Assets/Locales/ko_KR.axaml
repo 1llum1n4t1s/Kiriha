@@ -100,6 +100,9 @@
   <x:String x:Key="Text.Folder.Videos" xml:space="preserve">비디오</x:String>
   <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">갤러리 종료 (Esc)</x:String>
   <x:String x:Key="Text.Gallery.FullScreen" xml:space="preserve">전체 화면 (F11, Esc로 종료)</x:String>
+  <x:String x:Key="Text.Gallery.Gamma" xml:space="preserve">감마 보정</x:String>
+  <x:String x:Key="Text.Gallery.GammaReset" xml:space="preserve">감마를 1.00으로 되돌리기</x:String>
+  <x:String x:Key="Text.Gallery.GammaTip" xml:space="preserve">어두운 부분의 밝기를 조정합니다 (표시만 바뀌며 파일은 변경되지 않습니다)</x:String>
   <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">이미지 정보</x:String>
   <x:String x:Key="Text.Gallery.Next" xml:space="preserve">다음 이미지 (→)</x:String>
   <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">이 이미지의 정보가 없습니다.</x:String>
@@ -251,12 +254,15 @@
   <x:String x:Key="Text.Settings.Mouse.Up" xml:space="preserve">한 단계 위로 이동</x:String>
   <x:String x:Key="Text.Settings.RunAtStartup" xml:space="preserve">Windows 시작 시 Kiriha 실행</x:String>
   <x:String x:Key="Text.Settings.RunAtStartupNote" xml:space="preserve">로그인할 때 Kiriha가 자동으로 실행됩니다.</x:String>
+  <x:String x:Key="Text.Settings.OpenImagesInGallery" xml:space="preserve">Kiriha 안에서는 이미지를 Kiriha로 열기</x:String>
+  <x:String x:Key="Text.Settings.OpenInGallery.Note" xml:space="preserve">Kiriha 안에서 더블클릭했을 때만 적용되며, 갤러리 전체 화면으로 엽니다 (각 제조사의 RAW도 이미지로 취급합니다). Windows 파일 연결은 변경하지 않습니다.</x:String>
+  <x:String x:Key="Text.Settings.OpenVideosInGallery" xml:space="preserve">Kiriha 안에서는 동영상을 Kiriha로 열기</x:String>
   <x:String x:Key="Text.Settings.Sharpen" xml:space="preserve">확대 시 흐림 줄이기 (선명하게)</x:String>
   <x:String x:Key="Text.Settings.Sharpen.High" xml:space="preserve">강하게</x:String>
   <x:String x:Key="Text.Settings.Sharpen.Low" xml:space="preserve">약하게</x:String>
   <x:String x:Key="Text.Settings.Sharpen.Max" xml:space="preserve">최대 (CAS)</x:String>
   <x:String x:Key="Text.Settings.Sharpen.Normal" xml:space="preserve">표준</x:String>
-  <x:String x:Key="Text.Settings.Sharpen.Note" xml:space="preserve">이미지와 동영상을 화면에 맞춰 확대할 때 윤곽만 은은하게 다듬습니다 (AMD FidelityFX RCAS 상당). 동영상 재생 시 CPU 사용량이 조금 늘어납니다.</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Note" xml:space="preserve">이미지와 동영상을 화면에 맞춰 확대할 때 윤곽만 은근히 다잡습니다 (AMD FidelityFX RCAS 상당). 동영상은 그릴 때 GPU에서 처리하므로 재생 중 CPU 부하는 거의 늘지 않습니다.</x:String>
   <x:String x:Key="Text.Settings.Shortcuts" xml:space="preserve">단축키</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOps" xml:space="preserve">파일 작업</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOpsBody" xml:space="preserve">Ctrl+X / C / V　잘라내기·복사·붙여넣기　　Delete / Shift+Delete　삭제·완전 삭제&#10;F2　이름 바꾸기　　Alt+Enter　속성　　Ctrl+Shift+N　새 폴더　　Alt+P　미리 보기</x:String>
@@ -292,6 +298,7 @@
   <x:String x:Key="Text.Settings.Window.RememberBounds" xml:space="preserve">창의 크기와 위치 저장</x:String>
   <x:String x:Key="Text.Settings.Window.RememberBoundsNote" xml:space="preserve">끄면 다음에는 기본 크기·위치로 시작합니다.</x:String>
   <x:String x:Key="Text.Settings.WindowsIntegration" xml:space="preserve">Windows 통합</x:String>
+  <x:String x:Key="Text.Settings.VideoSeekSeconds" xml:space="preserve">동영상 되감기·빨리 감기 초 수</x:String>
   <x:String x:Key="Text.Share.FileCount" xml:space="preserve">파일 {0}개</x:String>
   <x:String x:Key="Text.Share.FoldersNotSupported" xml:space="preserve">폴더는 공유할 수 없습니다(파일을 선택해 주세요)</x:String>
   <x:String x:Key="Text.Share.NoItems" xml:space="preserve">공유할 항목이 없습니다</x:String>
@@ -364,6 +371,8 @@
   <x:String x:Key="Text.Type.FileFolder" xml:space="preserve">파일 폴더</x:String>
   <x:String x:Key="Text.Type.LocalDisk" xml:space="preserve">로컬 디스크</x:String>
   <x:String x:Key="Text.Type.LocalDiskFormat" xml:space="preserve">로컬 디스크 ({0})</x:String>
+  <x:String x:Key="Text.Video.SeekBack" xml:space="preserve">되감기 (←)</x:String>
+  <x:String x:Key="Text.Video.SeekForward" xml:space="preserve">빨리 감기 (→)</x:String>
   <x:String x:Key="Text.Video.Unavailable" xml:space="preserve">이 동영상을 재생할 수 없습니다(일치하는 코덱을 찾지 못했습니다)</x:String>
   <x:String x:Key="Text.Video.PlayPauseTip" xml:space="preserve">재생 / 일시 중지 (Space)</x:String>
   <x:String x:Key="Text.Video.MuteTip" xml:space="preserve">음소거</x:String>

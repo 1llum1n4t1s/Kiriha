@@ -10,6 +10,7 @@ namespace Kiriha.Tests;
 /// 平坦な面は 1 ビットも動かさない（＝ノイズを持ち上げない）、値は 0〜255 に収まる
 /// （＝白飛び・黒潰れを作らない）、アルファは触らない、端の画素は素通しする。
 /// </summary>
+[Collection(SharpenSettingsCollection.Name)]
 public sealed class ContrastAdaptiveSharpenTests
 {
     public ContrastAdaptiveSharpenTests()

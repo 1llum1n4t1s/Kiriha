@@ -100,6 +100,9 @@
   <x:String x:Key="Text.Folder.Videos" xml:space="preserve">Vídeos</x:String>
   <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">Sair da galeria (Esc)</x:String>
   <x:String x:Key="Text.Gallery.FullScreen" xml:space="preserve">Tela cheia (F11, Esc para sair)</x:String>
+  <x:String x:Key="Text.Gallery.Gamma" xml:space="preserve">Gama</x:String>
+  <x:String x:Key="Text.Gallery.GammaReset" xml:space="preserve">Redefinir a gama para 1,00</x:String>
+  <x:String x:Key="Text.Gallery.GammaTip" xml:space="preserve">Ajusta o brilho das áreas escuras (apenas exibição; o arquivo não muda)</x:String>
   <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">Informações da imagem</x:String>
   <x:String x:Key="Text.Gallery.Next" xml:space="preserve">Próxima imagem (seta direita)</x:String>
   <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">Não há informações disponíveis para esta imagem.</x:String>
@@ -251,12 +254,15 @@
   <x:String x:Key="Text.Settings.Mouse.Up" xml:space="preserve">Subir um nível</x:String>
   <x:String x:Key="Text.Settings.RunAtStartup" xml:space="preserve">Executar o Kiriha ao iniciar o Windows</x:String>
   <x:String x:Key="Text.Settings.RunAtStartupNote" xml:space="preserve">O Kiriha é iniciado automaticamente ao fazer login.</x:String>
+  <x:String x:Key="Text.Settings.OpenImagesInGallery" xml:space="preserve">Abrir imagens no próprio Kiriha</x:String>
+  <x:String x:Key="Text.Settings.OpenInGallery.Note" xml:space="preserve">Vale só para o duplo clique dentro do Kiriha, que abre o arquivo em tela cheia na galeria (os RAW contam como imagens). As associações do Windows não são alteradas.</x:String>
+  <x:String x:Key="Text.Settings.OpenVideosInGallery" xml:space="preserve">Abrir vídeos no próprio Kiriha</x:String>
   <x:String x:Key="Text.Settings.Sharpen" xml:space="preserve">Reduzir o desfoque ao ampliar (nitidez)</x:String>
   <x:String x:Key="Text.Settings.Sharpen.High" xml:space="preserve">Forte</x:String>
   <x:String x:Key="Text.Settings.Sharpen.Low" xml:space="preserve">Leve</x:String>
   <x:String x:Key="Text.Settings.Sharpen.Max" xml:space="preserve">Máxima (CAS)</x:String>
   <x:String x:Key="Text.Settings.Sharpen.Normal" xml:space="preserve">Padrão</x:String>
-  <x:String x:Key="Text.Settings.Sharpen.Note" xml:space="preserve">Reforça apenas as bordas, com moderação, ao ampliar imagens e vídeos para a tela (equivalente ao AMD FidelityFX RCAS). Em vídeo, o uso de CPU aumenta um pouco.</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Note" xml:space="preserve">Reforça de leve apenas as bordas quando a imagem ou o vídeo é ampliado para caber na tela (equivale ao AMD FidelityFX RCAS). O vídeo é processado na GPU ao desenhar, então a reprodução quase não pesa na CPU.</x:String>
   <x:String x:Key="Text.Settings.Shortcuts" xml:space="preserve">Atalhos</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOps" xml:space="preserve">Operações com arquivos</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOpsBody" xml:space="preserve">Ctrl+X / C / V　Recortar, copiar, colar　　Delete / Shift+Delete　Excluir, excluir definitivamente&#10;F2　Renomear　　Alt+Enter　Propriedades　　Ctrl+Shift+N　Nova pasta　　Alt+P　Visualização</x:String>
@@ -292,6 +298,7 @@
   <x:String x:Key="Text.Settings.Window.RememberBounds" xml:space="preserve">Lembrar o tamanho e a posição da janela</x:String>
   <x:String x:Key="Text.Settings.Window.RememberBoundsNote" xml:space="preserve">Se desativado, na próxima vez o Kiriha abrirá com o tamanho e a posição padrão.</x:String>
   <x:String x:Key="Text.Settings.WindowsIntegration" xml:space="preserve">Integração com o Windows</x:String>
+  <x:String x:Key="Text.Settings.VideoSeekSeconds" xml:space="preserve">Segundos por salto ao retroceder ou avançar o vídeo</x:String>
   <x:String x:Key="Text.Share.FileCount" xml:space="preserve">{0} arquivo(s)</x:String>
   <x:String x:Key="Text.Share.FoldersNotSupported" xml:space="preserve">Não é possível compartilhar pastas (selecione arquivos)</x:String>
   <x:String x:Key="Text.Share.NoItems" xml:space="preserve">Não há nada para compartilhar</x:String>
@@ -364,6 +371,8 @@
   <x:String x:Key="Text.Type.FileFolder" xml:space="preserve">Pasta de arquivos</x:String>
   <x:String x:Key="Text.Type.LocalDisk" xml:space="preserve">Disco local</x:String>
   <x:String x:Key="Text.Type.LocalDiskFormat" xml:space="preserve">Disco local ({0})</x:String>
+  <x:String x:Key="Text.Video.SeekBack" xml:space="preserve">Retroceder (seta esquerda)</x:String>
+  <x:String x:Key="Text.Video.SeekForward" xml:space="preserve">Avançar (seta direita)</x:String>
   <x:String x:Key="Text.Video.Unavailable" xml:space="preserve">Não é possível reproduzir este vídeo (nenhum codec compatível encontrado)</x:String>
   <x:String x:Key="Text.Video.PlayPauseTip" xml:space="preserve">Reproduzir / pausar (Espaço)</x:String>
   <x:String x:Key="Text.Video.MuteTip" xml:space="preserve">Sem áudio</x:String>

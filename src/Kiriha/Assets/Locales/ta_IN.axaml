@@ -100,6 +100,9 @@
   <x:String x:Key="Text.Folder.Videos" xml:space="preserve">வீடியோக்கள்</x:String>
   <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">தொகுப்பிலிருந்து வெளியேறு (Esc)</x:String>
   <x:String x:Key="Text.Gallery.FullScreen" xml:space="preserve">முழுத்திரை (F11, வெளியேற Esc)</x:String>
+  <x:String x:Key="Text.Gallery.Gamma" xml:space="preserve">காமா</x:String>
+  <x:String x:Key="Text.Gallery.GammaReset" xml:space="preserve">காமாவை 1.00 ஆக மீட்டமை</x:String>
+  <x:String x:Key="Text.Gallery.GammaTip" xml:space="preserve">இருண்ட பகுதிகளின் ஒளியை சரிசெய்யும் (காட்சிக்கு மட்டும்; கோப்பு மாறாது)</x:String>
   <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">பட தகவல்</x:String>
   <x:String x:Key="Text.Gallery.Next" xml:space="preserve">அடுத்த படம் (வலது அம்பு)</x:String>
   <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">இந்தப் படத்திற்கான தகவல் இல்லை.</x:String>
@@ -251,12 +254,15 @@
   <x:String x:Key="Text.Settings.Mouse.Up" xml:space="preserve">ஒரு நிலை மேலே செல்</x:String>
   <x:String x:Key="Text.Settings.RunAtStartup" xml:space="preserve">Windows தொடங்கும்போது Kiriha ஐ இயக்கு</x:String>
   <x:String x:Key="Text.Settings.RunAtStartupNote" xml:space="preserve">உள்நுழையும்போது Kiriha தானாகத் தொடங்கும்.</x:String>
+  <x:String x:Key="Text.Settings.OpenImagesInGallery" xml:space="preserve">Kiriha உள்ளே படங்களை Kiriha-விலேயே திற</x:String>
+  <x:String x:Key="Text.Settings.OpenInGallery.Note" xml:space="preserve">Kiriha உள்ளே இரட்டைச் சொடுக்கு செய்யும்போது மட்டுமே பொருந்தும்; கோப்பு காட்சியகத்தில் முழுத்திரையில் திறக்கும் (RAW கோப்புகளும் படங்களாகவே கருதப்படும்). Windows இணைப்புகள் மாற்றப்படுவதில்லை.</x:String>
+  <x:String x:Key="Text.Settings.OpenVideosInGallery" xml:space="preserve">Kiriha உள்ளே காணொளிகளை Kiriha-விலேயே திற</x:String>
   <x:String x:Key="Text.Settings.Sharpen" xml:space="preserve">பெரிதாக்கும்போது மங்கலைக் குறை (கூர்மையாக்கம்)</x:String>
   <x:String x:Key="Text.Settings.Sharpen.High" xml:space="preserve">அதிகம்</x:String>
   <x:String x:Key="Text.Settings.Sharpen.Low" xml:space="preserve">குறைவு</x:String>
   <x:String x:Key="Text.Settings.Sharpen.Max" xml:space="preserve">அதிகபட்சம் (CAS)</x:String>
   <x:String x:Key="Text.Settings.Sharpen.Normal" xml:space="preserve">இயல்பு</x:String>
-  <x:String x:Key="Text.Settings.Sharpen.Note" xml:space="preserve">படங்களையும் காணொளிகளையும் திரைக்கு ஏற்ப பெரிதாக்கும்போது விளிம்புகளை மட்டும் மென்மையாக கூர்மையாக்கும் (AMD FidelityFX RCAS நிகர்). காணொளியில் CPU பயன்பாடு சற்று அதிகரிக்கும்.</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Note" xml:space="preserve">படத்தையோ காணொளியையோ திரைக்கு ஏற்ப பெரிதாக்கும்போது விளிம்புகளை மட்டும் மெதுவாக இறுக்கும் (AMD FidelityFX RCAS நிகர்). காணொளி வரையும்போது GPU-வில் செயலாக்கப்படுவதால், இயக்கத்தில் CPU சுமை கிட்டத்தட்ட கூடாது.</x:String>
   <x:String x:Key="Text.Settings.Shortcuts" xml:space="preserve">குறுக்குவழிகள்</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOps" xml:space="preserve">கோப்புச் செயல்பாடுகள்</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOpsBody" xml:space="preserve">Ctrl+X / C / V　வெட்டு, நகலெடு, ஒட்டு　　Delete / Shift+Delete　நீக்கு, நிரந்தரமாக நீக்கு&#10;F2　பெயர் மாற்று　　Alt+Enter　பண்புகள்　　Ctrl+Shift+N　புதிய கோப்புறை　　Alt+P　முன்னோட்டம்</x:String>
@@ -292,6 +298,7 @@
   <x:String x:Key="Text.Settings.Window.RememberBounds" xml:space="preserve">சாளரத்தின் அளவையும் இடத்தையும் நினைவில் வை</x:String>
   <x:String x:Key="Text.Settings.Window.RememberBoundsNote" xml:space="preserve">முடக்கினால், அடுத்த முறை இயல்பு அளவிலும் இடத்திலும் தொடங்கும்.</x:String>
   <x:String x:Key="Text.Settings.WindowsIntegration" xml:space="preserve">Windows ஒருங்கிணைப்பு</x:String>
+  <x:String x:Key="Text.Settings.VideoSeekSeconds" xml:space="preserve">காணொளியை முன்/பின் நகர்த்தும் விநாடிகள்</x:String>
   <x:String x:Key="Text.Share.FileCount" xml:space="preserve">{0} கோப்புகள்</x:String>
   <x:String x:Key="Text.Share.FoldersNotSupported" xml:space="preserve">கோப்புறைகளைப் பகிர முடியாது (கோப்புகளைத் தேர்ந்தெடுக்கவும்)</x:String>
   <x:String x:Key="Text.Share.NoItems" xml:space="preserve">பகிர எதுவும் இல்லை</x:String>
@@ -364,6 +371,8 @@
   <x:String x:Key="Text.Type.FileFolder" xml:space="preserve">கோப்புக் கோப்புறை</x:String>
   <x:String x:Key="Text.Type.LocalDisk" xml:space="preserve">உள்ளூர் வட்டு</x:String>
   <x:String x:Key="Text.Type.LocalDiskFormat" xml:space="preserve">உள்ளூர் வட்டு ({0})</x:String>
+  <x:String x:Key="Text.Video.SeekBack" xml:space="preserve">பின்னோக்கி (இடது அம்பு)</x:String>
+  <x:String x:Key="Text.Video.SeekForward" xml:space="preserve">முன்னோக்கி (வலது அம்பு)</x:String>
   <x:String x:Key="Text.Video.Unavailable" xml:space="preserve">இந்த வீடியோவை இயக்க முடியவில்லை (பொருந்தும் கோடெக் கிடைக்கவில்லை)</x:String>
   <x:String x:Key="Text.Video.PlayPauseTip" xml:space="preserve">இயக்கு / இடைநிறுத்து (Space)</x:String>
   <x:String x:Key="Text.Video.MuteTip" xml:space="preserve">ஒலியடக்கு</x:String>

@@ -20,6 +20,16 @@ public sealed class AppStorageCollection
 }
 
 /// <summary>
+/// 鮮鋭化とガンマの設定は static（全タブ共通の状態）なので、これを書き換えるテストは
+/// 直列に走らせる。並列に走らせると、隣のテストが変えた強さで結果を比べてしまう。
+/// </summary>
+[CollectionDefinition(SharpenSettingsCollection.Name)]
+public sealed class SharpenSettingsCollection
+{
+    public const string Name = "鮮鋭化・ガンマ設定を書き換える直列テスト";
+}
+
+/// <summary>
 /// <see cref="AppStoragePaths"/> の保存先を一意な一時ディレクトリと一時レジストリ接頭辞へ差し替えるスコープ。
 /// 実ユーザーのデータに触れないための土台なので、保存系サービスを触るテストは必ず using で囲む。
 /// </summary>

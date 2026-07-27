@@ -100,6 +100,9 @@
   <x:String x:Key="Text.Folder.Videos" xml:space="preserve">ビデオ</x:String>
   <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">ギャラリーを終了 (Esc)</x:String>
   <x:String x:Key="Text.Gallery.FullScreen" xml:space="preserve">全画面表示 (F11 / Esc で終了)</x:String>
+  <x:String x:Key="Text.Gallery.Gamma" xml:space="preserve">ガンマ補正</x:String>
+  <x:String x:Key="Text.Gallery.GammaReset" xml:space="preserve">ガンマを 1.00 に戻す</x:String>
+  <x:String x:Key="Text.Gallery.GammaTip" xml:space="preserve">暗い部分の明るさを調整します（表示だけ。ファイルは変わりません）</x:String>
   <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">画像情報</x:String>
   <x:String x:Key="Text.Gallery.Next" xml:space="preserve">次の画像 (→)</x:String>
   <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">この画像の情報はありません。</x:String>
@@ -251,12 +254,15 @@
   <x:String x:Key="Text.Settings.Mouse.Up" xml:space="preserve">上の階層に移動</x:String>
   <x:String x:Key="Text.Settings.RunAtStartup" xml:space="preserve">Windows のスタートアップに登録する</x:String>
   <x:String x:Key="Text.Settings.RunAtStartupNote" xml:space="preserve">サインイン時に Kiriha を自動で起動します。</x:String>
+  <x:String x:Key="Text.Settings.OpenImagesInGallery" xml:space="preserve">Kiriha 内では画像を Kiriha で開く</x:String>
+  <x:String x:Key="Text.Settings.OpenInGallery.Note" xml:space="preserve">Kiriha の中でダブルクリックしたときだけの動作です。ギャラリー表示の全画面で開きます（各社の RAW も画像として扱います）。Windows の関連付けは変更しません。</x:String>
+  <x:String x:Key="Text.Settings.OpenVideosInGallery" xml:space="preserve">Kiriha 内では動画を Kiriha で開く</x:String>
   <x:String x:Key="Text.Settings.Sharpen" xml:space="preserve">拡大表示のぼけを抑える（鮮鋭化）</x:String>
   <x:String x:Key="Text.Settings.Sharpen.High" xml:space="preserve">強め</x:String>
   <x:String x:Key="Text.Settings.Sharpen.Low" xml:space="preserve">弱め</x:String>
   <x:String x:Key="Text.Settings.Sharpen.Max" xml:space="preserve">最強（CAS）</x:String>
   <x:String x:Key="Text.Settings.Sharpen.Normal" xml:space="preserve">標準</x:String>
-  <x:String x:Key="Text.Settings.Sharpen.Note" xml:space="preserve">画像と動画を画面に合わせて拡大するときに、輪郭だけを控えめに締めます（AMD FidelityFX の RCAS 相当）。動画では再生中の負荷が少し増えます。</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Note" xml:space="preserve">画像と動画を画面に合わせて拡大するときに、輪郭だけを控えめに締めます（AMD FidelityFX の RCAS 相当）。動画は描画時に GPU で処理するため、再生中の CPU 負荷はほとんど増えません。</x:String>
   <x:String x:Key="Text.Settings.Shortcuts" xml:space="preserve">ショートカット</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOps" xml:space="preserve">ファイル操作</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOpsBody" xml:space="preserve">Ctrl+X / C / V　切り取り・コピー・貼り付け　　Delete / Shift+Delete　削除・完全削除&#10;F2　名前の変更　　Alt+Enter　プロパティ　　Ctrl+Shift+N　新しいフォルダー　　Alt+P　プレビュー</x:String>
@@ -292,6 +298,7 @@
   <x:String x:Key="Text.Settings.Window.RememberBounds" xml:space="preserve">ウィンドウのサイズと位置を保存する</x:String>
   <x:String x:Key="Text.Settings.Window.RememberBoundsNote" xml:space="preserve">OFF にすると、次回は既定のサイズ・位置で起動します。</x:String>
   <x:String x:Key="Text.Settings.WindowsIntegration" xml:space="preserve">Windows 統合</x:String>
+  <x:String x:Key="Text.Settings.VideoSeekSeconds" xml:space="preserve">動画の早送り・巻き戻しの秒数</x:String>
   <x:String x:Key="Text.Share.FileCount" xml:space="preserve">{0} 個のファイル</x:String>
   <x:String x:Key="Text.Share.FoldersNotSupported" xml:space="preserve">フォルダーは共有できません（ファイルを選択してください）</x:String>
   <x:String x:Key="Text.Share.NoItems" xml:space="preserve">共有する項目がありません</x:String>
@@ -364,6 +371,8 @@
   <x:String x:Key="Text.Type.FileFolder" xml:space="preserve">ファイル フォルダー</x:String>
   <x:String x:Key="Text.Type.LocalDisk" xml:space="preserve">ローカル ディスク</x:String>
   <x:String x:Key="Text.Type.LocalDiskFormat" xml:space="preserve">ローカル ディスク ({0})</x:String>
+  <x:String x:Key="Text.Video.SeekBack" xml:space="preserve">巻き戻し（←）</x:String>
+  <x:String x:Key="Text.Video.SeekForward" xml:space="preserve">早送り（→）</x:String>
   <x:String x:Key="Text.Video.Unavailable" xml:space="preserve">この動画は再生できません（対応するコーデックが見つかりませんでした）</x:String>
   <x:String x:Key="Text.Video.PlayPauseTip" xml:space="preserve">再生 / 一時停止 (Space)</x:String>
   <x:String x:Key="Text.Video.MuteTip" xml:space="preserve">ミュート</x:String>

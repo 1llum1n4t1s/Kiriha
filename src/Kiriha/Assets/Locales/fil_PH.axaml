@@ -100,6 +100,9 @@
   <x:String x:Key="Text.Folder.Videos" xml:space="preserve">Mga video</x:String>
   <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">Lumabas sa gallery (Esc)</x:String>
   <x:String x:Key="Text.Gallery.FullScreen" xml:space="preserve">Buong screen (F11, Esc para lumabas)</x:String>
+  <x:String x:Key="Text.Gallery.Gamma" xml:space="preserve">Gamma</x:String>
+  <x:String x:Key="Text.Gallery.GammaReset" xml:space="preserve">Ibalik ang gamma sa 1.00</x:String>
+  <x:String x:Key="Text.Gallery.GammaTip" xml:space="preserve">Isinasaayos ang liwanag ng madidilim na bahagi (display lang; hindi nagbabago ang file)</x:String>
   <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">Impormasyon ng larawan</x:String>
   <x:String x:Key="Text.Gallery.Next" xml:space="preserve">Susunod na larawan (kanang arrow)</x:String>
   <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">Walang impormasyong makuha para sa larawang ito.</x:String>
@@ -251,12 +254,15 @@
   <x:String x:Key="Text.Settings.Mouse.Up" xml:space="preserve">Umakyat ng isang antas</x:String>
   <x:String x:Key="Text.Settings.RunAtStartup" xml:space="preserve">Patakbuhin ang Kiriha kapag nagsimula ang Windows</x:String>
   <x:String x:Key="Text.Settings.RunAtStartupNote" xml:space="preserve">Awtomatikong tumatakbo ang Kiriha kapag nag-sign in ka.</x:String>
+  <x:String x:Key="Text.Settings.OpenImagesInGallery" xml:space="preserve">Buksan ang mga larawan sa Kiriha mismo</x:String>
+  <x:String x:Key="Text.Settings.OpenInGallery.Note" xml:space="preserve">Para lang ito sa double-click sa loob ng Kiriha; bubuksan ang file nang full screen sa gallery (bilang larawan din ang mga RAW). Hindi binabago ang file association ng Windows.</x:String>
+  <x:String x:Key="Text.Settings.OpenVideosInGallery" xml:space="preserve">Buksan ang mga video sa Kiriha mismo</x:String>
   <x:String x:Key="Text.Settings.Sharpen" xml:space="preserve">Bawasan ang labo kapag pinalaki (pagpapatalas)</x:String>
   <x:String x:Key="Text.Settings.Sharpen.High" xml:space="preserve">Malakas</x:String>
   <x:String x:Key="Text.Settings.Sharpen.Low" xml:space="preserve">Mahina</x:String>
   <x:String x:Key="Text.Settings.Sharpen.Max" xml:space="preserve">Pinakamalakas (CAS)</x:String>
   <x:String x:Key="Text.Settings.Sharpen.Normal" xml:space="preserve">Karaniwan</x:String>
-  <x:String x:Key="Text.Settings.Sharpen.Note" xml:space="preserve">Bahagyang tinitiim lang ang mga gilid kapag pinalaki ang larawan at video sa screen (katumbas ng AMD FidelityFX RCAS). Bahagyang tumataas ang paggamit ng CPU sa video.</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Note" xml:space="preserve">Marahang hinihigpitan lang ang mga gilid kapag pinalaki ang larawan o video sa screen (katumbas ng AMD FidelityFX RCAS). Sa GPU ginagawa ang video habang iginuguhit, kaya halos walang dagdag na CPU sa panonood.</x:String>
   <x:String x:Key="Text.Settings.Shortcuts" xml:space="preserve">Mga shortcut</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOps" xml:space="preserve">Mga operasyon sa file</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOpsBody" xml:space="preserve">Ctrl+X / C / V　I-cut, kopyahin, i-paste　　Delete / Shift+Delete　Tanggalin, tanggalin nang tuluyan&#10;F2　Palitan ang pangalan　　Alt+Enter　Mga katangian　　Ctrl+Shift+N　Bagong folder　　Alt+P　Preview</x:String>
@@ -292,6 +298,7 @@
   <x:String x:Key="Text.Settings.Window.RememberBounds" xml:space="preserve">Tandaan ang laki at posisyon ng window</x:String>
   <x:String x:Key="Text.Settings.Window.RememberBoundsNote" xml:space="preserve">Kapag naka-off, bubukas ang Kiriha sa default na laki at posisyon sa susunod.</x:String>
   <x:String x:Key="Text.Settings.WindowsIntegration" xml:space="preserve">Integrasyon sa Windows</x:String>
+  <x:String x:Key="Text.Settings.VideoSeekSeconds" xml:space="preserve">Segundo bawat lundag kapag nagre-rewind o nagfa-fast forward</x:String>
   <x:String x:Key="Text.Share.FileCount" xml:space="preserve">{0} file</x:String>
   <x:String x:Key="Text.Share.FoldersNotSupported" xml:space="preserve">Hindi maibabahagi ang mga folder (pumili ng mga file)</x:String>
   <x:String x:Key="Text.Share.NoItems" xml:space="preserve">Walang maibabahagi</x:String>
@@ -364,6 +371,8 @@
   <x:String x:Key="Text.Type.FileFolder" xml:space="preserve">File folder</x:String>
   <x:String x:Key="Text.Type.LocalDisk" xml:space="preserve">Local Disk</x:String>
   <x:String x:Key="Text.Type.LocalDiskFormat" xml:space="preserve">Local Disk ({0})</x:String>
+  <x:String x:Key="Text.Video.SeekBack" xml:space="preserve">I-rewind (kaliwang arrow)</x:String>
+  <x:String x:Key="Text.Video.SeekForward" xml:space="preserve">I-fast forward (kanang arrow)</x:String>
   <x:String x:Key="Text.Video.Unavailable" xml:space="preserve">Hindi mapatugtog ang video na ito (walang natagpuang tugmang codec)</x:String>
   <x:String x:Key="Text.Video.PlayPauseTip" xml:space="preserve">Patugtugin / i-pause (Space)</x:String>
   <x:String x:Key="Text.Video.MuteTip" xml:space="preserve">I-mute</x:String>

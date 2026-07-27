@@ -39,6 +39,9 @@ public partial class MainWindow : Window
 
     /// <summary>拡大中のドラッグ移動の基準点。null ならドラッグしていない。</summary>
     private Point? _galleryPanOrigin;
+
+    /// <summary>動画のクリック判定（押した位置）。ここからほとんど動かずに離したら再生 / 一時停止。</summary>
+    private Point? _galleryVideoClickOrigin;
     private bool _dragInProgress;
     private readonly HashSet<ListBox> _bulkSelectionLists = [];
     private ListBox? _marqueeListBox;
@@ -144,6 +147,10 @@ public partial class MainWindow : Window
         onFirstOpened = (_, _) =>
         {
             Opened -= onFirstOpened;
+            // 最大化状態で復元した場合、ウィンドウを作る前に書いた WindowDecorations は
+            // プラットフォーム側へ届かない（実測: 枠ぶん 7px はみ出した 2062x1118 のまま）。
+            // ハンドルができたここでもう一度そろえる。
+            ApplyWindowDecorations(WindowState);
             if (ViewModel is { } vm) _ = vm.RefreshSidebarAsync();
         };
         Opened += onFirstOpened;
@@ -240,6 +247,11 @@ public partial class MainWindow : Window
         {
             WindowState = WindowState.Maximized;
         }
+
+        // OnPropertyChanged 経由の反映は ViewModel がまだ載っていない時点でも起こりうるので、
+        // 復元直後にここでも一度そろえておく。
+        ApplyWindowDecorations(WindowState);
+        vm.IsWindowMaximized = WindowState is WindowState.Maximized or WindowState.FullScreen;
     }
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
@@ -259,8 +271,27 @@ public partial class MainWindow : Window
                 // 「最小化時にタスクトレイに格納する」ON: タスクバーからも消し、トレイアイコンのみにする（Discord 相当）。
                 Hide();
             }
+
+            ApplyWindowDecorations(state);
+            if (ViewModel is { } vm)
+            {
+                // 最大化中はギャラリーの余白・角丸・輪郭を落として画面の端まで使う
+                vm.IsWindowMaximized = state is WindowState.Maximized or WindowState.FullScreen;
+            }
         }
     }
+
+    /// <summary>
+    /// 最大化・全画面のときはウィンドウ枠を消す。
+    ///
+    /// 通常時の BorderOnly は、キャプションを自前で描いているぶん OS 側の枠（＝リサイズ用の
+    /// 掴みしろ）を残すためのもの。最大化・全画面ではリサイズできないので枠に用は無く、
+    /// 画面の端に線が 1 本残って動画が端まで使えなくなるだけなので落とす。
+    /// </summary>
+    private void ApplyWindowDecorations(WindowState state)
+        => WindowDecorations = state is WindowState.Maximized or WindowState.FullScreen
+            ? WindowDecorations.None
+            : WindowDecorations.BorderOnly;
 
     protected override void OnClosing(WindowClosingEventArgs e)
     {
@@ -1915,7 +1946,11 @@ public partial class MainWindow : Window
             && !IsDetailsBackgroundColumnHit(senderList, e.Source)
             && (e.Source as Visual)?.FindAncestorOfType<ListBoxItem>()?.DataContext is FileSystemEntry entry)
         {
-            tab.Open(entry);
+            if (!TryOpenInGallery(tab, entry))
+            {
+                tab.Open(entry);
+            }
+
             return;
         }
 
@@ -1924,6 +1959,32 @@ public partial class MainWindow : Window
         {
             ExecuteBackgroundClickAction(tab, ViewModel?.OptBackgroundDoubleClickAction);
         }
+    }
+
+    /// <summary>
+    /// 設定が ON なら、画像・動画のダブルクリックをギャラリーの全画面表示で受ける。
+    /// 開いたら true（呼び出し側は関連付けでの起動をしない）。
+    ///
+    /// これは Kiriha の中だけの動作で、Windows の関連付け（エクスプローラーからのダブルクリック）
+    /// には触らない。関連付けを取ると、他のアプリで開きたいファイルまで奪ってしまうため。
+    /// </summary>
+    private bool TryOpenInGallery(TabViewModel tab, FileSystemEntry entry)
+    {
+        if (ViewModel is not { } vm || entry.IsDirectory)
+        {
+            return false;
+        }
+
+        var wanted = (vm.OptOpenImagesInGallery && TabViewModel.IsGalleryImage(entry.FullPath))
+                     || (vm.OptOpenVideosInGallery && TabViewModel.IsGalleryVideo(entry.FullPath));
+        if (!wanted)
+        {
+            return false;
+        }
+
+        tab.OpenInGallery(entry);
+        vm.IsGalleryFullScreen = true;
+        return true;
     }
 
     /// <summary>フォルダー背景のダブル / ホイールクリックに割り当てられた動作を実行する。</summary>
@@ -2083,9 +2144,16 @@ public partial class MainWindow : Window
         // フォーカスさえこのパネルに乗れば、ファイル一覧の外でも Del / F2 などが確実に効く。
         (sender as Control)?.Focus();
 
-        // 拡大中は左ドラッグで見たい場所へ画像を動かせるようにする（手のひらツール）。
-        _galleryPanOrigin = e.GetCurrentPoint(this).Properties.IsLeftButtonPressed
+        var isVideo = ViewModel?.SelectedTab is { IsSettingsTab: false, IsVideoPreview: true };
+
+        // 動画は「画面をクリックで再生 / 一時停止」を優先する。手のひらドラッグは始めない。
+        // 実際の切り替えは PointerReleased 側（押しっぱなしの誤爆を避けるため）。
+        _galleryPanOrigin = !isVideo
+            && e.GetCurrentPoint(this).Properties.IsLeftButtonPressed
             && ViewModel?.SelectedTab is { IsSettingsTab: false, IsGalleryZoomed: true }
+            ? e.GetPosition(this)
+            : null;
+        _galleryVideoClickOrigin = isVideo && e.GetCurrentPoint(this).Properties.IsLeftButtonPressed
             ? e.GetPosition(this)
             : null;
         UpdateGalleryCursor(sender as Control);
@@ -2157,11 +2225,18 @@ public partial class MainWindow : Window
     private static bool IsGalleryOverlayControl(Control control)
         => control.Classes.Contains("gallerybar") || control.Classes.Contains("gallerynav");
 
-    /// <summary>手のひらツールのカーソル。ドラッグ中は握った手にする。</summary>
+    /// <summary>手のひらツールのカーソル。ドラッグ中は握った手にする。
+    /// 動画はクリックで再生 / 一時停止を切り替える操作なので、手のひらではなく通常の矢印にする。</summary>
     private void UpdateGalleryCursor(Control? area)
     {
         if (area is null)
         {
+            return;
+        }
+
+        if (ViewModel?.SelectedTab is { IsSettingsTab: false, IsVideoPreview: true })
+        {
+            area.Cursor = Cursor.Default;
             return;
         }
 
@@ -2203,6 +2278,23 @@ public partial class MainWindow : Window
         return timer;
     }
 
+    /// <summary>
+    /// ギャラリーで動画を大きく見ているときの ← / → 。再生中は早送り・巻き戻し、
+    /// 一時停止中はコマ送りへ割り当てる。扱ったら true（呼び出し側は画像送りをしない）。
+    ///
+    /// 大きく見ているとき（全画面表示、またはウィンドウが最大化）に限るのは、
+    /// 小さい窓では従来どおり ← / → で画像を送れるほうが扱いやすいため。
+    /// </summary>
+    private bool TryHandleGalleryVideoArrow(TabViewModel tab, int direction)
+    {
+        if (ViewModel is not { } vm || !vm.IsGalleryFullScreen && WindowState != WindowState.Maximized)
+        {
+            return false;
+        }
+
+        return tab.TryHandleVideoArrow(direction);
+    }
+
     /// <summary>ギャラリーのメイン画像にフォーカスがあるときの一覧向けキー操作（Del / F2 / 切り取り等）。</summary>
     private void GalleryImage_KeyDown(object? sender, KeyEventArgs e)
     {
@@ -2228,6 +2320,25 @@ public partial class MainWindow : Window
                 break;
             case Key.Right when tab.IsVideoPreview && e.KeyModifiers.HasFlag(KeyModifiers.Shift):
                 tab.SeekVideoBy(5);
+                break;
+            // 動画を大きく見ている間は素の ← / → がシークに取られるので、
+            // ファイル送りは Ctrl+← / Ctrl+→ に用意しておく。
+            case Key.Left when ctrl && tab.IsGalleryView:
+                tab.MoveGallerySelection(-1);
+                break;
+            case Key.Right when ctrl && tab.IsGalleryView:
+                tab.MoveGallerySelection(1);
+                break;
+            // ギャラリー中の ↑ / ↓ はガンマ補正（コントロールバーのスライダーと同じ値）。
+            case Key.Up when !ctrl && !alt && tab.IsGalleryView:
+                tab.AdjustGalleryGamma(1);
+                break;
+            case Key.Down when !ctrl && !alt && tab.IsGalleryView:
+                tab.AdjustGalleryGamma(-1);
+                break;
+            case Key.Left when !alt && TryHandleGalleryVideoArrow(tab, -1):
+                break;
+            case Key.Right when !alt && TryHandleGalleryVideoArrow(tab, 1):
                 break;
             case Key.Left when !alt:
                 tab.MoveGallerySelection(-1);
@@ -2266,6 +2377,23 @@ public partial class MainWindow : Window
         _galleryPanOrigin = null;
         UpdateGalleryCursor(sender as Control);
 
+        // 動画は画面クリックで再生 / 一時停止（プレイヤーの一般的な操作）。
+        // 押した位置からほとんど動いていないときだけ「クリック」と見なす。
+        var clickOrigin = _galleryVideoClickOrigin;
+        _galleryVideoClickOrigin = null;
+        if (clickOrigin is { } origin
+            && e.InitialPressMouseButton == MouseButton.Left
+            && !IsGalleryOverlaySource(e.Source)
+            && ViewModel?.SelectedTab is { IsSettingsTab: false, IsVideoPreview: true } videoTab)
+        {
+            var moved = e.GetPosition(this) - origin;
+            if (Math.Abs(moved.X) <= 4 && Math.Abs(moved.Y) <= 4
+                && videoTab.ToggleVideoPlaybackCommand.CanExecute(null))
+            {
+                videoTab.ToggleVideoPlaybackCommand.Execute(null);
+            }
+        }
+
         // 表示中の画像の右クリックは、通常のファイル右クリックと同じ Windows シェルメニューを出す。
         if (e.InitialPressMouseButton != MouseButton.Right
             || ViewModel?.SelectedTab is not { IsSettingsTab: false } tab
@@ -2288,6 +2416,30 @@ public partial class MainWindow : Window
         var ctrl = e.KeyModifiers.HasFlag(KeyModifiers.Control);
         switch (e.Key)
         {
+            // ギャラリーのフィルムストリップでは、Ctrl+← / Ctrl+→ をファイル送りに割り当てる
+            // （動画を大きく見ている間、素の ← / → はシークに取られるため）。
+            case Key.Left or Key.Right when ctrl
+                                            && listBox.Classes.Contains("gallerystrip")
+                                            && tab.IsGalleryView:
+                tab.MoveGallerySelection(e.Key == Key.Left ? -1 : 1);
+                e.Handled = true;
+                break;
+            // ギャラリー中の ↑ / ↓ はガンマ補正。ストリップは横並びなので標準のキーナビと衝突しない。
+            case Key.Up or Key.Down when !ctrl
+                                         && listBox.Classes.Contains("gallerystrip")
+                                         && tab.IsGalleryView:
+                tab.AdjustGalleryGamma(e.Key == Key.Up ? 1 : -1);
+                e.Handled = true;
+                break;
+            // フィルムストリップにフォーカスがあると ListBox 標準のキーナビが選択を動かしてしまう。
+            // 動画を大きく見ている間の ← / → はシーク・コマ送りなので、ここで先に消費する。
+            case Key.Left or Key.Right when !ctrl
+                                            && !e.KeyModifiers.HasFlag(KeyModifiers.Alt)
+                                            && !e.KeyModifiers.HasFlag(KeyModifiers.Shift)
+                                            && listBox.Classes.Contains("gallerystrip")
+                                            && TryHandleGalleryVideoArrow(tab, e.Key == Key.Left ? -1 : 1):
+                e.Handled = true;
+                break;
             case Key.X when ctrl:
                 tab.CutCommand.Execute(null);
                 e.Handled = true;

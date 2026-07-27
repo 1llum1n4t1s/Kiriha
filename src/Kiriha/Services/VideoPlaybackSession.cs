@@ -60,11 +60,9 @@ internal sealed partial class VideoPlaybackSession : IDisposable
     private IWICBitmap? _wicFrame;
     /// <summary>_wicFrame のネイティブポインタ。TransferVideoFrame へ毎フレーム渡すため保持する。</summary>
     private nint _wicFramePointer;
-    private WriteableBitmap? _frontBuffer;
-    private WriteableBitmap? _backBuffer;
+    private VideoFrame? _frontBuffer;
+    private VideoFrame? _backBuffer;
 
-    /// <summary>鮮鋭化の入力用に使い回すバッファ（毎フレーム確保しないため）。</summary>
-    private uint[]? _sharpenSource;
     private PixelSize _frameSize;
     private bool _disposed;
 
@@ -132,7 +130,7 @@ internal sealed partial class VideoPlaybackSession : IDisposable
     public VideoPlaybackState State { get; private set; } = VideoPlaybackState.Loading;
 
     /// <summary>直近に取り出したフレーム。まだ 1 枚も来ていなければ null。</summary>
-    public WriteableBitmap? CurrentFrame { get; private set; }
+    public VideoFrame? CurrentFrame { get; private set; }
 
     /// <summary>尺（秒）。取得前や不明な場合は 0。</summary>
     public double Duration { get; private set; }
@@ -507,6 +505,9 @@ internal sealed partial class VideoPlaybackSession : IDisposable
     /// <c>TransferVideoFrame</c> が S_OK を返し続けるのに中身が更新されない
     /// （＝絵が止まり、GC が走ったときだけ数秒に 1 回だけ切り替わる）状態になる。実測で確認した。
     /// <c>CopyPixels</c> ならロックオブジェクトを持たないので、この問題が起きない。
+    ///
+    /// 鮮鋭化とガンマ補正はここでは掛けない。描画時に GPU シェーダー
+    /// （<see cref="Controls.VideoFrameView"/>）が掛けるので、ここは素の画素を写すだけにする。
     /// </summary>
     private bool CopyToBackBuffer()
     {
@@ -515,36 +516,14 @@ internal sealed partial class VideoPlaybackSession : IDisposable
             return false;
         }
 
-        using var framebuffer = _backBuffer.Lock();
-        var stride = (uint)framebuffer.RowBytes;
-        if (!ContrastAdaptiveSharpenService.Enabled)
-        {
-            return _wicFrame.CopyPixels(0, stride, stride * (uint)_frameSize.Height, framebuffer.Address) >= 0;
-        }
-
-        // 鮮鋭化は元画素を読みながら書くので、転送先へ直接は書けない。一度こちらへ写してから通す。
-        // 毎フレーム確保するとフル HD で 8MB の割り当てが 30 回/秒になるため、バッファは使い回す。
-        var pixels = _frameSize.Width * _frameSize.Height;
-        if (_sharpenSource is null || _sharpenSource.Length < pixels)
-        {
-            _sharpenSource = new uint[pixels];
-        }
-
-        var sourceStride = (uint)(_frameSize.Width * 4);
+        var stride = (uint)_backBuffer.Stride;
         unsafe
         {
-            fixed (uint* buffer = _sharpenSource)
+            fixed (byte* buffer = _backBuffer.Pixels)
             {
-                if (_wicFrame.CopyPixels(0, sourceStride, sourceStride * (uint)_frameSize.Height, (nint)buffer) < 0)
-                {
-                    return false;
-                }
+                return _wicFrame.CopyPixels(0, stride, stride * (uint)_frameSize.Height, (nint)buffer) >= 0;
             }
         }
-
-        ContrastAdaptiveSharpenService.Apply(
-            _sharpenSource, _frameSize.Width, _frameSize.Height, framebuffer.Address, framebuffer.RowBytes / 4);
-        return true;
     }
 
     /// <summary>メタデータ確定時に映像サイズを確定し、転送先バッファを用意する。</summary>
@@ -594,8 +573,8 @@ internal sealed partial class VideoPlaybackSession : IDisposable
         _wicFrame = wicBitmap;
         _wicFramePointer = wicPointer;
         _frameSize = size;
-        _frontBuffer = new WriteableBitmap(size, new Vector(96, 96), PixelFormat.Bgra8888, AlphaFormat.Premul);
-        _backBuffer = new WriteableBitmap(size, new Vector(96, 96), PixelFormat.Bgra8888, AlphaFormat.Premul);
+        _frontBuffer = new VideoFrame(size);
+        _backBuffer = new VideoFrame(size);
     }
 
     private void DisposeBuffers()
@@ -609,11 +588,8 @@ internal sealed partial class VideoPlaybackSession : IDisposable
         // 生成された RCW は ComObject で IDisposable を実装していないため、明示的に参照を落とす
         ((object?)_wicFrame as ComObject)?.FinalRelease();
         _wicFrame = null;
-        _frontBuffer?.Dispose();
-        _backBuffer?.Dispose();
         _frontBuffer = null;
         _backBuffer = null;
-        _sharpenSource = null;
         CurrentFrame = null;
         _frameSize = default;
     }

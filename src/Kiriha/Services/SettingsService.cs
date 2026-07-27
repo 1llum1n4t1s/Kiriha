@@ -183,8 +183,18 @@ public sealed class AppSettings
     /// <summary>ギャラリー表示の画像・動画に RCAS の鮮鋭化を掛ける（拡大時のぼけ対策、既定 ON）。</summary>
     public bool SharpenGallery { get; set; } = true;
 
-    /// <summary>鮮鋭化の強さ（SharpenStrength の名前。Low / Normal / High）。</summary>
+    /// <summary>鮮鋭化の強さ（SharpenStrength の名前。Low / Normal / High / Max）。</summary>
     public string SharpenStrength { get; set; } = "Normal";
+
+    /// <summary>動画の早送り・巻き戻し 1 回あたりの秒数（既定 1 秒）。</summary>
+    public double VideoSeekSeconds { get; set; } = 1.0;
+
+    /// <summary>Kiriha 内で画像をダブルクリックしたとき、ギャラリーの全画面表示で開く（既定 ON）。
+    /// Windows の関連付けには関与しない（エクスプローラーからの起動は従来どおり）。</summary>
+    public bool OpenImagesInGallery { get; set; } = true;
+
+    /// <summary>Kiriha 内で動画をダブルクリックしたとき、ギャラリーの全画面表示で開く（既定 ON）。</summary>
+    public bool OpenVideosInGallery { get; set; } = true;
 
     /// <summary>最小化時にタスクバーではなくタスクトレイに格納する（Discord と同等の挙動、既定 OFF）。</summary>
     public bool MinimizeToTray { get; set; }

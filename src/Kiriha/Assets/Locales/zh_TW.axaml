@@ -100,6 +100,9 @@
   <x:String x:Key="Text.Folder.Videos" xml:space="preserve">影片</x:String>
   <x:String x:Key="Text.Gallery.CloseTip" xml:space="preserve">離開圖庫 (Esc)</x:String>
   <x:String x:Key="Text.Gallery.FullScreen" xml:space="preserve">全螢幕顯示 (F11，Esc 離開)</x:String>
+  <x:String x:Key="Text.Gallery.Gamma" xml:space="preserve">伽瑪校正</x:String>
+  <x:String x:Key="Text.Gallery.GammaReset" xml:space="preserve">將伽瑪還原為 1.00</x:String>
+  <x:String x:Key="Text.Gallery.GammaTip" xml:space="preserve">調整暗部的亮度（僅影響顯示，不會修改檔案）</x:String>
   <x:String x:Key="Text.Gallery.ImageInfo" xml:space="preserve">影像資訊</x:String>
   <x:String x:Key="Text.Gallery.Next" xml:space="preserve">下一張圖片 (→)</x:String>
   <x:String x:Key="Text.Gallery.NoImageInfo" xml:space="preserve">沒有這張影像的資訊。</x:String>
@@ -251,12 +254,15 @@
   <x:String x:Key="Text.Settings.Mouse.Up" xml:space="preserve">移到上一層</x:String>
   <x:String x:Key="Text.Settings.RunAtStartup" xml:space="preserve">開機時啟動 Kiriha</x:String>
   <x:String x:Key="Text.Settings.RunAtStartupNote" xml:space="preserve">登入時會自動啟動 Kiriha。</x:String>
+  <x:String x:Key="Text.Settings.OpenImagesInGallery" xml:space="preserve">在 Kiriha 內用 Kiriha 開啟圖片</x:String>
+  <x:String x:Key="Text.Settings.OpenInGallery.Note" xml:space="preserve">僅在 Kiriha 內雙擊時生效，會以藝廊模式全螢幕開啟（各廠商的 RAW 也視為圖片）。不會變更 Windows 的檔案關聯。</x:String>
+  <x:String x:Key="Text.Settings.OpenVideosInGallery" xml:space="preserve">在 Kiriha 內用 Kiriha 開啟影片</x:String>
   <x:String x:Key="Text.Settings.Sharpen" xml:space="preserve">減少放大時的模糊（銳化）</x:String>
   <x:String x:Key="Text.Settings.Sharpen.High" xml:space="preserve">強</x:String>
   <x:String x:Key="Text.Settings.Sharpen.Low" xml:space="preserve">弱</x:String>
   <x:String x:Key="Text.Settings.Sharpen.Max" xml:space="preserve">最強 (CAS)</x:String>
   <x:String x:Key="Text.Settings.Sharpen.Normal" xml:space="preserve">標準</x:String>
-  <x:String x:Key="Text.Settings.Sharpen.Note" xml:space="preserve">將圖片與影片放大至螢幕尺寸時，僅輕微強化輪廓（相當於 AMD FidelityFX RCAS）。播放影片時 CPU 使用量會略為增加。</x:String>
+  <x:String x:Key="Text.Settings.Sharpen.Note" xml:space="preserve">將圖片與影片放大到螢幕大小時，只對輪廓做適度銳化（相當於 AMD FidelityFX RCAS）。影片在繪製時交給 GPU 處理，播放幾乎不會增加 CPU 負擔。</x:String>
   <x:String x:Key="Text.Settings.Shortcuts" xml:space="preserve">快速鍵</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOps" xml:space="preserve">檔案操作</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.FileOpsBody" xml:space="preserve">Ctrl+X / C / V　剪下、複製、貼上　　Delete / Shift+Delete　刪除、永久刪除&#10;F2　重新命名　　Alt+Enter　內容　　Ctrl+Shift+N　新增資料夾　　Alt+P　預覽</x:String>
@@ -292,6 +298,7 @@
   <x:String x:Key="Text.Settings.Window.RememberBounds" xml:space="preserve">記住視窗的大小和位置</x:String>
   <x:String x:Key="Text.Settings.Window.RememberBoundsNote" xml:space="preserve">關閉後，下次會以預設的大小和位置啟動。</x:String>
   <x:String x:Key="Text.Settings.WindowsIntegration" xml:space="preserve">Windows 整合</x:String>
+  <x:String x:Key="Text.Settings.VideoSeekSeconds" xml:space="preserve">影片快進快退的秒數</x:String>
   <x:String x:Key="Text.Share.FileCount" xml:space="preserve">{0} 個檔案</x:String>
   <x:String x:Key="Text.Share.FoldersNotSupported" xml:space="preserve">無法共用資料夾（請選取檔案）</x:String>
   <x:String x:Key="Text.Share.NoItems" xml:space="preserve">沒有可共用的項目</x:String>
@@ -364,6 +371,8 @@
   <x:String x:Key="Text.Type.FileFolder" xml:space="preserve">檔案資料夾</x:String>
   <x:String x:Key="Text.Type.LocalDisk" xml:space="preserve">本機磁碟</x:String>
   <x:String x:Key="Text.Type.LocalDiskFormat" xml:space="preserve">本機磁碟 ({0})</x:String>
+  <x:String x:Key="Text.Video.SeekBack" xml:space="preserve">快退 (←)</x:String>
+  <x:String x:Key="Text.Video.SeekForward" xml:space="preserve">快進 (→)</x:String>
   <x:String x:Key="Text.Video.Unavailable" xml:space="preserve">無法播放這個影片（找不到相符的編解碼器）</x:String>
   <x:String x:Key="Text.Video.PlayPauseTip" xml:space="preserve">播放 / 暫停 (Space)</x:String>
   <x:String x:Key="Text.Video.MuteTip" xml:space="preserve">靜音</x:String>

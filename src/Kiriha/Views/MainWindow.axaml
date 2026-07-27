@@ -255,19 +255,26 @@
 
         <!-- ===== 選択中タブの中身 =====
              左マージンだけ 0。タブ列側の余白 (3) と掴み代の Thumb (5) で 8px の隙間が
-             できており、ここに更に 6 を足すとウィンドウ左端側の 8px と幅が揃わなくなる。 -->
-        <ContentControl Grid.Row="1" Grid.Column="1" Margin="0,6,6,6"
+             できており、ここに更に 6 を足すとウィンドウ左端側の 8px と幅が揃わなくなる。
+             ギャラリーを画面いっぱいで見ているあいだは余白ごと落とす（MainWindowViewModel
+             .IsGalleryEdgeToEdge）。この 6px と下の輪郭線が、最大化時にディスプレイの端へ
+             走って「ウィンドウ枠」に見えていたもの。 -->
+        <ContentControl Grid.Row="1" Grid.Column="1"
+                        Margin="{Binding ContentIslandMargin}"
                         Content="{Binding SelectedTab}">
             <ContentControl.ContentTemplate>
                 <DataTemplate x:DataType="vm:TabViewModel">
                     <Panel>
                     <Border x:Name="ContentIsland"
                             Background="{DynamicResource ContentBg}"
-                            CornerRadius="10">
+                            CornerRadius="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ContentIslandCornerRadius}">
                     <Border.Clip>
-                        <!-- ClipToBounds は矩形なので、実寸へ追従する角丸ジオメトリで子要素まで切り抜く。 -->
+                        <!-- ClipToBounds は矩形なので、実寸へ追従する角丸ジオメトリで子要素まで切り抜く。
+                             Geometry は論理ツリーに乗らないので $parent や DataContext が届かない。
+                             角丸は Border 自身から ElementName でもらう（値が 2 か所に散らない利点もある）。 -->
                         <RectangleGeometry Rect="{Binding Bounds, ElementName=ContentIsland}"
-                                           RadiusX="10" RadiusY="10" />
+                                           RadiusX="{Binding CornerRadius.TopLeft, ElementName=ContentIsland}"
+                                           RadiusY="{Binding CornerRadius.TopLeft, ElementName=ContentIsland}" />
                     </Border.Clip>
                     <Panel>
 
@@ -970,7 +977,8 @@
                                              右クリックで通常のファイルと同じ Windows シェルメニューを出す。 -->
                                         <!-- Background を敷かないと画像の外（レターボックス）がヒットテスト対象外になり、
                                              背景上ではホイール送り・クリック・右クリックが効かなくなる -->
-                                        <Panel x:Name="GalleryImageArea" Grid.Row="0" Margin="18,18,18,6"
+                                        <Panel x:Name="GalleryImageArea" Grid.Row="0"
+                                               Margin="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).GalleryImageMargin}"
                                                Background="Transparent"
                                                Focusable="True"
                                                ClipToBounds="True"
@@ -997,11 +1005,15 @@
                                                        Stretch="{Binding PreviewStretch}" StretchDirection="DownOnly"
                                                        HorizontalAlignment="Center" VerticalAlignment="Center"
                                                        RenderOptions.BitmapInterpolationMode="HighQuality" />
-                                                <!-- 動画のフレーム。VideoFrame は 2 枚のビットマップを交互に差し替えて更新される。
-                                                     静止画と違い拡大も許すので StretchDirection は既定（Both）のまま。 -->
-                                                <Image Source="{Binding VideoFrame}" Stretch="Uniform"
-                                                       IsVisible="{Binding IsVideoPreview}"
-                                                       RenderOptions.BitmapInterpolationMode="HighQuality" />
+                                                <!-- 動画のフレーム。VideoFrame は 2 枚のバッファを交互に差し替えて更新される。
+                                                     鮮鋭化とガンマ補正は描画時の SkSL シェーダーが掛けるので、
+                                                     Image ではなく専用コントロールで描く（CPU 負荷を GPU へ逃がす）。
+                                                     静止画と違い拡大も許すので、領域いっぱいまで引き伸ばす。 -->
+                                                <c:VideoFrameView Frame="{Binding VideoFrame}"
+                                                                  Gamma="{Binding GalleryGamma}"
+                                                                  Revision="{Binding VideoRenderRevision}"
+                                                                  IsVisible="{Binding IsVideoPreview}"
+                                                                  HorizontalAlignment="Center" VerticalAlignment="Center" />
                                             </Panel>
                                             <!-- 画像プレビューも動画も無いファイルはアイコン + 名前で表示する -->
                                             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
@@ -1101,12 +1113,39 @@
                                                             ToolTip.Tip="{DynamicResource Text.Gallery.ZoomReset}">
                                                         <TextBlock Text="{Binding GalleryZoomText}" FontSize="12" />
                                                     </Button>
+
+                                                    <Border Classes="gallerysep" />
+
+                                                    <!-- ガンマ補正。暗い写真・動画の暗部を持ち上げる表示だけの調整で、
+                                                         ファイルは書き換えない。静止画と動画のどちらにも効く。 -->
+                                                    <TextBlock Classes="fico videotime" Text="&#xE706;" FontSize="13"
+                                                               Margin="4,0,6,0" />
+                                                    <Slider Classes="galleryzoom" Width="100" VerticalAlignment="Center"
+                                                            Minimum="0.4" Maximum="2.5" SmallChange="0.05" LargeChange="0.2"
+                                                            AutomationProperties.Name="{DynamicResource Text.Gallery.Gamma}"
+                                                            ToolTip.Tip="{DynamicResource Text.Gallery.GammaTip}"
+                                                            Value="{Binding GalleryGamma, Mode=TwoWay}" />
+                                                    <!-- 倍率と同じく、現在値そのものを「押すと 1.00 に戻る」ボタンにする。 -->
+                                                    <Button Classes="videobtn" Width="62" Margin="4,0,0,0"
+                                                            Command="{Binding ResetGalleryGammaCommand}"
+                                                            IsEnabled="{Binding CanResetGalleryGamma}"
+                                                            AutomationProperties.Name="{DynamicResource Text.Gallery.GammaReset}"
+                                                            ToolTip.Tip="{DynamicResource Text.Gallery.GammaReset}">
+                                                        <TextBlock Text="{Binding GalleryGammaText}" FontSize="12" />
+                                                    </Button>
                                                 </StackPanel>
 
                                                 <Grid Grid.Column="1" Margin="12,0,0,0"
                                                       IsVisible="{Binding IsVideoPreview}"
-                                                      ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto,Auto,Auto" RowDefinitions="Auto">
+                                                      ColumnDefinitions="Auto,Auto,Auto,Auto,*,Auto,Auto,Auto,Auto,Auto" RowDefinitions="Auto">
+                                                    <!-- 巻き戻し / 早送り。1 回あたりの秒数は設定 > 表示 で変えられる。 -->
                                                     <Button Grid.Column="0" Classes="videobtn"
+                                                            Command="{Binding SeekVideoBackwardCommand}"
+                                                            AutomationProperties.Name="{DynamicResource Text.Video.SeekBack}"
+                                                            ToolTip.Tip="{DynamicResource Text.Video.SeekBack}">
+                                                        <TextBlock Classes="fico" FontSize="14" Text="&#xE892;" />
+                                                    </Button>
+                                                    <Button Grid.Column="1" Classes="videobtn"
                                                             Command="{Binding ToggleVideoPlaybackCommand}"
                                                             ToolTip.Tip="{DynamicResource Text.Video.PlayPauseTip}">
                                                         <Panel>
@@ -1116,14 +1155,20 @@
                                                                        IsVisible="{Binding IsVideoPlaying}" />
                                                         </Panel>
                                                     </Button>
-                                                    <TextBlock Grid.Column="1" Text="{Binding VideoPositionText}"
+                                                    <Button Grid.Column="2" Classes="videobtn"
+                                                            Command="{Binding SeekVideoForwardCommand}"
+                                                            AutomationProperties.Name="{DynamicResource Text.Video.SeekForward}"
+                                                            ToolTip.Tip="{DynamicResource Text.Video.SeekForward}">
+                                                        <TextBlock Classes="fico" FontSize="14" Text="&#xE893;" />
+                                                    </Button>
+                                                    <TextBlock Grid.Column="3" Text="{Binding VideoPositionText}"
                                                                Classes="videotime" Margin="6,0,8,0" />
-                                                    <Slider Grid.Column="2" Classes="videoseek" VerticalAlignment="Center"
+                                                    <Slider Grid.Column="4" Classes="videoseek" VerticalAlignment="Center"
                                                             Minimum="0" Maximum="{Binding VideoDurationSeconds}"
                                                             Value="{Binding VideoPositionSeconds, Mode=TwoWay}" />
-                                                    <TextBlock Grid.Column="3" Text="{Binding VideoDurationText}"
+                                                    <TextBlock Grid.Column="5" Text="{Binding VideoDurationText}"
                                                                Classes="videotime" Margin="8,0,4,0" />
-                                                    <Button Grid.Column="4" Classes="videobtn"
+                                                    <Button Grid.Column="6" Classes="videobtn"
                                                             Command="{Binding ToggleVideoMuteCommand}"
                                                             ToolTip.Tip="{DynamicResource Text.Video.MuteTip}">
                                                         <Panel>
@@ -1133,11 +1178,11 @@
                                                                        IsVisible="{Binding IsVideoMuted}" />
                                                         </Panel>
                                                     </Button>
-                                                    <Slider Grid.Column="5" Classes="videovolume" VerticalAlignment="Center"
+                                                    <Slider Grid.Column="7" Classes="videovolume" VerticalAlignment="Center"
                                                             Width="82" Minimum="0" Maximum="1"
                                                             ToolTip.Tip="{DynamicResource Text.Video.VolumeTip}"
                                                             Value="{Binding VideoVolume, Mode=TwoWay}" />
-                                                    <Button Grid.Column="6" Classes="videobtn"
+                                                    <Button Grid.Column="8" Classes="videobtn"
                                                             Command="{Binding ToggleVideoLoopCommand}"
                                                             Classes.active="{Binding IsVideoLooping}"
                                                             ToolTip.Tip="{DynamicResource Text.Video.LoopTip}">
@@ -1145,7 +1190,7 @@
                                                     </Button>
                                                     <!-- 再生速度は候補から選ぶ（巡回ボタンだと目的の倍率まで押し続ける必要があった）。
                                                          選んだ倍率は音量・ミュートと同じく settings.json へ保存する。 -->
-                                                    <ComboBox Grid.Column="7" Classes="videorate" Margin="8,0,0,0"
+                                                    <ComboBox Grid.Column="9" Classes="videorate" Margin="8,0,0,0"
                                                               ItemsSource="{Binding VideoRateOptions}"
                                                               SelectedIndex="{Binding VideoRateIndex, Mode=TwoWay}"
                                                               AutomationProperties.Name="{DynamicResource Text.Video.RateTip}"
@@ -1213,7 +1258,8 @@
                                                            Background="Transparent"
                                                            Opacity="{Binding RowOpacity}"
                                                            ToolTip.Tip="{Binding RowTooltip}">
-                                                        <Border CornerRadius="8" ClipToBounds="True" IsVisible="{Binding HasThumbnail}">
+                                                        <!-- 角は丸めない（フィルムストリップは写真の縁をそのまま見せる） -->
+                                                        <Border CornerRadius="0" ClipToBounds="True" IsVisible="{Binding HasThumbnail}">
                                                             <Image Source="{Binding Thumbnail}" Stretch="UniformToFill"
                                                                    RenderOptions.BitmapInterpolationMode="HighQuality" />
                                                         </Border>
@@ -1330,7 +1376,9 @@
                          持たせると、同じ角丸ジオメトリのクリップが 1px の線をちょうど削り取ってしまい、
                          四隅の弧だけ線が消えて見える（直線部分は残るので「角だけ切れている」ように見える）。 -->
                     <Border BorderBrush="{DynamicResource Divider}" BorderThickness="1"
-                            CornerRadius="10" IsHitTestVisible="False" />
+                            CornerRadius="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ContentIslandCornerRadius}"
+                            IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsContentIslandOutlineVisible}"
+                            IsHitTestVisible="False" />
                     </Panel>
                 </DataTemplate>
             </ContentControl.ContentTemplate>

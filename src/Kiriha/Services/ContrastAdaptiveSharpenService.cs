@@ -75,6 +75,21 @@ internal static class ContrastAdaptiveSharpenService
     private static bool _denoise = true;
     private static bool _useCas;
 
+    // ここから下は GPU シェーダー版（GalleryShaderService）へ同じ設定を渡すための読み出し口。
+    // アルゴリズムを 2 か所で持たないよう、係数の決め方は上の Strength だけが握る。
+
+    /// <summary>0 = 鮮鋭化なし / 1 = RCAS / 2 = CAS。</summary>
+    public static int ShaderMode => !Enabled ? 0 : _useCas ? 2 : 1;
+
+    /// <summary>RCAS の sharpness 係数。</summary>
+    public static float ShaderSharpness => _con;
+
+    /// <summary>RCAS のノイズ検出を掛けるか。</summary>
+    public static bool ShaderDenoise => _denoise;
+
+    /// <summary>CAS の掛かり方を決める係数（負の値）。</summary>
+    public static float ShaderCasPeak => _casPeak;
+
     /// <summary>CAS の sharpness（0〜1）。FSR のサンプルの既定は 0.8 前後。</summary>
     private const float CasSharpness = 0.85f;
 

@@ -215,6 +215,26 @@
                                                 <TextBlock Classes="settingscaption" Margin="0,6,0,0"
                                                            TextWrapping="Wrap"
                                                            Text="{DynamicResource Text.Settings.Sharpen.Note}" />
+
+                                                <!-- 動画の早送り・巻き戻し 1 回あたりの秒数（コントロールバーのボタンと ← / →） -->
+                                                <TextBlock Classes="settingscaption" Margin="0,14,0,0"
+                                                           Text="{DynamicResource Text.Settings.VideoSeekSeconds}" />
+                                                <NumericUpDown Classes="settingsfield" Margin="0,4,0,0"
+                                                               MinWidth="140" HorizontalAlignment="Left"
+                                                               Minimum="0.1" Maximum="60" Increment="0.5"
+                                                               FormatString="0.#"
+                                                               AutomationProperties.Name="{DynamicResource Text.Settings.VideoSeekSeconds}"
+                                                               Value="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptVideoSeekSeconds}" />
+
+                                                <!-- Kiriha 内でのダブルクリック動作。Windows の関連付けには関与しない。 -->
+                                                <CheckBox Margin="0,14,0,0"
+                                                          Content="{DynamicResource Text.Settings.OpenImagesInGallery}"
+                                                          IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptOpenImagesInGallery}" />
+                                                <CheckBox Content="{DynamicResource Text.Settings.OpenVideosInGallery}"
+                                                          IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptOpenVideosInGallery}" />
+                                                <TextBlock Classes="settingscaption" Margin="0,6,0,0"
+                                                           TextWrapping="Wrap"
+                                                           Text="{DynamicResource Text.Settings.OpenInGallery.Note}" />
                                             </StackPanel>
                                         </HeaderedContentControl>
                                     </StackPanel>
