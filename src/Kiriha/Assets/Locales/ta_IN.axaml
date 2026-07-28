@@ -31,6 +31,8 @@
   <x:String x:Key="Text.Column.Name" xml:space="preserve">பெயர்</x:String>
   <x:String x:Key="Text.Column.Size" xml:space="preserve">அளவு</x:String>
   <x:String x:Key="Text.Column.Type" xml:space="preserve">வகை</x:String>
+  <x:String x:Key="Text.Command.CopyPath" xml:space="preserve">தேர்வின் பாதையை நகலெடு</x:String>
+  <x:String x:Key="Text.Command.CopyPathTip" xml:space="preserve">தேர்வின் பாதையை நகலெடு (Ctrl+Shift+C)</x:String>
   <x:String x:Key="Text.Command.CopyTip" xml:space="preserve">நகலெடு (Ctrl+C)</x:String>
   <x:String x:Key="Text.Command.Cut" xml:space="preserve">வெட்டு</x:String>
   <x:String x:Key="Text.Command.CutTip" xml:space="preserve">வெட்டு (Ctrl+X)</x:String>
@@ -167,6 +169,7 @@
   <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(எதுவும் இல்லை)</x:String>
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">பின்</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">பின் (வரலாற்றுக்கு வலது கிளிக்)</x:String>
+  <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">இடம் போதாத கோப்புறைகள் (சொடுக்கினால் பட்டியல்)</x:String>
   <x:String x:Key="Text.Nav.EditPathTip" xml:space="preserve">பாதையைத் திருத்த கிளிக் செய்யவும்</x:String>
   <x:String x:Key="Text.Nav.Forward" xml:space="preserve">முன்</x:String>
   <x:String x:Key="Text.Nav.ForwardTip" xml:space="preserve">முன் (வரலாற்றுக்கு வலது கிளிக்)</x:String>

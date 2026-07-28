@@ -651,6 +651,9 @@ public partial class MainWindow : Window
         try
         {
             await Clipboard.SetTextAsync(text);
+            // 切り取り / コピーと同じくステータスバーで結果を返す（ツールバーのボタンからだと
+            // 見た目が変わらず、コピーできたのか分からないため）。
+            tab.StatusText = LocalizationService.Text("Text.Clipboard.CopiedToClipboard");
         }
         catch (Exception ex)
         {
@@ -1291,6 +1294,42 @@ public partial class MainWindow : Window
             var steps = i + 1;
             var item = new MenuItem { Header = name };
             item.Click += (_, _) => tab.GoHistorySteps(steps, back);
+            flyout.Items.Add(item);
+        }
+
+        flyout.ShowAt(button);
+    }
+
+    // ===== パンくずのオーバーフロー（幅が足りず畳まれた上位フォルダー） =====
+
+    /// <summary>
+    /// 幅に収まらず畳まれた上位フォルダーを一覧で出す。
+    ///
+    /// 畳んだ個数は <see cref="BreadcrumbPanel"/> が兄弟の ItemsControl へ添付プロパティで
+    /// 載せている。ここはアドレスバー（＝タブごとの DataTemplate の中）なので、コードから
+    /// x:Name で ItemsControl を引けない。同じ Grid の子から型で拾う。
+    /// </summary>
+    private void BreadcrumbOverflow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (sender is not Button { DataContext: TabViewModel tab } button
+            || button.Parent is not Grid grid
+            || grid.Children.OfType<ItemsControl>().FirstOrDefault() is not { } items)
+        {
+            return;
+        }
+
+        var count = Math.Min(BreadcrumbPanel.GetOverflowCount(items), tab.Breadcrumbs.Count);
+        if (count <= 0)
+        {
+            return;
+        }
+
+        var flyout = new MenuFlyout { Placement = PlacementMode.BottomEdgeAlignedLeft };
+        foreach (var segment in tab.Breadcrumbs.Take(count))
+        {
+            var captured = segment.Path;
+            var item = new MenuItem { Header = segment.Name, Icon = new TextBlock { Text = "📁" } };
+            item.Click += (_, _) => tab.NavigateTo(captured);
             flyout.Items.Add(item);
         }
 

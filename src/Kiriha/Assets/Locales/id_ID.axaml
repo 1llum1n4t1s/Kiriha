@@ -31,6 +31,8 @@
   <x:String x:Key="Text.Column.Name" xml:space="preserve">Nama</x:String>
   <x:String x:Key="Text.Column.Size" xml:space="preserve">Ukuran</x:String>
   <x:String x:Key="Text.Column.Type" xml:space="preserve">Jenis</x:String>
+  <x:String x:Key="Text.Command.CopyPath" xml:space="preserve">Salin jalur pilihan</x:String>
+  <x:String x:Key="Text.Command.CopyPathTip" xml:space="preserve">Salin jalur pilihan (Ctrl+Shift+C)</x:String>
   <x:String x:Key="Text.Command.CopyTip" xml:space="preserve">Salin (Ctrl+C)</x:String>
   <x:String x:Key="Text.Command.Cut" xml:space="preserve">Potong</x:String>
   <x:String x:Key="Text.Command.CutTip" xml:space="preserve">Potong (Ctrl+X)</x:String>
@@ -167,6 +169,7 @@
   <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(Tidak ada)</x:String>
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">Kembali</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">Kembali (klik kanan untuk riwayat)</x:String>
+  <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">Folder yang tidak muat (klik untuk melihatnya)</x:String>
   <x:String x:Key="Text.Nav.EditPathTip" xml:space="preserve">Klik untuk mengedit jalur</x:String>
   <x:String x:Key="Text.Nav.Forward" xml:space="preserve">Maju</x:String>
   <x:String x:Key="Text.Nav.ForwardTip" xml:space="preserve">Maju (klik kanan untuk riwayat)</x:String>

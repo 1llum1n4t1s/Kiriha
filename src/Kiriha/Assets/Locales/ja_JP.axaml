@@ -31,6 +31,8 @@
   <x:String x:Key="Text.Column.Name" xml:space="preserve">名前</x:String>
   <x:String x:Key="Text.Column.Size" xml:space="preserve">サイズ</x:String>
   <x:String x:Key="Text.Column.Type" xml:space="preserve">種類</x:String>
+  <x:String x:Key="Text.Command.CopyPath" xml:space="preserve">選択のパスをコピー</x:String>
+  <x:String x:Key="Text.Command.CopyPathTip" xml:space="preserve">選択のパスをコピー (Ctrl+Shift+C)</x:String>
   <x:String x:Key="Text.Command.CopyTip" xml:space="preserve">コピー (Ctrl+C)</x:String>
   <x:String x:Key="Text.Command.Cut" xml:space="preserve">切り取り</x:String>
   <x:String x:Key="Text.Command.CutTip" xml:space="preserve">切り取り (Ctrl+X)</x:String>
@@ -167,6 +169,7 @@
   <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(なし)</x:String>
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">戻る</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">戻る (右クリックで履歴)</x:String>
+  <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">表示しきれないフォルダー（クリックで一覧）</x:String>
   <x:String x:Key="Text.Nav.EditPathTip" xml:space="preserve">クリックしてパスを編集</x:String>
   <x:String x:Key="Text.Nav.Forward" xml:space="preserve">進む</x:String>
   <x:String x:Key="Text.Nav.ForwardTip" xml:space="preserve">進む (右クリックで履歴)</x:String>

@@ -31,6 +31,8 @@
   <x:String x:Key="Text.Column.Name" xml:space="preserve">नाम</x:String>
   <x:String x:Key="Text.Column.Size" xml:space="preserve">परिमाणम्</x:String>
   <x:String x:Key="Text.Column.Type" xml:space="preserve">प्रकारः</x:String>
+  <x:String x:Key="Text.Command.CopyPath" xml:space="preserve">चितानां मार्गं प्रतिलिख</x:String>
+  <x:String x:Key="Text.Command.CopyPathTip" xml:space="preserve">चितानां मार्गं प्रतिलिख (Ctrl+Shift+C)</x:String>
   <x:String x:Key="Text.Command.CopyTip" xml:space="preserve">प्रतिलिख (Ctrl+C)</x:String>
   <x:String x:Key="Text.Command.Cut" xml:space="preserve">छिन्धि</x:String>
   <x:String x:Key="Text.Command.CutTip" xml:space="preserve">छिन्धि (Ctrl+X)</x:String>
@@ -167,6 +169,7 @@
   <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(किमपि नास्ति)</x:String>
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">पश्चात्</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">पश्चात् (इतिहासाय दक्षिणनुदनम्)</x:String>
+  <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">ये सञ्चिकाकोशाः न दृश्यन्ते (नुदतु सूचीदर्शनाय)</x:String>
   <x:String x:Key="Text.Nav.EditPathTip" xml:space="preserve">मार्गं सम्पादयितुं नुद</x:String>
   <x:String x:Key="Text.Nav.Forward" xml:space="preserve">अग्रे</x:String>
   <x:String x:Key="Text.Nav.ForwardTip" xml:space="preserve">अग्रे (इतिहासाय दक्षिणनुदनम्)</x:String>

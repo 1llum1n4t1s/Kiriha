@@ -157,7 +157,7 @@ public sealed class AppSettings
 
     public double ColTypeWidth { get; set; } = 140;
 
-    public double ColSizeWidth { get; set; } = 180;
+    public double ColSizeWidth { get; set; } = 90;
 
     /// <summary>詳細表示の列の表示 / 非表示（ヘッダー右クリックで切替、次回起動時に復元）。</summary>
     public bool ShowColModified { get; set; } = true;

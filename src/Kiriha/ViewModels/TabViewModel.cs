@@ -144,7 +144,7 @@ public partial class TabViewModel : ObservableObject
     private double _colTypeWidth = 140;
 
     [ObservableProperty]
-    private double _colSizeWidth = 180;
+    private double _colSizeWidth = 90;
 
     [ObservableProperty]
     private double _colCreatedWidth = 170;
@@ -3043,6 +3043,7 @@ public partial class TabViewModel : ObservableObject
         CopyCommand.NotifyCanExecuteChanged();
         DeleteCommand.NotifyCanExecuteChanged();
         RenameCommand.NotifyCanExecuteChanged();
+        OnPropertyChanged(nameof(CanCopySelectedPaths));
 
         if (selection.Count == 0)
         {
@@ -3096,6 +3097,12 @@ public partial class TabViewModel : ObservableObject
     }
 
     private bool HasSelection => _selection.Count > 0;
+
+    /// <summary>
+    /// 「選択のパスをコピー」が使えるか。コピー自体はクリップボードを持つ View 側
+    /// （<c>MainWindow.CopySelectedPaths</c>）が行うため、コマンドではなく活性判定だけを公開する。
+    /// </summary>
+    public bool CanCopySelectedPaths => HasSelection;
 
     /// <summary>ドライブは切り取り / 削除 / 名前変更の対象にしない（誤操作防止、エクスプローラー互換）。</summary>
     private bool HasModifiableSelection => _selection.Count > 0 && _selection.All(e => !e.IsDrive);

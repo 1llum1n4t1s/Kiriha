@@ -711,7 +711,7 @@ public partial class MainWindowViewModel : ObservableObject
         _settings.ColModifiedWidth = 160;
         _settings.ColCreatedWidth = 170;
         _settings.ColTypeWidth = 140;
-        _settings.ColSizeWidth = 180;
+        _settings.ColSizeWidth = 90;
         _settings.ShowColModified = true;
         _settings.ShowColCreated = false;
         _settings.ShowColType = true;

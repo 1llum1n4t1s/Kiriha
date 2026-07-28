@@ -31,6 +31,8 @@
   <x:String x:Key="Text.Column.Name" xml:space="preserve">Имя</x:String>
   <x:String x:Key="Text.Column.Size" xml:space="preserve">Размер</x:String>
   <x:String x:Key="Text.Column.Type" xml:space="preserve">Тип</x:String>
+  <x:String x:Key="Text.Command.CopyPath" xml:space="preserve">Копировать путь выделенного</x:String>
+  <x:String x:Key="Text.Command.CopyPathTip" xml:space="preserve">Копировать путь выделенного (Ctrl+Shift+C)</x:String>
   <x:String x:Key="Text.Command.CopyTip" xml:space="preserve">Копировать (Ctrl+C)</x:String>
   <x:String x:Key="Text.Command.Cut" xml:space="preserve">Вырезать</x:String>
   <x:String x:Key="Text.Command.CutTip" xml:space="preserve">Вырезать (Ctrl+X)</x:String>
@@ -167,6 +169,7 @@
   <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(Нет)</x:String>
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">Назад</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">Назад (правый клик — журнал)</x:String>
+  <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">Папки, которые не поместились (нажмите, чтобы показать)</x:String>
   <x:String x:Key="Text.Nav.EditPathTip" xml:space="preserve">Щёлкните, чтобы изменить путь</x:String>
   <x:String x:Key="Text.Nav.Forward" xml:space="preserve">Вперёд</x:String>
   <x:String x:Key="Text.Nav.ForwardTip" xml:space="preserve">Вперёд (правый клик — журнал)</x:String>

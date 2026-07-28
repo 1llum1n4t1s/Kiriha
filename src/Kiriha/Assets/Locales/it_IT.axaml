@@ -31,6 +31,8 @@
   <x:String x:Key="Text.Column.Name" xml:space="preserve">Nome</x:String>
   <x:String x:Key="Text.Column.Size" xml:space="preserve">Dimensione</x:String>
   <x:String x:Key="Text.Column.Type" xml:space="preserve">Tipo</x:String>
+  <x:String x:Key="Text.Command.CopyPath" xml:space="preserve">Copia percorso della selezione</x:String>
+  <x:String x:Key="Text.Command.CopyPathTip" xml:space="preserve">Copia percorso della selezione (Ctrl+Maiusc+C)</x:String>
   <x:String x:Key="Text.Command.CopyTip" xml:space="preserve">Copia (Ctrl+C)</x:String>
   <x:String x:Key="Text.Command.Cut" xml:space="preserve">Taglia</x:String>
   <x:String x:Key="Text.Command.CutTip" xml:space="preserve">Taglia (Ctrl+X)</x:String>
@@ -167,6 +169,7 @@
   <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(Nessuno)</x:String>
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">Indietro</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">Indietro (clic destro per la cronologia)</x:String>
+  <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">Cartelle che non entrano (fai clic per elencarle)</x:String>
   <x:String x:Key="Text.Nav.EditPathTip" xml:space="preserve">Fai clic per modificare il percorso</x:String>
   <x:String x:Key="Text.Nav.Forward" xml:space="preserve">Avanti</x:String>
   <x:String x:Key="Text.Nav.ForwardTip" xml:space="preserve">Avanti (clic destro per la cronologia)</x:String>

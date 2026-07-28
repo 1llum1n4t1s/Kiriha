@@ -31,6 +31,8 @@
   <x:String x:Key="Text.Column.Name" xml:space="preserve">Nombre</x:String>
   <x:String x:Key="Text.Column.Size" xml:space="preserve">Tamaño</x:String>
   <x:String x:Key="Text.Column.Type" xml:space="preserve">Tipo</x:String>
+  <x:String x:Key="Text.Command.CopyPath" xml:space="preserve">Copiar ruta de la selección</x:String>
+  <x:String x:Key="Text.Command.CopyPathTip" xml:space="preserve">Copiar ruta de la selección (Ctrl+Mayús+C)</x:String>
   <x:String x:Key="Text.Command.CopyTip" xml:space="preserve">Copiar (Ctrl+C)</x:String>
   <x:String x:Key="Text.Command.Cut" xml:space="preserve">Cortar</x:String>
   <x:String x:Key="Text.Command.CutTip" xml:space="preserve">Cortar (Ctrl+X)</x:String>
@@ -167,6 +169,7 @@
   <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(Ninguno)</x:String>
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">Atrás</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">Atrás (clic derecho para el historial)</x:String>
+  <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">Carpetas que no caben (haz clic para verlas)</x:String>
   <x:String x:Key="Text.Nav.EditPathTip" xml:space="preserve">Haz clic para editar la ruta</x:String>
   <x:String x:Key="Text.Nav.Forward" xml:space="preserve">Adelante</x:String>
   <x:String x:Key="Text.Nav.ForwardTip" xml:space="preserve">Adelante (clic derecho para el historial)</x:String>

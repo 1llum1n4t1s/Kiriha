@@ -31,6 +31,8 @@
   <x:String x:Key="Text.Column.Name" xml:space="preserve">Name</x:String>
   <x:String x:Key="Text.Column.Size" xml:space="preserve">Size</x:String>
   <x:String x:Key="Text.Column.Type" xml:space="preserve">Type</x:String>
+  <x:String x:Key="Text.Command.CopyPath" xml:space="preserve">Copy path of selection</x:String>
+  <x:String x:Key="Text.Command.CopyPathTip" xml:space="preserve">Copy path of selection (Ctrl+Shift+C)</x:String>
   <x:String x:Key="Text.Command.CopyTip" xml:space="preserve">Copy (Ctrl+C)</x:String>
   <x:String x:Key="Text.Command.Cut" xml:space="preserve">Cut</x:String>
   <x:String x:Key="Text.Command.CutTip" xml:space="preserve">Cut (Ctrl+X)</x:String>
@@ -167,6 +169,7 @@
   <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(None)</x:String>
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">Back</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">Back (right-click for history)</x:String>
+  <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">Folders that do not fit (click to list them)</x:String>
   <x:String x:Key="Text.Nav.EditPathTip" xml:space="preserve">Click to edit the path</x:String>
   <x:String x:Key="Text.Nav.Forward" xml:space="preserve">Forward</x:String>
   <x:String x:Key="Text.Nav.ForwardTip" xml:space="preserve">Forward (right-click for history)</x:String>

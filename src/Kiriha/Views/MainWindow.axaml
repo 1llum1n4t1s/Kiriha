@@ -192,6 +192,19 @@
                                 <TextBlock Text="{DynamicResource Text.Gallery.ImageInfo}" FontSize="11" FontWeight="SemiBold"
                                            Margin="0,0,0,8"
                                            Foreground="{DynamicResource TextSecondary}" />
+                                <!-- ファイル名は Exif の読み取りを待たずに出したいので、メタ情報の一覧
+                                     （GalleryMetadata）へ混ぜず独立して置く。混ぜると読み込み中は消え、
+                                     Exif を持たないファイルでは「情報なし」の案内が出せなくなる。
+                                     ラベルは詳細表示の「名前」列と同じキーを使い回す。 -->
+                                <StackPanel Margin="0,0,0,9"
+                                            IsVisible="{Binding SelectedTab.SelectedEntry, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                    <TextBlock Text="{DynamicResource Text.Column.Name}" FontSize="10.5"
+                                               Foreground="{DynamicResource TextSecondary}" />
+                                    <TextBlock Text="{Binding SelectedTab.SelectedEntry.DisplayName}" FontSize="12.5"
+                                               Foreground="{DynamicResource TextPrimary}"
+                                               TextWrapping="Wrap"
+                                               ToolTip.Tip="{Binding SelectedTab.SelectedEntry.FullPath}" />
+                                </StackPanel>
                                 <ItemsControl ItemsSource="{Binding SelectedTab.GalleryMetadata}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate x:DataType="m:GalleryMetadataItem">
@@ -325,25 +338,43 @@
                                     PointerReleased="BreadcrumbBar_PointerReleased">
 
                                 <Grid ColumnDefinitions="*,40">
-                                    <!-- パンくずリスト（Windows 11 相当） -->
-                                    <ScrollViewer Grid.Column="0" IsVisible="{Binding !IsEditingPath}"
-                                                  HorizontalScrollBarVisibility="Hidden"
-                                                  VerticalScrollBarVisibility="Disabled"
-                                                  VerticalAlignment="Center"
-                                                  Margin="8,0">
-                                        <ItemsControl ItemsSource="{Binding Breadcrumbs}">
+                                    <!-- パンくずリスト（Windows 11 相当）。
+                                         幅が足りないときは BreadcrumbPanel が先頭側（浅い階層）から畳み、
+                                         左端の「…」ボタンで畳んだぶんを開けるようにする。
+                                         現在フォルダー（末尾）は常に押せる位置に残る。 -->
+                                    <Grid Grid.Column="0" IsVisible="{Binding !IsEditingPath}"
+                                          VerticalAlignment="Center" Margin="8,0"
+                                          ColumnDefinitions="Auto,*">
+                                        <Button Grid.Column="0" Classes="crumb" Padding="4,3"
+                                                IsVisible="{Binding #BreadcrumbItems.(c:BreadcrumbPanel.HasOverflow)}"
+                                                Click="BreadcrumbOverflow_Click"
+                                                ToolTip.Tip="{DynamicResource Text.Nav.CrumbOverflow}"
+                                                AutomationProperties.Name="{DynamicResource Text.Nav.CrumbOverflow}">
+                                            <TextBlock Classes="fico" Text="&#xE712;" FontSize="12"
+                                                       Foreground="{DynamicResource TextSecondary}"
+                                                       VerticalAlignment="Center" />
+                                        </Button>
+                                        <ItemsControl x:Name="BreadcrumbItems" Grid.Column="1"
+                                                      ItemsSource="{Binding Breadcrumbs}">
                                             <ItemsControl.ItemsPanel>
                                                 <ItemsPanelTemplate>
-                                                    <StackPanel Orientation="Horizontal" />
+                                                    <c:BreadcrumbPanel />
                                                 </ItemsPanelTemplate>
                                             </ItemsControl.ItemsPanel>
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate x:DataType="m:BreadcrumbSegment">
                                                     <StackPanel Orientation="Horizontal">
-                                                        <Button Classes="crumb" Content="{Binding Name}"
+                                                        <!-- 1 つの名前が長すぎるフォルダーでも隣を押し出さないよう、
+                                                             上限を決めて省略表示にする（全体はツールチップで読める）。 -->
+                                                        <Button Classes="crumb"
                                                                 Command="{Binding $parent[ItemsControl].((vm:TabViewModel)DataContext).NavigateToPathCommand}"
                                                                 CommandParameter="{Binding Path}"
-                                                                PointerReleased="Crumb_PointerReleased" />
+                                                                ToolTip.Tip="{Binding Path}"
+                                                                PointerReleased="Crumb_PointerReleased">
+                                                            <TextBlock Text="{Binding Name}" MaxWidth="220"
+                                                                       TextTrimming="CharacterEllipsis"
+                                                                       VerticalAlignment="Center" />
+                                                        </Button>
                                                         <!-- シェブロンクリックでサブフォルダーのドロップダウン（エクスプローラーと同じ） -->
                                                         <Button Classes="crumb" Padding="2,3" Click="CrumbChevron_Click"
                                                                 AutomationProperties.Name="{DynamicResource Text.A11y.OpenSubfolders}">
@@ -355,7 +386,7 @@
                                                 </DataTemplate>
                                             </ItemsControl.ItemTemplate>
                                         </ItemsControl>
-                                    </ScrollViewer>
+                                    </Grid>
 
                                     <!-- 長いパスでも直接入力へ切り替えられる固定クリック領域 -->
                                     <Border Grid.Column="1" Background="Transparent"
@@ -509,6 +540,12 @@
                                         VerticalAlignment="Center" Command="{Binding CutCommand}" />
                                 <Button Classes="cmd cmdicon" Content="&#xE8C8;" ToolTip.Tip="{DynamicResource Text.Command.CopyTip}" AutomationProperties.Name="{DynamicResource Text.Common.Copy}"
                                         VerticalAlignment="Center" Command="{Binding CopyCommand}" />
+                                <!-- 選択のパスをコピー。アドレスバークリック（＝現在フォルダーのパス）とは別で、
+                                     選択中のファイル / フォルダーのフルパスをクリップボードへ入れる。 -->
+                                <Button Classes="cmd cmdicon" Content="&#xE71B;" ToolTip.Tip="{DynamicResource Text.Command.CopyPathTip}"
+                                        AutomationProperties.Name="{DynamicResource Text.Command.CopyPath}"
+                                        IsEnabled="{Binding CanCopySelectedPaths}"
+                                        VerticalAlignment="Center" Click="CopyPath_Click" />
                                 <Button Classes="cmd cmdicon" Content="&#xE77F;" ToolTip.Tip="{DynamicResource Text.Command.PasteTip}" AutomationProperties.Name="{DynamicResource Text.Command.Paste}"
                                         VerticalAlignment="Center" Command="{Binding PasteCommand}" />
                                 <Button Classes="cmd cmdicon" Content="&#xE8AC;" ToolTip.Tip="{DynamicResource Text.Command.RenameTip}" AutomationProperties.Name="{DynamicResource Text.Command.Rename}"

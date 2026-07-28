@@ -31,6 +31,8 @@
   <x:String x:Key="Text.Column.Name" xml:space="preserve">Nomen</x:String>
   <x:String x:Key="Text.Column.Size" xml:space="preserve">Magnitudo</x:String>
   <x:String x:Key="Text.Column.Type" xml:space="preserve">Genus</x:String>
+  <x:String x:Key="Text.Command.CopyPath" xml:space="preserve">Semitam selectorum exscribere</x:String>
+  <x:String x:Key="Text.Command.CopyPathTip" xml:space="preserve">Semitam selectorum exscribere (Ctrl+Shift+C)</x:String>
   <x:String x:Key="Text.Command.CopyTip" xml:space="preserve">Exscribere (Ctrl+C)</x:String>
   <x:String x:Key="Text.Command.Cut" xml:space="preserve">Exsecare</x:String>
   <x:String x:Key="Text.Command.CutTip" xml:space="preserve">Exsecare (Ctrl+X)</x:String>
@@ -167,6 +169,7 @@
   <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(Nihil)</x:String>
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">Retro</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">Retro (dextro clicu pro historia)</x:String>
+  <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">Scrinia quae non capiuntur (preme ut enumerentur)</x:String>
   <x:String x:Key="Text.Nav.EditPathTip" xml:space="preserve">Preme ut semitam recenseas</x:String>
   <x:String x:Key="Text.Nav.Forward" xml:space="preserve">Prorsum</x:String>
   <x:String x:Key="Text.Nav.ForwardTip" xml:space="preserve">Prorsum (dextro clicu pro historia)</x:String>
