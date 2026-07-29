@@ -44,9 +44,35 @@ public static class MaterialIconService
         }
     }
 
-    /// <summary>現在の実効テーマがライトかどうか（ライト専用アイコンの優先に使う）。</summary>
-    public static bool IsLightTheme()
-        => (Application.Current?.ActualThemeVariant ?? ThemeVariant.Dark) == ThemeVariant.Light;
+    /// <summary>UI スレッドで取り込んだ実効テーマ（ライトなら true）。既定はダーク扱い。</summary>
+    private static volatile bool _isLightTheme;
+
+    private static bool _themeWatchAttached;
+
+    /// <summary>
+    /// 現在の実効テーマがライトかどうか（ライト専用アイコンの優先に使う）。
+    /// <para>
+    /// ここで <c>Application.Current.ActualThemeVariant</c> を直接読んではいけない。Avalonia の
+    /// プロパティ読み取りは UI スレッド固定で、<see cref="FileSystemService.GetEntries"/> は
+    /// ナビゲーションのたびに <c>Task.Run</c>（＝スレッドプール）から呼ばれるため、
+    /// VerifyAccess に弾かれて列挙ごと例外になる。実際にそれが起き、Material アイコン設定の
+    /// ユーザーはフォルダーを開くたびに「フォルダーを開けませんでした」になっていた。
+    /// </para>
+    /// </summary>
+    public static bool IsLightTheme() => _isLightTheme;
+
+    /// <summary>現在のテーマを取り込み、以降の変更にも追従する。UI スレッドから 1 度だけ呼ぶ。</summary>
+    public static void AttachThemeWatch()
+    {
+        if (_themeWatchAttached || Application.Current is not { } app)
+        {
+            return;
+        }
+
+        _themeWatchAttached = true;
+        _isLightTheme = app.ActualThemeVariant == ThemeVariant.Light;
+        app.ActualThemeVariantChanged += (_, _) => _isLightTheme = app.ActualThemeVariant == ThemeVariant.Light;
+    }
 
     /// <summary>
     /// ファイル / フォルダー名からアイコンキー（拡張子なしの PNG ファイル名）を解決する。

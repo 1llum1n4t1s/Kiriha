@@ -33,6 +33,10 @@ public partial class App : Application
             e.Handled = true;
         };
 
+        // アイコン解決のテーマ判定を UI スレッドで取り込む。ファイル列挙はバックグラウンドで走るため、
+        // ここで拾っておかないと列挙側が Avalonia のプロパティを別スレッドから読んで例外になる。
+        Services.MaterialIconService.AttachThemeWatch();
+
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             var viewModel = new MainWindowViewModel();

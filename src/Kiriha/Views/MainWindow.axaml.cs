@@ -3233,6 +3233,63 @@ public partial class MainWindow : Window
         }
     }
 
+    /// <summary>ドラッグ中にタブへ重ねてから、そのタブへ切り替えるまでの待ち時間
+    /// （Chrome やエクスプローラーのタブと同じ「重ねて待つと開く」挙動）。</summary>
+    private static readonly TimeSpan TabHoverSwitchDelay = TimeSpan.FromSeconds(1);
+
+    /// <summary>ドラッグ中に重ねているタブ（切り替え待ち）。</summary>
+    private TabViewModel? _tabHoverSwitchTab;
+
+    /// <summary>切り替え待ちの世代番号。対象が変わったら古い待機を無効にする。</summary>
+    private int _tabHoverSwitchRevision;
+
+    /// <summary>
+    /// タブバー上のポインター直下にある実タブを返す。プレビュータブの上では直前の対象を保つ:
+    /// タブ行の上半分に重ねるとプレビューがその上へ挿入されて行がずれ、ポインターの真下が
+    /// プレビューに変わるため、ここで null に落とすと切り替えが永久に発火しない。
+    /// </summary>
+    private TabViewModel? ResolveHoveredTab(DragEventArgs e)
+    {
+        if ((e.Source as Visual)?.FindAncestorOfType<ListBoxItem>()?.DataContext is not TabViewModel tab)
+        {
+            return null;
+        }
+
+        return ReferenceEquals(tab, _tabDropPreviewTab) ? _tabHoverSwitchTab : tab;
+    }
+
+    /// <summary>ドラッグ中に同じタブへ一定時間留まったら、そのタブへ切り替える。
+    /// 切り替え後もドラッグは続いているので、そのままタブ内のフォルダーへドロップできる。</summary>
+    private void UpdateTabHoverSwitch(TabViewModel? hovered)
+    {
+        if (ReferenceEquals(hovered, _tabHoverSwitchTab))
+        {
+            return;
+        }
+
+        _tabHoverSwitchRevision++;
+        _tabHoverSwitchTab = hovered;
+        if (hovered is null)
+        {
+            return;
+        }
+
+        var revision = _tabHoverSwitchRevision;
+        DispatcherTimer.RunOnce(() =>
+        {
+            // 待機中に対象が変わった / タブが閉じられた場合は何もしない
+            if (revision != _tabHoverSwitchRevision
+                || ViewModel is not { } vm
+                || !vm.Tabs.Contains(hovered)
+                || ReferenceEquals(vm.SelectedTab, hovered))
+            {
+                return;
+            }
+
+            vm.SelectedTab = hovered;
+        }, TabHoverSwitchDelay);
+    }
+
     private void RemoveTabDropPreview()
     {
         if (_tabDropPreviewTab is { } preview)
@@ -3304,9 +3361,13 @@ public partial class MainWindow : Window
         var files = GetDroppedPaths(e);
         if (files.Count == 0)
         {
+            UpdateTabHoverSwitch(null);
             ClearFileDropVisual();
             return;
         }
+
+        // タブに重ね続けたらそのタブへ切り替える。別のタブの中のフォルダーへ落とすための導線。
+        UpdateTabHoverSwitch(IsOnVerticalTabStrip(e) ? ResolveHoveredTab(e) : null);
 
         if (IsOnBookmarkBar(e))
         {
@@ -3393,6 +3454,7 @@ public partial class MainWindow : Window
         {
             if (revision == _fileDropVisualRevision)
             {
+                UpdateTabHoverSwitch(null);
                 ClearFileDropVisual();
             }
         }, TimeSpan.FromMilliseconds(45));
@@ -3402,7 +3464,16 @@ public partial class MainWindow : Window
     {
         var rightDrop = _rightButtonDragObserved;
         _rightButtonDragObserved = false;
+        UpdateTabHoverSwitch(null);
         var files = GetDroppedPaths(e);
+
+        // ドロップ先の領域判定は ClearFileDropVisual より先に確定させる。プレビュータブの上で
+        // 離した場合、ClearFileDropVisual がそのタブを取り除くと e.Source が視覚ツリーから外れ、
+        // 祖先をたどる IsOnVerticalTabStrip / IsOnBookmarkBar が後から false に変わってしまう。
+        var isOnBookmarkBar = IsOnBookmarkBar(e);
+        var isOnTabStrip = IsOnVerticalTabStrip(e);
+        var tabStripDropZone = isOnTabStrip ? ResolveTabStripDropZone(e) : 0;
+
         // プレビュータブが仮配置済みなら、ユーザーが見ているその位置をそのまま挿入位置にする
         // （ClearFileDropVisual でプレビューが取り除かれる前に確定させる）
         var previewIndex = _tabDropPreviewTab is { } preview ? ViewModel?.Tabs.IndexOf(preview) : null;
@@ -3413,7 +3484,7 @@ public partial class MainWindow : Window
         }
 
         // お気に入りバーへのドロップは登録（アプリ内 / アプリ外どちらの DnD も可）
-        if (IsOnBookmarkBar(e))
+        if (isOnBookmarkBar)
         {
             e.Handled = true;
             foreach (var file in files)
@@ -3425,10 +3496,10 @@ public partial class MainWindow : Window
         }
 
         // タブバー全域はフォルダーを新しいタブで開く（ファイルは対象外）
-        if (IsOnVerticalTabStrip(e))
+        if (isOnTabStrip)
         {
             e.Handled = true;
-            ViewModel?.OpenFolderTabsAt(files, previewIndex is >= 0 ? previewIndex.Value : ResolveTabStripDropZone(e));
+            ViewModel?.OpenFolderTabsAt(files, previewIndex is >= 0 ? previewIndex.Value : tabStripDropZone);
             return;
         }
 

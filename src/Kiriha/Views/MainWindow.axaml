@@ -697,9 +697,8 @@
                                 </Border.IsVisible>
                                 <Grid RowDefinitions="Auto,*">
                                 <!-- クイックアクセス / XP 風ツリーの切り替えトグル -->
-                                <ToggleButton Grid.Row="0" Margin="8,8,8,2" Padding="8,4"
-                                              HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                                              CornerRadius="8" FontSize="12"
+                                <ToggleButton Grid.Row="0" Classes="chip" Margin="8,8,8,2"
+                                              HorizontalAlignment="Stretch" FontSize="12"
                                               IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ShowSidebarTree, Mode=TwoWay}"
                                               AutomationProperties.Name="{DynamicResource Text.A11y.SwitchToTree}"
                                               ToolTip.Tip="{DynamicResource Text.Sidebar.ToggleTip}">

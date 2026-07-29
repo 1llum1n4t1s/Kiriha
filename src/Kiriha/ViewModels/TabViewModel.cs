@@ -2473,7 +2473,9 @@ public partial class TabViewModel : ObservableObject
                     return;
                 }
 
-                Logger.LogException($"フォルダーが存在しないため PC に移動します: {path}", ex);
+                // 想定内の代替処理（未マウントのクラウドドライブ等）。ERROR + スタックで残すと
+                // 実害のある失敗と見分けが付かなくなるため、種別とメッセージだけを警告で残す。
+                Logger.Log($"フォルダーが存在しないため PC に移動します: {path}: {ex.GetType().Name}", LogLevel.Warning);
                 path = FileSystemService.ComputerPath;
                 preserveSelection = null;
             }

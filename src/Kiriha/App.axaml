@@ -50,7 +50,7 @@
                     <Color x:Key="NeutralInteractive">#3C4043</Color>
                     <!-- 選択中タブ用。地色と同じにすると背景へ完全に同化するので、常に一段明るい色を持たせる
                          （ライトの #FFFFFF と同じ「アクティブが一番明るい」関係に揃える）。 -->
-                    <Color x:Key="NeutralElevated">#4A4D51</Color>
+                    <Color x:Key="NeutralElevated">#56595D</Color>
                     <SolidColorBrush x:Key="TabSelectedBg" Color="{StaticResource NeutralElevated}" />
                     <SolidColorBrush x:Key="TabStripBg" Color="{StaticResource NeutralBase}" />
                     <SolidColorBrush x:Key="VerticalTabsSurfaceBg" Color="Transparent" />
@@ -92,7 +92,7 @@
                     <Color x:Key="NeutralSurface">#282C34</Color>
                     <Color x:Key="NeutralInteractive">#3E4451</Color>
                     <!-- 選択中タブ用（Dark の NeutralElevated と同じ役割）。 -->
-                    <Color x:Key="NeutralElevated">#4B5263</Color>
+                    <Color x:Key="NeutralElevated">#575E6F</Color>
                     <SolidColorBrush x:Key="TabSelectedBg" Color="{StaticResource NeutralElevated}" />
                     <SolidColorBrush x:Key="TabStripBg" Color="{StaticResource NeutralBase}" />
                     <SolidColorBrush x:Key="VerticalTabsSurfaceBg" Color="Transparent" />
@@ -132,7 +132,7 @@
                     <Color x:Key="NeutralInteractive">#38444D</Color>
                     <!-- 選択中タブ用（Dark の NeutralElevated と同じ役割）。X の Dim でも
                          選択中の項目は地色より明るく描かれる。 -->
-                    <Color x:Key="NeutralElevated">#46535F</Color>
+                    <Color x:Key="NeutralElevated">#525F6B</Color>
                     <SolidColorBrush x:Key="TabSelectedBg" Color="{StaticResource NeutralElevated}" />
                     <SolidColorBrush x:Key="TabStripBg" Color="{StaticResource NeutralBase}" />
                     <SolidColorBrush x:Key="VerticalTabsSurfaceBg" Color="Transparent" />

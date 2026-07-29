@@ -131,6 +131,48 @@
             <Setter Property="Background" Value="{DynamicResource SelectedBg}" />
             <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
         </Style>
+        <!-- 状態を持つトグル（クイックアクセス / ツリー切り替え）。既定の ToggleButton テーマは
+             アプリの配色トークンを一切使わず浮くため、垂直タブと同じチップ表現
+             （待機 TabIdleBg / ホバー TabHoverBg / オン TabSelectedBg + アクセント線）に揃える。
+             背景は既定テーマが /template/ ContentPresenter へ直接書き込むので、
+             タブ項目と同じく Template ごと差し替えて上書きする。 -->
+        <Style Selector="ToggleButton.chip">
+            <Setter Property="MinHeight" Value="0" />
+            <Setter Property="Padding" Value="8,4" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Background" Value="{DynamicResource TabIdleBg}" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <ContentPresenter Name="PART_ContentPresenter"
+                                      Background="{TemplateBinding Background}"
+                                      BorderBrush="{TemplateBinding BorderBrush}"
+                                      BorderThickness="{TemplateBinding BorderThickness}"
+                                      CornerRadius="{TemplateBinding CornerRadius}"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      Padding="{TemplateBinding Padding}"
+                                      HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="ToggleButton.chip:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource TabHoverBg}" />
+        </Style>
+        <Style Selector="ToggleButton.chip:checked /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource TabSelectedBg}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
+            <Setter Property="BorderThickness" Value="2,0,0,0" />
+        </Style>
+        <Style Selector="ToggleButton.chip:checked:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource TabSelectedBg}" />
+        </Style>
+
         <!-- Fluent アイコン共通 -->
         <Style Selector="TextBlock.fico">
             <Setter Property="FontFamily" Value="Segoe Fluent Icons,Segoe MDL2 Assets" />
