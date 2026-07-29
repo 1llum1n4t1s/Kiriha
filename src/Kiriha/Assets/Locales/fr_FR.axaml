@@ -69,6 +69,10 @@
   <x:String x:Key="Text.Drag.Move" xml:space="preserve">Déplacer</x:String>
   <x:String x:Key="Text.Drag.OpenInTab" xml:space="preserve">Ouvrir dans un onglet</x:String>
   <x:String x:Key="Text.Drive.FreeOfTotal" xml:space="preserve">{0} libres sur {1}</x:String>
+  <x:String x:Key="Text.Drop.CopyHere" xml:space="preserve">Copier ici</x:String>
+  <x:String x:Key="Text.Drop.CreateShortcutHere" xml:space="preserve">Créer les raccourcis ici</x:String>
+  <x:String x:Key="Text.Drop.MoveHere" xml:space="preserve">Déplacer ici</x:String>
+  <x:String x:Key="Text.Drop.ShortcutSuffix" xml:space="preserve"> - Raccourci</x:String>
   <x:String x:Key="Text.Error.AccessDenied" xml:space="preserve">Accès refusé</x:String>
   <x:String x:Key="Text.Error.Code" xml:space="preserve">Erreur {0}</x:String>
   <x:String x:Key="Text.Error.CodeWithDesc" xml:space="preserve">Erreur {0} : {1}</x:String>
@@ -191,6 +195,7 @@
   <x:String x:Key="Text.Op.Moved" xml:space="preserve">{0} élément(s) déplacé(s)</x:String>
   <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">Échec du collage ({0})</x:String>
   <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">Échec du renommage ({0})</x:String>
+  <x:String x:Key="Text.Op.ShortcutsCreated" xml:space="preserve">{0} raccourci(s) créé(s)</x:String>
   <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">{0} fichier(s)  {1}</x:String>
   <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> ou plus</x:String>
   <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">Vider la Corbeille</x:String>

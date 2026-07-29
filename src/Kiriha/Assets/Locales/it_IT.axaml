@@ -69,6 +69,10 @@
   <x:String x:Key="Text.Drag.Move" xml:space="preserve">Sposta</x:String>
   <x:String x:Key="Text.Drag.OpenInTab" xml:space="preserve">Apri in una scheda</x:String>
   <x:String x:Key="Text.Drive.FreeOfTotal" xml:space="preserve">{0} liberi su {1}</x:String>
+  <x:String x:Key="Text.Drop.CopyHere" xml:space="preserve">Copia qui</x:String>
+  <x:String x:Key="Text.Drop.CreateShortcutHere" xml:space="preserve">Crea collegamenti qui</x:String>
+  <x:String x:Key="Text.Drop.MoveHere" xml:space="preserve">Sposta qui</x:String>
+  <x:String x:Key="Text.Drop.ShortcutSuffix" xml:space="preserve"> - Collegamento</x:String>
   <x:String x:Key="Text.Error.AccessDenied" xml:space="preserve">Accesso negato</x:String>
   <x:String x:Key="Text.Error.Code" xml:space="preserve">Errore {0}</x:String>
   <x:String x:Key="Text.Error.CodeWithDesc" xml:space="preserve">Errore {0}: {1}</x:String>
@@ -191,6 +195,7 @@
   <x:String x:Key="Text.Op.Moved" xml:space="preserve">{0} elemento/i spostato/i</x:String>
   <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">Incolla non riuscito ({0})</x:String>
   <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">Ridenominazione non riuscita ({0})</x:String>
+  <x:String x:Key="Text.Op.ShortcutsCreated" xml:space="preserve">Creati {0} collegamenti</x:String>
   <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">{0} file  {1}</x:String>
   <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> o più</x:String>
   <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">Svuota il Cestino</x:String>

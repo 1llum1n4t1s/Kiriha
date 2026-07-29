@@ -69,6 +69,10 @@
   <x:String x:Key="Text.Drag.Move" xml:space="preserve">Mover</x:String>
   <x:String x:Key="Text.Drag.OpenInTab" xml:space="preserve">Abrir em uma guia</x:String>
   <x:String x:Key="Text.Drive.FreeOfTotal" xml:space="preserve">{0} livres de {1}</x:String>
+  <x:String x:Key="Text.Drop.CopyHere" xml:space="preserve">Copiar aqui</x:String>
+  <x:String x:Key="Text.Drop.CreateShortcutHere" xml:space="preserve">Criar atalhos aqui</x:String>
+  <x:String x:Key="Text.Drop.MoveHere" xml:space="preserve">Mover aqui</x:String>
+  <x:String x:Key="Text.Drop.ShortcutSuffix" xml:space="preserve"> - Atalho</x:String>
   <x:String x:Key="Text.Error.AccessDenied" xml:space="preserve">Acesso negado</x:String>
   <x:String x:Key="Text.Error.Code" xml:space="preserve">Erro {0}</x:String>
   <x:String x:Key="Text.Error.CodeWithDesc" xml:space="preserve">Erro {0}: {1}</x:String>
@@ -191,6 +195,7 @@
   <x:String x:Key="Text.Op.Moved" xml:space="preserve">{0} item(ns) movido(s)</x:String>
   <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">Falha ao colar ({0})</x:String>
   <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">Falha ao renomear ({0})</x:String>
+  <x:String x:Key="Text.Op.ShortcutsCreated" xml:space="preserve">{0} atalho(s) criado(s)</x:String>
   <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">{0} arquivo(s)  {1}</x:String>
   <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> ou mais</x:String>
   <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">Esvaziar a Lixeira</x:String>

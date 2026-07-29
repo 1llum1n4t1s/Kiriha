@@ -69,6 +69,10 @@
   <x:String x:Key="Text.Drag.Move" xml:space="preserve">이동</x:String>
   <x:String x:Key="Text.Drag.OpenInTab" xml:space="preserve">탭에서 열기</x:String>
   <x:String x:Key="Text.Drive.FreeOfTotal" xml:space="preserve">{1} 중 {0} 사용 가능</x:String>
+  <x:String x:Key="Text.Drop.CopyHere" xml:space="preserve">여기에 복사</x:String>
+  <x:String x:Key="Text.Drop.CreateShortcutHere" xml:space="preserve">여기에 바로 가기 만들기</x:String>
+  <x:String x:Key="Text.Drop.MoveHere" xml:space="preserve">여기로 이동</x:String>
+  <x:String x:Key="Text.Drop.ShortcutSuffix" xml:space="preserve"> - 바로 가기</x:String>
   <x:String x:Key="Text.Error.AccessDenied" xml:space="preserve">액세스가 거부되었습니다</x:String>
   <x:String x:Key="Text.Error.Code" xml:space="preserve">오류 {0}</x:String>
   <x:String x:Key="Text.Error.CodeWithDesc" xml:space="preserve">오류 {0}: {1}</x:String>
@@ -191,6 +195,7 @@
   <x:String x:Key="Text.Op.Moved" xml:space="preserve">{0}개 항목을 이동했습니다</x:String>
   <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">붙여넣지 못했습니다({0})</x:String>
   <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">이름을 바꾸지 못했습니다({0})</x:String>
+  <x:String x:Key="Text.Op.ShortcutsCreated" xml:space="preserve">{0}개의 바로 가기를 만들었습니다</x:String>
   <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">파일 {0}개  {1}</x:String>
   <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> 이상</x:String>
   <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">휴지통 비우기</x:String>

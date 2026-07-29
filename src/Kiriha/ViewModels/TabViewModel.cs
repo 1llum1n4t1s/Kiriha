@@ -144,7 +144,7 @@ public partial class TabViewModel : ObservableObject
     private double _colTypeWidth = 140;
 
     [ObservableProperty]
-    private double _colSizeWidth = 90;
+    private double _colSizeWidth = 100;
 
     [ObservableProperty]
     private double _colCreatedWidth = 170;
@@ -3384,6 +3384,26 @@ public partial class TabViewModel : ObservableObject
         {
             Refresh();
             StatusText = LocalizationService.Text(move ? "Text.Op.Moved" : "Text.Op.Copied", effective.Count);
+        }
+        else if (!result.IsCancelled)
+        {
+            StatusText = LocalizationService.Text("Text.Op.Failed", FormatOpError(result.NativeErrorCode));
+        }
+    }
+
+    /// <summary>右ボタンドラッグの「ショートカットをここに作成」。ドロップされたパスごとに .lnk を作る。</summary>
+    public async Task DropShortcutsAsync(IReadOnlyList<string> files, string destDir)
+    {
+        if (files.Count == 0 || destDir.Length == 0)
+        {
+            return;
+        }
+
+        var result = await Task.Run(() => ShellLinkService.Create(files, destDir));
+        if (result.IsSuccess)
+        {
+            Refresh();
+            StatusText = LocalizationService.Text("Text.Op.ShortcutsCreated", files.Count);
         }
         else if (!result.IsCancelled)
         {

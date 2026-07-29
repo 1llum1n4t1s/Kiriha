@@ -69,6 +69,10 @@
   <x:String x:Key="Text.Drag.Move" xml:space="preserve">Mover</x:String>
   <x:String x:Key="Text.Drag.OpenInTab" xml:space="preserve">Abrir en una pestaña</x:String>
   <x:String x:Key="Text.Drive.FreeOfTotal" xml:space="preserve">{0} libres de {1}</x:String>
+  <x:String x:Key="Text.Drop.CopyHere" xml:space="preserve">Copiar aquí</x:String>
+  <x:String x:Key="Text.Drop.CreateShortcutHere" xml:space="preserve">Crear accesos directos aquí</x:String>
+  <x:String x:Key="Text.Drop.MoveHere" xml:space="preserve">Mover aquí</x:String>
+  <x:String x:Key="Text.Drop.ShortcutSuffix" xml:space="preserve"> - Acceso directo</x:String>
   <x:String x:Key="Text.Error.AccessDenied" xml:space="preserve">Acceso denegado</x:String>
   <x:String x:Key="Text.Error.Code" xml:space="preserve">Error {0}</x:String>
   <x:String x:Key="Text.Error.CodeWithDesc" xml:space="preserve">Error {0}: {1}</x:String>
@@ -191,6 +195,7 @@
   <x:String x:Key="Text.Op.Moved" xml:space="preserve">{0} elemento(s) movido(s)</x:String>
   <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">Error al pegar ({0})</x:String>
   <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">Error al cambiar el nombre ({0})</x:String>
+  <x:String x:Key="Text.Op.ShortcutsCreated" xml:space="preserve">Se crearon {0} accesos directos</x:String>
   <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">{0} archivo(s)  {1}</x:String>
   <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> o más</x:String>
   <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">Vaciar la Papelera de reciclaje</x:String>

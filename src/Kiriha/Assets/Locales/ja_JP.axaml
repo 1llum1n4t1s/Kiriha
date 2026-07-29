@@ -69,6 +69,10 @@
   <x:String x:Key="Text.Drag.Move" xml:space="preserve">移動</x:String>
   <x:String x:Key="Text.Drag.OpenInTab" xml:space="preserve">タブで開く</x:String>
   <x:String x:Key="Text.Drive.FreeOfTotal" xml:space="preserve">空き {0} / {1}</x:String>
+  <x:String x:Key="Text.Drop.CopyHere" xml:space="preserve">ここにコピー</x:String>
+  <x:String x:Key="Text.Drop.CreateShortcutHere" xml:space="preserve">ショートカットをここに作成</x:String>
+  <x:String x:Key="Text.Drop.MoveHere" xml:space="preserve">ここに移動</x:String>
+  <x:String x:Key="Text.Drop.ShortcutSuffix" xml:space="preserve"> - ショートカット</x:String>
   <x:String x:Key="Text.Error.AccessDenied" xml:space="preserve">アクセスが拒否されました</x:String>
   <x:String x:Key="Text.Error.Code" xml:space="preserve">エラー {0}</x:String>
   <x:String x:Key="Text.Error.CodeWithDesc" xml:space="preserve">エラー {0}: {1}</x:String>
@@ -191,6 +195,7 @@
   <x:String x:Key="Text.Op.Moved" xml:space="preserve">{0} 個の項目を移動しました</x:String>
   <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">貼り付けに失敗しました（{0}）</x:String>
   <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">名前を変更できませんでした（{0}）</x:String>
+  <x:String x:Key="Text.Op.ShortcutsCreated" xml:space="preserve">{0} 個のショートカットを作成しました</x:String>
   <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">{0} 個のファイル  {1}</x:String>
   <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> 以上</x:String>
   <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">ごみ箱を空にする</x:String>

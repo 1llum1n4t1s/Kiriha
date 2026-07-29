@@ -69,6 +69,10 @@
   <x:String x:Key="Text.Drag.Move" xml:space="preserve">Ilipat</x:String>
   <x:String x:Key="Text.Drag.OpenInTab" xml:space="preserve">Buksan sa tab</x:String>
   <x:String x:Key="Text.Drive.FreeOfTotal" xml:space="preserve">{0} na libre sa {1}</x:String>
+  <x:String x:Key="Text.Drop.CopyHere" xml:space="preserve">Kopyahin dito</x:String>
+  <x:String x:Key="Text.Drop.CreateShortcutHere" xml:space="preserve">Gumawa ng mga shortcut dito</x:String>
+  <x:String x:Key="Text.Drop.MoveHere" xml:space="preserve">Ilipat dito</x:String>
+  <x:String x:Key="Text.Drop.ShortcutSuffix" xml:space="preserve"> - Shortcut</x:String>
   <x:String x:Key="Text.Error.AccessDenied" xml:space="preserve">Tinanggihan ang pag-access</x:String>
   <x:String x:Key="Text.Error.Code" xml:space="preserve">Error {0}</x:String>
   <x:String x:Key="Text.Error.CodeWithDesc" xml:space="preserve">Error {0}: {1}</x:String>
@@ -191,6 +195,7 @@
   <x:String x:Key="Text.Op.Moved" xml:space="preserve">{0} item ang nailipat</x:String>
   <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">Nabigo ang pag-paste ({0})</x:String>
   <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">Nabigo ang pagpapalit ng pangalan ({0})</x:String>
+  <x:String x:Key="Text.Op.ShortcutsCreated" xml:space="preserve">Gumawa ng {0} shortcut</x:String>
   <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">{0} file  {1}</x:String>
   <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> o higit pa</x:String>
   <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">Walisin ang Recycle Bin</x:String>

@@ -69,6 +69,10 @@
   <x:String x:Key="Text.Drag.Move" xml:space="preserve">நகர்த்து</x:String>
   <x:String x:Key="Text.Drag.OpenInTab" xml:space="preserve">தாவலில் திற</x:String>
   <x:String x:Key="Text.Drive.FreeOfTotal" xml:space="preserve">{1} இல் {0} காலி</x:String>
+  <x:String x:Key="Text.Drop.CopyHere" xml:space="preserve">இங்கே நகலெடு</x:String>
+  <x:String x:Key="Text.Drop.CreateShortcutHere" xml:space="preserve">இங்கே குறுக்குவழிகளை உருவாக்கு</x:String>
+  <x:String x:Key="Text.Drop.MoveHere" xml:space="preserve">இங்கே நகர்த்து</x:String>
+  <x:String x:Key="Text.Drop.ShortcutSuffix" xml:space="preserve"> - குறுக்குவழி</x:String>
   <x:String x:Key="Text.Error.AccessDenied" xml:space="preserve">அணுகல் மறுக்கப்பட்டது</x:String>
   <x:String x:Key="Text.Error.Code" xml:space="preserve">பிழை {0}</x:String>
   <x:String x:Key="Text.Error.CodeWithDesc" xml:space="preserve">பிழை {0}: {1}</x:String>
@@ -191,6 +195,7 @@
   <x:String x:Key="Text.Op.Moved" xml:space="preserve">{0} உருப்படிகள் நகர்த்தப்பட்டன</x:String>
   <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">ஒட்டுதல் தோல்வியடைந்தது ({0})</x:String>
   <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">பெயர் மாற்றம் தோல்வியடைந்தது ({0})</x:String>
+  <x:String x:Key="Text.Op.ShortcutsCreated" xml:space="preserve">{0} குறுக்குவழிகள் உருவாக்கப்பட்டன</x:String>
   <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">{0} கோப்புகள்  {1}</x:String>
   <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> அல்லது அதற்கு மேல்</x:String>
   <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">மறுசுழற்சிக் கூடையைக் காலி செய்</x:String>

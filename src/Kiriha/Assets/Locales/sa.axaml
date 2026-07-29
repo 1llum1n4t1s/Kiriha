@@ -69,6 +69,10 @@
   <x:String x:Key="Text.Drag.Move" xml:space="preserve">स्थानान्तरणम्</x:String>
   <x:String x:Key="Text.Drag.OpenInTab" xml:space="preserve">पत्रे उद्घाटय</x:String>
   <x:String x:Key="Text.Drive.FreeOfTotal" xml:space="preserve">{1} इत्यस्मात् {0} रिक्तम्</x:String>
+  <x:String x:Key="Text.Drop.CopyHere" xml:space="preserve">अत्र प्रतिलिख्यताम्</x:String>
+  <x:String x:Key="Text.Drop.CreateShortcutHere" xml:space="preserve">अत्र संक्षेपमार्गः रच्यताम्</x:String>
+  <x:String x:Key="Text.Drop.MoveHere" xml:space="preserve">अत्र चाल्यताम्</x:String>
+  <x:String x:Key="Text.Drop.ShortcutSuffix" xml:space="preserve"> - संक्षेपमार्गः</x:String>
   <x:String x:Key="Text.Error.AccessDenied" xml:space="preserve">प्रवेशः निषिद्धः</x:String>
   <x:String x:Key="Text.Error.Code" xml:space="preserve">दोषः {0}</x:String>
   <x:String x:Key="Text.Error.CodeWithDesc" xml:space="preserve">दोषः {0}: {1}</x:String>
@@ -191,6 +195,7 @@
   <x:String x:Key="Text.Op.Moved" xml:space="preserve">{0} वस्तूनि स्थानान्तरितानि</x:String>
   <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">लेपनं विफलम् ({0})</x:String>
   <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">नामपरिवर्तनं विफलम् ({0})</x:String>
+  <x:String x:Key="Text.Op.ShortcutsCreated" xml:space="preserve">{0} संक्षेपमार्गाः रचिताः</x:String>
   <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">{0} सञ्चिकाः  {1}</x:String>
   <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> तदधिकम्</x:String>
   <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">पुनश्चक्रपेटिकां रिक्तां कुरु</x:String>

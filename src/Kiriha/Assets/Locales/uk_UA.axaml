@@ -69,6 +69,10 @@
   <x:String x:Key="Text.Drag.Move" xml:space="preserve">Перемістити</x:String>
   <x:String x:Key="Text.Drag.OpenInTab" xml:space="preserve">Відкрити у вкладці</x:String>
   <x:String x:Key="Text.Drive.FreeOfTotal" xml:space="preserve">{0} вільно з {1}</x:String>
+  <x:String x:Key="Text.Drop.CopyHere" xml:space="preserve">Копіювати сюди</x:String>
+  <x:String x:Key="Text.Drop.CreateShortcutHere" xml:space="preserve">Створити ярлики тут</x:String>
+  <x:String x:Key="Text.Drop.MoveHere" xml:space="preserve">Перемістити сюди</x:String>
+  <x:String x:Key="Text.Drop.ShortcutSuffix" xml:space="preserve"> - ярлик</x:String>
   <x:String x:Key="Text.Error.AccessDenied" xml:space="preserve">Відмовлено в доступі</x:String>
   <x:String x:Key="Text.Error.Code" xml:space="preserve">Помилка {0}</x:String>
   <x:String x:Key="Text.Error.CodeWithDesc" xml:space="preserve">Помилка {0}: {1}</x:String>
@@ -191,6 +195,7 @@
   <x:String x:Key="Text.Op.Moved" xml:space="preserve">Переміщено об'єктів: {0}</x:String>
   <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">Не вдалося вставити ({0})</x:String>
   <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">Не вдалося перейменувати ({0})</x:String>
+  <x:String x:Key="Text.Op.ShortcutsCreated" xml:space="preserve">Створено ярликів: {0}</x:String>
   <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">файлів: {0}  {1}</x:String>
   <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> або більше</x:String>
   <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">Очистити Кошик</x:String>

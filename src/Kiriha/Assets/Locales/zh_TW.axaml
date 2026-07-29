@@ -69,6 +69,10 @@
   <x:String x:Key="Text.Drag.Move" xml:space="preserve">移動</x:String>
   <x:String x:Key="Text.Drag.OpenInTab" xml:space="preserve">在分頁中開啟</x:String>
   <x:String x:Key="Text.Drive.FreeOfTotal" xml:space="preserve">{1} 中有 {0} 可用</x:String>
+  <x:String x:Key="Text.Drop.CopyHere" xml:space="preserve">複製到目前位置</x:String>
+  <x:String x:Key="Text.Drop.CreateShortcutHere" xml:space="preserve">在目前位置建立捷徑</x:String>
+  <x:String x:Key="Text.Drop.MoveHere" xml:space="preserve">移動到目前位置</x:String>
+  <x:String x:Key="Text.Drop.ShortcutSuffix" xml:space="preserve"> - 捷徑</x:String>
   <x:String x:Key="Text.Error.AccessDenied" xml:space="preserve">存取被拒</x:String>
   <x:String x:Key="Text.Error.Code" xml:space="preserve">錯誤 {0}</x:String>
   <x:String x:Key="Text.Error.CodeWithDesc" xml:space="preserve">錯誤 {0}: {1}</x:String>
@@ -191,6 +195,7 @@
   <x:String x:Key="Text.Op.Moved" xml:space="preserve">已移動 {0} 個項目</x:String>
   <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">貼上失敗（{0}）</x:String>
   <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">重新命名失敗（{0}）</x:String>
+  <x:String x:Key="Text.Op.ShortcutsCreated" xml:space="preserve">已建立 {0} 個捷徑</x:String>
   <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">{0} 個檔案  {1}</x:String>
   <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> 以上</x:String>
   <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">清空資源回收筒</x:String>

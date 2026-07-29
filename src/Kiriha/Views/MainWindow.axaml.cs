@@ -29,6 +29,16 @@ public partial class MainWindow : Window
     private int _fileDropVisualRevision;
     private Point _dragStartPoint;
 
+    /// <summary>ドラッグを開始したボタン。右ボタンならドロップ時に操作選択メニューを出す（エクスプローラー仕様）。</summary>
+    private MouseButton _dragButton = MouseButton.Left;
+
+    /// <summary>このドラッグセッション中に右ボタンの押下を観測したか。ドロップ時のメニュー要否の判定に使う。
+    /// アプリ内・アプリ外どちらが開始したドラッグでも同じ判定になるよう、押下状態は Win32 から取る。</summary>
+    private bool _rightButtonDragObserved;
+
+    /// <summary>右ボタンドラッグ直後のリリースでコンテキストメニューを出さないための抑止フラグ。</summary>
+    private bool _suppressContextMenuAfterDrag;
+
     /// <summary>動画コントロールをマウス停止後に引っ込めるまでの時間。</summary>
     private static readonly TimeSpan VideoBarHideDelay = TimeSpan.FromSeconds(2);
 
@@ -1676,6 +1686,14 @@ public partial class MainWindow : Window
             return;
         }
 
+        // 右ボタンドラッグを終えた直後のリリースではメニューを出さない
+        if (_suppressContextMenuAfterDrag)
+        {
+            _suppressContextMenuAfterDrag = false;
+            e.Handled = true;
+            return;
+        }
+
         var flyout = new MenuFlyout();
 
         if (link.IsShellCommand)
@@ -2580,7 +2598,13 @@ public partial class MainWindow : Window
 
     private void DragSource_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        // 前回の右ボタンドラッグの抑止フラグは、次の押下までに必ず落とす
+        // （OLE のドラッグループを抜けたあと PointerReleased が届かない環境があるため）。
+        _suppressContextMenuAfterDrag = false;
+
+        var properties = e.GetCurrentPoint(this).Properties;
+        var isRightPress = properties.IsRightButtonPressed;
+        if (!properties.IsLeftButtonPressed && !isRightPress)
         {
             ResetDragSource();
             return;
@@ -2596,7 +2620,8 @@ public partial class MainWindow : Window
         if (listBox is not null && isFileList && item is not null
             && IsDetailsBackgroundColumnHit(listBox, e.Source))
         {
-            if (!TryStartMarqueeSelection(listBox, e))
+            // 範囲選択は左ドラッグだけ。右ドラッグは背景メニュー（リリース時）に任せる。
+            if (isRightPress || !TryStartMarqueeSelection(listBox, e))
             {
                 ResetDragSource();
             }
@@ -2609,15 +2634,22 @@ public partial class MainWindow : Window
             _dragPressArgs = e;
             _dragListBox = listBox;
             _dragSidebarLink = null;
+            _dragButton = isRightPress ? MouseButton.Right : MouseButton.Left;
             // 複数選択済みの項目を押すとListBox既定処理が選択を1件へ縮めるため、
             // トンネル段階の選択状態を保持してExplorer同様にまとめてドラッグする。
             // Ctrl/Shift 併用時はトグル・範囲選択の既定動作を尊重して保持しない。
             var noSelectionModifiers = !e.KeyModifiers.HasFlag(KeyModifiers.Control)
                                        && !e.KeyModifiers.HasFlag(KeyModifiers.Shift);
-            _dragSelectionSnapshot = noSelectionModifiers && item.IsSelected
-                && listBox.SelectedItems?.OfType<FileSystemEntry>().ToList() is { Count: > 1 } selected
+            var currentSelection = listBox.SelectedItems?.OfType<FileSystemEntry>().ToList();
+            _dragSelectionSnapshot = isRightPress
+                // 右ドラッグは押下時点で対象が確定する（未選択の項目を押したらその1件だけ）。
+                // 右クリックの選択反映はリリース時のため、ここで解決しないと直前の選択を引きずる。
+                ? (item.IsSelected && currentSelection is { Count: > 0 } rightSelection
+                    ? rightSelection
+                    : [pressedEntry])
+                : (noSelectionModifiers && item.IsSelected && currentSelection is { Count: > 1 } selected
                     ? selected
-                    : null;
+                    : null);
             _dragStartPoint = e.GetPosition(this);
             _dragInProgress = false;
 
@@ -2642,7 +2674,7 @@ public partial class MainWindow : Window
         {
             // 空白部分の左ドラッグは、エクスプローラーと同じ範囲選択へ切り替える。
             // スクロールバー上では開始せず、通常のスクロール操作を維持する。
-            if (!TryStartMarqueeSelection(listBox, e))
+            if (isRightPress || !TryStartMarqueeSelection(listBox, e))
             {
                 ResetDragSource();
             }
@@ -2661,6 +2693,7 @@ public partial class MainWindow : Window
             _dragPressArgs = e;
             _dragListBox = listBox;
             _dragSidebarLink = link;
+            _dragButton = isRightPress ? MouseButton.Right : MouseButton.Left;
             _dragSelectionSnapshot = null;
             _dragStartPoint = e.GetPosition(this);
             _dragInProgress = false;
@@ -2676,6 +2709,7 @@ public partial class MainWindow : Window
             _dragPressArgs = e;
             _dragListBox = null;
             _dragSidebarLink = null;
+            _dragButton = isRightPress ? MouseButton.Right : MouseButton.Left;
             _dragTreeNodePath = treeNode.Path;
             _dragSelectionSnapshot = null;
             _dragStartPoint = e.GetPosition(this);
@@ -2702,7 +2736,11 @@ public partial class MainWindow : Window
             return;
         }
 
-        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        var properties = e.GetCurrentPoint(this).Properties;
+        var buttonStillDown = _dragButton == MouseButton.Right
+            ? properties.IsRightButtonPressed
+            : properties.IsLeftButtonPressed;
+        if (!buttonStillDown)
         {
             ResetDragSource();
             return;
@@ -2714,20 +2752,23 @@ public partial class MainWindow : Window
             return;
         }
 
+        var rightDrag = _dragButton == MouseButton.Right;
+
         if (_dragSidebarLink is { } sidebarLink)
         {
             _dragInProgress = true;
             _ = StartDragAsync(
                 refreshTab: null,
                 [(sidebarLink.Path, !sidebarLink.IsFile)],
-                _dragPressArgs);
+                _dragPressArgs,
+                rightDrag);
             return;
         }
 
         if (_dragTreeNodePath is { } treePath)
         {
             _dragInProgress = true;
-            _ = StartDragAsync(refreshTab: null, [(treePath, true)], _dragPressArgs);
+            _ = StartDragAsync(refreshTab: null, [(treePath, true)], _dragPressArgs, rightDrag);
             return;
         }
 
@@ -2749,7 +2790,8 @@ public partial class MainWindow : Window
         _ = StartDragAsync(
             tab,
             selection.Select(entry => (entry.FullPath, entry.IsDirectory)).ToList(),
-            _dragPressArgs);
+            _dragPressArgs,
+            rightDrag);
     }
 
     private void DragSource_PointerReleased(object? sender, PointerReleasedEventArgs e)
@@ -2843,7 +2885,8 @@ public partial class MainWindow : Window
     private async Task StartDragAsync(
         TabViewModel? refreshTab,
         IReadOnlyList<(string Path, bool IsDirectory)> entries,
-        PointerPressedEventArgs pressArgs)
+        PointerPressedEventArgs pressArgs,
+        bool rightDrag)
     {
         try
         {
@@ -2866,9 +2909,20 @@ public partial class MainWindow : Window
                 return;
             }
 
+            // 右ボタンドラッグは、リリース時のメニューに「ショートカットをここに作成」が出るよう
+            // Link も許可する（エクスプローラーへ落としたときは向こう側がこの許可を見てメニューを作る）。
+            var allowed = rightDrag
+                ? DragDropEffects.Copy | DragDropEffects.Move | DragDropEffects.Link
+                : DragDropEffects.Copy | DragDropEffects.Move;
+            if (rightDrag)
+            {
+                _rightButtonDragObserved = true;
+                _suppressContextMenuAfterDrag = true;
+            }
+
             _fileDragPreview = new DragPreviewWindow(previewEntries);
             _fileDragPreview.Show(this);
-            var effect = await DragDrop.DoDragDropAsync(pressArgs, transfer, DragDropEffects.Copy | DragDropEffects.Move);
+            var effect = await DragDrop.DoDragDropAsync(pressArgs, transfer, allowed);
             if (refreshTab is not null && effect.HasFlag(DragDropEffects.Move))
             {
                 // 移動元フォルダーの反映はフォルダー監視が正本。監視が使えないタブだけ保険の時限再読み込み
@@ -2902,6 +2956,8 @@ public partial class MainWindow : Window
         _dragSelectionSnapshot = null;
         _dragPressCollapseEntry = null;
         _dragInProgress = false;
+        _dragButton = MouseButton.Left;
+        _rightButtonDragObserved = false;
     }
 
     // ===== 背景ドラッグによる範囲選択 =====
@@ -3238,6 +3294,13 @@ public partial class MainWindow : Window
 
     private void OnDragOver(object? sender, DragEventArgs e)
     {
+        // ドロップ時点では既にボタンが離れているため、ドラッグ中に一度でも右ボタンを観測したら
+        // このセッションは右ボタンドラッグとして扱う（アプリ外から来たドラッグもこれで判定できる）。
+        if (!_rightButtonDragObserved && MouseButtonState.IsRightButtonDown)
+        {
+            _rightButtonDragObserved = true;
+        }
+
         var files = GetDroppedPaths(e);
         if (files.Count == 0)
         {
@@ -3337,6 +3400,8 @@ public partial class MainWindow : Window
 
     private void OnDrop(object? sender, DragEventArgs e)
     {
+        var rightDrop = _rightButtonDragObserved;
+        _rightButtonDragObserved = false;
         var files = GetDroppedPaths(e);
         // プレビュータブが仮配置済みなら、ユーザーが見ているその位置をそのまま挿入位置にする
         // （ClearFileDropVisual でプレビューが取り除かれる前に確定させる）
@@ -3373,9 +3438,59 @@ public partial class MainWindow : Window
             return;
         }
 
-        var move = ResolveDropEffect(e, files, destDir) == DragDropEffects.Move;
         e.Handled = true;
+
+        // 右ボタンドラッグはドロップ時に操作を選ばせる（エクスプローラーと同じ）
+        if (rightDrop)
+        {
+            ShowRightDragDropMenu(refreshTab, files, destDir, e.GetPosition(this));
+            return;
+        }
+
+        var move = ResolveDropEffect(e, files, destDir) == DragDropEffects.Move;
         _ = refreshTab.DropFilesAsync(files, destDir, move);
+    }
+
+    /// <summary>右ボタンドラッグのドロップ地点に「ここにコピー / ここに移動 / ショートカットをここに作成 /
+    /// キャンセル」を出す。既定になる操作（同一ドライブなら移動、別ドライブならコピー）は
+    /// エクスプローラーと同じく太字にする。</summary>
+    private void ShowRightDragDropMenu(TabViewModel tab, List<string> files, string destDir, Point position)
+    {
+        var flyout = new MenuFlyout
+        {
+            Placement = PlacementMode.AnchorAndGravity,
+            PlacementAnchor = Avalonia.Controls.Primitives.PopupPositioning.PopupAnchor.TopLeft,
+            PlacementGravity = Avalonia.Controls.Primitives.PopupPositioning.PopupGravity.BottomRight,
+            HorizontalOffset = position.X,
+            VerticalOffset = position.Y,
+        };
+
+        var copy = new MenuItem { Header = LocalizationService.Text("Text.Drop.CopyHere") };
+        copy.Click += (_, _) => _ = tab.DropFilesAsync(files, destDir, move: false);
+
+        var move = new MenuItem { Header = LocalizationService.Text("Text.Drop.MoveHere") };
+        move.Click += (_, _) => _ = tab.DropFilesAsync(files, destDir, move: true);
+
+        var shortcut = new MenuItem { Header = LocalizationService.Text("Text.Drop.CreateShortcutHere") };
+        shortcut.Click += (_, _) => _ = tab.DropShortcutsAsync(files, destDir);
+
+        if (ResolveDefaultDropEffect(files, destDir) == DragDropEffects.Move)
+        {
+            move.FontWeight = FontWeight.Bold;
+        }
+        else
+        {
+            copy.FontWeight = FontWeight.Bold;
+        }
+
+        flyout.Items.Add(copy);
+        flyout.Items.Add(move);
+        flyout.Items.Add(shortcut);
+        flyout.Items.Add(new Separator());
+        // キャンセルは閉じるだけ（何もしない項目を置くのがエクスプローラーと同じ形）
+        flyout.Items.Add(new MenuItem { Header = LocalizationService.Text("Text.Common.Cancel") });
+
+        flyout.ShowAt(this);
     }
 
     /// <summary>ドロップ先のフィードバック。エクスプローラー同等の最小構成として、対象の
@@ -3462,6 +3577,12 @@ public partial class MainWindow : Window
             return DragDropEffects.Move;
         }
 
+        return ResolveDefaultDropEffect(files, destDir);
+    }
+
+    /// <summary>修飾キーなしの既定則: 同一ドライブ = 移動 / 別ドライブ = コピー。</summary>
+    private static DragDropEffects ResolveDefaultDropEffect(List<string> files, string destDir)
+    {
         var sameRoot = string.Equals(
             Path.GetPathRoot(files[0]),
             Path.GetPathRoot(destDir),
@@ -3502,6 +3623,14 @@ public partial class MainWindow : Window
 
         if (e.InitialPressMouseButton != MouseButton.Right)
         {
+            return;
+        }
+
+        // 右ボタンドラッグを終えた直後のリリースではメニューを出さない（ドロップ側のメニューが出ている）
+        if (_suppressContextMenuAfterDrag)
+        {
+            _suppressContextMenuAfterDrag = false;
+            e.Handled = true;
             return;
         }
 

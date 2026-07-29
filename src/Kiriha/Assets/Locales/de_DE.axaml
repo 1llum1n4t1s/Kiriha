@@ -69,6 +69,10 @@
   <x:String x:Key="Text.Drag.Move" xml:space="preserve">Verschieben</x:String>
   <x:String x:Key="Text.Drag.OpenInTab" xml:space="preserve">In Tab öffnen</x:String>
   <x:String x:Key="Text.Drive.FreeOfTotal" xml:space="preserve">{0} frei von {1}</x:String>
+  <x:String x:Key="Text.Drop.CopyHere" xml:space="preserve">Hierher kopieren</x:String>
+  <x:String x:Key="Text.Drop.CreateShortcutHere" xml:space="preserve">Verknüpfungen hier erstellen</x:String>
+  <x:String x:Key="Text.Drop.MoveHere" xml:space="preserve">Hierher verschieben</x:String>
+  <x:String x:Key="Text.Drop.ShortcutSuffix" xml:space="preserve"> - Verknüpfung</x:String>
   <x:String x:Key="Text.Error.AccessDenied" xml:space="preserve">Zugriff verweigert</x:String>
   <x:String x:Key="Text.Error.Code" xml:space="preserve">Fehler {0}</x:String>
   <x:String x:Key="Text.Error.CodeWithDesc" xml:space="preserve">Fehler {0}: {1}</x:String>
@@ -191,6 +195,7 @@
   <x:String x:Key="Text.Op.Moved" xml:space="preserve">{0} Element(e) verschoben</x:String>
   <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">Einfügen fehlgeschlagen ({0})</x:String>
   <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">Umbenennen fehlgeschlagen ({0})</x:String>
+  <x:String x:Key="Text.Op.ShortcutsCreated" xml:space="preserve">{0} Verknüpfung(en) erstellt</x:String>
   <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">{0} Datei(en)  {1}</x:String>
   <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> oder mehr</x:String>
   <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">Papierkorb leeren</x:String>

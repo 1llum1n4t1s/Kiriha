@@ -69,6 +69,10 @@
   <x:String x:Key="Text.Drag.Move" xml:space="preserve">Movere</x:String>
   <x:String x:Key="Text.Drag.OpenInTab" xml:space="preserve">In scheda aperire</x:String>
   <x:String x:Key="Text.Drive.FreeOfTotal" xml:space="preserve">{0} vacua ex {1}</x:String>
+  <x:String x:Key="Text.Drop.CopyHere" xml:space="preserve">Huc copiare</x:String>
+  <x:String x:Key="Text.Drop.CreateShortcutHere" xml:space="preserve">Compendia hic creare</x:String>
+  <x:String x:Key="Text.Drop.MoveHere" xml:space="preserve">Huc movere</x:String>
+  <x:String x:Key="Text.Drop.ShortcutSuffix" xml:space="preserve"> - Compendium</x:String>
   <x:String x:Key="Text.Error.AccessDenied" xml:space="preserve">Aditus negatus est</x:String>
   <x:String x:Key="Text.Error.Code" xml:space="preserve">Error {0}</x:String>
   <x:String x:Key="Text.Error.CodeWithDesc" xml:space="preserve">Error {0}: {1}</x:String>
@@ -191,6 +195,7 @@
   <x:String x:Key="Text.Op.Moved" xml:space="preserve">Res {0} motae</x:String>
   <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">Agglutinatio defecit ({0})</x:String>
   <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">Mutatio nominis defecit ({0})</x:String>
+  <x:String x:Key="Text.Op.ShortcutsCreated" xml:space="preserve">{0} compendia creata sunt</x:String>
   <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">Fasciculi {0}  {1}</x:String>
   <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> vel plures</x:String>
   <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">Scrinium vacuefacere</x:String>
