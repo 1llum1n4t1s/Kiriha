@@ -15,6 +15,17 @@ internal static partial class ShellThumbnailService
     private const uint BiRgb = 0;
     private const int RpcEChangedMode = unchecked((int)0x80010106);
 
+    /// <summary>GetImage が「その画像はまだ用意できていない」ことを示す HRESULT。抽出はシェル側で
+    /// 進んでいるため、少し待って取り直せば取れる一時的な失敗（恒久的な失敗と区別する）。</summary>
+    private const int EPending = unchecked((int)0x8000000A);
+
+    /// <summary>E_PENDING の取り直し回数と間隔。呼び出し元は 1 項目につき 1 回しか要求しないため、
+    /// ここで取り切らないとアイコンが空欄のまま残る（実測: 起動直後に一覧の項目を一斉要求すると
+    /// フォルダーがランダムに 0x8000000A を返し、1 回目の取り直しでほぼ埋まる）。
+    /// 待つのはバックグラウンドスレッドで、上限も短いため一覧表示の応答には影響しない。</summary>
+    private const int PendingRetryCount = 3;
+    private static readonly TimeSpan PendingRetryDelay = TimeSpan.FromMilliseconds(120);
+
     private static readonly Guid IidIShellItemImageFactory =
         new("bcc18b79-ba16-442f-80c4-8a59c30c463b");
     private static readonly StrategyBasedComWrappers ComWrappers = new();
@@ -24,17 +35,20 @@ internal static partial class ShellThumbnailService
     /// サムネイルハンドラーやコーデックがない場合は null を返す。
     /// </summary>
     public static Bitmap? TryGetThumbnail(string path, int requestedSize)
-        => TryGetShellImage(path, requestedSize, SiigbfThumbnailOnly, AlphaFormat.Opaque);
+        => TryGetShellImage(path, requestedSize, SiigbfThumbnailOnly, AlphaFormat.Opaque, pendingRetryCount: 0);
 
-    /// <summary>Shell が項目に割り当てた Windows 標準アイコンを取得する。</summary>
+    /// <summary>Shell が項目に割り当てた Windows 標準アイコンを取得する。
+    /// サムネイルと違って代わりに出せる絵が無く、取れなければ空欄になってしまうため、
+    /// 一時的な失敗（E_PENDING）はここで取り切る。</summary>
     public static Bitmap? TryGetIcon(string path, int requestedSize)
-        => TryGetShellImage(path, requestedSize, SiigbfIconOnly, AlphaFormat.Premul);
+        => TryGetShellImage(path, requestedSize, SiigbfIconOnly, AlphaFormat.Premul, PendingRetryCount);
 
     private static Bitmap? TryGetShellImage(
         string path,
         int requestedSize,
         uint flags,
-        AlphaFormat alphaFormat)
+        AlphaFormat alphaFormat,
+        int pendingRetryCount)
     {
         var initializeResult = CoInitializeEx(0, 0);
         var shouldUninitialize = initializeResult >= 0;
@@ -69,11 +83,8 @@ internal static partial class ShellThumbnailService
 
             try
             {
-                if (factory.GetImage(
-                        new NativeSize(requestedSize, requestedSize),
-                        flags,
-                        out var hBitmap) < 0
-                    || hBitmap == 0)
+                if (!TryGetImageWithPendingRetry(
+                        factory, requestedSize, flags, pendingRetryCount, out var hBitmap))
                 {
                     return null;
                 }
@@ -100,6 +111,38 @@ internal static partial class ShellThumbnailService
             {
                 CoUninitialize();
             }
+        }
+    }
+
+    /// <summary>E_PENDING（まだ用意できていない）だけを取り直しながら画像を取得する。
+    /// それ以外の失敗はハンドラーやコーデックが無いなど恒久的な理由なので即座に諦める。</summary>
+    private static bool TryGetImageWithPendingRetry(
+        IShellItemImageFactory factory,
+        int requestedSize,
+        uint flags,
+        int retryCount,
+        out nint hBitmap)
+    {
+        for (var attempt = 0; ; attempt++)
+        {
+            var imageResult = factory.GetImage(
+                new NativeSize(requestedSize, requestedSize),
+                flags,
+                out hBitmap);
+            if (imageResult >= 0 && hBitmap != 0)
+            {
+                return true;
+            }
+
+            if (imageResult != EPending || attempt >= retryCount)
+            {
+                hBitmap = 0;
+                return false;
+            }
+
+            // 抽出が終わるのを待つ。呼び出し元は専用スレッド（Task.Run）なので UI は止まらない。
+            // 間隔を伸ばしていくのは、初回生成に時間がかかる項目でも取り切れるようにするため。
+            Thread.Sleep(PendingRetryDelay * (attempt + 1));
         }
     }
 
