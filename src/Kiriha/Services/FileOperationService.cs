@@ -60,9 +60,16 @@ internal static partial class FileOperationService
             },
             destDir);
 
-    /// <summary>ごみ箱へ削除（Explorer 同様 Undo 可能）。permanent = true で完全削除（システム確認あり）。</summary>
-    public static FileOperationResult DeleteToRecycleBin(IReadOnlyList<string> sources, bool permanent = false)
-        => Execute(
+    /// <summary>ごみ箱へ削除（Explorer 同様 Undo 可能）。permanent = true で完全削除（システム確認あり）。
+    /// <paramref name="recycled"/> を渡すと、ごみ箱へ入った項目（Ctrl+Z の復元元）を受け取れる。</summary>
+    public static FileOperationResult DeleteToRecycleBin(
+        IReadOnlyList<string> sources,
+        bool permanent = false,
+        List<RecycledItem>? recycled = null)
+    {
+        // 完全削除は復元しようがないので、シンクも張らない
+        var sink = permanent || recycled is null ? null : new DeleteRecycleSink();
+        var result = Execute(
             permanent ? 0 : FofAllowUndo | FofxRecycleOnDelete,
             "削除",
             (operation, _) =>
@@ -70,6 +77,46 @@ internal static partial class FileOperationService
                 foreach (var source in sources)
                 {
                     var hr = operation.DeleteItem(CreateShellItem(source), 0);
+                    if (hr < 0)
+                    {
+                        return hr;
+                    }
+                }
+
+                return 0;
+            },
+            destination: null,
+            sink);
+
+        if (sink is not null && result.IsSuccess)
+        {
+            recycled!.AddRange(sink.Recycled);
+        }
+
+        return result;
+    }
+
+    /// <summary>ごみ箱の項目を元の場所へ戻す（Ctrl+Z の実体）。
+    /// ごみ箱名前空間の項目のまま移動するため、エクスプローラーで「元に戻す」を選んだときと同じく
+    /// $I 側の記録も片付く（$R ファイルを実パスとして move すると、その記録が孤立して残る）。</summary>
+    public static FileOperationResult RestoreFromRecycleBin(IReadOnlyList<RecycledItem> items)
+        => Execute(
+            FofAllowUndo,
+            "元に戻す",
+            (operation, _) =>
+            {
+                foreach (var item in items)
+                {
+                    if (Path.GetDirectoryName(item.OriginalPath) is not { Length: > 0 } destinationDir)
+                    {
+                        continue;
+                    }
+
+                    var hr = operation.MoveItem(
+                        CreateShellItem(item.RecycledParsingName),
+                        CreateShellItem(destinationDir),
+                        Path.GetFileName(item.OriginalPath),
+                        0);
                     if (hr < 0)
                     {
                         return hr;
@@ -147,7 +194,8 @@ internal static partial class FileOperationService
         uint flags,
         string operationName,
         Func<IFileOperation, IShellItem?, int> queue,
-        string? destination)
+        string? destination,
+        IFileOperationProgressSink? sink = null)
     {
         var result = new FileOperationResult(FileOperationOutcome.Failed, 0);
         Exception? error = null;
@@ -156,7 +204,7 @@ internal static partial class FileOperationService
         {
             try
             {
-                result = ExecuteCore(flags, operationName, queue, destination);
+                result = ExecuteCore(flags, operationName, queue, destination, sink);
             }
             catch (Exception ex)
             {
@@ -184,7 +232,8 @@ internal static partial class FileOperationService
         uint flags,
         string operationName,
         Func<IFileOperation, IShellItem?, int> queue,
-        string? destination)
+        string? destination,
+        IFileOperationProgressSink? sink)
     {
         var initializeResult = CoInitializeEx(0, CoinitApartmentThreaded);
         var shouldUninitialize = initializeResult >= 0;
@@ -194,6 +243,7 @@ internal static partial class FileOperationService
         }
 
         IFileOperation? operation = null;
+        uint? adviseCookie = null;
         try
         {
             var hr = CoCreateInstance(
@@ -222,6 +272,13 @@ internal static partial class FileOperationService
             if (hr < 0)
             {
                 return Fail(operationName, hr, destination);
+            }
+
+            // シンクは操作単位で 1 回だけ登録する（項目ごとの DeleteItem に渡す必要はない）。
+            // 失敗しても操作自体は続行できるため、ここでは中断しない。
+            if (sink is not null && operation.Advise(sink, out var sinkCookie) >= 0)
+            {
+                adviseCookie = sinkCookie;
             }
 
             var destinationItem = destination is null ? null : CreateShellItem(destination);
@@ -253,6 +310,11 @@ internal static partial class FileOperationService
             // COM オブジェクトは、この専用 STA スレッドが終わる前に手放す。
             // 放置すると解放がファイナライザ（MTA）へ回り、生成元のアパートメントが
             // 既に無い状態で解放されることになる。
+            if (adviseCookie is { } cookie && operation is not null)
+            {
+                operation.Unadvise(cookie);
+            }
+
             ReleaseShellItems();
             ComRelease.Release(operation);
             if (shouldUninitialize)
@@ -375,7 +437,7 @@ internal static partial class FileOperationService
 internal partial interface IFileOperation
 {
     [PreserveSig]
-    int Advise(nint sink, out uint cookie);
+    int Advise(IFileOperationProgressSink sink, out uint cookie);
 
     [PreserveSig]
     int Unadvise(uint cookie);

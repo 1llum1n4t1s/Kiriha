@@ -196,6 +196,8 @@
   <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">Falha ao colar ({0})</x:String>
   <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">Falha ao renomear ({0})</x:String>
   <x:String x:Key="Text.Op.ShortcutsCreated" xml:space="preserve">{0} atalho(s) criado(s)</x:String>
+  <x:String x:Key="Text.Op.UndoFailed" xml:space="preserve">Não foi possível desfazer ({0})</x:String>
+  <x:String x:Key="Text.Op.Undone" xml:space="preserve">{0} item(ns) restaurado(s)</x:String>
   <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">{0} arquivo(s)  {1}</x:String>
   <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> ou mais</x:String>
   <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">Esvaziar a Lixeira</x:String>

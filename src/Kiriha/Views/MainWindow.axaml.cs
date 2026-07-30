@@ -397,6 +397,9 @@ public partial class MainWindow : Window
             case Key.V when ctrl:
                 if (tab is { IsSettingsTab: false } && tab.PasteCommand.CanExecute(null)) tab.PasteCommand.Execute(null);
                 break;
+            case Key.Z when ctrl:
+                if (tab is { IsSettingsTab: false }) _ = tab.UndoLastOperationAsync();
+                break;
             case Key.A when ctrl:
                 // ファイル一覧の外（背景クリック後やツールバー操作後など）にフォーカスがあっても
                 // 全選択できるようにするフォールバック。テキストボックス内は各自の Ctrl+A が先に消費する。
@@ -901,8 +904,20 @@ public partial class MainWindow : Window
     /// <summary>ツリービューの選択で選択中タブを該当フォルダーへ移動する（XP のツリーと同じ操作感）。</summary>
     private void SidebarTree_SelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
+        // ツリーはタブごとのテンプレート内にあるため、選択タブが変わるたびに作り直される。
+        // 生成直後は SelectedItem の双方向バインディングが保存済みノードを新しい TreeView へ
+        // 流し込み、その初期プッシュでも SelectionChanged が発火する（実測: set_SelectedTab →
+        // ContentPresenter.UpdateChild → 論理ツリー接続 → バインディング購読 → SelectSingleItem）。
+        // ユーザー操作と取り違えると、切り替え先のタブが前のタブのフォルダーへ飛ばされ、
+        // 固定タブなら「移動先を新しいタブで開く」規則でタブが増えてしまう。
+        // 実際のクリックは Loaded 後に来るため、読み込み前の通知は無視する。
+        if (sender is not TreeView { IsLoaded: true })
+        {
+            return;
+        }
+
         if (e.AddedItems is not [FolderTreeNode node, ..]
-            || ViewModel?.SelectedTab is not { IsSettingsTab: false } tab)
+            || ViewModel is not { SelectedTab: { IsSettingsTab: false } tab } vm)
         {
             return;
         }
@@ -910,6 +925,15 @@ public partial class MainWindow : Window
         // プレースホルダー（読み込み中）ノードや同一パスへの再選択は無視する
         if (node is { Path: "", Kind: FolderTreeNode.NodeKind.Folder }
             || WindowsPathIdentity.Instance.Equals(node.Path, tab.CurrentPath))
+        {
+            return;
+        }
+
+        // SelectionChanged はユーザーのクリック以外でも発火する: 現在地同期がノードを選び直したとき、
+        // その選択が双方向バインディング経由で折り返し通知されたとき、展開でコンテナが生成されたとき。
+        // これらをユーザー操作と取り違えると、選択中タブが同期先のフォルダーへ勝手に移動し、
+        // 固定タブなら「移動先を新しいタブで開く」規則が働いて一番下にタブが増えてしまう。
+        if (vm.IsSyncingSidebarTree || vm.TryConsumeSyncedTreeNodeEcho(node))
         {
             return;
         }
@@ -2452,6 +2476,9 @@ public partial class MainWindow : Window
             case Key.V when ctrl:
                 if (tab.PasteCommand.CanExecute(null)) tab.PasteCommand.Execute(null);
                 break;
+            case Key.Z when ctrl:
+                _ = tab.UndoLastOperationAsync();
+                break;
             default:
                 return;
         }
@@ -2525,6 +2552,10 @@ public partial class MainWindow : Window
                 break;
             case Key.V when ctrl:
                 tab.PasteCommand.Execute(null);
+                e.Handled = true;
+                break;
+            case Key.Z when ctrl:
+                _ = tab.UndoLastOperationAsync();
                 e.Handled = true;
                 break;
             case Key.A when ctrl:

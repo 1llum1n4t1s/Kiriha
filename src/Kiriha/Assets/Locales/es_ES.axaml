@@ -196,6 +196,8 @@
   <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">Error al pegar ({0})</x:String>
   <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">Error al cambiar el nombre ({0})</x:String>
   <x:String x:Key="Text.Op.ShortcutsCreated" xml:space="preserve">Se crearon {0} accesos directos</x:String>
+  <x:String x:Key="Text.Op.UndoFailed" xml:space="preserve">No se pudo deshacer ({0})</x:String>
+  <x:String x:Key="Text.Op.Undone" xml:space="preserve">Se restauraron {0} elementos</x:String>
   <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">{0} archivo(s)  {1}</x:String>
   <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> o más</x:String>
   <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">Vaciar la Papelera de reciclaje</x:String>

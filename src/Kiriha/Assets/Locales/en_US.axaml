@@ -196,6 +196,8 @@
   <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">Paste failed ({0})</x:String>
   <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">Rename failed ({0})</x:String>
   <x:String x:Key="Text.Op.ShortcutsCreated" xml:space="preserve">Created {0} shortcut(s)</x:String>
+  <x:String x:Key="Text.Op.UndoFailed" xml:space="preserve">Could not undo ({0})</x:String>
+  <x:String x:Key="Text.Op.Undone" xml:space="preserve">Restored {0} item(s)</x:String>
   <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">{0} file(s)  {1}</x:String>
   <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> or more</x:String>
   <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">Empty Recycle Bin</x:String>

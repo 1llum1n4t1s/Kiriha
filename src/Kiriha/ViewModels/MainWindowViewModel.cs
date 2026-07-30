@@ -45,6 +45,14 @@ public partial class MainWindowViewModel : ObservableObject
     /// （非表示のタブで音が鳴り続けるのを防ぐ）。</summary>
     partial void OnSelectedTabChanged(TabViewModel? oldValue, TabViewModel? newValue)
     {
+        // 並べ替え中は ListBox の選択バインディングが一時的に選択を落とす（→直後に復元する）。
+        // その往復に反応してツリー同期や動画の停止・再開を走らせると、同期の折り返しで
+        // 選択中タブが別フォルダーへ飛ばされるなどの副作用が出るため、確定するまで何もしない。
+        if (_isMovingTab)
+        {
+            return;
+        }
+
         OnPropertyChanged(nameof(WindowTitle));
         newValue?.EnsureCurrentPathAvailable();
         _ = SyncSidebarTreeToCurrentPathAsync();
@@ -200,9 +208,35 @@ public partial class MainWindowViewModel : ObservableObject
     /// <summary>同期処理の世代。ナビゲーション連打時に古い同期結果で選択を上書きしない。</summary>
     private int _treeSyncGeneration;
 
+    /// <summary>「現在地同期」でアプリ側からツリー選択を動かしている間の入れ子数。
+    /// TreeView.SelectionChanged はユーザーのクリックだけでなく、この同期やノード展開に伴う
+    /// 再通知でも発火する。ユーザー操作と取り違えると選択中タブが別フォルダーへ移動し、
+    /// 固定タブでは「移動先を新しいタブで開く」規則が働いてタブが増えてしまう。</summary>
+    private int _sidebarTreeSyncDepth;
+
+    /// <summary>同期中（アプリ側がツリー選択を動かしている最中）かどうか。</summary>
+    internal bool IsSyncingSidebarTree => _sidebarTreeSyncDepth > 0;
+
+    /// <summary>同期でアプリ側が選んだノード。同じノードの SelectionChanged が折り返し通知された
+    /// ときに 1 回だけ読み捨てるための引換券（同期完了後のレイアウトで届く分を拾う）。</summary>
+    private Models.FolderTreeNode? _syncedTreeNodeEcho;
+
+    /// <summary>アプリ側の選択に対する折り返し通知なら true を返して引換券を消費する。</summary>
+    internal bool TryConsumeSyncedTreeNodeEcho(Models.FolderTreeNode node)
+    {
+        if (!ReferenceEquals(node, _syncedTreeNodeEcho))
+        {
+            return false;
+        }
+
+        _syncedTreeNodeEcho = null;
+        return true;
+    }
+
     /// <summary>選択中タブの現在フォルダーまでツリーを展開して選択状態にする。</summary>
     public async Task SyncSidebarTreeToCurrentPathAsync()
     {
+        _sidebarTreeSyncDepth++;
         try
         {
             await SyncSidebarTreeToCurrentPathCoreAsync();
@@ -211,6 +245,10 @@ public partial class MainWindowViewModel : ObservableObject
         {
             // 呼び出し元は fire-and-forget のため、ここで握りつぶさず必ずログへ残す
             Logger.LogException("サイドバーツリーの現在地同期に失敗しました", ex);
+        }
+        finally
+        {
+            _sidebarTreeSyncDepth--;
         }
     }
 
@@ -269,11 +307,19 @@ public partial class MainWindowViewModel : ObservableObject
 
     private void SelectTreeNode(Models.FolderTreeNode? node)
     {
-        if (node is not null)
+        if (node is null)
         {
-            node.IsExpanded = true;
-            SidebarTreeSelectedItem = node;
+            return;
         }
+
+        node.IsExpanded = true;
+        if (ReferenceEquals(SidebarTreeSelectedItem, node))
+        {
+            return;
+        }
+
+        _syncedTreeNodeEcho = node;
+        SidebarTreeSelectedItem = node;
     }
 
     /// <summary>candidate が target 自身またはその祖先ディレクトリかどうか。</summary>
@@ -1479,12 +1525,23 @@ public partial class MainWindowViewModel : ObservableObject
     private void MoveTabPreservingSelection(int from, int to)
     {
         var previousSelection = SelectedTab;
-        Tabs.Move(from, to);
-        if (!ReferenceEquals(SelectedTab, previousSelection))
+        _isMovingTab = true;
+        try
         {
-            SelectedTab = previousSelection;
+            Tabs.Move(from, to);
+            if (!ReferenceEquals(SelectedTab, previousSelection))
+            {
+                SelectedTab = previousSelection;
+            }
+        }
+        finally
+        {
+            _isMovingTab = false;
         }
     }
+
+    /// <summary>MoveTabPreservingSelection 実行中の印（OnSelectedTabChanged の副作用抑止用）。</summary>
+    private bool _isMovingTab;
 
     private void SavePinned()
     {

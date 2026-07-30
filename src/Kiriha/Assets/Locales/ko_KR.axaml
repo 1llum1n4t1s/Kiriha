@@ -196,6 +196,8 @@
   <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">붙여넣지 못했습니다({0})</x:String>
   <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">이름을 바꾸지 못했습니다({0})</x:String>
   <x:String x:Key="Text.Op.ShortcutsCreated" xml:space="preserve">{0}개의 바로 가기를 만들었습니다</x:String>
+  <x:String x:Key="Text.Op.UndoFailed" xml:space="preserve">실행 취소할 수 없습니다 ({0})</x:String>
+  <x:String x:Key="Text.Op.Undone" xml:space="preserve">{0}개의 항목을 복원했습니다</x:String>
   <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">파일 {0}개  {1}</x:String>
   <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> 이상</x:String>
   <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">휴지통 비우기</x:String>

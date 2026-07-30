@@ -196,6 +196,8 @@
   <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">लेपनं विफलम् ({0})</x:String>
   <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">नामपरिवर्तनं विफलम् ({0})</x:String>
   <x:String x:Key="Text.Op.ShortcutsCreated" xml:space="preserve">{0} संक्षेपमार्गाः रचिताः</x:String>
+  <x:String x:Key="Text.Op.UndoFailed" xml:space="preserve">प्रत्यावर्तनं न शक्यम् ({0})</x:String>
+  <x:String x:Key="Text.Op.Undone" xml:space="preserve">{0} वस्तूनि पुनःस्थापितानि</x:String>
   <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">{0} सञ्चिकाः  {1}</x:String>
   <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> तदधिकम्</x:String>
   <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">पुनश्चक्रपेटिकां रिक्तां कुरु</x:String>

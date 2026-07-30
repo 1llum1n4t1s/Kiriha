@@ -196,6 +196,8 @@
   <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">粘贴失败（{0}）</x:String>
   <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">重命名失败（{0}）</x:String>
   <x:String x:Key="Text.Op.ShortcutsCreated" xml:space="preserve">已创建 {0} 个快捷方式</x:String>
+  <x:String x:Key="Text.Op.UndoFailed" xml:space="preserve">无法撤消 ({0})</x:String>
+  <x:String x:Key="Text.Op.Undone" xml:space="preserve">已还原 {0} 个项目</x:String>
   <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">{0} 个文件  {1}</x:String>
   <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> 以上</x:String>
   <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">清空回收站</x:String>

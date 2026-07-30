@@ -196,6 +196,8 @@
   <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">Échec du collage ({0})</x:String>
   <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">Échec du renommage ({0})</x:String>
   <x:String x:Key="Text.Op.ShortcutsCreated" xml:space="preserve">{0} raccourci(s) créé(s)</x:String>
+  <x:String x:Key="Text.Op.UndoFailed" xml:space="preserve">Impossible d&apos;annuler ({0})</x:String>
+  <x:String x:Key="Text.Op.Undone" xml:space="preserve">{0} élément(s) restauré(s)</x:String>
   <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">{0} fichier(s)  {1}</x:String>
   <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> ou plus</x:String>
   <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">Vider la Corbeille</x:String>

@@ -196,6 +196,8 @@
   <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">ஒட்டுதல் தோல்வியடைந்தது ({0})</x:String>
   <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">பெயர் மாற்றம் தோல்வியடைந்தது ({0})</x:String>
   <x:String x:Key="Text.Op.ShortcutsCreated" xml:space="preserve">{0} குறுக்குவழிகள் உருவாக்கப்பட்டன</x:String>
+  <x:String x:Key="Text.Op.UndoFailed" xml:space="preserve">செயல்தவிர்க்க முடியவில்லை ({0})</x:String>
+  <x:String x:Key="Text.Op.Undone" xml:space="preserve">{0} உருப்படிகள் மீட்கப்பட்டன</x:String>
   <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">{0} கோப்புகள்  {1}</x:String>
   <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> அல்லது அதற்கு மேல்</x:String>
   <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">மறுசுழற்சிக் கூடையைக் காலி செய்</x:String>

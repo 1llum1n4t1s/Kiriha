@@ -196,6 +196,8 @@
   <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">Einfügen fehlgeschlagen ({0})</x:String>
   <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">Umbenennen fehlgeschlagen ({0})</x:String>
   <x:String x:Key="Text.Op.ShortcutsCreated" xml:space="preserve">{0} Verknüpfung(en) erstellt</x:String>
+  <x:String x:Key="Text.Op.UndoFailed" xml:space="preserve">Rückgängig machen nicht möglich ({0})</x:String>
+  <x:String x:Key="Text.Op.Undone" xml:space="preserve">{0} Element(e) wiederhergestellt</x:String>
   <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">{0} Datei(en)  {1}</x:String>
   <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> oder mehr</x:String>
   <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">Papierkorb leeren</x:String>

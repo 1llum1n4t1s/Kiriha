@@ -3221,17 +3221,43 @@ public partial class TabViewModel : ObservableObject
         // 削除後はエクスプローラーと同じく隣接項目を選択する
         var anchorIndex = _selection.Count > 0 ? _entries.IndexOf(_selection[0]) : -1;
 
-        var result = await Task.Run(() => FileOperationService.DeleteToRecycleBin(targets, permanent));
+        var recycled = new List<RecycledItem>();
+        var result = await Task.Run(() => FileOperationService.DeleteToRecycleBin(targets, permanent, recycled));
         if (!result.IsSuccess)
         {
             if (!result.IsCancelled) StatusText = LocalizationService.Text("Text.Op.DeleteFailed", FormatOpError(result.NativeErrorCode));
             return;
         }
+
+        // Ctrl+Z で戻せるようにごみ箱側の項目を控える（完全削除では空のまま）
+        FileUndoService.PushDelete(recycled);
         await NavigateToAsync(CurrentPath, record: false);
 
         if (anchorIndex >= 0 && Entries.Count > 0)
         {
             SelectedEntry = Entries[Math.Min(anchorIndex, Entries.Count - 1)];
+        }
+    }
+
+    /// <summary>Ctrl+Z。直近の削除をごみ箱から元の場所へ戻す（エクスプローラーと同じ挙動）。
+    /// 戻せる操作が無いときは何もしない（エクスプローラーもメッセージを出さない）。</summary>
+    public async Task UndoLastOperationAsync()
+    {
+        if (FileUndoService.PopDelete() is not { } recycled)
+        {
+            return;
+        }
+
+        var result = await Task.Run(() => FileOperationService.RestoreFromRecycleBin(recycled));
+        if (result.IsSuccess)
+        {
+            await NavigateToAsync(CurrentPath, record: false);
+            StatusText = LocalizationService.Text("Text.Op.Undone", recycled.Count);
+        }
+        else if (!result.IsCancelled)
+        {
+            // 戻せなかった分は履歴へ戻さない（ごみ箱を空にした後などは何度試しても失敗するため）
+            StatusText = LocalizationService.Text("Text.Op.UndoFailed", FormatOpError(result.NativeErrorCode));
         }
     }
 

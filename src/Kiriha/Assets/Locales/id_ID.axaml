@@ -196,6 +196,8 @@
   <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">Gagal menempel ({0})</x:String>
   <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">Gagal mengganti nama ({0})</x:String>
   <x:String x:Key="Text.Op.ShortcutsCreated" xml:space="preserve">{0} pintasan dibuat</x:String>
+  <x:String x:Key="Text.Op.UndoFailed" xml:space="preserve">Tidak dapat membatalkan ({0})</x:String>
+  <x:String x:Key="Text.Op.Undone" xml:space="preserve">{0} item dipulihkan</x:String>
   <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">{0} berkas  {1}</x:String>
   <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> atau lebih</x:String>
   <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">Kosongkan Recycle Bin</x:String>

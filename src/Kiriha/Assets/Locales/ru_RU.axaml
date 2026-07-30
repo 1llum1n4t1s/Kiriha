@@ -196,6 +196,8 @@
   <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">Не удалось вставить ({0})</x:String>
   <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">Не удалось переименовать ({0})</x:String>
   <x:String x:Key="Text.Op.ShortcutsCreated" xml:space="preserve">Создано ярлыков: {0}</x:String>
+  <x:String x:Key="Text.Op.UndoFailed" xml:space="preserve">Не удалось отменить ({0})</x:String>
+  <x:String x:Key="Text.Op.Undone" xml:space="preserve">Восстановлено объектов: {0}</x:String>
   <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">файлов: {0}  {1}</x:String>
   <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> или больше</x:String>
   <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">Очистить Корзину</x:String>

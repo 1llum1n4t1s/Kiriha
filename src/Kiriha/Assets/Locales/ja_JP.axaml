@@ -196,6 +196,8 @@
   <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">貼り付けに失敗しました（{0}）</x:String>
   <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">名前を変更できませんでした（{0}）</x:String>
   <x:String x:Key="Text.Op.ShortcutsCreated" xml:space="preserve">{0} 個のショートカットを作成しました</x:String>
+  <x:String x:Key="Text.Op.UndoFailed" xml:space="preserve">元に戻せませんでした（{0}）</x:String>
+  <x:String x:Key="Text.Op.Undone" xml:space="preserve">{0} 個の項目を元に戻しました</x:String>
   <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">{0} 個のファイル  {1}</x:String>
   <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> 以上</x:String>
   <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">ごみ箱を空にする</x:String>

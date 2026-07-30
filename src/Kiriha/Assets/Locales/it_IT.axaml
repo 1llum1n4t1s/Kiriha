@@ -196,6 +196,8 @@
   <x:String x:Key="Text.Op.PasteFailed" xml:space="preserve">Incolla non riuscito ({0})</x:String>
   <x:String x:Key="Text.Op.RenameFailed" xml:space="preserve">Ridenominazione non riuscita ({0})</x:String>
   <x:String x:Key="Text.Op.ShortcutsCreated" xml:space="preserve">Creati {0} collegamenti</x:String>
+  <x:String x:Key="Text.Op.UndoFailed" xml:space="preserve">Impossibile annullare ({0})</x:String>
+  <x:String x:Key="Text.Op.Undone" xml:space="preserve">Ripristinati {0} elementi</x:String>
   <x:String x:Key="Text.Preview.FolderSummary" xml:space="preserve">{0} file  {1}</x:String>
   <x:String x:Key="Text.Preview.OrMore" xml:space="preserve"> o più</x:String>
   <x:String x:Key="Text.RecycleBin.Empty" xml:space="preserve">Svuota il Cestino</x:String>
