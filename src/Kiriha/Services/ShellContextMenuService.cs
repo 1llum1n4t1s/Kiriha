@@ -43,6 +43,76 @@ internal static partial class ShellContextMenuService
     /// <summary>アプリ独自項目のコマンド ID。シェル項目は 1〜0x7FFF を使うので、その外側を割り当てる。</summary>
     private const int ExtraItemCommandId = 0x8000;
 
+    /// <summary>CMIC_MASK_UNICODE。立てると *W フィールドが使われる。</summary>
+    private const uint CmicMaskUnicode = 0x0000_4000;
+
+    /// <summary>
+    /// lpDirectory（作業ディレクトリ）を渡して IContextMenu.InvokeCommand を実行する。
+    /// これを省くと、起動されるプログラムのカレントディレクトリが Kiriha のプロセスのものになる。
+    /// 「管理者として実行」では昇格した別プロセスとして起動されるため、そのカレントは
+    /// C:\Windows\System32 になり、`ESETUninstaller.exe /force` のように自分と同じフォルダーの
+    /// ファイルを相対参照するバッチが「認識されていません」で失敗する。エクスプローラーは
+    /// 対象フォルダーを lpDirectory として渡しており、それに合わせる。
+    /// </summary>
+    /// <param name="verbName">verb 名。メニュー項目をコマンド ID で実行するときは null。</param>
+    /// <param name="commandId">MAKEINTRESOURCE 相当のコマンド ID（verbName が null のときに使う）。</param>
+    private static unsafe int InvokeCommandInDirectory(
+        IContextMenu menu,
+        nint hwnd,
+        string? verbName,
+        nint commandId,
+        string? workingDirectory)
+    {
+        var verbAnsi = verbName is null ? 0 : Marshal.StringToHGlobalAnsi(verbName);
+        var verbUnicode = verbName is null ? 0 : Marshal.StringToHGlobalUni(verbName);
+        var directoryAnsi = workingDirectory is null ? 0 : Marshal.StringToHGlobalAnsi(workingDirectory);
+        var directoryUnicode = workingDirectory is null ? 0 : Marshal.StringToHGlobalUni(workingDirectory);
+        try
+        {
+            var info = new CmInvokeCommandInfoEx
+            {
+                Size = (uint)sizeof(CmInvokeCommandInfoEx),
+                Mask = CmicMaskUnicode,
+                Hwnd = hwnd,
+                // コマンド ID 指定（MAKEINTRESOURCE）のときは ANSI・Unicode どちらも同じ値を入れる。
+                Verb = verbName is null ? commandId : verbAnsi,
+                VerbW = verbName is null ? commandId : verbUnicode,
+                Directory = directoryAnsi,
+                DirectoryW = directoryUnicode,
+                Show = 1, // SW_SHOWNORMAL
+            };
+            return menu.InvokeCommand((nint)(&info));
+        }
+        finally
+        {
+            if (verbAnsi != 0) Marshal.FreeHGlobal(verbAnsi);
+            if (verbUnicode != 0) Marshal.FreeHGlobal(verbUnicode);
+            if (directoryAnsi != 0) Marshal.FreeHGlobal(directoryAnsi);
+            if (directoryUnicode != 0) Marshal.FreeHGlobal(directoryUnicode);
+        }
+    }
+
+    /// <summary>対象の項目が入っているフォルダー（= 起動するプログラムの作業ディレクトリ）。
+    /// ドライブ直下などで親が取れない場合はそのパス自身を使う。</summary>
+    private static string? ResolveWorkingDirectory(string path)
+    {
+        try
+        {
+            if (path.Length == 0 || path == FileSystemService.ComputerPath)
+            {
+                return null;
+            }
+
+            var parent = Path.GetDirectoryName(path);
+            return parent is { Length: > 0 } ? parent : path;
+        }
+        catch (ArgumentException)
+        {
+            // シェル名前空間の仮想パス（::{GUID} 等）は実フォルダーではないので指定しない
+            return null;
+        }
+    }
+
     /// <summary>
     /// 指定パスに対してシェル verb を直接実行する（例: "unpinfromhome" = クイックアクセスから外す、
     /// "pintohome" = クイックアクセスにピン留め）。
@@ -73,7 +143,6 @@ internal static partial class ShellContextMenuService
                     return false;
                 }
 
-                var verbPtr = Marshal.StringToHGlobalAnsi(verb);
                 try
                 {
                     if (menu.QueryContextMenu(hmenu, 0, 1, 0x7FFF, 0) < 0)
@@ -82,26 +151,17 @@ internal static partial class ShellContextMenuService
                         return false;
                     }
 
-                    unsafe
+                    var hr = InvokeCommandInDirectory(
+                        menu, hwnd, verb, commandId: 0, ResolveWorkingDirectory(path));
+                    if (hr < 0)
                     {
-                        var info = new CmInvokeCommandInfo
-                        {
-                            Size = (uint)sizeof(CmInvokeCommandInfo),
-                            Hwnd = hwnd,
-                            Verb = verbPtr,
-                            Show = 1,
-                        };
-                        var hr = menu.InvokeCommand((nint)(&info));
-                        if (hr < 0)
-                        {
-                            LogVerbFailure(verb, path, $"InvokeCommand (hr=0x{hr:X8})");
-                        }
-                        return hr >= 0;
+                        LogVerbFailure(verb, path, $"InvokeCommand (hr=0x{hr:X8})");
                     }
+
+                    return hr >= 0;
                 }
                 finally
                 {
-                    Marshal.FreeHGlobal(verbPtr);
                     DestroyMenu(hmenu);
                 }
             }
@@ -173,7 +233,7 @@ internal static partial class ShellContextMenuService
                     contextMenuPtr,
                     CreateObjectFlags.None);
                 Marshal.Release(contextMenuPtr);
-                return InvokeVerb(menu, hwnd, verb);
+                return InvokeVerb(menu, hwnd, verb, directoryPath);
             }
             finally
             {
@@ -188,7 +248,7 @@ internal static partial class ShellContextMenuService
         }
     }
 
-    private static bool InvokeVerb(IContextMenu menu, nint hwnd, string verb)
+    private static bool InvokeVerb(IContextMenu menu, nint hwnd, string verb, string? workingDirectory)
     {
         var hmenu = CreatePopupMenu();
         if (hmenu == 0)
@@ -196,7 +256,6 @@ internal static partial class ShellContextMenuService
             return false;
         }
 
-        var verbPtr = Marshal.StringToHGlobalAnsi(verb);
         try
         {
             var result = menu.QueryContextMenu(hmenu, 0, 1, 0x7FFF, 0);
@@ -205,22 +264,12 @@ internal static partial class ShellContextMenuService
                 return LogBackgroundVerbFailure("IContextMenu.QueryContextMenu", result);
             }
 
-            unsafe
-            {
-                var info = new CmInvokeCommandInfo
-                {
-                    Size = (uint)sizeof(CmInvokeCommandInfo),
-                    Hwnd = hwnd,
-                    Verb = verbPtr,
-                    Show = 1,
-                };
-                result = menu.InvokeCommand((nint)(&info));
-                return result >= 0 || LogBackgroundVerbFailure("IContextMenu.InvokeCommand", result);
-            }
+            // 背景メニューはそのフォルダー自身が作業ディレクトリ（貼り付け先もここ）。
+            result = InvokeCommandInDirectory(menu, hwnd, verb, commandId: 0, workingDirectory);
+            return result >= 0 || LogBackgroundVerbFailure("IContextMenu.InvokeCommand", result);
         }
         finally
         {
-            Marshal.FreeHGlobal(verbPtr);
             DestroyMenu(hmenu);
         }
     }
@@ -291,7 +340,8 @@ internal static partial class ShellContextMenuService
                 }
             }
 
-            return pidls.Count > 0 && ShowForPidls(hwnd, pidls, x, y, extraItem);
+            return pidls.Count > 0
+                   && ShowForPidls(hwnd, pidls, x, y, extraItem, ResolveWorkingDirectory(paths[0]));
         }
         finally
         {
@@ -302,7 +352,13 @@ internal static partial class ShellContextMenuService
         }
     }
 
-    private static bool ShowForPidls(nint hwnd, IReadOnlyList<nint> pidls, int x, int y, ShellMenuExtraItem? extraItem)
+    private static bool ShowForPidls(
+        nint hwnd,
+        IReadOnlyList<nint> pidls,
+        int x,
+        int y,
+        ShellMenuExtraItem? extraItem,
+        string? workingDirectory)
     {
         // シェル拡張（クラウドストレージ・AV 等）の不調で QueryContextMenu が数十秒ブロックすることが
         // あるため、所要時間を計測して遅延時だけ記録する（犯人特定の手掛かりを残す）。
@@ -425,18 +481,12 @@ internal static partial class ShellContextMenuService
                     }
                 }
 
-                var info = new CmInvokeCommandInfo
-                {
-                    Size = (uint)sizeof(CmInvokeCommandInfo),
-                    Hwnd = hwnd,
-                    Verb = cmd - 1,
-                    Show = 1, // SW_SHOWNORMAL
-                };
                 // InvokeCommand ではサードパーティ拡張のコードが動く。フリーズ・クラッシュ時に
                 // 「どの項目を実行した直後か」をログから追えるよう、実行前に記録し遅延も計測する
                 Logger.Log($"シェルメニュー項目を実行: cmd={cmd}", LogLevel.Debug);
                 var invokeStart = sw.ElapsedMilliseconds;
-                var hr = menu.InvokeCommand((nint)(&info));
+                var hr = InvokeCommandInDirectory(
+                    menu, hwnd, verbName: null, commandId: cmd - 1, workingDirectory);
                 var invokeMs = sw.ElapsedMilliseconds - invokeStart;
                 if (invokeMs > 1000 || hr < 0)
                 {
@@ -577,8 +627,11 @@ internal static partial class ShellContextMenuService
     [LibraryImport("shell32.dll")]
     private static partial int SHMultiFileProperties(nint pdtobj, uint flags);
 
+    /// <summary>CMINVOKECOMMANDINFOEX。Unicode 版のフィールド（*W）まで持つ拡張版で、
+    /// 作業ディレクトリを Unicode で渡すために使う（ANSI の lpDirectory だけだと、
+    /// システム ANSI コードページで表せないフォルダー名が壊れる）。</summary>
     [StructLayout(LayoutKind.Sequential)]
-    private struct CmInvokeCommandInfo
+    private struct CmInvokeCommandInfoEx
     {
         public uint Size;
         public uint Mask;
@@ -589,6 +642,13 @@ internal static partial class ShellContextMenuService
         public int Show;
         public uint HotKey;
         public nint Icon;
+        public nint Title;
+        public nint VerbW;
+        public nint ParametersW;
+        public nint DirectoryW;
+        public nint TitleW;
+        public int InvokeX;
+        public int InvokeY;
     }
 
     [LibraryImport("shell32.dll", StringMarshalling = StringMarshalling.Utf16)]

@@ -2921,9 +2921,12 @@ public partial class MainWindow : Window
     {
         try
         {
+            // 同じパスを 2 回渡すと、受け取り側では同じファイルを 2 つドロップされたことになる
+            // （WinMerge なら 3 つ目のペインが開く）。選択の作り方は押下時のスナップショット・
+            // ListBox の SelectedItems・一括選択の復元と経路が複数あるため、渡す直前で一意にする。
             var transfer = new DataTransfer();
             var previewEntries = new List<(string Path, bool IsDirectory)>();
-            foreach (var entry in entries)
+            foreach (var entry in DistinctByPath(entries))
             {
                 IStorageItem? item = entry.IsDirectory
                     ? await StorageProvider.TryGetFolderFromPathAsync(new Uri(entry.Path))
@@ -2966,6 +2969,28 @@ public partial class MainWindow : Window
             ClearFileDropVisual();
             ResetDragSource();
         }
+    }
+
+    /// <summary>同じパスの重複を取り除く（Windows のパスは大文字小文字を区別しない）。</summary>
+    private static List<(string Path, bool IsDirectory)> DistinctByPath(
+        IReadOnlyList<(string Path, bool IsDirectory)> entries)
+    {
+        if (entries.Count < 2)
+        {
+            return [.. entries];
+        }
+
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var result = new List<(string Path, bool IsDirectory)>(entries.Count);
+        foreach (var entry in entries)
+        {
+            if (seen.Add(entry.Path))
+            {
+                result.Add(entry);
+            }
+        }
+
+        return result;
     }
 
     private void CloseFileDragPreview()
