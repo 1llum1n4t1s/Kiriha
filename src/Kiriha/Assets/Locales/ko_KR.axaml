@@ -42,6 +42,7 @@
   <x:String x:Key="Text.Command.Options" xml:space="preserve">옵션</x:String>
   <x:String x:Key="Text.Command.Paste" xml:space="preserve">붙여넣기</x:String>
   <x:String x:Key="Text.Command.PasteTip" xml:space="preserve">붙여넣기 (Ctrl+V)</x:String>
+  <x:String x:Key="Text.Command.PropertiesTip" xml:space="preserve">속성 (Alt+Enter)</x:String>
   <x:String x:Key="Text.Command.Rename" xml:space="preserve">이름 바꾸기</x:String>
   <x:String x:Key="Text.Command.RenameTip" xml:space="preserve">이름 바꾸기 (F2)</x:String>
   <x:String x:Key="Text.Command.Share" xml:space="preserve">공유</x:String>
@@ -171,6 +172,7 @@
   <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">새 창</x:String>
   <x:String x:Key="Text.Menu.NoSubfolders" xml:space="preserve">(하위 폴더 없음)</x:String>
   <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(없음)</x:String>
+  <x:String x:Key="Text.Menu.ShowMoreOptions" xml:space="preserve">추가 옵션 표시</x:String>
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">뒤로</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">뒤로(마우스 오른쪽 클릭으로 기록)</x:String>
   <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">다 표시하지 못한 폴더 (클릭하면 목록)</x:String>
@@ -219,6 +221,11 @@
   <x:String x:Key="Text.Settings.About" xml:space="preserve">Kiriha 정보</x:String>
   <x:String x:Key="Text.Settings.About.Body" xml:space="preserve">Kiriha는 Windows 탐색기의 파일 작업과 Chrome의 탭·주소 표시줄·즐겨찾기를 하나의 화면에 모았습니다. 설정은 현재 사용자에게 저장됩니다.</x:String>
   <x:String x:Key="Text.Settings.Acrylic" xml:space="preserve">창에 아크릴 효과(반투명 흐림) 사용</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu" xml:space="preserve">마우스 오른쪽 버튼 메뉴</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Modern" xml:space="preserve">Kiriha 자체 (Windows 11 스타일)</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Note" xml:space="preserve">Windows 11 스타일 메뉴는 선별된 항목과 셸 확장만 표시하며, 보내기 같은 하위 메뉴는 "추가 옵션 표시"에 남습니다. 확장이 제대로 표시되지 않으면 다른 방식으로 전환하세요.</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Shell" xml:space="preserve">Kiriha 자체 (셸 항목 그대로)</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.System" xml:space="preserve">Windows 기본</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp" xml:space="preserve">폴더와 드라이브를 여는 기본 앱을 Kiriha로 설정</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.Off" xml:space="preserve">사용하면 탐색기에서 폴더나 드라이브를 열 때 Kiriha가 실행됩니다.</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.On" xml:space="preserve">현재 폴더와 드라이브는 Kiriha에서 열립니다. 해제하면 이전 동작으로 돌아갑니다.</x:String>
@@ -342,10 +349,13 @@
   <x:String x:Key="Text.Tab.New" xml:space="preserve">새 탭</x:String>
   <x:String x:Key="Text.Tab.NewBelow" xml:space="preserve">아래에 새 탭 열기</x:String>
   <x:String x:Key="Text.Tab.NewTip" xml:space="preserve">새 탭 (Ctrl+T)</x:String>
+  <x:String x:Key="Text.Tab.OpenInTabs" xml:space="preserve">새 탭에서 열기({0}개)</x:String>
   <x:String x:Key="Text.Tab.Pin" xml:space="preserve">탭 고정</x:String>
+  <x:String x:Key="Text.Tab.PinInTabs" xml:space="preserve">새 탭으로 고정({0}개)</x:String>
   <x:String x:Key="Text.Tab.Pinned" xml:space="preserve">고정된 탭</x:String>
   <x:String x:Key="Text.Tab.RecentlyClosed" xml:space="preserve">최근 닫은 탭</x:String>
   <x:String x:Key="Text.Tab.Reopen" xml:space="preserve">닫은 탭 다시 열기</x:String>
+  <x:String x:Key="Text.Tab.SortTip" xml:space="preserve">탭 정렬</x:String>
   <x:String x:Key="Text.Tab.Unpin" xml:space="preserve">탭 고정 해제</x:String>
   <x:String x:Key="Text.TabAction.CloseDuplicates" xml:space="preserve">같은 위치의 중복 탭 닫기</x:String>
   <x:String x:Key="Text.TabAction.CloseLeft" xml:space="preserve">위쪽 탭 닫기</x:String>
@@ -409,4 +419,5 @@
   <x:String x:Key="Text.View.PreviewPane" xml:space="preserve">미리 보기 창</x:String>
   <x:String x:Key="Text.View.Small" xml:space="preserve">작은 아이콘</x:String>
   <x:String x:Key="Text.View.StatusBar" xml:space="preserve">상태 표시줄</x:String>
+  <x:String x:Key="Text.View.Tiles" xml:space="preserve">나란히 보기</x:String>
 </ResourceDictionary>

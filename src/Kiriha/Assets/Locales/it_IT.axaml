@@ -42,6 +42,7 @@
   <x:String x:Key="Text.Command.Options" xml:space="preserve">Opzioni</x:String>
   <x:String x:Key="Text.Command.Paste" xml:space="preserve">Incolla</x:String>
   <x:String x:Key="Text.Command.PasteTip" xml:space="preserve">Incolla (Ctrl+V)</x:String>
+  <x:String x:Key="Text.Command.PropertiesTip" xml:space="preserve">Proprietà (Alt+Invio)</x:String>
   <x:String x:Key="Text.Command.Rename" xml:space="preserve">Rinomina</x:String>
   <x:String x:Key="Text.Command.RenameTip" xml:space="preserve">Rinomina (F2)</x:String>
   <x:String x:Key="Text.Command.Share" xml:space="preserve">Condividi</x:String>
@@ -171,6 +172,7 @@
   <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">Nuova finestra</x:String>
   <x:String x:Key="Text.Menu.NoSubfolders" xml:space="preserve">(Nessuna sottocartella)</x:String>
   <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(Nessuno)</x:String>
+  <x:String x:Key="Text.Menu.ShowMoreOptions" xml:space="preserve">Mostra altre opzioni</x:String>
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">Indietro</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">Indietro (clic destro per la cronologia)</x:String>
   <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">Cartelle che non entrano (fai clic per elencarle)</x:String>
@@ -219,6 +221,11 @@
   <x:String x:Key="Text.Settings.About" xml:space="preserve">Informazioni su Kiriha</x:String>
   <x:String x:Key="Text.Settings.About.Body" xml:space="preserve">Kiriha unisce in un'unica finestra la gestione dei file di Esplora risorse e le schede, la barra degli indirizzi e i preferiti di Chrome. Le impostazioni vengono salvate per l'utente corrente.</x:String>
   <x:String x:Key="Text.Settings.Acrylic" xml:space="preserve">Usa l'effetto acrilico (sfocatura traslucida) per la finestra</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu" xml:space="preserve">Menu di scelta rapida</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Modern" xml:space="preserve">Nativo di Kiriha (stile Windows 11)</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Note" xml:space="preserve">Il menu in stile Windows 11 mostra solo voci selezionate ed estensioni della shell; i sottomenu come «Invia a» restano in «Mostra altre opzioni». Cambia modalità se un'estensione non compare correttamente.</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Shell" xml:space="preserve">Nativo di Kiriha (voci della shell invariate)</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.System" xml:space="preserve">Predefinito di Windows</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp" xml:space="preserve">Imposta Kiriha come app predefinita per aprire cartelle e unità</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.Off" xml:space="preserve">Se attivo, Kiriha si avvia ogni volta che apri una cartella o un'unità da Esplora file.</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.On" xml:space="preserve">Al momento cartelle e unità si aprono in Kiriha. Disattivando l'opzione viene ripristinato il comportamento precedente.</x:String>
@@ -342,10 +349,13 @@
   <x:String x:Key="Text.Tab.New" xml:space="preserve">Nuova scheda</x:String>
   <x:String x:Key="Text.Tab.NewBelow" xml:space="preserve">Apri una nuova scheda sotto</x:String>
   <x:String x:Key="Text.Tab.NewTip" xml:space="preserve">Nuova scheda (Ctrl+T)</x:String>
+  <x:String x:Key="Text.Tab.OpenInTabs" xml:space="preserve">Apri in nuove schede ({0})</x:String>
   <x:String x:Key="Text.Tab.Pin" xml:space="preserve">Aggiungi la scheda</x:String>
+  <x:String x:Key="Text.Tab.PinInTabs" xml:space="preserve">Aggiungi come schede fissate ({0})</x:String>
   <x:String x:Key="Text.Tab.Pinned" xml:space="preserve">Scheda aggiunta</x:String>
   <x:String x:Key="Text.Tab.RecentlyClosed" xml:space="preserve">Schede chiuse di recente</x:String>
   <x:String x:Key="Text.Tab.Reopen" xml:space="preserve">Riapri la scheda chiusa</x:String>
+  <x:String x:Key="Text.Tab.SortTip" xml:space="preserve">Ordina schede</x:String>
   <x:String x:Key="Text.Tab.Unpin" xml:space="preserve">Rimuovi la scheda aggiunta</x:String>
   <x:String x:Key="Text.TabAction.CloseDuplicates" xml:space="preserve">Chiudi le schede duplicate della stessa cartella</x:String>
   <x:String x:Key="Text.TabAction.CloseLeft" xml:space="preserve">Chiudi le schede sovrastanti</x:String>
@@ -409,4 +419,5 @@
   <x:String x:Key="Text.View.PreviewPane" xml:space="preserve">Riquadro di anteprima</x:String>
   <x:String x:Key="Text.View.Small" xml:space="preserve">Icone piccole</x:String>
   <x:String x:Key="Text.View.StatusBar" xml:space="preserve">Barra di stato</x:String>
+  <x:String x:Key="Text.View.Tiles" xml:space="preserve">Riquadri</x:String>
 </ResourceDictionary>

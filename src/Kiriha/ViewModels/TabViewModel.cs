@@ -73,10 +73,11 @@ public partial class TabViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(
-        nameof(IsDetailsView), nameof(IsListView), nameof(IsIconsView), nameof(IconFontSize),
+        nameof(IsDetailsView), nameof(IsListView), nameof(IsIconsView), nameof(IsTilesView),
+        nameof(IconFontSize),
         nameof(ListOrientation), nameof(IsGalleryView),
         nameof(IsViewExtraLarge), nameof(IsViewLarge), nameof(IsViewMedium),
-        nameof(IsViewSmall), nameof(IsViewList), nameof(IsViewDetails))]
+        nameof(IsViewSmall), nameof(IsViewList), nameof(IsViewDetails), nameof(IsViewTiles))]
     private ViewMode _viewMode = ViewMode.Details;
 
     /// <summary>タブ自身（✕ ボタン / コンテキストメニュー）からの閉じる要求。</summary>
@@ -1851,7 +1852,7 @@ public partial class TabViewModel : ObservableObject
             _ => IconSize,
         };
 
-        if (IsIconsView)
+        if (UsesThumbnails)
         {
             ResetThumbnailScope();
         }
@@ -1924,7 +1925,7 @@ public partial class TabViewModel : ObservableObject
         // 安価な判定を先に済ませる。このメソッドは EffectiveViewportChanged から
         // 1 項目あたりレイアウト中に何度も呼ばれるため、対象外のときに拡張子判定まで
         // 走らせると（詳細・一覧表示では毎回まるごと無駄になる）無視できない回数になる。
-        if (!IsIconsView || _isDetached || entry.IsDirectory || entry.IsThumbnailFinal
+        if (!UsesThumbnails || _isDetached || entry.IsDirectory || entry.IsThumbnailFinal
             || _thumbnailScope is not { } scope)
         {
             return;
@@ -2024,7 +2025,7 @@ public partial class TabViewModel : ObservableObject
     /// 置き換わっていたら同一パスの現行 entry を探して引き渡す。</summary>
     private void PublishThumbnail(FileSystemEntry entry, Bitmap? bitmap, CancellationToken token, bool isFinal)
     {
-        var target = token.IsCancellationRequested || !IsIconsView
+        var target = token.IsCancellationRequested || !UsesThumbnails
             ? null
             : _entryByPath.GetValueOrDefault(entry.FullPath);
         if (target is null || target.IsThumbnailFinal)
@@ -2092,8 +2093,24 @@ public partial class TabViewModel : ObservableObject
     public string CurrentPath
     {
         get => _currentPath;
-        private set => SetProperty(ref _currentPath, value);
+        private set
+        {
+            if (SetProperty(ref _currentPath, value))
+            {
+                OnPropertyChanged(nameof(IsComputerRoot));
+                OnPropertyChanged(nameof(CanChangeViewMode));
+            }
+        }
     }
+
+    /// <summary>「PC」（ドライブ一覧）を表示中か。</summary>
+    public bool IsComputerRoot => CurrentPath == FileSystemService.ComputerPath;
+
+    /// <summary>
+    /// 表示方法を切り替えられるか。「PC」はドライブの名前・空き容量・使用率バーを見る場所なので
+    /// 並べて表示に固定し、メニュー・Ctrl+ホイールのどちらからも変えられないようにする。
+    /// </summary>
+    public bool CanChangeViewMode => !IsComputerRoot && !IsSettingsTab;
 
     private List<FileSystemEntry> _entries = [];
 
@@ -2106,6 +2123,12 @@ public partial class TabViewModel : ObservableObject
     public bool IsListView => ViewMode is ViewMode.List or ViewMode.SmallIcons;
 
     public bool IsIconsView => ViewMode is ViewMode.ExtraLargeIcons or ViewMode.LargeIcons or ViewMode.MediumIcons;
+
+    /// <summary>エクスプローラーの「並べて表示」。サイズはスライダーに追従せず固定（本家と同じ）。</summary>
+    public bool IsTilesView => ViewMode == ViewMode.Tiles;
+
+    /// <summary>サムネイルを読み込む表示か。並べて表示も 48px のサムネイルを出す（エクスプローラーと同じ）。</summary>
+    public bool UsesThumbnails => IsIconsView || IsTilesView;
 
     /// <summary>小アイコンは横方向へ折り返し、一覧は縦方向を埋めてから次の列へ進む。</summary>
     public Avalonia.Layout.Orientation ListOrientation
@@ -2144,6 +2167,7 @@ public partial class TabViewModel : ObservableObject
     public bool IsViewSmall => ViewMode == ViewMode.SmallIcons;
     public bool IsViewList => ViewMode == ViewMode.List;
     public bool IsViewDetails => ViewMode == ViewMode.Details;
+    public bool IsViewTiles => ViewMode == ViewMode.Tiles;
 
     public bool ShowHidden => _options.ShowHidden;
 
@@ -2538,7 +2562,7 @@ public partial class TabViewModel : ObservableObject
         // 移動したら前フォルダーのサムネイル読み込みはその場で打ち切る。クラウド同期フォルダー
         // （Google ドライブ等）は1件に数秒かかることがあり、打ち切らないと移動先のサムネイルが
         // 旧フォルダーの待ち行列の後ろに並んでいつまでも表示されない。
-        if (IsIconsView)
+        if (UsesThumbnails)
         {
             ResetThumbnailScope();
         }
@@ -2563,6 +2587,23 @@ public partial class TabViewModel : ObservableObject
         var pathChanged = !isInitialNavigation
             && !WindowsPathIdentity.Instance.Equals(_lastViewSettingsPath, path);
         _lastViewSettingsPath = path;
+
+        // 「PC」は並べて表示に固定する。適用フラグを立てたまま書くので、
+        // フォルダー別の記憶も既定表示も作られない（戻ったときは元のフォルダーの記憶が効く）。
+        if (path == FileSystemService.ComputerPath)
+        {
+            _isApplyingFolderViewSettings = true;
+            try
+            {
+                ViewMode = ViewMode.Tiles;
+            }
+            finally
+            {
+                _isApplyingFolderViewSettings = false;
+            }
+
+            return;
+        }
 
         if (_folderViewSettings?.TryGet(path, out var settings) == true)
         {
@@ -3044,6 +3085,7 @@ public partial class TabViewModel : ObservableObject
         CutCommand.NotifyCanExecuteChanged();
         CopyCommand.NotifyCanExecuteChanged();
         DeleteCommand.NotifyCanExecuteChanged();
+        DeletePermanentCommand.NotifyCanExecuteChanged();
         RenameCommand.NotifyCanExecuteChanged();
         OnPropertyChanged(nameof(CanCopySelectedPaths));
 
@@ -3106,8 +3148,15 @@ public partial class TabViewModel : ObservableObject
     /// </summary>
     public bool CanCopySelectedPaths => HasSelection;
 
-    /// <summary>ドライブは切り取り / 削除 / 名前変更の対象にしない（誤操作防止、エクスプローラー互換）。</summary>
+    /// <summary>
+    /// ドライブは切り取り / コピー / 削除 / 名前変更の対象にしない（誤操作防止）。
+    /// クリップボードへ載せた時点で、貼り付け先でドライブ中身の移動・コピーになり得るため、
+    /// 削除だけでなくコピーも同じ判定で塞ぐ。
+    /// </summary>
     private bool HasModifiableSelection => _selection.Count > 0 && _selection.All(e => !e.IsDrive);
+
+    /// <summary>クリップボード・削除に渡してよい選択（ドライブを除いたもの）。</summary>
+    private List<FileSystemEntry> ModifiableSelection => _selection.Where(e => !e.IsDrive).ToList();
 
     private bool HasSingleSelection => _selection.Count == 1 && !_selection[0].IsDrive;
 
@@ -3115,25 +3164,27 @@ public partial class TabViewModel : ObservableObject
     public bool CanCreateNew => CurrentPath != FileSystemService.ComputerPath && !IsSettingsTab;
 
     [RelayCommand(CanExecute = nameof(HasModifiableSelection))]
-    private void Cut()
-    {
-        if (ClipboardFileService.SetFiles(_selection.Select(e => e.FullPath).ToList(), cut: true))
-        {
-            StatusText = LocalizationService.Text("Text.Clipboard.Cut", _selection.Count);
-            PasteCommand.NotifyCanExecuteChanged();
-        }
-        else
-        {
-            StatusText = LocalizationService.Text("Text.Clipboard.WriteFailed");
-        }
-    }
+    private void Cut() => SetClipboard(cut: true);
 
-    [RelayCommand(CanExecute = nameof(HasSelection))]
-    private void Copy()
+    [RelayCommand(CanExecute = nameof(HasModifiableSelection))]
+    private void Copy() => SetClipboard(cut: false);
+
+    /// <summary>
+    /// 選択をクリップボードへ載せる。RelayCommand.Execute は CanExecute を見ずに走るので、
+    /// ドライブの除外は活性判定だけに任せずここでも行う。
+    /// </summary>
+    private void SetClipboard(bool cut)
     {
-        if (ClipboardFileService.SetFiles(_selection.Select(e => e.FullPath).ToList(), cut: false))
+        var targets = ModifiableSelection;
+        if (targets.Count == 0)
         {
-            StatusText = LocalizationService.Text("Text.Clipboard.Copied", _selection.Count);
+            return;
+        }
+
+        if (ClipboardFileService.SetFiles(targets.Select(e => e.FullPath).ToList(), cut))
+        {
+            StatusText = LocalizationService.Text(
+                cut ? "Text.Clipboard.Cut" : "Text.Clipboard.Copied", targets.Count);
             PasteCommand.NotifyCanExecuteChanged();
         }
         else
@@ -3199,11 +3250,11 @@ public partial class TabViewModel : ObservableObject
         else if (!result.IsCancelled) StatusText = LocalizationService.Text("Text.Op.PasteFailed", FormatOpError(result.NativeErrorCode));
     }
 
-    [RelayCommand(CanExecute = nameof(HasSelection))]
+    [RelayCommand(CanExecute = nameof(HasModifiableSelection))]
     private Task DeleteAsync() => DeleteCoreAsync(permanent: false);
 
     /// <summary>Shift+Delete の完全削除（ごみ箱を経由しない、システム確認あり）。</summary>
-    [RelayCommand(CanExecute = nameof(HasSelection))]
+    [RelayCommand(CanExecute = nameof(HasModifiableSelection))]
     private Task DeletePermanent() => DeleteCoreAsync(permanent: true);
 
     /// <summary>ファイル操作エラーを「エラー 206: パスが長すぎます」の形式に整形する（説明が無いコードは生数値のみ）。</summary>
@@ -3217,9 +3268,18 @@ public partial class TabViewModel : ObservableObject
 
     private async Task DeleteCoreAsync(bool permanent)
     {
-        var targets = _selection.Select(e => e.FullPath).ToList();
+        // ドライブ（PC ビューの C: 等）は絶対に削除対象にしない。IFileOperation にドライブ直下を
+        // 渡すと中身の一括削除が始まってしまうため、CanExecute（HasModifiableSelection）だけでなく
+        // ここでも弾く。RelayCommand.Execute は CanExecute を見ずに走るので、保険が要る。
+        var deletable = ModifiableSelection;
+        if (deletable.Count == 0)
+        {
+            return;
+        }
+
+        var targets = deletable.Select(e => e.FullPath).ToList();
         // 削除後はエクスプローラーと同じく隣接項目を選択する
-        var anchorIndex = _selection.Count > 0 ? _entries.IndexOf(_selection[0]) : -1;
+        var anchorIndex = _entries.IndexOf(deletable[0]);
 
         var recycled = new List<RecycledItem>();
         var result = await Task.Run(() => FileOperationService.DeleteToRecycleBin(targets, permanent, recycled));
@@ -3632,7 +3692,7 @@ public partial class TabViewModel : ObservableObject
     [RelayCommand]
     private void SetViewMode(string mode)
     {
-        if (Enum.TryParse<ViewMode>(mode, out var value))
+        if (CanChangeViewMode && Enum.TryParse<ViewMode>(mode, out var value))
         {
             ViewMode = value;
         }

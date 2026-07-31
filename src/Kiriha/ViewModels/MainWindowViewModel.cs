@@ -826,6 +826,27 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
+    /// <summary>
+    /// 右クリックメニューの実装方式。表示ラベルは XAML 側の ComboBoxItem が持ち、
+    /// ここで扱うのは enum 名の文字列（アイコンセット・テーマ設定と同じ Tag 方式）。
+    /// </summary>
+    public string? OptContextMenuStyle
+    {
+        get => ContextMenuStyle.ToString();
+        set
+        {
+            if (value is null || !Enum.TryParse<ContextMenuStyle>(value, out var style) || !Enum.IsDefined(style)) return;
+            if (ContextMenuStyle == style) return;
+            ContextMenuStyle = style;
+            _settings.ContextMenuStyle = style.ToString();
+            SettingsService.Save(_settings);
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>右クリックメニューの実装方式（View が右クリック時に読む）。</summary>
+    public ContextMenuStyle ContextMenuStyle { get; private set; } = Models.ContextMenuStyle.Modern;
+
     // ===== フォルダーの既定表示（表示設定を保存していないフォルダーで使う） =====
     //
     // フォルダーごとの記憶（folder-views.json）が無いフォルダーは、ここで決めた表示方法と
@@ -986,6 +1007,10 @@ public partial class MainWindowViewModel : ObservableObject
             : _settings.UseMaterialIcons ? FileIconSet.Material : FileIconSet.Original;
         _settings.IconSet = Options.IconSet.ToString();
         _settings.UseMaterialIcons = false;
+        ContextMenuStyle = Enum.TryParse<ContextMenuStyle>(_settings.ContextMenuStyle, out var menuStyle)
+                           && Enum.IsDefined(menuStyle)
+            ? menuStyle
+            : Models.ContextMenuStyle.Modern;
         Options.Changed += (_, e) =>
         {
             _settings.ShowHidden = Options.ShowHidden;
@@ -1940,6 +1965,35 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
+    /// <summary>選択したフォルダー群をまとめて末尾のタブとして開く（ファイル一覧の右クリック用）。
+    /// 開いた順に並べ、最後の 1 つを選択状態にする。</summary>
+    public void OpenFolderTabs(IEnumerable<string> paths)
+    {
+        TabViewModel? last = null;
+        foreach (var path in paths.Where(Directory.Exists))
+        {
+            last = AddTab(Path.GetFullPath(path), pinned: false);
+        }
+
+        if (last is not null)
+        {
+            SelectedTab = last;
+        }
+    }
+
+    /// <summary>選択したフォルダー群を固定タブとして追加する（ファイル一覧の右クリック用）。
+    /// 固定タブは「そこに常駐させて後から参照する」ための置き場なので、開いても選択は移さない
+    /// （今の作業タブから離れず、複数まとめて固定しても最後の 1 つへ飛ばされない）。
+    /// AddTab の pinned 指定で IsPinned が立ち、Tab_PropertyChanged 経由で固定ブロックへの
+    /// 並べ替えと設定の保存まで走る。</summary>
+    public void PinFolderTabs(IEnumerable<string> paths)
+    {
+        foreach (var path in paths.Where(Directory.Exists))
+        {
+            AddTab(Path.GetFullPath(path), pinned: true);
+        }
+    }
+
     /// <summary>Explorer または二重起動から渡されたフォルダーを新しいタブで開く。</summary>
     public bool OpenShellPaths(IEnumerable<string> paths)
     {
@@ -1995,6 +2049,25 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
+    /// <summary>タブ一覧下部の並べ替えボタン用。固定タブ・通常タブそれぞれのブロック内で名前順に並べる。</summary>
+    [RelayCommand]
+    private void SortTabsByName()
+        => ReorderTabs(Tabs.Where(t => !t.IsSettingsTab)
+            .OrderBy(t => t.Title, StringComparer.CurrentCultureIgnoreCase)
+            .ToList());
+
+    /// <summary>同じくパス順。同じ親フォルダーのタブが隣り合うので、階層で揃えたいときはこちら。</summary>
+    [RelayCommand]
+    private void SortTabsByPath()
+        => ReorderTabs(Tabs.Where(t => !t.IsSettingsTab)
+            .OrderBy(t => t.CurrentPath, StringComparer.OrdinalIgnoreCase)
+            .ToList());
+
+    /// <summary>並び順の反転。並べ替えた直後に押せば降順になる。</summary>
+    [RelayCommand]
+    private void ReverseTabOrder()
+        => ReorderTabs(Tabs.Where(t => !t.IsSettingsTab).Reverse().ToList());
+
     private static void RefreshTabs(IEnumerable<TabViewModel> tabs)
     {
         foreach (var tab in tabs.Where(t => !t.IsSettingsTab).ToList()) tab.RefreshCommand.Execute(null);
@@ -2005,12 +2078,22 @@ public partial class MainWindowViewModel : ObservableObject
         foreach (var tab in tabs.ToList()) tab.IsPinned = pinned;
     }
 
+    /// <summary>並べ替えの本体。固定タブと通常タブはそれぞれのブロック内だけで並び替え、
+    /// ブロックの境界（固定タブが必ず上）は動かさない。
+    /// 設定タブは並べ替えの対象外（パスも表示名の意味も他のタブと違う）だが、
+    /// 固定されているなら固定ブロックの末尾に残す。ここを一律で全体の末尾へ送ると、
+    /// 固定した設定タブが並べ替えのたびに固定ブロックから弾き出されてしまう。</summary>
     private void ReorderTabs(IEnumerable<TabViewModel> ordered)
     {
-        var pinned = ordered.Where(t => t.IsPinned).ToList();
-        var unpinned = ordered.Where(t => !t.IsPinned).ToList();
-        var settings = Tabs.Where(t => t.IsSettingsTab).ToList();
-        var target = pinned.Concat(unpinned).Concat(settings).ToList();
+        var orderedList = ordered.ToList();
+        var settingsTabs = Tabs.Where(t => t.IsSettingsTab).ToList();
+        var pinned = orderedList.Where(t => t.IsPinned)
+            .Concat(settingsTabs.Where(t => t.IsPinned))
+            .ToList();
+        var unpinned = orderedList.Where(t => !t.IsPinned)
+            .Concat(settingsTabs.Where(t => !t.IsPinned))
+            .ToList();
+        var target = pinned.Concat(unpinned).ToList();
         for (var i = 0; i < target.Count; i++)
         {
             var current = Tabs.IndexOf(target[i]);

@@ -42,6 +42,7 @@
   <x:String x:Key="Text.Command.Options" xml:space="preserve">Opciones</x:String>
   <x:String x:Key="Text.Command.Paste" xml:space="preserve">Pegar</x:String>
   <x:String x:Key="Text.Command.PasteTip" xml:space="preserve">Pegar (Ctrl+V)</x:String>
+  <x:String x:Key="Text.Command.PropertiesTip" xml:space="preserve">Propiedades (Alt+Enter)</x:String>
   <x:String x:Key="Text.Command.Rename" xml:space="preserve">Cambiar nombre</x:String>
   <x:String x:Key="Text.Command.RenameTip" xml:space="preserve">Cambiar nombre (F2)</x:String>
   <x:String x:Key="Text.Command.Share" xml:space="preserve">Compartir</x:String>
@@ -171,6 +172,7 @@
   <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">Ventana nueva</x:String>
   <x:String x:Key="Text.Menu.NoSubfolders" xml:space="preserve">(Sin subcarpetas)</x:String>
   <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(Ninguno)</x:String>
+  <x:String x:Key="Text.Menu.ShowMoreOptions" xml:space="preserve">Mostrar más opciones</x:String>
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">Atrás</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">Atrás (clic derecho para el historial)</x:String>
   <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">Carpetas que no caben (haz clic para verlas)</x:String>
@@ -219,6 +221,11 @@
   <x:String x:Key="Text.Settings.About" xml:space="preserve">Acerca de Kiriha</x:String>
   <x:String x:Key="Text.Settings.About.Body" xml:space="preserve">Kiriha reúne en una sola ventana la gestión de archivos del Explorador de Windows y las pestañas, la barra de direcciones y los marcadores de Chrome. La configuración se guarda para el usuario actual.</x:String>
   <x:String x:Key="Text.Settings.Acrylic" xml:space="preserve">Usar el efecto acrílico (desenfoque translúcido) en la ventana</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu" xml:space="preserve">Menú contextual</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Modern" xml:space="preserve">Propio de Kiriha (estilo Windows 11)</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Note" xml:space="preserve">El menú de estilo Windows 11 muestra solo entradas seleccionadas y extensiones del shell; los submenús como «Enviar a» quedan en «Mostrar más opciones». Cambia de modo si alguna extensión no aparece correctamente.</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Shell" xml:space="preserve">Propio de Kiriha (elementos del shell tal cual)</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.System" xml:space="preserve">Predeterminado de Windows</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp" xml:space="preserve">Hacer de Kiriha la aplicación predeterminada para abrir carpetas y unidades</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.Off" xml:space="preserve">Al activarlo, Kiriha se inicia cuando abras una carpeta o unidad desde el Explorador.</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.On" xml:space="preserve">Ahora las carpetas y unidades se abren en Kiriha. Al desactivarlo se restaura el comportamiento anterior.</x:String>
@@ -342,10 +349,13 @@
   <x:String x:Key="Text.Tab.New" xml:space="preserve">Pestaña nueva</x:String>
   <x:String x:Key="Text.Tab.NewBelow" xml:space="preserve">Abrir una pestaña nueva abajo</x:String>
   <x:String x:Key="Text.Tab.NewTip" xml:space="preserve">Pestaña nueva (Ctrl+T)</x:String>
+  <x:String x:Key="Text.Tab.OpenInTabs" xml:space="preserve">Abrir en pestañas nuevas ({0})</x:String>
   <x:String x:Key="Text.Tab.Pin" xml:space="preserve">Anclar la pestaña</x:String>
+  <x:String x:Key="Text.Tab.PinInTabs" xml:space="preserve">Fijar en pestañas nuevas ({0})</x:String>
   <x:String x:Key="Text.Tab.Pinned" xml:space="preserve">Pestaña anclada</x:String>
   <x:String x:Key="Text.Tab.RecentlyClosed" xml:space="preserve">Pestañas cerradas recientemente</x:String>
   <x:String x:Key="Text.Tab.Reopen" xml:space="preserve">Reabrir la pestaña cerrada</x:String>
+  <x:String x:Key="Text.Tab.SortTip" xml:space="preserve">Ordenar pestañas</x:String>
   <x:String x:Key="Text.Tab.Unpin" xml:space="preserve">Desanclar la pestaña</x:String>
   <x:String x:Key="Text.TabAction.CloseDuplicates" xml:space="preserve">Cerrar las pestañas duplicadas de la misma carpeta</x:String>
   <x:String x:Key="Text.TabAction.CloseLeft" xml:space="preserve">Cerrar las pestañas de arriba</x:String>
@@ -409,4 +419,5 @@
   <x:String x:Key="Text.View.PreviewPane" xml:space="preserve">Panel de vista previa</x:String>
   <x:String x:Key="Text.View.Small" xml:space="preserve">Iconos pequeños</x:String>
   <x:String x:Key="Text.View.StatusBar" xml:space="preserve">Barra de estado</x:String>
+  <x:String x:Key="Text.View.Tiles" xml:space="preserve">Mosaicos</x:String>
 </ResourceDictionary>

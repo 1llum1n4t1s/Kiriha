@@ -42,6 +42,7 @@
   <x:String x:Key="Text.Command.Options" xml:space="preserve">Параметры</x:String>
   <x:String x:Key="Text.Command.Paste" xml:space="preserve">Вставить</x:String>
   <x:String x:Key="Text.Command.PasteTip" xml:space="preserve">Вставить (Ctrl+V)</x:String>
+  <x:String x:Key="Text.Command.PropertiesTip" xml:space="preserve">Свойства (Alt+Enter)</x:String>
   <x:String x:Key="Text.Command.Rename" xml:space="preserve">Переименовать</x:String>
   <x:String x:Key="Text.Command.RenameTip" xml:space="preserve">Переименовать (F2)</x:String>
   <x:String x:Key="Text.Command.Share" xml:space="preserve">Поделиться</x:String>
@@ -171,6 +172,7 @@
   <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">Новое окно</x:String>
   <x:String x:Key="Text.Menu.NoSubfolders" xml:space="preserve">(Нет вложенных папок)</x:String>
   <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(Нет)</x:String>
+  <x:String x:Key="Text.Menu.ShowMoreOptions" xml:space="preserve">Показать дополнительные параметры</x:String>
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">Назад</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">Назад (правый клик — журнал)</x:String>
   <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">Папки, которые не поместились (нажмите, чтобы показать)</x:String>
@@ -219,6 +221,11 @@
   <x:String x:Key="Text.Settings.About" xml:space="preserve">О программе Kiriha</x:String>
   <x:String x:Key="Text.Settings.About.Body" xml:space="preserve">Kiriha объединяет в одном окне работу с файлами как в Проводнике Windows и вкладки, адресную строку и закладки как в Chrome. Параметры сохраняются для текущего пользователя.</x:String>
   <x:String x:Key="Text.Settings.Acrylic" xml:space="preserve">Использовать акриловый эффект (полупрозрачное размытие) для окна</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu" xml:space="preserve">Контекстное меню</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Modern" xml:space="preserve">Собственное меню Kiriha (в стиле Windows 11)</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Note" xml:space="preserve">Меню в стиле Windows 11 показывает только отобранные пункты и расширения оболочки; подменю вроде «Отправить» остаются в «Показать дополнительные параметры». Смените режим, если какое-то расширение отображается неправильно.</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Shell" xml:space="preserve">Собственное меню Kiriha (элементы оболочки без изменений)</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.System" xml:space="preserve">Стандартное меню Windows</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp" xml:space="preserve">Сделать Kiriha приложением по умолчанию для открытия папок и дисков</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.Off" xml:space="preserve">Если включено, Kiriha запускается каждый раз, когда папка или диск открывается из Проводника.</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.On" xml:space="preserve">Сейчас папки и диски открываются в Kiriha. При отключении вернётся прежнее поведение.</x:String>
@@ -342,10 +349,13 @@
   <x:String x:Key="Text.Tab.New" xml:space="preserve">Новая вкладка</x:String>
   <x:String x:Key="Text.Tab.NewBelow" xml:space="preserve">Открыть новую вкладку ниже</x:String>
   <x:String x:Key="Text.Tab.NewTip" xml:space="preserve">Новая вкладка (Ctrl+T)</x:String>
+  <x:String x:Key="Text.Tab.OpenInTabs" xml:space="preserve">Открыть в новых вкладках ({0})</x:String>
   <x:String x:Key="Text.Tab.Pin" xml:space="preserve">Закрепить вкладку</x:String>
+  <x:String x:Key="Text.Tab.PinInTabs" xml:space="preserve">Закрепить в новых вкладках ({0})</x:String>
   <x:String x:Key="Text.Tab.Pinned" xml:space="preserve">Закреплённая вкладка</x:String>
   <x:String x:Key="Text.Tab.RecentlyClosed" xml:space="preserve">Недавно закрытые вкладки</x:String>
   <x:String x:Key="Text.Tab.Reopen" xml:space="preserve">Открыть закрытую вкладку</x:String>
+  <x:String x:Key="Text.Tab.SortTip" xml:space="preserve">Сортировать вкладки</x:String>
   <x:String x:Key="Text.Tab.Unpin" xml:space="preserve">Открепить вкладку</x:String>
   <x:String x:Key="Text.TabAction.CloseDuplicates" xml:space="preserve">Закрыть дублирующие вкладки той же папки</x:String>
   <x:String x:Key="Text.TabAction.CloseLeft" xml:space="preserve">Закрыть вкладки выше</x:String>
@@ -409,4 +419,5 @@
   <x:String x:Key="Text.View.PreviewPane" xml:space="preserve">Область просмотра</x:String>
   <x:String x:Key="Text.View.Small" xml:space="preserve">Мелкие значки</x:String>
   <x:String x:Key="Text.View.StatusBar" xml:space="preserve">Строка состояния</x:String>
+  <x:String x:Key="Text.View.Tiles" xml:space="preserve">Плитка</x:String>
 </ResourceDictionary>

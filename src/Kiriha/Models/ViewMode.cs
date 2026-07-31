@@ -9,4 +9,10 @@ public enum ViewMode
     SmallIcons,
     List,
     Details,
+
+    /// <summary>
+    /// エクスプローラーの「並べて表示」。48px アイコンの右へ 名前 / 種類 / サイズ を最大 3 行で並べる。
+    /// 既存の保存値（settings.json / folder-views.json）との互換のため、末尾に足すこと。
+    /// </summary>
+    Tiles,
 }

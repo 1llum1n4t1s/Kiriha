@@ -319,15 +319,16 @@ internal static partial class ShellContextMenuService
     }
 
     /// <summary>指定パスのシェルコンテキストメニューをスクリーン座標 (x, y) に表示する。コマンド実行時 true。</summary>
-    public static bool Show(nint hwnd, string path, int x, int y, ShellMenuExtraItem? extraItem = null)
-        => Show(hwnd, [path], x, y, extraItem);
+    public static bool Show(nint hwnd, string path, int x, int y, params ShellMenuExtraItem?[] extraItems)
+        => Show(hwnd, [path], x, y, extraItems);
 
     /// <summary>
     /// 複数パス（同一フォルダー内の複数選択）のシェルコンテキストメニューを表示する。
     /// Explorer と同じく、削除・コピー・送る等の verb は選択全体に対して実行される。
-    /// <paramref name="extraItem"/> を渡すと、区切り線を挟んでアプリ独自の項目を末尾に足す。
+    /// <paramref name="extraItems"/> を渡すと、区切り線を挟んでアプリ独自の項目を末尾に足す
+    /// （渡した順に並ぶ）。null 要素は無視するので、条件付きの項目はそのまま並べてよい。
     /// </summary>
-    public static bool Show(nint hwnd, IReadOnlyList<string> paths, int x, int y, ShellMenuExtraItem? extraItem = null)
+    public static bool Show(nint hwnd, IReadOnlyList<string> paths, int x, int y, params ShellMenuExtraItem?[] extraItems)
     {
         var pidls = new List<nint>(paths.Count);
         try
@@ -341,7 +342,10 @@ internal static partial class ShellContextMenuService
             }
 
             return pidls.Count > 0
-                   && ShowForPidls(hwnd, pidls, x, y, extraItem, ResolveWorkingDirectory(paths[0]));
+                   && ShowForPidls(
+                       hwnd, pidls, x, y,
+                       [.. extraItems.Where(item => item is not null).Select(item => item!)],
+                       ResolveWorkingDirectory(paths[0]));
         }
         finally
         {
@@ -357,7 +361,7 @@ internal static partial class ShellContextMenuService
         IReadOnlyList<nint> pidls,
         int x,
         int y,
-        ShellMenuExtraItem? extraItem,
+        IReadOnlyList<ShellMenuExtraItem> extraItems,
         string? workingDirectory)
     {
         // シェル拡張（クラウドストレージ・AV 等）の不調で QueryContextMenu が数十秒ブロックすることが
@@ -415,7 +419,7 @@ internal static partial class ShellContextMenuService
         }
 
         // アプリ独自項目のアイコン。メニューを壊した後に解放する（表示中は必要）。
-        var extraBitmap = (nint)0;
+        var extraBitmaps = new List<nint>();
         try
         {
             if (menu.QueryContextMenu(hmenu, 0, 1, 0x7FFF, 0) < 0)
@@ -434,13 +438,22 @@ internal static partial class ShellContextMenuService
             // Kiriha 自身の中で「Kiriha で開く」は無意味なので取り除く（エクスプローラー側には残る）
             RemoveOwnVerbItems(menu, hmenu);
 
-            // アプリ独自の項目（「エクスプローラーで開く」等）はシェル項目の後ろへ足す。
+            // アプリ独自の項目（「新しいタブで開く」「エクスプローラーで開く」等）はシェル項目の後ろへ足す。
             // シェル拡張の項目を押しのけないよう、必ず QueryContextMenu の後に追加する。
-            if (extraItem is not null)
+            // コマンド ID は ExtraItemCommandId から連番。シェルが使う 1〜0x7FFF の外側なので衝突しない。
+            if (extraItems.Count > 0)
             {
                 AppendMenu(hmenu, MfSeparator, 0, string.Empty);
-                AppendMenu(hmenu, MfString, (nuint)ExtraItemCommandId, extraItem.Text);
-                extraBitmap = SetMenuItemStockIcon(hmenu, ExtraItemCommandId, extraItem.StockIconId);
+                for (var i = 0; i < extraItems.Count; i++)
+                {
+                    var id = ExtraItemCommandId + i;
+                    AppendMenu(hmenu, MfString, (nuint)id, extraItems[i].Text);
+                    var bitmap = SetMenuItemStockIcon(hmenu, id, extraItems[i].StockIconId);
+                    if (bitmap != 0)
+                    {
+                        extraBitmaps.Add(bitmap);
+                    }
+                }
             }
 
             // 前面でないウィンドウからだとメニュー外クリックで閉じなくなるため前面化する
@@ -451,9 +464,9 @@ internal static partial class ShellContextMenuService
                 return false;
             }
 
-            if (cmd == ExtraItemCommandId && extraItem is not null)
+            if (cmd >= ExtraItemCommandId && cmd < ExtraItemCommandId + extraItems.Count)
             {
-                extraItem.Invoke();
+                extraItems[cmd - ExtraItemCommandId].Invoke();
                 return true;
             }
 
@@ -501,9 +514,9 @@ internal static partial class ShellContextMenuService
         finally
         {
             DestroyMenu(hmenu);
-            if (extraBitmap != 0)
+            foreach (var bitmap in extraBitmaps)
             {
-                DeleteObject(extraBitmap);
+                DeleteObject(bitmap);
             }
 
             // IContextMenu の実体はサードパーティのシェル拡張。GC 任せにせずここで手放す

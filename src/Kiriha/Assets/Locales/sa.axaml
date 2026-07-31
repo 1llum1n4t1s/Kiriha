@@ -42,6 +42,7 @@
   <x:String x:Key="Text.Command.Options" xml:space="preserve">विकल्पाः</x:String>
   <x:String x:Key="Text.Command.Paste" xml:space="preserve">लेपय</x:String>
   <x:String x:Key="Text.Command.PasteTip" xml:space="preserve">लेपय (Ctrl+V)</x:String>
+  <x:String x:Key="Text.Command.PropertiesTip" xml:space="preserve">गुणधर्माः (Alt+Enter)</x:String>
   <x:String x:Key="Text.Command.Rename" xml:space="preserve">नाम परिवर्तय</x:String>
   <x:String x:Key="Text.Command.RenameTip" xml:space="preserve">नाम परिवर्तय (F2)</x:String>
   <x:String x:Key="Text.Command.Share" xml:space="preserve">विभाजय</x:String>
@@ -171,6 +172,7 @@
   <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">नवीनं गवाक्षम्</x:String>
   <x:String x:Key="Text.Menu.NoSubfolders" xml:space="preserve">(उपसञ्चिकाकोष्ठानि न सन्ति)</x:String>
   <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(किमपि नास्ति)</x:String>
+  <x:String x:Key="Text.Menu.ShowMoreOptions" xml:space="preserve">अधिकविकल्पान् दर्शय</x:String>
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">पश्चात्</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">पश्चात् (इतिहासाय दक्षिणनुदनम्)</x:String>
   <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">ये सञ्चिकाकोशाः न दृश्यन्ते (नुदतु सूचीदर्शनाय)</x:String>
@@ -219,6 +221,11 @@
   <x:String x:Key="Text.Settings.About" xml:space="preserve">Kiriha विषये</x:String>
   <x:String x:Key="Text.Settings.About.Body" xml:space="preserve">Kiriha इत्येतत् Windows सञ्चिकादर्शकस्य सञ्चिकाकर्म, Chrome इत्यस्य पत्राणि, पदवीपट्टिका, चिह्नानि च एकस्मिन् गवाक्षे संयोजयति। विन्यासाः वर्तमानप्रयोक्तुः कृते रक्ष्यन्ते।</x:String>
   <x:String x:Key="Text.Settings.Acrylic" xml:space="preserve">गवाक्षे आक्रिलिकप्रभावं (अर्धपारदर्शकं मन्दीकरणम्) प्रयुङ्क्ष्व</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu" xml:space="preserve">सन्दर्भसूची</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Modern" xml:space="preserve">किरिहस्वकीयम् (Windows 11 शैली)</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Note" xml:space="preserve">Windows 11-शैल्याः सूची चितान् विषयान् शेल-विस्तारांश्च एव दर्शयति; "प्रेषय" इत्यादीनि उपसूचीनि "अधिकविकल्पान् दर्शय" इत्यत्र तिष्ठन्ति। यदि कश्चित् विस्तारः सम्यक् न दृश्यते तर्हि अन्यं प्रकारं चिनोतु।</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Shell" xml:space="preserve">किरिहस्वकीयम् (शेल-विषयाः यथावत्)</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.System" xml:space="preserve">Windows-मानकम्</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp" xml:space="preserve">कोष्ठानां चालकानां च उद्घाटनाय Kiriha इत्येतत् प्रामाणिकम् अनुप्रयोगं कुरु</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.Off" xml:space="preserve">सक्रिये सति, सञ्चिकादर्शकात् कोष्ठं वा चालकं उद्घाटयति चेत् Kiriha आरभते।</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.On" xml:space="preserve">सम्प्रति कोष्ठानि चालकाश्च Kiriha इत्यत्र उद्घाट्यन्ते। निष्क्रिये सति पूर्वव्यवहारः पुनरागच्छति।</x:String>
@@ -342,10 +349,13 @@
   <x:String x:Key="Text.Tab.New" xml:space="preserve">नवीनं पत्रम्</x:String>
   <x:String x:Key="Text.Tab.NewBelow" xml:space="preserve">अधः नवीनं पत्रम् उद्घाटय</x:String>
   <x:String x:Key="Text.Tab.NewTip" xml:space="preserve">नवीनं पत्रम् (Ctrl+T)</x:String>
+  <x:String x:Key="Text.Tab.OpenInTabs" xml:space="preserve">नवीनपटलेषु उद्घाटयतु ({0})</x:String>
   <x:String x:Key="Text.Tab.Pin" xml:space="preserve">पत्रं स्थापय</x:String>
+  <x:String x:Key="Text.Tab.PinInTabs" xml:space="preserve">नवीनपटलेषु स्थिरीकरोतु ({0})</x:String>
   <x:String x:Key="Text.Tab.Pinned" xml:space="preserve">स्थापितं पत्रम्</x:String>
   <x:String x:Key="Text.Tab.RecentlyClosed" xml:space="preserve">सद्यः पिहितानि पत्राणि</x:String>
   <x:String x:Key="Text.Tab.Reopen" xml:space="preserve">पिहितं पत्रं पुनः उद्घाटय</x:String>
+  <x:String x:Key="Text.Tab.SortTip" xml:space="preserve">पटलानि क्रमीकरोतु</x:String>
   <x:String x:Key="Text.Tab.Unpin" xml:space="preserve">पत्रस्थापनं मुञ्च</x:String>
   <x:String x:Key="Text.TabAction.CloseDuplicates" xml:space="preserve">समानस्थानस्य द्विगुणपत्राणि पिधेहि</x:String>
   <x:String x:Key="Text.TabAction.CloseLeft" xml:space="preserve">उपरिस्थानि पत्राणि पिधेहि</x:String>
@@ -409,4 +419,5 @@
   <x:String x:Key="Text.View.PreviewPane" xml:space="preserve">पूर्वदर्शनपटलम्</x:String>
   <x:String x:Key="Text.View.Small" xml:space="preserve">लघुप्रतीकानि</x:String>
   <x:String x:Key="Text.View.StatusBar" xml:space="preserve">स्थितिपट्टिका</x:String>
+  <x:String x:Key="Text.View.Tiles" xml:space="preserve">फलकरूपेण</x:String>
 </ResourceDictionary>

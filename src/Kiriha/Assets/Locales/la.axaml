@@ -42,6 +42,7 @@
   <x:String x:Key="Text.Command.Options" xml:space="preserve">Optiones</x:String>
   <x:String x:Key="Text.Command.Paste" xml:space="preserve">Agglutinare</x:String>
   <x:String x:Key="Text.Command.PasteTip" xml:space="preserve">Agglutinare (Ctrl+V)</x:String>
+  <x:String x:Key="Text.Command.PropertiesTip" xml:space="preserve">Proprietates (Alt+Enter)</x:String>
   <x:String x:Key="Text.Command.Rename" xml:space="preserve">Nomen mutare</x:String>
   <x:String x:Key="Text.Command.RenameTip" xml:space="preserve">Nomen mutare (F2)</x:String>
   <x:String x:Key="Text.Command.Share" xml:space="preserve">Communicare</x:String>
@@ -171,6 +172,7 @@
   <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">Fenestra nova</x:String>
   <x:String x:Key="Text.Menu.NoSubfolders" xml:space="preserve">(Nullae subplicae)</x:String>
   <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(Nihil)</x:String>
+  <x:String x:Key="Text.Menu.ShowMoreOptions" xml:space="preserve">Plures optiones monstrare</x:String>
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">Retro</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">Retro (dextro clicu pro historia)</x:String>
   <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">Scrinia quae non capiuntur (preme ut enumerentur)</x:String>
@@ -219,6 +221,11 @@
   <x:String x:Key="Text.Settings.About" xml:space="preserve">De Kiriha</x:String>
   <x:String x:Key="Text.Settings.About.Body" xml:space="preserve">Kiriha operationes fasciculorum Exploratoris Windows cum schedis, tabula inscriptionis et notis Chrome in una fenestra coniungit. Optiones pro usuario praesenti servantur.</x:String>
   <x:String x:Key="Text.Settings.Acrylic" xml:space="preserve">Effectum acrylicum (nebulam pellucidam) in fenestra adhibere</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu" xml:space="preserve">Menu contextuale</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Modern" xml:space="preserve">Kiriha proprium (stilus Windows 11)</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Note" xml:space="preserve">Menu stilo Windows 11 tantum electa elementa et extensiones shell ostendit; submenus ut "Mittere ad" sub "Plures optiones monstrare" manent. Alium modum elige si extensio quaedam recte non apparet.</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Shell" xml:space="preserve">Kiriha proprium (elementa shell intacta)</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.System" xml:space="preserve">Windows usitatum</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp" xml:space="preserve">Kiriha applicationem praedefinitam ad plicas et discos aperiendos facere</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.Off" xml:space="preserve">Si activatum est, Kiriha incipit quotiens plica vel discus ex Exploratore aperitur.</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.On" xml:space="preserve">Nunc plicae et disci in Kiriha aperiuntur. Si deactivatur, mos pristinus restituitur.</x:String>
@@ -342,10 +349,13 @@
   <x:String x:Key="Text.Tab.New" xml:space="preserve">Scheda nova</x:String>
   <x:String x:Key="Text.Tab.NewBelow" xml:space="preserve">Schedam novam infra aperire</x:String>
   <x:String x:Key="Text.Tab.NewTip" xml:space="preserve">Scheda nova (Ctrl+T)</x:String>
+  <x:String x:Key="Text.Tab.OpenInTabs" xml:space="preserve">In novis fenestellis aperire ({0})</x:String>
   <x:String x:Key="Text.Tab.Pin" xml:space="preserve">Schedam affigere</x:String>
+  <x:String x:Key="Text.Tab.PinInTabs" xml:space="preserve">In novis fenestellis affigere ({0})</x:String>
   <x:String x:Key="Text.Tab.Pinned" xml:space="preserve">Scheda affixa</x:String>
   <x:String x:Key="Text.Tab.RecentlyClosed" xml:space="preserve">Schedae nuper clausae</x:String>
   <x:String x:Key="Text.Tab.Reopen" xml:space="preserve">Schedam clausam iterum aperire</x:String>
+  <x:String x:Key="Text.Tab.SortTip" xml:space="preserve">Fenestellas ordinare</x:String>
   <x:String x:Key="Text.Tab.Unpin" xml:space="preserve">Schedam solvere</x:String>
   <x:String x:Key="Text.TabAction.CloseDuplicates" xml:space="preserve">Schedas geminas eiusdem plicae claudere</x:String>
   <x:String x:Key="Text.TabAction.CloseLeft" xml:space="preserve">Schedas supra claudere</x:String>
@@ -409,4 +419,5 @@
   <x:String x:Key="Text.View.PreviewPane" xml:space="preserve">Tabula praevisionis</x:String>
   <x:String x:Key="Text.View.Small" xml:space="preserve">Imagunculae parvae</x:String>
   <x:String x:Key="Text.View.StatusBar" xml:space="preserve">Tabula status</x:String>
+  <x:String x:Key="Text.View.Tiles" xml:space="preserve">Tessellae</x:String>
 </ResourceDictionary>

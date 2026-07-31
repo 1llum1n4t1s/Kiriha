@@ -42,6 +42,7 @@
   <x:String x:Key="Text.Command.Options" xml:space="preserve">Opsi</x:String>
   <x:String x:Key="Text.Command.Paste" xml:space="preserve">Tempel</x:String>
   <x:String x:Key="Text.Command.PasteTip" xml:space="preserve">Tempel (Ctrl+V)</x:String>
+  <x:String x:Key="Text.Command.PropertiesTip" xml:space="preserve">Properti (Alt+Enter)</x:String>
   <x:String x:Key="Text.Command.Rename" xml:space="preserve">Ganti nama</x:String>
   <x:String x:Key="Text.Command.RenameTip" xml:space="preserve">Ganti nama (F2)</x:String>
   <x:String x:Key="Text.Command.Share" xml:space="preserve">Bagikan</x:String>
@@ -171,6 +172,7 @@
   <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">Jendela baru</x:String>
   <x:String x:Key="Text.Menu.NoSubfolders" xml:space="preserve">(Tidak ada subfolder)</x:String>
   <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(Tidak ada)</x:String>
+  <x:String x:Key="Text.Menu.ShowMoreOptions" xml:space="preserve">Tampilkan opsi lainnya</x:String>
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">Kembali</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">Kembali (klik kanan untuk riwayat)</x:String>
   <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">Folder yang tidak muat (klik untuk melihatnya)</x:String>
@@ -219,6 +221,11 @@
   <x:String x:Key="Text.Settings.About" xml:space="preserve">Tentang Kiriha</x:String>
   <x:String x:Key="Text.Settings.About.Body" xml:space="preserve">Kiriha menyatukan pengelolaan berkas ala Windows Explorer dengan tab, bilah alamat, dan markah ala Chrome dalam satu jendela. Pengaturan disimpan untuk pengguna saat ini.</x:String>
   <x:String x:Key="Text.Settings.Acrylic" xml:space="preserve">Gunakan efek akrilik (buram tembus pandang) pada jendela</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu" xml:space="preserve">Menu konteks</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Modern" xml:space="preserve">Milik Kiriha (gaya Windows 11)</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Note" xml:space="preserve">Menu bergaya Windows 11 hanya menampilkan item pilihan dan ekstensi shell; submenu seperti "Kirim ke" tetap berada di "Tampilkan opsi lainnya". Ganti mode jika ada ekstensi yang tidak muncul dengan benar.</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Shell" xml:space="preserve">Milik Kiriha (item shell apa adanya)</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.System" xml:space="preserve">Bawaan Windows</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp" xml:space="preserve">Jadikan Kiriha aplikasi bawaan untuk membuka folder dan drive</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.Off" xml:space="preserve">Jika diaktifkan, Kiriha berjalan setiap kali folder atau drive dibuka dari File Explorer.</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.On" xml:space="preserve">Saat ini folder dan drive dibuka di Kiriha. Menonaktifkannya akan memulihkan perilaku sebelumnya.</x:String>
@@ -342,10 +349,13 @@
   <x:String x:Key="Text.Tab.New" xml:space="preserve">Tab baru</x:String>
   <x:String x:Key="Text.Tab.NewBelow" xml:space="preserve">Buka tab baru di bawah</x:String>
   <x:String x:Key="Text.Tab.NewTip" xml:space="preserve">Tab baru (Ctrl+T)</x:String>
+  <x:String x:Key="Text.Tab.OpenInTabs" xml:space="preserve">Buka di tab baru ({0})</x:String>
   <x:String x:Key="Text.Tab.Pin" xml:space="preserve">Sematkan tab</x:String>
+  <x:String x:Key="Text.Tab.PinInTabs" xml:space="preserve">Sematkan di tab baru ({0})</x:String>
   <x:String x:Key="Text.Tab.Pinned" xml:space="preserve">Tab tersemat</x:String>
   <x:String x:Key="Text.Tab.RecentlyClosed" xml:space="preserve">Tab yang baru ditutup</x:String>
   <x:String x:Key="Text.Tab.Reopen" xml:space="preserve">Buka lagi tab yang ditutup</x:String>
+  <x:String x:Key="Text.Tab.SortTip" xml:space="preserve">Urutkan tab</x:String>
   <x:String x:Key="Text.Tab.Unpin" xml:space="preserve">Lepas sematan tab</x:String>
   <x:String x:Key="Text.TabAction.CloseDuplicates" xml:space="preserve">Tutup tab ganda untuk folder yang sama</x:String>
   <x:String x:Key="Text.TabAction.CloseLeft" xml:space="preserve">Tutup tab di atas</x:String>
@@ -409,4 +419,5 @@
   <x:String x:Key="Text.View.PreviewPane" xml:space="preserve">Panel pratinjau</x:String>
   <x:String x:Key="Text.View.Small" xml:space="preserve">Ikon kecil</x:String>
   <x:String x:Key="Text.View.StatusBar" xml:space="preserve">Bilah status</x:String>
+  <x:String x:Key="Text.View.Tiles" xml:space="preserve">Ubin</x:String>
 </ResourceDictionary>

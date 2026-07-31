@@ -629,15 +629,23 @@ public partial class MainWindow : Window
             && (e.Source as Visual)?.FindAncestorOfType<ListBox>() is { } list
             && (list.Classes.Contains("files") || list.Classes.Contains("icons")))
         {
+            // 「PC」は並べて表示に固定（TabViewModel.CanChangeViewMode）。ホイールでも動かさない。
+            if (!tab.CanChangeViewMode)
+            {
+                e.Handled = true;
+                return;
+            }
+
             if (tab.IsIconsView)
             {
                 tab.IconSize = Math.Clamp(tab.IconSize + e.Delta.Y * 8, 24, 160);
             }
             else
             {
+                // 並べて表示はエクスプローラーの Ctrl+ホイールでも詳細のひとつ下に来る
                 var order = new[]
                 {
-                    ViewMode.Details, ViewMode.List, ViewMode.SmallIcons,
+                    ViewMode.Tiles, ViewMode.Details, ViewMode.List, ViewMode.SmallIcons,
                     ViewMode.MediumIcons, ViewMode.LargeIcons, ViewMode.ExtraLargeIcons,
                 };
                 var index = Array.IndexOf(order, tab.ViewMode);
@@ -2542,12 +2550,14 @@ public partial class MainWindow : Window
                                             && TryHandleGalleryVideoArrow(tab, e.Key == Key.Left ? -1 : 1):
                 e.Handled = true;
                 break;
+            // RelayCommand.Execute は CanExecute を見ないので、破壊的な操作はここで活性を確かめる。
+            // ドライブ選択中（PC ビュー）の切り取り / 削除 / 名前変更を素通りさせないため。
             case Key.X when ctrl:
-                tab.CutCommand.Execute(null);
+                if (tab.CutCommand.CanExecute(null)) tab.CutCommand.Execute(null);
                 e.Handled = true;
                 break;
             case Key.C when ctrl:
-                tab.CopyCommand.Execute(null);
+                if (tab.CopyCommand.CanExecute(null)) tab.CopyCommand.Execute(null);
                 e.Handled = true;
                 break;
             case Key.V when ctrl:
@@ -2564,15 +2574,15 @@ public partial class MainWindow : Window
                 break;
             case Key.Delete when e.KeyModifiers.HasFlag(KeyModifiers.Shift):
                 // Shift+Delete で完全削除（エクスプローラー互換）
-                tab.DeletePermanentCommand.Execute(null);
+                if (tab.DeletePermanentCommand.CanExecute(null)) tab.DeletePermanentCommand.Execute(null);
                 e.Handled = true;
                 break;
             case Key.Delete:
-                tab.DeleteCommand.Execute(null);
+                if (tab.DeleteCommand.CanExecute(null)) tab.DeleteCommand.Execute(null);
                 e.Handled = true;
                 break;
             case Key.F2:
-                tab.RenameCommand.Execute(null);
+                if (tab.RenameCommand.CanExecute(null)) tab.RenameCommand.Execute(null);
                 e.Handled = true;
                 break;
             case Key.Enter when e.KeyModifiers.HasFlag(KeyModifiers.Alt):
@@ -2596,16 +2606,15 @@ public partial class MainWindow : Window
             case Key.Apps:
             case Key.F10 when e.KeyModifiers.HasFlag(KeyModifiers.Shift):
                 // アプリケーションキー / Shift+F10 で選択項目のシェルメニュー
-                if (listBox.SelectedItem is FileSystemEntry sel && TryGetPlatformHandle() is { } handle)
+                if (listBox.SelectedItem is FileSystemEntry sel)
                 {
-                    var pt = this.PointToScreen(listBox.TranslatePoint(new Point(80, 80), this) ?? new Point(200, 200));
-                    var invoked = ShellContextMenuService.Show(handle.Handle, sel.FullPath, pt.X, pt.Y,
-                        BuildOpenInExplorerItem(tab, [sel.FullPath]));
-                    if (invoked)
-                    {
-                        RefreshAfterShellOperation(tab);
-                    }
-
+                    // マウスポインターは無関係な場所にあり得るので、一覧の左上あたりを基準に出す。
+                    // Shift+F10 の Shift は「メニューを開く」操作の一部なので拡張 verb 扱いにはしない。
+                    var origin = listBox.TranslatePoint(new Point(80, 80), this) ?? new Point(200, 200);
+                    ShowShellContextMenu(
+                        tab, [sel.FullPath], this.PointToScreen(origin),
+                        extendedVerbs: false,
+                        anchor: new Rect(origin, new Size(1, 1)));
                     e.Handled = true;
                 }
 
@@ -2928,6 +2937,16 @@ public partial class MainWindow : Window
             var previewEntries = new List<(string Path, bool IsDirectory)>();
             foreach (var entry in DistinctByPath(entries))
             {
+                // ドライブ直下（PC 階層や左ペインの C: など）は掴ませない。掴めてしまうと
+                // フォルダーへのドロップがドライブ中身の移動・コピーになり得るため。
+                // ドラッグ元は「ファイル一覧 / 左ペイン / ツリー」の 3 経路あるが、
+                // どれもここを通るので塞ぐのはこの 1 か所でよい。
+                // 全部が除外されたら previewEntries が空になり、下でドラッグごと中止される。
+                if (IsDriveRootPath(entry.Path))
+                {
+                    continue;
+                }
+
                 IStorageItem? item = entry.IsDirectory
                     ? await StorageProvider.TryGetFolderFromPathAsync(new Uri(entry.Path))
                     : await StorageProvider.TryGetFileFromPathAsync(new Uri(entry.Path));
@@ -2969,6 +2988,21 @@ public partial class MainWindow : Window
             ClearFileDropVisual();
             ResetDragSource();
         }
+    }
+
+    /// <summary>
+    /// ドライブ直下（<c>C:\</c>）やネットワーク共有のルート（<c>\\server\share</c>）かどうか。
+    /// エクスプローラー同様、これらは移動・コピーの対象にしないための判定。
+    /// </summary>
+    private static bool IsDriveRootPath(string path)
+    {
+        if (string.IsNullOrEmpty(path))
+        {
+            return false;
+        }
+
+        var root = Path.GetPathRoot(path);
+        return !string.IsNullOrEmpty(root) && WindowsPathIdentity.Instance.Equals(root, path);
     }
 
     /// <summary>同じパスの重複を取り除く（Windows のパスは大文字小文字を区別しない）。</summary>
@@ -3881,18 +3915,45 @@ public partial class MainWindow : Window
         }
     }
 
-    /// <summary>指定パスに対する Windows 標準のシェルコンテキストメニューを表示する。</summary>
+    /// <summary>指定パスに対するコンテキストメニューを表示する。</summary>
     private void ShowShellContextMenu(TabViewModel tab, string path, PointerReleasedEventArgs e)
-        => ShowShellContextMenu(tab, [path], this.PointToScreen(e.GetPosition(this)));
+        => ShowShellContextMenu(tab, [path], this.PointToScreen(e.GetPosition(this)),
+            e.KeyModifiers.HasFlag(KeyModifiers.Shift));
 
-    /// <summary>複数選択に対するシェルコンテキストメニュー（削除・コピー等は選択全体が対象）。</summary>
+    /// <summary>複数選択に対するコンテキストメニュー（削除・コピー等は選択全体が対象）。</summary>
     private void ShowShellContextMenu(TabViewModel tab, IReadOnlyList<string> paths, PointerReleasedEventArgs e)
-        => ShowShellContextMenu(tab, paths, this.PointToScreen(e.GetPosition(this)));
+        => ShowShellContextMenu(tab, paths, this.PointToScreen(e.GetPosition(this)),
+            e.KeyModifiers.HasFlag(KeyModifiers.Shift));
 
     private void ShowShellContextMenu(TabViewModel tab, string path, PixelPoint screen)
         => ShowShellContextMenu(tab, [path], screen);
 
-    private void ShowShellContextMenu(TabViewModel tab, IReadOnlyList<string> paths, PixelPoint screen)
+    /// <summary>
+    /// 設定（<see cref="MainWindowViewModel.ContextMenuStyle"/>）に応じて、Kiriha 独自描画のメニューか
+    /// Windows 標準の Win32 メニューを出す。独自描画はシェルメニューを組み立てられなかったときだけ
+    /// Win32 へフォールバックするので、シェル拡張が壊れていても右クリックが無反応にはならない。
+    /// </summary>
+    /// <param name="extendedVerbs">Shift 押下時。エクスプローラーと同じく拡張 verb も含める。</param>
+    /// <param name="anchor">キーボードから開くときの基準矩形（このウィンドウ上の座標）。</param>
+    private void ShowShellContextMenu(
+        TabViewModel tab,
+        IReadOnlyList<string> paths,
+        PixelPoint screen,
+        bool extendedVerbs = false,
+        Rect? anchor = null)
+    {
+        var style = ViewModel?.ContextMenuStyle ?? ContextMenuStyle.Modern;
+        if (style != ContextMenuStyle.System
+            && TryShowCustomContextMenu(tab, paths, style, extendedVerbs, screen, anchor))
+        {
+            return;
+        }
+
+        ShowSystemContextMenu(tab, paths, screen);
+    }
+
+    /// <summary>Windows 標準の Win32 メニュー（TrackPopupMenuEx）を表示する。</summary>
+    private void ShowSystemContextMenu(TabViewModel tab, IReadOnlyList<string> paths, PixelPoint screen)
     {
         var handle = TryGetPlatformHandle();
         if (handle is null)
@@ -3901,11 +3962,50 @@ public partial class MainWindow : Window
         }
 
         var invoked = ShellContextMenuService.Show(handle.Handle, paths, screen.X, screen.Y,
+            BuildOpenInTabsItem(paths),
+            BuildPinInTabsItem(paths),
             BuildOpenInExplorerItem(tab, paths));
         if (invoked)
         {
             RefreshAfterShellOperation(tab);
         }
+    }
+
+    /// <summary>
+    /// フォルダーを右クリックしたときに足す「新しいタブで開く」項目。複数選択していれば
+    /// まとめて開く（エクスプローラーの「新しいウィンドウで開く」に相当する導線）。
+    /// 最後に開いたタブを選択状態にして、そのまま作業を続けられるようにする。
+    /// </summary>
+    private ShellMenuExtraItem? BuildOpenInTabsItem(IReadOnlyList<string> paths)
+    {
+        if (ViewModel is not { } vm || paths.Count == 0 || !paths.All(Directory.Exists))
+        {
+            return null;
+        }
+
+        var targets = paths.ToList();
+        return new ShellMenuExtraItem(
+            LocalizationService.Text("Text.Tab.OpenInTabs", targets.Count),
+            () => vm.OpenFolderTabs(targets),
+            ShellContextMenuService.StockIconFolder);
+    }
+
+    /// <summary>
+    /// フォルダーを右クリックしたときに足す「新しいタブでピン留め」項目。
+    /// よく使うフォルダーを常駐させる導線で、選択は今のタブに残したまま固定ブロックへ積む。
+    /// </summary>
+    private ShellMenuExtraItem? BuildPinInTabsItem(IReadOnlyList<string> paths)
+    {
+        if (ViewModel is not { } vm || paths.Count == 0 || !paths.All(Directory.Exists))
+        {
+            return null;
+        }
+
+        var targets = paths.ToList();
+        return new ShellMenuExtraItem(
+            LocalizationService.Text("Text.Tab.PinInTabs", targets.Count),
+            () => vm.PinFolderTabs(targets),
+            ShellContextMenuService.StockIconFolder);
     }
 
     /// <summary>

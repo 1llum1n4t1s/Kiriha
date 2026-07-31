@@ -54,6 +54,10 @@ public static class ThemeService
         Apply(app);
     }
 
+    /// <summary>アクリル効果が有効か。ポップアップ側（独自コンテキストメニュー）が
+    /// 自分のウィンドウにも同じ透明度設定を掛けるかの判断に使う。</summary>
+    public static bool IsAcrylicEnabled => _acrylicEnabled;
+
     private static void Apply(Application app)
     {
         Color accent;
@@ -105,30 +109,48 @@ public static class ThemeService
     private static readonly Color LightTabStripBg = Color.Parse("#DEE1E6");
     private static readonly Color LightContentBg = Color.Parse("#FFFFFF");
     private static readonly Color LightSidebarBg = Color.Parse("#F8F9FA");
-    private static readonly Color LightOmniboxBg = Color.Parse("#F1F3F4");
+    // ライトだけは帯（TabActiveBg）が白なので、明るくすると逆に埋もれる。
+    // 暗い系と同じ分離感を出すため、白から離す向き（少し沈める向き）へ同じくらい動かす。
+    private static readonly Color LightOmniboxBg = Color.Parse("#E6E9EC");
     private static readonly Color LightStatusBg = Color.Parse("#F8F9FA");
+    // アドレスバー帯 / お気に入りバー / タブのドラッグゴーストが共有する面。
+    // ライトだけ TabStripBg（#DEE1E6）と別色なので、流用せず個別に持つ。
+    private static readonly Color LightTabActiveBg = Color.Parse("#FFFFFF");
 
     private static readonly Color DarkTabStripBg = Color.Parse("#202124");
     private static readonly Color DarkContentBg = Color.Parse("#2B2C2F");
     private static readonly Color DarkSidebarBg = Color.Parse("#2B2C2F");
-    private static readonly Color DarkOmniboxBg = Color.Parse("#2B2C2F");
+    // アドレスバーの入力欄と検索ボックス。帯（TabActiveBg）の上に乗る面なので、
+    // 本文と同色だと沈んで見える。Dim と同じ「帯からの差（+36/+36/+39）」だけ明るくして、
+    // どのテーマでも同じ分離感にそろえる（絶対値をそろえると各テーマの色味が壊れる）。
+    private static readonly Color DarkOmniboxBg = Color.Parse("#44454B");
     private static readonly Color DarkStatusBg = Color.Parse("#2B2C2F");
+    private static readonly Color DarkTabActiveBg = Color.Parse("#202124");
 
     private static readonly Color OneDarkTabStripBg = Color.Parse("#21252B");
     private static readonly Color OneDarkContentBg = Color.Parse("#282C34");
     private static readonly Color OneDarkSidebarBg = Color.Parse("#282C34");
-    private static readonly Color OneDarkOmniboxBg = Color.Parse("#282C34");
+    private static readonly Color OneDarkOmniboxBg = Color.Parse("#454952");
     private static readonly Color OneDarkStatusBg = Color.Parse("#282C34");
+    private static readonly Color OneDarkTabActiveBg = Color.Parse("#21252B");
 
     /// <summary>ライトのアクリル時だけ使う地色。通常の #DEE1E6 は無彩色なので、ぼかしで暗い壁紙を
     /// 拾うとただのくすんだ灰色に見えてしまう。青をわずかに足して、沈んでも淡い青白に見えるようにする。</summary>
     private static readonly Color LightAcrylicBase = Color.Parse("#E4EEFC");
 
+    // 設定タブの地色。App.axaml の SettingsPageBg と同じ基準色（暗い系は NeutralBase）。
+    // ContentBg と同じアルファを掛けないと、アクリル有効時に設定タブだけ不透明で浮く。
+    private static readonly Color LightSettingsPageBg = Color.Parse("#F3F6FA");
+    private static readonly Color DarkSettingsPageBg = Color.Parse("#202124");
+    private static readonly Color OneDarkSettingsPageBg = Color.Parse("#21252B");
+    private static readonly Color DimSettingsPageBg = Color.Parse("#15202B");
+
     private static readonly Color DimTabStripBg = Color.Parse("#15202B");
     private static readonly Color DimContentBg = Color.Parse("#1E2732");
     private static readonly Color DimSidebarBg = Color.Parse("#1E2732");
-    private static readonly Color DimOmniboxBg = Color.Parse("#1E2732");
+    private static readonly Color DimOmniboxBg = Color.Parse("#394452");
     private static readonly Color DimStatusBg = Color.Parse("#1E2732");
+    private static readonly Color DimTabActiveBg = Color.Parse("#15202B");
 
     // アクリル時の不透明度。ぼかしの質感は残しつつ、透ける部分が壁紙の色に染まって
     // 不透明な面から浮かないよう、全体に濃いめへ寄せてある。
@@ -137,26 +159,30 @@ public static class ThemeService
     //  実測で 1 段しか変わらなかったため、濃さの調整はこちらのアルファで行う。）
 
     /// <summary>コンテンツ部の不透明度（文字を読む面なので最も濃い）。</summary>
-    private const byte ContentAlpha = 0xE6;
+    private const byte ContentAlpha = 0x99;
 
     /// <summary>クロム部（サイドバー/アドレスバー/ステータスバー）の不透明度。</summary>
-    private const byte ChromeAlpha = 0xDB;
+    private const byte ChromeAlpha = 0x99;
 
     /// <summary>ぼかしの上に敷くテーマ色の膜の不透明度。タブストリップや垂直タブの背後など、
     /// 面が乗らない場所の濃さはこれで決まる。0 にすると壁紙のぼかしがそのまま出て、
     /// 不透明な面と明らかに色が違って見えるので、テーマの色味は残る程度に留める。</summary>
-    private const byte ScrimAlpha = 0xC7;
+    private const byte ScrimAlpha = 0x99;
+
+    /// <summary>独自コンテキストメニューの地色の不透明度。ぼかしの質感は残しつつ、
+    /// 背後のファイル一覧の文字が透けて読めてしまわない濃さにする（本文の面より少し濃い）。</summary>
+    private const byte MenuAlpha = 0x99;
 
     private static void ApplyAcrylicBackgrounds(Application app)
     {
         var variant = app.ActualThemeVariant;
-        var (tabStrip, content, sidebar, omnibox, status) = variant == OneDark
-            ? (OneDarkTabStripBg, OneDarkContentBg, OneDarkSidebarBg, OneDarkOmniboxBg, OneDarkStatusBg)
+        var (tabStrip, content, sidebar, omnibox, status, tabActive) = variant == OneDark
+            ? (OneDarkTabStripBg, OneDarkContentBg, OneDarkSidebarBg, OneDarkOmniboxBg, OneDarkStatusBg, OneDarkTabActiveBg)
             : variant == Dim
-                ? (DimTabStripBg, DimContentBg, DimSidebarBg, DimOmniboxBg, DimStatusBg)
+                ? (DimTabStripBg, DimContentBg, DimSidebarBg, DimOmniboxBg, DimStatusBg, DimTabActiveBg)
                 : variant == ThemeVariant.Dark
-                    ? (DarkTabStripBg, DarkContentBg, DarkSidebarBg, DarkOmniboxBg, DarkStatusBg)
-                    : (LightTabStripBg, LightContentBg, LightSidebarBg, LightOmniboxBg, LightStatusBg);
+                    ? (DarkTabStripBg, DarkContentBg, DarkSidebarBg, DarkOmniboxBg, DarkStatusBg, DarkTabActiveBg)
+                    : (LightTabStripBg, LightContentBg, LightSidebarBg, LightOmniboxBg, LightStatusBg, LightTabActiveBg);
 
         // ライトのアクリルだけは地色を淡い青白へ寄せる（LightAcrylicBase の説明を参照）。
         // 暗い系テーマはぼかしを拾っても色味が保たれるので、そのままテーマの地色を使う。
@@ -179,6 +205,28 @@ public static class ThemeService
         // 不透明な TabStripBg を持つため、ここへ別の面を重ねず質感を連続させる。
         app.Resources["VerticalTabsSurfaceBg"] = new SolidColorBrush(Colors.Transparent);
         app.Resources["ContentBg"] = new SolidColorBrush(WithAlpha(content, _acrylicEnabled ? ContentAlpha : (byte)0xFF));
+        // 設定タブもファイル一覧と同じ「本文の面」。App.axaml の静的な不透明ブラシのままだと
+        // アクリル有効時にここだけ濃さが揃わず、コンテンツ島から浮いて見える。
+        var settingsPage = variant == OneDark
+            ? OneDarkSettingsPageBg
+            : variant == Dim
+                ? DimSettingsPageBg
+                : variant == ThemeVariant.Dark
+                    ? DarkSettingsPageBg
+                    : LightSettingsPageBg;
+        app.Resources["SettingsPageBg"] = new SolidColorBrush(
+            WithAlpha(settingsPage, _acrylicEnabled ? ContentAlpha : (byte)0xFF));
+        // 独自コンテキストメニューの地色。ContentBg をそのまま使うと、メニューは別ウィンドウ
+        // （PopupRoot）なので背後にぼかし面が無く、半透明がただの素通しになって文字が読めない。
+        // メニュー自身がアクリルを敷いたうえで、本文より濃いこの膜を重ねる。
+        app.Resources["MenuBg"] = new SolidColorBrush(WithAlpha(content, _acrylicEnabled ? MenuAlpha : (byte)0xFF));
+        // メニューのぼかし面の表示切替。ポップアップは View から手が届かないので、
+        // DynamicResource の bool を IsVisible に直接バインドして切り替える。
+        app.Resources["MenuAcrylicVisible"] = _acrylicEnabled;
+        // アドレスバー帯・お気に入りバー・タブのドラッグゴーストが共有する面。役割としては
+        // サイドバーやステータスバーと同じクロムなので、同じ ChromeAlpha でそろえる。
+        // ここを静的な不透明色のままにすると、他を薄くしたときにこの帯だけ 100% で残って浮く。
+        app.Resources["TabActiveBg"] = new SolidColorBrush(WithAlpha(tabActive, _acrylicEnabled ? ChromeAlpha : (byte)0xFF));
         app.Resources["SidebarBg"] = new SolidColorBrush(WithAlpha(sidebar, _acrylicEnabled ? ChromeAlpha : (byte)0xFF));
         app.Resources["OmniboxBg"] = new SolidColorBrush(WithAlpha(omnibox, _acrylicEnabled ? ChromeAlpha : (byte)0xFF));
         app.Resources["StatusBg"] = new SolidColorBrush(WithAlpha(status, _acrylicEnabled ? ChromeAlpha : (byte)0xFF));

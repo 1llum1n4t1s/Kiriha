@@ -42,6 +42,7 @@
   <x:String x:Key="Text.Command.Options" xml:space="preserve">Options</x:String>
   <x:String x:Key="Text.Command.Paste" xml:space="preserve">Coller</x:String>
   <x:String x:Key="Text.Command.PasteTip" xml:space="preserve">Coller (Ctrl+V)</x:String>
+  <x:String x:Key="Text.Command.PropertiesTip" xml:space="preserve">Propriétés (Alt+Entrée)</x:String>
   <x:String x:Key="Text.Command.Rename" xml:space="preserve">Renommer</x:String>
   <x:String x:Key="Text.Command.RenameTip" xml:space="preserve">Renommer (F2)</x:String>
   <x:String x:Key="Text.Command.Share" xml:space="preserve">Partager</x:String>
@@ -171,6 +172,7 @@
   <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">Nouvelle fenêtre</x:String>
   <x:String x:Key="Text.Menu.NoSubfolders" xml:space="preserve">(Aucun sous-dossier)</x:String>
   <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(Aucun)</x:String>
+  <x:String x:Key="Text.Menu.ShowMoreOptions" xml:space="preserve">Afficher plus d'options</x:String>
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">Précédent</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">Précédent (clic droit pour l'historique)</x:String>
   <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">Dossiers qui ne tiennent pas (cliquez pour les afficher)</x:String>
@@ -219,6 +221,11 @@
   <x:String x:Key="Text.Settings.About" xml:space="preserve">À propos de Kiriha</x:String>
   <x:String x:Key="Text.Settings.About.Body" xml:space="preserve">Kiriha réunit dans une seule fenêtre la gestion de fichiers de l'Explorateur Windows et les onglets, la barre d'adresse et les favoris de Chrome. Les paramètres sont enregistrés pour l'utilisateur actuel.</x:String>
   <x:String x:Key="Text.Settings.Acrylic" xml:space="preserve">Utiliser l'effet acrylique (flou translucide) pour la fenêtre</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu" xml:space="preserve">Menu contextuel</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Modern" xml:space="preserve">Propre à Kiriha (style Windows 11)</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Note" xml:space="preserve">Le menu de style Windows 11 n'affiche que des entrées sélectionnées et les extensions du shell ; les sous-menus comme « Envoyer vers » restent sous « Afficher plus d'options ». Changez de mode si une extension ne s'affiche pas correctement.</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Shell" xml:space="preserve">Propre à Kiriha (éléments du shell tels quels)</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.System" xml:space="preserve">Standard Windows</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp" xml:space="preserve">Faire de Kiriha l'application par défaut pour ouvrir les dossiers et les lecteurs</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.Off" xml:space="preserve">Une fois activé, Kiriha démarre dès qu'un dossier ou un lecteur est ouvert depuis l'Explorateur.</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.On" xml:space="preserve">Les dossiers et les lecteurs s'ouvrent actuellement dans Kiriha. En désactivant cette option, le comportement précédent est rétabli.</x:String>
@@ -342,10 +349,13 @@
   <x:String x:Key="Text.Tab.New" xml:space="preserve">Nouvel onglet</x:String>
   <x:String x:Key="Text.Tab.NewBelow" xml:space="preserve">Ouvrir un nouvel onglet en dessous</x:String>
   <x:String x:Key="Text.Tab.NewTip" xml:space="preserve">Nouvel onglet (Ctrl+T)</x:String>
+  <x:String x:Key="Text.Tab.OpenInTabs" xml:space="preserve">Ouvrir dans de nouveaux onglets ({0})</x:String>
   <x:String x:Key="Text.Tab.Pin" xml:space="preserve">Épingler l'onglet</x:String>
+  <x:String x:Key="Text.Tab.PinInTabs" xml:space="preserve">Épingler dans de nouveaux onglets ({0})</x:String>
   <x:String x:Key="Text.Tab.Pinned" xml:space="preserve">Onglet épinglé</x:String>
   <x:String x:Key="Text.Tab.RecentlyClosed" xml:space="preserve">Onglets récemment fermés</x:String>
   <x:String x:Key="Text.Tab.Reopen" xml:space="preserve">Rouvrir l'onglet fermé</x:String>
+  <x:String x:Key="Text.Tab.SortTip" xml:space="preserve">Trier les onglets</x:String>
   <x:String x:Key="Text.Tab.Unpin" xml:space="preserve">Détacher l'onglet</x:String>
   <x:String x:Key="Text.TabAction.CloseDuplicates" xml:space="preserve">Fermer les onglets en double du même dossier</x:String>
   <x:String x:Key="Text.TabAction.CloseLeft" xml:space="preserve">Fermer les onglets du dessus</x:String>
@@ -409,4 +419,5 @@
   <x:String x:Key="Text.View.PreviewPane" xml:space="preserve">Volet d'aperçu</x:String>
   <x:String x:Key="Text.View.Small" xml:space="preserve">Petites icônes</x:String>
   <x:String x:Key="Text.View.StatusBar" xml:space="preserve">Barre d'état</x:String>
+  <x:String x:Key="Text.View.Tiles" xml:space="preserve">Mosaïques</x:String>
 </ResourceDictionary>

@@ -1,0 +1,220 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:conv="using:Avalonia.Data.Converters"
+                    xmlns:c="using:Kiriha.Controls">
+  <!--
+    Windows 11 のエクスプローラー風コンテキストメニューの見た目。
+
+    ここは Application.Resources へマージして使う。ContextMenu のポップアップは別の
+    PopupRoot に載るため、Window 側の StyleInclude（MainWindowStyles.axaml）だけに置くと
+    解決経路が状況依存になる。アプリ全体のリソースに置けば必ず最後に見つかる。
+
+    項目・区切り線・アイコン行のボタンには暗黙テーマを当てず x:Key で持たせている。
+    暗黙テーマにすると、タブやサイドバーで使っている既存の MenuFlyout まで巻き込むため。
+    ExplorerContextMenu が生成時に TryFindResource で引いて Theme プロパティへ差し込む。
+
+    地色は ContentBg ではなく MenuBg を使う。ContentBg はアクリル有効時に ThemeService が
+    半透明（0xE6）へ差し替えるので、ぼかし面を持たないポップアップでそれを使うと背後の
+    ファイル一覧がそのまま透けて読めてしまう。ぼかしはメニュー自身が
+    ExperimentalAcrylicBorder で敷き、その上に MenuBg の膜を重ねる。
+  -->
+
+  <!-- メニュー項目 1 行。左からアイコン 24 / 表示名 / ショートカット表記 / サブメニューの山括弧。 -->
+  <ControlTheme x:Key="ExplorerMenuItemTheme" TargetType="MenuItem">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+    <Setter Property="MinHeight" Value="28" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <Border Name="PART_LayoutRoot"
+                  Background="{TemplateBinding Background}"
+                  CornerRadius="4"
+                  Padding="8,0"
+                  MinHeight="{TemplateBinding MinHeight}">
+            <Grid ColumnDefinitions="24,*,Auto,Auto">
+              <ContentPresenter Name="PART_IconPresenter"
+                                Grid.Column="0"
+                                Content="{TemplateBinding Icon}"
+                                Width="16" Height="16"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center" />
+              <ContentPresenter Name="PART_HeaderPresenter"
+                                Grid.Column="1"
+                                Content="{TemplateBinding Header}"
+                                Margin="8,0,0,0"
+                                VerticalAlignment="Center"
+                                RecognizesAccessKey="True" />
+              <!-- Tag にショートカット表記の文字列を入れている（シェル由来の任意文字列を
+                   受けるので KeyGesture ではなく string）。無いときは列ごと消す。 -->
+              <TextBlock Name="PART_ShortcutText"
+                         Grid.Column="2"
+                         Text="{TemplateBinding Tag}"
+                         Foreground="{DynamicResource TextTertiary}"
+                         FontSize="12"
+                         Margin="24,0,0,0"
+                         VerticalAlignment="Center"
+                         IsVisible="{TemplateBinding Tag, Converter={x:Static conv:ObjectConverters.IsNotNull}}" />
+              <TextBlock Name="PART_ChevronText"
+                         Grid.Column="3"
+                         Text="&#xE76C;"
+                         FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
+                         FontSize="10"
+                         Foreground="{DynamicResource TextSecondary}"
+                         Margin="16,0,0,0"
+                         VerticalAlignment="Center" />
+            </Grid>
+          </Border>
+
+          <!-- 影用の余白は持たない。持つとポップアップ「ウィンドウ」がその分だけ大きくなり、
+               ウィンドウ全体に掛かるアクリルがその帯を矩形で塗って、角丸の枠からはみ出した
+               下地に見える。角丸のクリップと影は DWM に任せる（ExplorerContextMenu 参照）。 -->
+          <Popup Name="PART_Popup"
+                 WindowManagerAddShadowHint="True"
+                 Placement="RightEdgeAlignedTop"
+                 HorizontalOffset="4"
+                 IsLightDismissEnabled="False"
+                 IsOpen="{TemplateBinding IsSubMenuOpen, Mode=TwoWay}">
+            <Panel>
+              <ExperimentalAcrylicBorder CornerRadius="8" IsHitTestVisible="False"
+                                         IsVisible="{DynamicResource MenuAcrylicVisible}">
+                <ExperimentalAcrylicBorder.Material>
+                  <ExperimentalAcrylicMaterial BackgroundSource="Digger"
+                                               TintColor="{DynamicResource AcrylicTintColor}" />
+                </ExperimentalAcrylicBorder.Material>
+              </ExperimentalAcrylicBorder>
+              <Border Background="{DynamicResource MenuBg}"
+                      BorderBrush="{DynamicResource SettingsCardBorder}"
+                      BorderThickness="1"
+                      CornerRadius="8"
+                      Padding="3"
+                      MinWidth="180"
+                      MaxWidth="420">
+                <ScrollViewer MaxHeight="560"
+                              HorizontalScrollBarVisibility="Disabled"
+                              VerticalScrollBarVisibility="Auto">
+                  <ItemsPresenter Name="PART_ItemsPresenter"
+                                  ItemsPanel="{TemplateBinding ItemsPanel}" />
+                </ScrollViewer>
+              </Border>
+            </Panel>
+          </Popup>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <!-- サブメニューを持たない項目では山括弧を消す。MenuItem.HasSubMenu は AvaloniaProperty では
+         ないので TemplateBinding できず、子項目が無いときに付く :empty 疑似クラスで判定する。 -->
+    <Style Selector="^:empty /template/ TextBlock#PART_ChevronText">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:pointerover /template/ Border#PART_LayoutRoot">
+      <Setter Property="Background" Value="{DynamicResource HoverBg}" />
+    </Style>
+    <Style Selector="^:selected /template/ Border#PART_LayoutRoot">
+      <Setter Property="Background" Value="{DynamicResource HoverBg}" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Foreground" Value="{DynamicResource TextTertiary}" />
+    </Style>
+    <Style Selector="^:disabled /template/ ContentPresenter#PART_IconPresenter">
+      <Setter Property="Opacity" Value="0.4" />
+    </Style>
+    <!-- 既定の動作（エクスプローラーで太字になる項目）。 -->
+    <Style Selector="^.defaultitem /template/ ContentPresenter#PART_HeaderPresenter">
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="ExplorerMenuSeparatorTheme" TargetType="Separator">
+    <Setter Property="Background" Value="{DynamicResource Divider}" />
+    <Setter Property="Margin" Value="10,3" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{TemplateBinding Background}" Height="1" />
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <!-- 上部の横並びアイコン行（切り取り / コピー / 名前の変更 / 共有 / 削除）。 -->
+  <ControlTheme x:Key="ExplorerMenuIconButtonTheme" TargetType="Button">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="CornerRadius" Value="4" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+    <Setter Property="MinWidth" Value="44" />
+    <Setter Property="Height" Value="30" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Name="PART_Root"
+                Background="{TemplateBinding Background}"
+                CornerRadius="{TemplateBinding CornerRadius}">
+          <ContentPresenter Content="{TemplateBinding Content}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover /template/ Border#PART_Root">
+      <Setter Property="Background" Value="{DynamicResource HoverBg}" />
+    </Style>
+    <Style Selector="^:pressed /template/ Border#PART_Root">
+      <Setter Property="Background" Value="{DynamicResource CrumbHoverBg}" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Foreground" Value="{DynamicResource TextTertiary}" />
+      <Setter Property="Opacity" Value="0.5" />
+    </Style>
+  </ControlTheme>
+
+  <!-- メニュー本体。角丸 8・影付きで、上部にアイコン行、その下に項目を積む。 -->
+  <ControlTheme x:Key="{x:Type c:ExplorerContextMenu}" TargetType="c:ExplorerContextMenu">
+    <Setter Property="Background" Value="{DynamicResource MenuBg}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource SettingsCardBorder}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="Padding" Value="3" />
+    <Setter Property="MinWidth" Value="240" />
+    <Setter Property="MaxWidth" Value="460" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="WindowManagerAddShadowHint" Value="True" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <!-- 影用の余白は持たない。持つとポップアップ「ウィンドウ」がその分だけ大きくなり、
+             ウィンドウ全体に掛かるアクリルがその帯を矩形で塗ってしまう（＝角丸の枠から
+             下地がはみ出して見える）。角丸のクリップと影は DWM 側に任せる
+             （ExplorerContextMenu.ApplyPopupChrome）。 -->
+        <Panel>
+          <!-- ぼかし面。アクリル無効時は必ず隠す（残すと TransparencyLevelHint=None でも
+               フォールバックのマテリアルを塗ってしまい、テーマ色から浮く）。 -->
+          <ExperimentalAcrylicBorder Name="PART_Acrylic"
+                                     CornerRadius="{TemplateBinding CornerRadius}"
+                                     IsHitTestVisible="False"
+                                     IsVisible="{DynamicResource MenuAcrylicVisible}">
+            <ExperimentalAcrylicBorder.Material>
+              <ExperimentalAcrylicMaterial BackgroundSource="Digger"
+                                           TintColor="{DynamicResource AcrylicTintColor}" />
+            </ExperimentalAcrylicBorder.Material>
+          </ExperimentalAcrylicBorder>
+          <Border Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="{TemplateBinding CornerRadius}"
+                  Padding="{TemplateBinding Padding}">
+            <StackPanel>
+              <UniformGrid Name="PART_HeaderPanel"
+                           Rows="1"
+                           Margin="0,0,0,2"
+                           IsVisible="{TemplateBinding HasHeaderEntries}" />
+              <ItemsPresenter Name="PART_ItemsPresenter"
+                              ItemsPanel="{TemplateBinding ItemsPanel}" />
+            </StackPanel>
+          </Border>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

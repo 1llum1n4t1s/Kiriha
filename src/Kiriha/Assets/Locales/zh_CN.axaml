@@ -42,6 +42,7 @@
   <x:String x:Key="Text.Command.Options" xml:space="preserve">选项</x:String>
   <x:String x:Key="Text.Command.Paste" xml:space="preserve">粘贴</x:String>
   <x:String x:Key="Text.Command.PasteTip" xml:space="preserve">粘贴 (Ctrl+V)</x:String>
+  <x:String x:Key="Text.Command.PropertiesTip" xml:space="preserve">属性 (Alt+Enter)</x:String>
   <x:String x:Key="Text.Command.Rename" xml:space="preserve">重命名</x:String>
   <x:String x:Key="Text.Command.RenameTip" xml:space="preserve">重命名 (F2)</x:String>
   <x:String x:Key="Text.Command.Share" xml:space="preserve">共享</x:String>
@@ -171,6 +172,7 @@
   <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">新建窗口</x:String>
   <x:String x:Key="Text.Menu.NoSubfolders" xml:space="preserve">(无子文件夹)</x:String>
   <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(无)</x:String>
+  <x:String x:Key="Text.Menu.ShowMoreOptions" xml:space="preserve">显示更多选项</x:String>
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">后退</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">后退（右键查看历史记录）</x:String>
   <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">放不下的文件夹（点击查看列表）</x:String>
@@ -219,6 +221,11 @@
   <x:String x:Key="Text.Settings.About" xml:space="preserve">关于 Kiriha</x:String>
   <x:String x:Key="Text.Settings.About.Body" xml:space="preserve">Kiriha 将 Windows 资源管理器的文件操作与 Chrome 的标签页、地址栏和书签整合到一个窗口中。设置保存在当前用户下。</x:String>
   <x:String x:Key="Text.Settings.Acrylic" xml:space="preserve">窗口使用亚克力效果（半透明模糊）</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu" xml:space="preserve">右键菜单</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Modern" xml:space="preserve">Kiriha 自绘（Windows 11 风格）</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Note" xml:space="preserve">Windows 11 风格的菜单只列出精选项目和 Shell 扩展；“发送到”等子菜单保留在“显示更多选项”中。若某个扩展显示不正常，请切换其他方式。</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Shell" xml:space="preserve">Kiriha 自绘（原样显示 Shell 项目）</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.System" xml:space="preserve">Windows 标准</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp" xml:space="preserve">将 Kiriha 设为打开文件夹和驱动器的默认应用</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.Off" xml:space="preserve">启用后，从资源管理器打开文件夹或驱动器时会启动 Kiriha。</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.On" xml:space="preserve">当前文件夹和驱动器会在 Kiriha 中打开。关闭后将恢复之前的行为。</x:String>
@@ -342,10 +349,13 @@
   <x:String x:Key="Text.Tab.New" xml:space="preserve">新建标签页</x:String>
   <x:String x:Key="Text.Tab.NewBelow" xml:space="preserve">在下方新建标签页</x:String>
   <x:String x:Key="Text.Tab.NewTip" xml:space="preserve">新建标签页 (Ctrl+T)</x:String>
+  <x:String x:Key="Text.Tab.OpenInTabs" xml:space="preserve">在新标签页中打开（{0} 个）</x:String>
   <x:String x:Key="Text.Tab.Pin" xml:space="preserve">固定标签页</x:String>
+  <x:String x:Key="Text.Tab.PinInTabs" xml:space="preserve">固定为新标签页（{0} 个）</x:String>
   <x:String x:Key="Text.Tab.Pinned" xml:space="preserve">已固定的标签页</x:String>
   <x:String x:Key="Text.Tab.RecentlyClosed" xml:space="preserve">最近关闭的标签页</x:String>
   <x:String x:Key="Text.Tab.Reopen" xml:space="preserve">重新打开已关闭的标签页</x:String>
+  <x:String x:Key="Text.Tab.SortTip" xml:space="preserve">排序标签页</x:String>
   <x:String x:Key="Text.Tab.Unpin" xml:space="preserve">取消固定标签页</x:String>
   <x:String x:Key="Text.TabAction.CloseDuplicates" xml:space="preserve">关闭同一位置的重复标签页</x:String>
   <x:String x:Key="Text.TabAction.CloseLeft" xml:space="preserve">关闭上方的标签页</x:String>
@@ -409,4 +419,5 @@
   <x:String x:Key="Text.View.PreviewPane" xml:space="preserve">预览窗格</x:String>
   <x:String x:Key="Text.View.Small" xml:space="preserve">小图标</x:String>
   <x:String x:Key="Text.View.StatusBar" xml:space="preserve">状态栏</x:String>
+  <x:String x:Key="Text.View.Tiles" xml:space="preserve">平铺</x:String>
 </ResourceDictionary>

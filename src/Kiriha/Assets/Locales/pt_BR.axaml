@@ -42,6 +42,7 @@
   <x:String x:Key="Text.Command.Options" xml:space="preserve">Opções</x:String>
   <x:String x:Key="Text.Command.Paste" xml:space="preserve">Colar</x:String>
   <x:String x:Key="Text.Command.PasteTip" xml:space="preserve">Colar (Ctrl+V)</x:String>
+  <x:String x:Key="Text.Command.PropertiesTip" xml:space="preserve">Propriedades (Alt+Enter)</x:String>
   <x:String x:Key="Text.Command.Rename" xml:space="preserve">Renomear</x:String>
   <x:String x:Key="Text.Command.RenameTip" xml:space="preserve">Renomear (F2)</x:String>
   <x:String x:Key="Text.Command.Share" xml:space="preserve">Compartilhar</x:String>
@@ -171,6 +172,7 @@
   <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">Nova janela</x:String>
   <x:String x:Key="Text.Menu.NoSubfolders" xml:space="preserve">(Sem subpastas)</x:String>
   <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(Nenhum)</x:String>
+  <x:String x:Key="Text.Menu.ShowMoreOptions" xml:space="preserve">Mostrar mais opções</x:String>
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">Voltar</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">Voltar (clique com o botão direito para o histórico)</x:String>
   <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">Pastas que não cabem (clique para listá-las)</x:String>
@@ -219,6 +221,11 @@
   <x:String x:Key="Text.Settings.About" xml:space="preserve">Sobre o Kiriha</x:String>
   <x:String x:Key="Text.Settings.About.Body" xml:space="preserve">O Kiriha reúne em uma única janela o gerenciamento de arquivos do Explorador do Windows e as guias, a barra de endereços e os favoritos do Chrome. As configurações são salvas para o usuário atual.</x:String>
   <x:String x:Key="Text.Settings.Acrylic" xml:space="preserve">Usar o efeito acrílico (desfoque translúcido) na janela</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu" xml:space="preserve">Menu de contexto</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Modern" xml:space="preserve">Próprio do Kiriha (estilo Windows 11)</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Note" xml:space="preserve">O menu no estilo Windows 11 lista apenas itens selecionados e extensões do shell; submenus como "Enviar para" ficam em "Mostrar mais opções". Troque de modo se alguma extensão não aparecer corretamente.</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Shell" xml:space="preserve">Próprio do Kiriha (itens do shell como estão)</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.System" xml:space="preserve">Padrão do Windows</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp" xml:space="preserve">Tornar o Kiriha o aplicativo padrão para abrir pastas e unidades</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.Off" xml:space="preserve">Quando ativado, o Kiriha é iniciado sempre que uma pasta ou unidade for aberta no Explorador.</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.On" xml:space="preserve">No momento, pastas e unidades abrem no Kiriha. Ao desativar, o comportamento anterior é restaurado.</x:String>
@@ -342,10 +349,13 @@
   <x:String x:Key="Text.Tab.New" xml:space="preserve">Nova guia</x:String>
   <x:String x:Key="Text.Tab.NewBelow" xml:space="preserve">Abrir uma nova guia abaixo</x:String>
   <x:String x:Key="Text.Tab.NewTip" xml:space="preserve">Nova guia (Ctrl+T)</x:String>
+  <x:String x:Key="Text.Tab.OpenInTabs" xml:space="preserve">Abrir em novas abas ({0})</x:String>
   <x:String x:Key="Text.Tab.Pin" xml:space="preserve">Fixar a guia</x:String>
+  <x:String x:Key="Text.Tab.PinInTabs" xml:space="preserve">Fixar em novas abas ({0})</x:String>
   <x:String x:Key="Text.Tab.Pinned" xml:space="preserve">Guia fixada</x:String>
   <x:String x:Key="Text.Tab.RecentlyClosed" xml:space="preserve">Guias fechadas recentemente</x:String>
   <x:String x:Key="Text.Tab.Reopen" xml:space="preserve">Reabrir a guia fechada</x:String>
+  <x:String x:Key="Text.Tab.SortTip" xml:space="preserve">Ordenar abas</x:String>
   <x:String x:Key="Text.Tab.Unpin" xml:space="preserve">Desafixar a guia</x:String>
   <x:String x:Key="Text.TabAction.CloseDuplicates" xml:space="preserve">Fechar guias duplicadas da mesma pasta</x:String>
   <x:String x:Key="Text.TabAction.CloseLeft" xml:space="preserve">Fechar as guias acima</x:String>
@@ -409,4 +419,5 @@
   <x:String x:Key="Text.View.PreviewPane" xml:space="preserve">Painel de visualização</x:String>
   <x:String x:Key="Text.View.Small" xml:space="preserve">Ícones pequenos</x:String>
   <x:String x:Key="Text.View.StatusBar" xml:space="preserve">Barra de status</x:String>
+  <x:String x:Key="Text.View.Tiles" xml:space="preserve">Lado a lado</x:String>
 </ResourceDictionary>

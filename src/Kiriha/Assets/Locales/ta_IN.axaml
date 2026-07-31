@@ -42,6 +42,7 @@
   <x:String x:Key="Text.Command.Options" xml:space="preserve">விருப்பங்கள்</x:String>
   <x:String x:Key="Text.Command.Paste" xml:space="preserve">ஒட்டு</x:String>
   <x:String x:Key="Text.Command.PasteTip" xml:space="preserve">ஒட்டு (Ctrl+V)</x:String>
+  <x:String x:Key="Text.Command.PropertiesTip" xml:space="preserve">பண்புகள் (Alt+Enter)</x:String>
   <x:String x:Key="Text.Command.Rename" xml:space="preserve">பெயர் மாற்று</x:String>
   <x:String x:Key="Text.Command.RenameTip" xml:space="preserve">பெயர் மாற்று (F2)</x:String>
   <x:String x:Key="Text.Command.Share" xml:space="preserve">பகிர்</x:String>
@@ -171,6 +172,7 @@
   <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">புதிய சாளரம்</x:String>
   <x:String x:Key="Text.Menu.NoSubfolders" xml:space="preserve">(துணைக் கோப்புறைகள் இல்லை)</x:String>
   <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(எதுவும் இல்லை)</x:String>
+  <x:String x:Key="Text.Menu.ShowMoreOptions" xml:space="preserve">மேலும் விருப்பங்களைக் காட்டு</x:String>
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">பின்</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">பின் (வரலாற்றுக்கு வலது கிளிக்)</x:String>
   <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">இடம் போதாத கோப்புறைகள் (சொடுக்கினால் பட்டியல்)</x:String>
@@ -219,6 +221,11 @@
   <x:String x:Key="Text.Settings.About" xml:space="preserve">Kiriha பற்றி</x:String>
   <x:String x:Key="Text.Settings.About.Body" xml:space="preserve">Windows எக்ஸ்ப்ளோரரின் கோப்புச் செயல்பாடுகளையும், Chrome இன் தாவல்கள், முகவரிப் பட்டி, புத்தகக்குறிகளையும் Kiriha ஒரே திரையில் இணைக்கிறது. அமைப்புகள் தற்போதைய பயனருக்குச் சேமிக்கப்படும்.</x:String>
   <x:String x:Key="Text.Settings.Acrylic" xml:space="preserve">சாளரத்திற்கு அக்ரிலிக் விளைவை (ஒளிபுகும் மங்கல்) பயன்படுத்து</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu" xml:space="preserve">சூழல் மெனு</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Modern" xml:space="preserve">Kiriha சொந்தம் (Windows 11 பாணி)</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Note" xml:space="preserve">Windows 11 பாணி மெனு தேர்ந்தெடுக்கப்பட்ட உருப்படிகளையும் ஷெல் நீட்டிப்புகளையும் மட்டுமே காட்டும்; "அனுப்பு" போன்ற துணை மெனுக்கள் "மேலும் விருப்பங்களைக் காட்டு" இல் இருக்கும். ஒரு நீட்டிப்பு சரியாகத் தோன்றாவிட்டால் வேறு முறைக்கு மாறவும்.</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Shell" xml:space="preserve">Kiriha சொந்தம் (ஷெல் உருப்படிகள் அப்படியே)</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.System" xml:space="preserve">Windows இயல்புநிலை</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp" xml:space="preserve">கோப்புறைகளையும் இயக்ககங்களையும் திறக்க Kiriha ஐ இயல்புநிலை பயன்பாடாக அமை</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.Off" xml:space="preserve">இயக்கினால், எக்ஸ்ப்ளோரரில் கோப்புறை அல்லது இயக்ககத்தைத் திறக்கும்போது Kiriha தொடங்கும்.</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.On" xml:space="preserve">தற்போது கோப்புறைகளும் இயக்ககங்களும் Kiriha இல் திறக்கின்றன. முடக்கினால் முந்தைய நடத்தை மீட்கப்படும்.</x:String>
@@ -342,10 +349,13 @@
   <x:String x:Key="Text.Tab.New" xml:space="preserve">புதிய தாவல்</x:String>
   <x:String x:Key="Text.Tab.NewBelow" xml:space="preserve">கீழே புதிய தாவலைத் திற</x:String>
   <x:String x:Key="Text.Tab.NewTip" xml:space="preserve">புதிய தாவல் (Ctrl+T)</x:String>
+  <x:String x:Key="Text.Tab.OpenInTabs" xml:space="preserve">புதிய தாவல்களில் திற ({0})</x:String>
   <x:String x:Key="Text.Tab.Pin" xml:space="preserve">தாவலைப் பொருத்து</x:String>
+  <x:String x:Key="Text.Tab.PinInTabs" xml:space="preserve">புதிய தாவல்களில் பொருத்து ({0})</x:String>
   <x:String x:Key="Text.Tab.Pinned" xml:space="preserve">பொருத்தப்பட்ட தாவல்</x:String>
   <x:String x:Key="Text.Tab.RecentlyClosed" xml:space="preserve">சமீபத்தில் மூடிய தாவல்கள்</x:String>
   <x:String x:Key="Text.Tab.Reopen" xml:space="preserve">மூடிய தாவலை மீண்டும் திற</x:String>
+  <x:String x:Key="Text.Tab.SortTip" xml:space="preserve">தாவல்களை வரிசைப்படுத்து</x:String>
   <x:String x:Key="Text.Tab.Unpin" xml:space="preserve">தாவலின் பொருத்தத்தை நீக்கு</x:String>
   <x:String x:Key="Text.TabAction.CloseDuplicates" xml:space="preserve">ஒரே இடத்தின் நகல் தாவல்களை மூடு</x:String>
   <x:String x:Key="Text.TabAction.CloseLeft" xml:space="preserve">மேலுள்ள தாவல்களை மூடு</x:String>
@@ -409,4 +419,5 @@
   <x:String x:Key="Text.View.PreviewPane" xml:space="preserve">முன்னோட்டப் பலகம்</x:String>
   <x:String x:Key="Text.View.Small" xml:space="preserve">சிறிய சின்னங்கள்</x:String>
   <x:String x:Key="Text.View.StatusBar" xml:space="preserve">நிலைப் பட்டி</x:String>
+  <x:String x:Key="Text.View.Tiles" xml:space="preserve">ஓடுகள்</x:String>
 </ResourceDictionary>

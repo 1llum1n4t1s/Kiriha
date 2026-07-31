@@ -177,6 +177,10 @@ public sealed class AppSettings
     /// <summary>v1.0.17 以前の設定から移行するために保持する旧フラグ。</summary>
     public bool UseMaterialIcons { get; set; }
 
+    /// <summary>右クリックメニューの実装方式（<see cref="Kiriha.Models.ContextMenuStyle"/> の enum 名）。
+    /// 未設定・不正値は既定の Modern として扱う。</summary>
+    public string? ContextMenuStyle { get; set; }
+
     /// <summary>ウィンドウにアクリル（半透明ぼかし）効果を使う（Lhamiel / RealTimeTranslator と同等、設定画面で切替）。</summary>
     public bool UseAcrylicBackground { get; set; } = true;
 

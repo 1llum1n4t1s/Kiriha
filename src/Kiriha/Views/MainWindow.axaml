@@ -27,8 +27,8 @@
         <ExperimentalAcrylicBorder IsHitTestVisible="False"
                                    IsVisible="{Binding OptUseAcrylicBackground}">
             <ExperimentalAcrylicBorder.Material>
-                <ExperimentalAcrylicMaterial BackgroundSource="Digger" MaterialOpacity="0.85"
-                                             TintColor="{DynamicResource AcrylicTintColor}" TintOpacity="0.9" />
+                <ExperimentalAcrylicMaterial BackgroundSource="Digger"
+                                             TintColor="{DynamicResource AcrylicTintColor}" />
             </ExperimentalAcrylicBorder.Material>
         </ExperimentalAcrylicBorder>
 
@@ -105,7 +105,7 @@
             <Grid Grid.Column="0" ClipToBounds="True">
                 <!-- ON/OFFともにタイトルバーと同じウィンドウ背景をそのまま見せる。 -->
                 <Border Background="{DynamicResource VerticalTabsSurfaceBg}">
-                    <Grid RowDefinitions="*,Auto,Auto">
+                    <Grid RowDefinitions="*,Auto">
                     <ListBox x:Name="VerticalTabsListBox" Grid.Row="0" Classes="verticaltabs"
                              IsVisible="{Binding !SelectedTab.IsGalleryView}"
                              AutomationProperties.Name="{DynamicResource Text.A11y.VerticalTabs}"
@@ -152,6 +152,19 @@
                                         </ContextMenu>
                                     </Grid.ContextMenu>
 
+                                    <!-- 固定タブの目印。行全体へアクセント色を薄く敷き、左端に太めの
+                                         アクセントバーを出す。選択中の印（ContentPresenter 側の左 2px 枠）
+                                         とは色の面積が違うので、選択と固定は同時に出ても見分けがつく。 -->
+                                    <Border Grid.Column="0" Grid.ColumnSpan="3"
+                                            IsVisible="{Binding IsPinned}"
+                                            Background="{DynamicResource AccentHoverBrush}"
+                                            CornerRadius="8" IsHitTestVisible="False" />
+                                    <Border Grid.Column="0" Grid.ColumnSpan="3"
+                                            IsVisible="{Binding IsPinned}"
+                                            Width="3" HorizontalAlignment="Left"
+                                            Background="{DynamicResource AccentBrush}"
+                                            CornerRadius="8,0,0,8" IsHitTestVisible="False" />
+
                                     <Grid Grid.Column="0">
                                         <TextBlock Text="📁" FontSize="13"
                                                    IsVisible="{Binding IsNormalTab}"
@@ -166,9 +179,9 @@
                                                VerticalAlignment="Center"
                                                TextTrimming="CharacterEllipsis" />
                                     <TextBlock Grid.Column="2" Classes="fico" Text="&#xE718;"
-                                               IsVisible="{Binding IsPinned}" FontSize="11"
+                                               IsVisible="{Binding IsPinned}" FontSize="12.5"
                                                Margin="0,0,10,0" VerticalAlignment="Center"
-                                               Foreground="{DynamicResource TextSecondary}"
+                                               Foreground="{DynamicResource AccentBrush}"
                                                ToolTip.Tip="{DynamicResource Text.Tab.Pinned}" />
                                     <Button Grid.Column="2" Classes="tabclose" Content="&#xE8BB;"
                                             IsVisible="{Binding !IsPinned}"
@@ -226,38 +239,48 @@
                         </ScrollViewer>
                     </Border>
 
-                    <Button x:Name="VerticalNewTabButton" Grid.Row="1"
-                            Classes="verticaltabaction verticalnewtab"
-                            Margin="8,4,3,2"
-                            Command="{Binding NewTabCommand}"
-                            AutomationProperties.Name="{DynamicResource Text.Tab.New}"
-                            ToolTip.Tip="{DynamicResource Text.Tab.NewTip}">
-                        <Grid ColumnDefinitions="28,*,Auto">
-                            <TextBlock Grid.Column="0" Classes="fico" Text="&#xE710;" FontSize="12"
+                    <!-- タブ一覧のフッター。アイコンだけを横に並べ、意味はツールチップで伝える。
+                         幅の狭いタブ列でも操作が縦に伸びないようにするため。 -->
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="2"
+                                Margin="8,4,3,10" HorizontalAlignment="Left">
+                        <Button x:Name="VerticalNewTabButton"
+                                Classes="verticaltabaction verticaltabicon"
+                                Command="{Binding NewTabCommand}"
+                                AutomationProperties.Name="{DynamicResource Text.Tab.New}"
+                                ToolTip.Tip="{DynamicResource Text.Tab.NewTip}">
+                            <TextBlock Classes="fico" Text="&#xE710;" FontSize="13"
                                        HorizontalAlignment="Center" VerticalAlignment="Center" />
-                            <TextBlock Grid.Column="1" Text="{DynamicResource Text.Tab.New}" FontSize="12.5"
-                                       Margin="6,0,0,0" VerticalAlignment="Center"
-                                       Foreground="{DynamicResource TextPrimary}" />
-                            <TextBlock Grid.Column="2" Text="Ctrl+T" FontSize="11.5"
-                                       Margin="8,0,2,0" VerticalAlignment="Center"
-                                       Foreground="{DynamicResource TextSecondary}" />
-                        </Grid>
-                    </Button>
+                        </Button>
 
-                    <Button x:Name="SettingsButton" Grid.Row="2"
-                            Classes="verticaltabaction verticalnewtab"
-                            Margin="8,0,3,10"
-                            AutomationProperties.Name="{DynamicResource Text.Nav.OpenSettings}"
-                            Command="{Binding OpenSettingsCommand}"
-                            ToolTip.Tip="{DynamicResource Text.Nav.OpenSettings}">
-                        <Grid ColumnDefinitions="28,*">
-                            <TextBlock Grid.Column="0" Classes="fico" Text="&#xE713;" FontSize="12"
+                        <!-- 並べ替え。固定タブと通常タブは、それぞれのブロック内だけで並び替わる。 -->
+                        <Button x:Name="TabSortButton"
+                                Classes="verticaltabaction verticaltabicon"
+                                AutomationProperties.Name="{DynamicResource Text.Tab.SortTip}"
+                                ToolTip.Tip="{DynamicResource Text.Tab.SortTip}">
+                            <TextBlock Classes="fico" Text="&#xE8CB;" FontSize="13"
                                        HorizontalAlignment="Center" VerticalAlignment="Center" />
-                            <TextBlock Grid.Column="1" Text="{DynamicResource Text.Nav.Settings}" FontSize="12.5"
-                                       Margin="6,0,0,0" VerticalAlignment="Center"
-                                       Foreground="{DynamicResource TextPrimary}" />
-                        </Grid>
-                    </Button>
+                            <Button.Flyout>
+                                <MenuFlyout Placement="TopEdgeAlignedLeft">
+                                    <MenuItem Header="{DynamicResource Text.TabAction.SortByName}"
+                                              Command="{Binding SortTabsByNameCommand}" />
+                                    <MenuItem Header="{DynamicResource Text.TabAction.SortByPath}"
+                                              Command="{Binding SortTabsByPathCommand}" />
+                                    <Separator />
+                                    <MenuItem Header="{DynamicResource Text.TabAction.Reverse}"
+                                              Command="{Binding ReverseTabOrderCommand}" />
+                                </MenuFlyout>
+                            </Button.Flyout>
+                        </Button>
+
+                        <Button x:Name="SettingsButton"
+                                Classes="verticaltabaction verticaltabicon"
+                                AutomationProperties.Name="{DynamicResource Text.Nav.OpenSettings}"
+                                Command="{Binding OpenSettingsCommand}"
+                                ToolTip.Tip="{DynamicResource Text.Nav.OpenSettings}">
+                            <TextBlock Classes="fico" Text="&#xE713;" FontSize="13"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Button>
+                    </StackPanel>
                     </Grid>
                 </Border>
             </Grid>
@@ -554,6 +577,9 @@
                                         VerticalAlignment="Center" Command="{Binding ShareCommand}" />
                                 <Button Classes="cmd cmdicon" Content="&#xE74D;" ToolTip.Tip="{DynamicResource Text.Command.DeleteTip}" AutomationProperties.Name="{DynamicResource Text.Common.Delete}"
                                         VerticalAlignment="Center" Command="{Binding DeleteCommand}" />
+                                <Button Classes="cmd cmdicon" Content="&#xE946;" ToolTip.Tip="{DynamicResource Text.Command.PropertiesTip}"
+                                        AutomationProperties.Name="{DynamicResource Text.Common.Properties}"
+                                        VerticalAlignment="Center" Command="{Binding ShowPropertiesCommand}" />
 
                                 <Border Width="1" Height="20" Background="{DynamicResource Divider}"
                                         VerticalAlignment="Center" Margin="4,0" />
@@ -600,24 +626,29 @@
                                     </StackPanel>
                                     <Button.Flyout>
                                         <MenuFlyout Placement="BottomEdgeAlignedLeft">
+                                            <!-- 「PC」は並べて表示に固定するので、表示方法の選択だけ無効化する
+                                                 （下のコンパクトビュー以降のトグルは PC でも使える） -->
                                             <MenuItem Header="{DynamicResource Text.View.ExtraLarge}" ToggleType="Radio"
-                                                      IsChecked="{Binding IsViewExtraLarge}"
+                                                      IsChecked="{Binding IsViewExtraLarge}" IsEnabled="{Binding CanChangeViewMode}"
                                                       Command="{Binding SetViewModeCommand}" CommandParameter="ExtraLargeIcons" />
                                             <MenuItem Header="{DynamicResource Text.View.Large}" ToggleType="Radio"
-                                                      IsChecked="{Binding IsViewLarge}"
+                                                      IsChecked="{Binding IsViewLarge}" IsEnabled="{Binding CanChangeViewMode}"
                                                       Command="{Binding SetViewModeCommand}" CommandParameter="LargeIcons" />
                                             <MenuItem Header="{DynamicResource Text.View.Medium}" ToggleType="Radio"
-                                                      IsChecked="{Binding IsViewMedium}"
+                                                      IsChecked="{Binding IsViewMedium}" IsEnabled="{Binding CanChangeViewMode}"
                                                       Command="{Binding SetViewModeCommand}" CommandParameter="MediumIcons" />
                                             <MenuItem Header="{DynamicResource Text.View.Small}" ToggleType="Radio"
-                                                      IsChecked="{Binding IsViewSmall}"
+                                                      IsChecked="{Binding IsViewSmall}" IsEnabled="{Binding CanChangeViewMode}"
                                                       Command="{Binding SetViewModeCommand}" CommandParameter="SmallIcons" />
                                             <MenuItem Header="{DynamicResource Text.View.List}" ToggleType="Radio"
-                                                      IsChecked="{Binding IsViewList}"
+                                                      IsChecked="{Binding IsViewList}" IsEnabled="{Binding CanChangeViewMode}"
                                                       Command="{Binding SetViewModeCommand}" CommandParameter="List" />
                                             <MenuItem Header="{DynamicResource Text.View.Details}" ToggleType="Radio"
-                                                      IsChecked="{Binding IsViewDetails}"
+                                                      IsChecked="{Binding IsViewDetails}" IsEnabled="{Binding CanChangeViewMode}"
                                                       Command="{Binding SetViewModeCommand}" CommandParameter="Details" />
+                                            <MenuItem Header="{DynamicResource Text.View.Tiles}" ToggleType="Radio"
+                                                      IsChecked="{Binding IsViewTiles}" IsEnabled="{Binding CanChangeViewMode}"
+                                                      Command="{Binding SetViewModeCommand}" CommandParameter="Tiles" />
                                             <Separator />
                                             <MenuItem Header="{DynamicResource Text.View.Compact}" ToggleType="CheckBox"
                                                       IsChecked="{Binding IsCompactView}"
@@ -950,6 +981,77 @@
                                                     <TextBlock Text="{Binding DisplayName}" FontSize="13" Foreground="{DynamicResource TextPrimary}"
                                                                VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
                                                 </StackPanel>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+
+                                    <!-- 並べて表示（エクスプローラーの「並べて表示」）。
+                                         実機を UI Automation とキャプチャで実測した値に合わせてある:
+                                         タイル 250x55dip・左右の間隔 4・48px アイコン・行送り 16・
+                                         左から右へ流して折り返す。アイコンサイズのスライダーには追従しない（本家も固定）。 -->
+                                    <ListBox Classes="files tiles"
+                                             IsVisible="{Binding IsTilesView}"
+                                             ItemsSource="{Binding Entries}"
+                                             SelectedItem="{Binding SelectedEntry}"
+                                             SelectionMode="Multiple"
+                                             Background="Transparent"
+                                             Padding="8,6,0,0"
+                                             DragDrop.AllowDrop="True"
+                                             DoubleTapped="FileList_DoubleTapped"
+                                             SelectionChanged="FileList_SelectionChanged"
+                                             PointerReleased="FileList_PointerReleased"
+                                             KeyDown="FileList_KeyDown">
+                                        <ListBox.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <c:VirtualizingWrapPanel ItemWidth="254" ItemHeight="59" CacheRows="2" />
+                                            </ItemsPanelTemplate>
+                                        </ListBox.ItemsPanel>
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate x:DataType="m:FileSystemEntry">
+                                                <Grid ColumnDefinitions="Auto,*" Height="55"
+                                                      Background="Transparent"
+                                                      EffectiveViewportChanged="FileItem_EffectiveViewportChanged"
+                                                      DataContextChanged="FileItem_DataContextChanged"
+                                                      Opacity="{Binding RowOpacity}"
+                                                      ToolTip.Tip="{Binding RowTooltip}">
+                                                    <Panel Grid.Column="0" Width="48" Height="48"
+                                                           Margin="6,0,0,0" VerticalAlignment="Center">
+                                                        <!-- 優先順位はアイコン表示と同じ: 実サムネイル > 選択中のアイコンセット -->
+                                                        <Image Source="{Binding Thumbnail}"
+                                                               IsVisible="{Binding HasThumbnail}"
+                                                               RenderOptions.BitmapInterpolationMode="HighQuality"
+                                                               Stretch="Uniform" />
+                                                        <Panel IsVisible="{Binding HasNoThumbnail}">
+                                                            <c:FileIconPresenter Entry="{Binding}"
+                                                                                 Owner="{Binding $parent[ListBox].((vm:TabViewModel)DataContext)}"
+                                                                                 IconSize="48"
+                                                                                 ScaleEmoji="True" />
+                                                        </Panel>
+                                                    </Panel>
+                                                    <!-- 文字は 3 行ぶん（16x3=48）で頭打ち。名前が 2 行に折り返すと
+                                                         サイズ行が枠外へ押し出されて消える = エクスプローラーと同じ挙動。
+                                                         枠より短いとき（フォルダーの 1 行）は上下中央に来る。 -->
+                                                    <Border Grid.Column="1" Height="48" Margin="8,0,6,0"
+                                                            VerticalAlignment="Center" ClipToBounds="True">
+                                                        <StackPanel MaxHeight="48" VerticalAlignment="Center">
+                                                            <TextBlock Text="{Binding DisplayName}"
+                                                                       FontSize="12" LineHeight="16" MaxLines="2"
+                                                                       TextWrapping="Wrap" TextTrimming="CharacterEllipsis"
+                                                                       Foreground="{DynamicResource TextPrimary}" />
+                                                            <!-- フォルダーは名前だけ（実機で種類・サイズが出ないことを確認済み） -->
+                                                            <TextBlock Text="{Binding TypeText}"
+                                                                       FontSize="12" LineHeight="16"
+                                                                       IsVisible="{Binding !IsDirectory}"
+                                                                       TextTrimming="CharacterEllipsis"
+                                                                       Foreground="{DynamicResource TextSecondary}" />
+                                                            <TextBlock Text="{Binding SizeText}"
+                                                                       FontSize="12" LineHeight="16"
+                                                                       IsVisible="{Binding !IsDirectory}"
+                                                                       TextTrimming="CharacterEllipsis"
+                                                                       Foreground="{DynamicResource TextSecondary}" />
+                                                        </StackPanel>
+                                                    </Border>
+                                                </Grid>
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>
                                     </ListBox>

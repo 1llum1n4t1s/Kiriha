@@ -81,6 +81,7 @@
                                                     <ComboBoxItem Tag="SmallIcons" Content="{DynamicResource Text.View.Small}" />
                                                     <ComboBoxItem Tag="List" Content="{DynamicResource Text.View.List}" />
                                                     <ComboBoxItem Tag="Details" Content="{DynamicResource Text.View.Details}" />
+                                                    <ComboBoxItem Tag="Tiles" Content="{DynamicResource Text.View.Tiles}" />
                                                 </ComboBox>
                                                 <TextBlock Text="{DynamicResource Text.Settings.DefaultView.Sort}" FontSize="13" Margin="0,6,0,0" />
                                                 <StackPanel Orientation="Horizontal" Spacing="8">
@@ -174,6 +175,21 @@
                                                 <TextBlock Classes="settingscaption" Margin="0,6,0,0"
                                                            TextWrapping="Wrap"
                                                            Text="{DynamicResource Text.Settings.IconSet.Note}" />
+                                            </StackPanel>
+                                        </HeaderedContentControl>
+
+                                        <HeaderedContentControl Classes="settingscard" Header="{DynamicResource Text.Settings.ContextMenu}">
+                                            <StackPanel Classes="settingsfields">
+                                                <ComboBox Classes="settingsfield" MinWidth="240" HorizontalAlignment="Left"
+                                                          SelectedValue="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptContextMenuStyle}"
+                                                          SelectedValueBinding="{Binding Tag, x:DataType=ComboBoxItem}">
+                                                    <ComboBoxItem Tag="Modern" Content="{DynamicResource Text.Settings.ContextMenu.Modern}" />
+                                                    <ComboBoxItem Tag="Shell" Content="{DynamicResource Text.Settings.ContextMenu.Shell}" />
+                                                    <ComboBoxItem Tag="System" Content="{DynamicResource Text.Settings.ContextMenu.System}" />
+                                                </ComboBox>
+                                                <TextBlock Classes="settingscaption" Margin="0,6,0,0"
+                                                           TextWrapping="Wrap"
+                                                           Text="{DynamicResource Text.Settings.ContextMenu.Note}" />
                                             </StackPanel>
                                         </HeaderedContentControl>
 

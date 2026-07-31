@@ -42,6 +42,7 @@
   <x:String x:Key="Text.Command.Options" xml:space="preserve">Параметри</x:String>
   <x:String x:Key="Text.Command.Paste" xml:space="preserve">Вставити</x:String>
   <x:String x:Key="Text.Command.PasteTip" xml:space="preserve">Вставити (Ctrl+V)</x:String>
+  <x:String x:Key="Text.Command.PropertiesTip" xml:space="preserve">Властивості (Alt+Enter)</x:String>
   <x:String x:Key="Text.Command.Rename" xml:space="preserve">Перейменувати</x:String>
   <x:String x:Key="Text.Command.RenameTip" xml:space="preserve">Перейменувати (F2)</x:String>
   <x:String x:Key="Text.Command.Share" xml:space="preserve">Поділитися</x:String>
@@ -171,6 +172,7 @@
   <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">Нове вікно</x:String>
   <x:String x:Key="Text.Menu.NoSubfolders" xml:space="preserve">(Немає підпапок)</x:String>
   <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(Немає)</x:String>
+  <x:String x:Key="Text.Menu.ShowMoreOptions" xml:space="preserve">Показати додаткові параметри</x:String>
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">Назад</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">Назад (правий клік — журнал)</x:String>
   <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">Теки, які не вмістилися (натисніть, щоб показати)</x:String>
@@ -219,6 +221,11 @@
   <x:String x:Key="Text.Settings.About" xml:space="preserve">Про Kiriha</x:String>
   <x:String x:Key="Text.Settings.About.Body" xml:space="preserve">Kiriha поєднує в одному вікні роботу з файлами як у Провіднику Windows та вкладки, адресний рядок і закладки як у Chrome. Параметри зберігаються для поточного користувача.</x:String>
   <x:String x:Key="Text.Settings.Acrylic" xml:space="preserve">Використовувати ефект акрилу (напівпрозоре розмиття) для вікна</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu" xml:space="preserve">Контекстне меню</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Modern" xml:space="preserve">Власне меню Kiriha (у стилі Windows 11)</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Note" xml:space="preserve">Меню у стилі Windows 11 показує лише відібрані пункти та розширення оболонки; підменю на кшталт «Надіслати» лишаються в «Показати додаткові параметри». Змініть режим, якщо якесь розширення відображається неправильно.</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Shell" xml:space="preserve">Власне меню Kiriha (елементи оболонки без змін)</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.System" xml:space="preserve">Стандартне меню Windows</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp" xml:space="preserve">Зробити Kiriha програмою за замовчуванням для відкриття папок і дисків</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.Off" xml:space="preserve">Якщо ввімкнено, Kiriha запускається щоразу, коли папку або диск відкривають із Провідника.</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.On" xml:space="preserve">Зараз папки та диски відкриваються в Kiriha. Якщо вимкнути, повернеться попередня поведінка.</x:String>
@@ -342,10 +349,13 @@
   <x:String x:Key="Text.Tab.New" xml:space="preserve">Нова вкладка</x:String>
   <x:String x:Key="Text.Tab.NewBelow" xml:space="preserve">Відкрити нову вкладку нижче</x:String>
   <x:String x:Key="Text.Tab.NewTip" xml:space="preserve">Нова вкладка (Ctrl+T)</x:String>
+  <x:String x:Key="Text.Tab.OpenInTabs" xml:space="preserve">Відкрити в нових вкладках ({0})</x:String>
   <x:String x:Key="Text.Tab.Pin" xml:space="preserve">Закріпити вкладку</x:String>
+  <x:String x:Key="Text.Tab.PinInTabs" xml:space="preserve">Закріпити в нових вкладках ({0})</x:String>
   <x:String x:Key="Text.Tab.Pinned" xml:space="preserve">Закріплена вкладка</x:String>
   <x:String x:Key="Text.Tab.RecentlyClosed" xml:space="preserve">Нещодавно закриті вкладки</x:String>
   <x:String x:Key="Text.Tab.Reopen" xml:space="preserve">Відновити закриту вкладку</x:String>
+  <x:String x:Key="Text.Tab.SortTip" xml:space="preserve">Сортувати вкладки</x:String>
   <x:String x:Key="Text.Tab.Unpin" xml:space="preserve">Відкріпити вкладку</x:String>
   <x:String x:Key="Text.TabAction.CloseDuplicates" xml:space="preserve">Закрити дубльовані вкладки тієї самої папки</x:String>
   <x:String x:Key="Text.TabAction.CloseLeft" xml:space="preserve">Закрити вкладки вище</x:String>
@@ -409,4 +419,5 @@
   <x:String x:Key="Text.View.PreviewPane" xml:space="preserve">Область попереднього перегляду</x:String>
   <x:String x:Key="Text.View.Small" xml:space="preserve">Дрібні значки</x:String>
   <x:String x:Key="Text.View.StatusBar" xml:space="preserve">Рядок стану</x:String>
+  <x:String x:Key="Text.View.Tiles" xml:space="preserve">Плитка</x:String>
 </ResourceDictionary>

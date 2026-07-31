@@ -42,6 +42,7 @@
   <x:String x:Key="Text.Command.Options" xml:space="preserve">オプション</x:String>
   <x:String x:Key="Text.Command.Paste" xml:space="preserve">貼り付け</x:String>
   <x:String x:Key="Text.Command.PasteTip" xml:space="preserve">貼り付け (Ctrl+V)</x:String>
+  <x:String x:Key="Text.Command.PropertiesTip" xml:space="preserve">プロパティ (Alt+Enter)</x:String>
   <x:String x:Key="Text.Command.Rename" xml:space="preserve">名前の変更</x:String>
   <x:String x:Key="Text.Command.RenameTip" xml:space="preserve">名前の変更 (F2)</x:String>
   <x:String x:Key="Text.Command.Share" xml:space="preserve">共有</x:String>
@@ -171,6 +172,7 @@
   <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">新しいウィンドウ</x:String>
   <x:String x:Key="Text.Menu.NoSubfolders" xml:space="preserve">(サブフォルダーなし)</x:String>
   <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(なし)</x:String>
+  <x:String x:Key="Text.Menu.ShowMoreOptions" xml:space="preserve">その他のオプションを確認</x:String>
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">戻る</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">戻る (右クリックで履歴)</x:String>
   <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">表示しきれないフォルダー（クリックで一覧）</x:String>
@@ -219,6 +221,11 @@
   <x:String x:Key="Text.Settings.About" xml:space="preserve">Kiriha について</x:String>
   <x:String x:Key="Text.Settings.About.Body" xml:space="preserve">Windows Explorerのファイル操作と、Chromeのタブ・アドレスバー・お気に入り操作を一つの画面にまとめています。設定は現在のユーザーに保存されます。</x:String>
   <x:String x:Key="Text.Settings.Acrylic" xml:space="preserve">ウィンドウにアクリル効果（半透明ぼかし）を使う</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu" xml:space="preserve">右クリックメニュー</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Modern" xml:space="preserve">Kiriha 独自（Windows 11 風）</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Note" xml:space="preserve">「Kiriha 独自（Windows 11 風）」は厳選した項目とシェル拡張だけを並べます。送る などのサブメニューは「その他のオプションを確認」から使えます。表示がおかしい拡張があるときは他の方式へ切り替えてください。</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Shell" xml:space="preserve">Kiriha 独自（シェルの項目をそのまま）</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.System" xml:space="preserve">Windows 標準</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp" xml:space="preserve">フォルダーとドライブを開く既定のアプリを Kiriha にする</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.Off" xml:space="preserve">有効にすると、エクスプローラーでフォルダーやドライブを開いたときに Kiriha が起動します。</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.On" xml:space="preserve">現在、フォルダーとドライブは Kiriha で開きます。解除すると変更前の動作へ戻します。</x:String>
@@ -342,10 +349,13 @@
   <x:String x:Key="Text.Tab.New" xml:space="preserve">新しいタブ</x:String>
   <x:String x:Key="Text.Tab.NewBelow" xml:space="preserve">新しいタブを下に開く</x:String>
   <x:String x:Key="Text.Tab.NewTip" xml:space="preserve">新しいタブ (Ctrl+T)</x:String>
+  <x:String x:Key="Text.Tab.OpenInTabs" xml:space="preserve">新しいタブで開く ({0} 件)</x:String>
   <x:String x:Key="Text.Tab.Pin" xml:space="preserve">タブを固定</x:String>
+  <x:String x:Key="Text.Tab.PinInTabs" xml:space="preserve">新しいタブでピン留め ({0} 件)</x:String>
   <x:String x:Key="Text.Tab.Pinned" xml:space="preserve">固定タブ</x:String>
   <x:String x:Key="Text.Tab.RecentlyClosed" xml:space="preserve">最近閉じたタブ</x:String>
   <x:String x:Key="Text.Tab.Reopen" xml:space="preserve">閉じたタブを開く</x:String>
+  <x:String x:Key="Text.Tab.SortTip" xml:space="preserve">タブを並べ替え</x:String>
   <x:String x:Key="Text.Tab.Unpin" xml:space="preserve">タブの固定を解除</x:String>
   <x:String x:Key="Text.TabAction.CloseDuplicates" xml:space="preserve">同じ場所の重複タブを閉じる</x:String>
   <x:String x:Key="Text.TabAction.CloseLeft" xml:space="preserve">上側のタブを閉じる</x:String>
@@ -409,4 +419,5 @@
   <x:String x:Key="Text.View.PreviewPane" xml:space="preserve">プレビューウィンドウ</x:String>
   <x:String x:Key="Text.View.Small" xml:space="preserve">小アイコン</x:String>
   <x:String x:Key="Text.View.StatusBar" xml:space="preserve">ステータスバー</x:String>
+  <x:String x:Key="Text.View.Tiles" xml:space="preserve">並べて表示</x:String>
 </ResourceDictionary>

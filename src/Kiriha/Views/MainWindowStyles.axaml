@@ -95,6 +95,16 @@
             <Setter Property="HorizontalAlignment" Value="Stretch" />
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         </Style>
+        <!-- タブ一覧フッターのアイコンのみボタン（新しいタブ / 並べ替え / 設定）。
+             ラベルを出さない代わりに、押せる面積は指の当たる 32x32 を確保する。 -->
+        <Style Selector="Button.verticaltabicon">
+            <Setter Property="Width" Value="32" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
         <!-- タイトルバー上の共通操作。 -->
         <Style Selector="Button.tabstripaction">
             <Setter Property="Width" Value="32" />
@@ -466,6 +476,18 @@
             <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
             <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled" />
         </Style>
+        <!-- 並べて表示のタイル。セル（254x59）から余白 2 を引いた 250x55 が 1 枚ぶん -->
+        <Style Selector="ListBox.files.tiles ListBoxItem">
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="2" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        </Style>
+        <Style Selector="ListBox.files.tiles">
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+        </Style>
+
         <!-- ファイル一覧（アイコン表示）のセル -->
         <Style Selector="ListBox.icons ListBoxItem">
             <Setter Property="Padding" Value="4" />

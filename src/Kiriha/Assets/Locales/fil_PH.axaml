@@ -42,6 +42,7 @@
   <x:String x:Key="Text.Command.Options" xml:space="preserve">Mga opsyon</x:String>
   <x:String x:Key="Text.Command.Paste" xml:space="preserve">I-paste</x:String>
   <x:String x:Key="Text.Command.PasteTip" xml:space="preserve">I-paste (Ctrl+V)</x:String>
+  <x:String x:Key="Text.Command.PropertiesTip" xml:space="preserve">Mga katangian (Alt+Enter)</x:String>
   <x:String x:Key="Text.Command.Rename" xml:space="preserve">Palitan ang pangalan</x:String>
   <x:String x:Key="Text.Command.RenameTip" xml:space="preserve">Palitan ang pangalan (F2)</x:String>
   <x:String x:Key="Text.Command.Share" xml:space="preserve">Ibahagi</x:String>
@@ -171,6 +172,7 @@
   <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">Bagong window</x:String>
   <x:String x:Key="Text.Menu.NoSubfolders" xml:space="preserve">(Walang subfolder)</x:String>
   <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(Wala)</x:String>
+  <x:String x:Key="Text.Menu.ShowMoreOptions" xml:space="preserve">Ipakita ang iba pang mga opsyon</x:String>
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">Bumalik</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">Bumalik (i-right click para sa history)</x:String>
   <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">Mga folder na hindi kasya (i-click para makita)</x:String>
@@ -219,6 +221,11 @@
   <x:String x:Key="Text.Settings.About" xml:space="preserve">Tungkol sa Kiriha</x:String>
   <x:String x:Key="Text.Settings.About.Body" xml:space="preserve">Pinagsasama ng Kiriha sa iisang window ang pamamahala ng file ng Windows Explorer at ang mga tab, address bar at bookmark ng Chrome. Nase-save ang mga setting para sa kasalukuyang user.</x:String>
   <x:String x:Key="Text.Settings.Acrylic" xml:space="preserve">Gamitin ang acrylic effect (malabong translucent) sa window</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu" xml:space="preserve">Menu ng konteksto</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Modern" xml:space="preserve">Sariling Kiriha (istilong Windows 11)</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Note" xml:space="preserve">Ang menu na istilong Windows 11 ay naglilista lamang ng piling item at mga shell extension; ang mga submenu gaya ng "Ipadala sa" ay nasa "Ipakita ang iba pang mga opsyon". Magpalit ng mode kung may extension na hindi lumalabas nang tama.</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Shell" xml:space="preserve">Sariling Kiriha (mga item ng shell na buo)</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.System" xml:space="preserve">Default ng Windows</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp" xml:space="preserve">Gawing default na app ang Kiriha sa pagbukas ng mga folder at drive</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.Off" xml:space="preserve">Kapag naka-on, tumatakbo ang Kiriha tuwing bubuksan ang folder o drive mula sa File Explorer.</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.On" xml:space="preserve">Sa kasalukuyan, bumubukas sa Kiriha ang mga folder at drive. Kapag ini-off ito, babalik ang dating gawi.</x:String>
@@ -342,10 +349,13 @@
   <x:String x:Key="Text.Tab.New" xml:space="preserve">Bagong tab</x:String>
   <x:String x:Key="Text.Tab.NewBelow" xml:space="preserve">Magbukas ng bagong tab sa ibaba</x:String>
   <x:String x:Key="Text.Tab.NewTip" xml:space="preserve">Bagong tab (Ctrl+T)</x:String>
+  <x:String x:Key="Text.Tab.OpenInTabs" xml:space="preserve">Buksan sa mga bagong tab ({0})</x:String>
   <x:String x:Key="Text.Tab.Pin" xml:space="preserve">I-pin ang tab</x:String>
+  <x:String x:Key="Text.Tab.PinInTabs" xml:space="preserve">I-pin sa mga bagong tab ({0})</x:String>
   <x:String x:Key="Text.Tab.Pinned" xml:space="preserve">Naka-pin na tab</x:String>
   <x:String x:Key="Text.Tab.RecentlyClosed" xml:space="preserve">Kamakailang naisarang mga tab</x:String>
   <x:String x:Key="Text.Tab.Reopen" xml:space="preserve">Buksan ulit ang naisarang tab</x:String>
+  <x:String x:Key="Text.Tab.SortTip" xml:space="preserve">Ayusin ang mga tab</x:String>
   <x:String x:Key="Text.Tab.Unpin" xml:space="preserve">Alisin sa pagka-pin ang tab</x:String>
   <x:String x:Key="Text.TabAction.CloseDuplicates" xml:space="preserve">Isara ang dobleng tab ng parehong folder</x:String>
   <x:String x:Key="Text.TabAction.CloseLeft" xml:space="preserve">Isara ang mga tab sa itaas</x:String>
@@ -409,4 +419,5 @@
   <x:String x:Key="Text.View.PreviewPane" xml:space="preserve">Preview pane</x:String>
   <x:String x:Key="Text.View.Small" xml:space="preserve">Maliliit na icon</x:String>
   <x:String x:Key="Text.View.StatusBar" xml:space="preserve">Status bar</x:String>
+  <x:String x:Key="Text.View.Tiles" xml:space="preserve">Mga tile</x:String>
 </ResourceDictionary>

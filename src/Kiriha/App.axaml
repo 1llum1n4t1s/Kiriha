@@ -188,6 +188,13 @@
             <ResourceInclude x:Key="la" Source="/Assets/Locales/la.axaml" />
 
             <SolidColorBrush x:Key="DialogAccentTintBrush" Color="Transparent" />
+
+
+            <!-- 独自描画コンテキストメニュー（Windows 11 風）の ControlTheme。ポップアップは別の
+                 PopupRoot に載るため、Window の StyleInclude ではなくアプリ全体のリソースに置く。 -->
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="avares://Kiriha/Views/ExplorerMenuStyles.axaml" />
+            </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
 

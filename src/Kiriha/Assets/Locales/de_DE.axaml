@@ -42,6 +42,7 @@
   <x:String x:Key="Text.Command.Options" xml:space="preserve">Optionen</x:String>
   <x:String x:Key="Text.Command.Paste" xml:space="preserve">Einfügen</x:String>
   <x:String x:Key="Text.Command.PasteTip" xml:space="preserve">Einfügen (Strg+V)</x:String>
+  <x:String x:Key="Text.Command.PropertiesTip" xml:space="preserve">Eigenschaften (Alt+Enter)</x:String>
   <x:String x:Key="Text.Command.Rename" xml:space="preserve">Umbenennen</x:String>
   <x:String x:Key="Text.Command.RenameTip" xml:space="preserve">Umbenennen (F2)</x:String>
   <x:String x:Key="Text.Command.Share" xml:space="preserve">Teilen</x:String>
@@ -171,6 +172,7 @@
   <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">Neues Fenster</x:String>
   <x:String x:Key="Text.Menu.NoSubfolders" xml:space="preserve">(Keine Unterordner)</x:String>
   <x:String x:Key="Text.Menu.NoneItem" xml:space="preserve">(Keine)</x:String>
+  <x:String x:Key="Text.Menu.ShowMoreOptions" xml:space="preserve">Weitere Optionen anzeigen</x:String>
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">Zurück</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">Zurück (Rechtsklick für Verlauf)</x:String>
   <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">Ordner, die nicht mehr passen (zum Auflisten klicken)</x:String>
@@ -219,6 +221,11 @@
   <x:String x:Key="Text.Settings.About" xml:space="preserve">Über Kiriha</x:String>
   <x:String x:Key="Text.Settings.About.Body" xml:space="preserve">Kiriha vereint die Dateiverwaltung des Windows-Explorers mit den Tabs, der Adressleiste und den Lesezeichen von Chrome in einem Fenster. Die Einstellungen werden für den aktuellen Benutzer gespeichert.</x:String>
   <x:String x:Key="Text.Settings.Acrylic" xml:space="preserve">Acryleffekt (durchscheinende Unschärfe) für das Fenster verwenden</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu" xml:space="preserve">Kontextmenü</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Modern" xml:space="preserve">Kiriha-eigen (Windows-11-Stil)</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Note" xml:space="preserve">Das Menü im Windows-11-Stil zeigt nur ausgewählte Einträge und Shell-Erweiterungen; Untermenüs wie „Senden an“ bleiben unter „Weitere Optionen anzeigen“. Wechseln Sie den Modus, wenn eine Erweiterung nicht korrekt erscheint.</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.Shell" xml:space="preserve">Kiriha-eigen (Shell-Einträge unverändert)</x:String>
+  <x:String x:Key="Text.Settings.ContextMenu.System" xml:space="preserve">Windows-Standard</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp" xml:space="preserve">Kiriha als Standard-App zum Öffnen von Ordnern und Laufwerken festlegen</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.Off" xml:space="preserve">Wenn aktiviert, startet Kiriha, sobald im Explorer ein Ordner oder Laufwerk geöffnet wird.</x:String>
   <x:String x:Key="Text.Settings.DefaultFolderApp.On" xml:space="preserve">Ordner und Laufwerke werden derzeit in Kiriha geöffnet. Beim Deaktivieren wird das vorherige Verhalten wiederhergestellt.</x:String>
@@ -342,10 +349,13 @@
   <x:String x:Key="Text.Tab.New" xml:space="preserve">Neuer Tab</x:String>
   <x:String x:Key="Text.Tab.NewBelow" xml:space="preserve">Neuen Tab unterhalb öffnen</x:String>
   <x:String x:Key="Text.Tab.NewTip" xml:space="preserve">Neuer Tab (Strg+T)</x:String>
+  <x:String x:Key="Text.Tab.OpenInTabs" xml:space="preserve">In neuen Tabs öffnen ({0})</x:String>
   <x:String x:Key="Text.Tab.Pin" xml:space="preserve">Tab anheften</x:String>
+  <x:String x:Key="Text.Tab.PinInTabs" xml:space="preserve">In neuen Tabs anheften ({0})</x:String>
   <x:String x:Key="Text.Tab.Pinned" xml:space="preserve">Angehefteter Tab</x:String>
   <x:String x:Key="Text.Tab.RecentlyClosed" xml:space="preserve">Zuletzt geschlossene Tabs</x:String>
   <x:String x:Key="Text.Tab.Reopen" xml:space="preserve">Geschlossenen Tab öffnen</x:String>
+  <x:String x:Key="Text.Tab.SortTip" xml:space="preserve">Tabs sortieren</x:String>
   <x:String x:Key="Text.Tab.Unpin" xml:space="preserve">Tab lösen</x:String>
   <x:String x:Key="Text.TabAction.CloseDuplicates" xml:space="preserve">Doppelte Tabs desselben Ordners schließen</x:String>
   <x:String x:Key="Text.TabAction.CloseLeft" xml:space="preserve">Tabs oberhalb schließen</x:String>
@@ -409,4 +419,5 @@
   <x:String x:Key="Text.View.PreviewPane" xml:space="preserve">Vorschaubereich</x:String>
   <x:String x:Key="Text.View.Small" xml:space="preserve">Kleine Symbole</x:String>
   <x:String x:Key="Text.View.StatusBar" xml:space="preserve">Statusleiste</x:String>
+  <x:String x:Key="Text.View.Tiles" xml:space="preserve">Kacheln</x:String>
 </ResourceDictionary>
