@@ -328,7 +328,10 @@ public class FileSystemServiceHappyTests
             {
                 Assert.True(x.IsDrive);
                 Assert.True(x.IsDirectory);
-                Assert.StartsWith("空き ", x.SizeText);
+                // 「空き領域 180 GB/475 GB」形式。単位付きの数値は Windows の
+                // StrFormatByteSize が作るのでここでは書式だけ確かめる。
+                Assert.StartsWith("空き領域 ", x.SizeText);
+                Assert.Contains("/", x.SizeText);
                 Assert.InRange(x.DriveUsedPercent, 0.0, 100.0);
             });
             Assert.Contains(

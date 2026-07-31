@@ -69,7 +69,7 @@
   <x:String x:Key="Text.Drag.Folder" xml:space="preserve">フォルダー</x:String>
   <x:String x:Key="Text.Drag.Move" xml:space="preserve">移動</x:String>
   <x:String x:Key="Text.Drag.OpenInTab" xml:space="preserve">タブで開く</x:String>
-  <x:String x:Key="Text.Drive.FreeOfTotal" xml:space="preserve">空き {0} / {1}</x:String>
+  <x:String x:Key="Text.Drive.FreeOfTotal" xml:space="preserve">空き領域 {0}/{1}</x:String>
   <x:String x:Key="Text.Drop.CopyHere" xml:space="preserve">ここにコピー</x:String>
   <x:String x:Key="Text.Drop.CreateShortcutHere" xml:space="preserve">ショートカットをここに作成</x:String>
   <x:String x:Key="Text.Drop.MoveHere" xml:space="preserve">ここに移動</x:String>

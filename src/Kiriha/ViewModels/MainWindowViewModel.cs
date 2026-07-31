@@ -2206,7 +2206,10 @@ public partial class MainWindowViewModel : ObservableObject
             result.Add(new DriveDisplay(
                 FileSystemService.GetDriveLabel(drive),
                 drive.RootDirectory.FullName,
-                LocalizationService.Text("Text.Drive.FreeOfTotal", Models.FileSystemEntry.FormatSize(drive.AvailableFreeSpace), Models.FileSystemEntry.FormatSize(drive.TotalSize))));
+                LocalizationService.Text(
+                    "Text.Drive.FreeOfTotal",
+                    Services.ShellDisplayService.FormatByteSize(drive.AvailableFreeSpace),
+                    Services.ShellDisplayService.FormatByteSize(drive.TotalSize))));
         }
 
         return result;

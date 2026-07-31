@@ -8,11 +8,17 @@ public static class FileSystemService
     /// <summary>PC（ドライブ一覧）を表す仮想パス。</summary>
     public const string ComputerPath = "";
 
-    /// <summary>サイドバー / パンくずに表示するドライブラベル（例: "Windows (C:)"）。</summary>
+    /// <summary>
+    /// サイドバー / パンくず / 一覧に表示するドライブラベル（例: "Windows (C:)"）。
+    /// エクスプローラーと同じ文字列にするためシェルの表示名を正本にする。ラベル未設定のドライブを
+    /// 自前で組み立てると "C:" にしかならないが、本家は種別名を補って "ローカル ディスク (C:)" と出す。
+    /// シェルが答えないときだけ従来の組み立てへ落とす。
+    /// </summary>
     public static string GetDriveLabel(DriveInfo drive)
-        => string.IsNullOrEmpty(drive.VolumeLabel)
-            ? drive.Name.TrimEnd('\\')
-            : $"{drive.VolumeLabel} ({drive.Name.TrimEnd('\\')})";
+        => ShellDisplayService.TryGetDisplayName(drive.RootDirectory.FullName)
+           ?? (string.IsNullOrEmpty(drive.VolumeLabel)
+               ? drive.Name.TrimEnd('\\')
+               : $"{drive.VolumeLabel} ({drive.Name.TrimEnd('\\')})");
 
     private static string? TryGetDriveFormat(DriveInfo drive)
     {
@@ -41,7 +47,12 @@ public static class FileSystemService
                     IsDirectory = true,
                     IsDrive = true,
                     MaterialIconKey = "", // MaterialIcon は IsDrive で常に null になるため未使用
-                    SizeTextOverride = LocalizationService.Text("Text.Drive.FreeOfTotal", FileSystemEntry.FormatSize(d.AvailableFreeSpace), FileSystemEntry.FormatSize(d.TotalSize)),
+                    // 単位付きの数値はエクスプローラーと同じ丸め（180 GB / 0.98 TB）にしたいので
+                    // Windows の StrFormatByteSize に任せる。FormatSize は GB 止まりで桁も違う。
+                    SizeTextOverride = LocalizationService.Text(
+                        "Text.Drive.FreeOfTotal",
+                        ShellDisplayService.FormatByteSize(d.AvailableFreeSpace),
+                        ShellDisplayService.FormatByteSize(d.TotalSize)),
                     DriveFormat = TryGetDriveFormat(d),
                     DriveUsedPercent = d.TotalSize > 0
                         ? (d.TotalSize - d.AvailableFreeSpace) * 100.0 / d.TotalSize

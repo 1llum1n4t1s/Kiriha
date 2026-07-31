@@ -3072,8 +3072,8 @@ public partial class TabViewModel : ObservableObject
                 ? grouped.ThenBy(e => e.Size ?? -1)
                 : grouped.ThenByDescending(e => e.Size ?? -1),
             _ => SortAscendingFlag
-                ? grouped.ThenBy(e => e.Name, StringComparer.CurrentCultureIgnoreCase)
-                : grouped.ThenByDescending(e => e.Name, StringComparer.CurrentCultureIgnoreCase),
+                ? grouped.ThenBy(e => e.SortName, StringComparer.CurrentCultureIgnoreCase)
+                : grouped.ThenByDescending(e => e.SortName, StringComparer.CurrentCultureIgnoreCase),
         };
         return sorted;
     }

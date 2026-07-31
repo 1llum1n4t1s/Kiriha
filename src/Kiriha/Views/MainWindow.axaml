@@ -1031,22 +1031,33 @@
                                                     <!-- 文字は 3 行ぶん（16x3=48）で頭打ち。名前が 2 行に折り返すと
                                                          サイズ行が枠外へ押し出されて消える = エクスプローラーと同じ挙動。
                                                          枠より短いとき（フォルダーの 1 行）は上下中央に来る。 -->
-                                                    <Border Grid.Column="1" Height="48" Margin="8,0,6,0"
+                                                    <Border Grid.Column="1" Height="48" Margin="2,0,0,0"
                                                             VerticalAlignment="Center" ClipToBounds="True">
                                                         <StackPanel MaxHeight="48" VerticalAlignment="Center">
                                                             <TextBlock Text="{Binding DisplayName}"
                                                                        FontSize="12" LineHeight="16" MaxLines="2"
                                                                        TextWrapping="Wrap" TextTrimming="CharacterEllipsis"
                                                                        Foreground="{DynamicResource TextPrimary}" />
-                                                            <!-- フォルダーは名前だけ（実機で種類・サイズが出ないことを確認済み） -->
+                                                            <!-- 通常のフォルダーは名前だけ（実機で種類・サイズが出ないことを確認済み）。
+                                                                 ドライブは 種類 の代わりに使用率ゲージが入り、
+                                                                 サイズ行が「空き領域 180 GB/475 GB」になる。 -->
                                                             <TextBlock Text="{Binding TypeText}"
                                                                        FontSize="12" LineHeight="16"
                                                                        IsVisible="{Binding !IsDirectory}"
                                                                        TextTrimming="CharacterEllipsis"
                                                                        Foreground="{DynamicResource TextSecondary}" />
+                                                            <!-- ゲージは 1 行ぶん（16）の中央へ 13 の高さで置く。
+                                                                 実測: バーは 12.8dip 高で、テキスト列の左端からタイル右端まで伸びる。 -->
+                                                            <Panel Height="16" IsVisible="{Binding IsDrive}">
+                                                                <ProgressBar Minimum="0" Maximum="100"
+                                                                             Value="{Binding DriveUsedPercent}"
+                                                                             MinWidth="0" Height="13"
+                                                                             HorizontalAlignment="Stretch"
+                                                                             VerticalAlignment="Center" />
+                                                            </Panel>
                                                             <TextBlock Text="{Binding SizeText}"
                                                                        FontSize="12" LineHeight="16"
-                                                                       IsVisible="{Binding !IsDirectory}"
+                                                                       IsVisible="{Binding HasSizeText}"
                                                                        TextTrimming="CharacterEllipsis"
                                                                        Foreground="{DynamicResource TextSecondary}" />
                                                         </StackPanel>

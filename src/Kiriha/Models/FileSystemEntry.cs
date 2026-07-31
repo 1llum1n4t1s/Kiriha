@@ -141,6 +141,18 @@ public partial class FileSystemEntry : ObservableObject
 
     public string SizeText => SizeTextOverride ?? (Size is not { } size ? "" : FormatSize(size));
 
+    /// <summary>サイズ行を出すか（ファイルとドライブは出す、通常のフォルダーは出さない）。
+    /// 並べて表示のタイルが、行数の決まった中で何を並べるかの判定に使う。</summary>
+    public bool HasSizeText => SizeText.Length > 0;
+
+    /// <summary>
+    /// 名前順の並べ替えキー。ドライブだけは表示名ではなくルートパスを使う。
+    /// 表示名はシェル由来で「ローカル ディスク (C:)」「Google Drive (G:)」のように
+    /// 種別名や製品名で始まるため、そのまま並べるとドライブレター順にならない
+    /// （エクスプローラーの「PC」は常に C: → D: … の順）。
+    /// </summary>
+    public string SortName => IsDrive ? FullPath : Name;
+
     public string ModifiedText => Modified?.ToString("yyyy/MM/dd HH:mm") ?? "";
 
     public string CreatedText => Created?.ToString("yyyy/MM/dd HH:mm") ?? "";
