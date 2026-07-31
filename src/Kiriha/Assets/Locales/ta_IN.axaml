@@ -133,7 +133,7 @@
   <x:String x:Key="Text.License.KeyPlaceholder" xml:space="preserve">KIRIHA- என்று தொடங்கும் உரிமக் குறியீடு</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckBody" xml:space="preserve">உரிமம் 30 நாட்களுக்கு மேலாக ஆன்லைனில் சரிபார்க்கப்படவில்லை. இணையத்துடன் இணைத்து “மீண்டும் ஆன்லைனில் சரிபார்” என்பதை அழுத்தவும்.</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckTitle" xml:space="preserve">உரிமத்தை ஆன்லைனில் சரிபார்க்க வேண்டும்</x:String>
-  <x:String x:Key="Text.License.Lock.TrialExpiredBody" xml:space="preserve">Kiriha ஐப் பயன்படுத்த செயல்படுத்தப்பட்ட உரிமம் தேவை (¥980, ஒரு முறை கொள்முதல்).</x:String>
+  <x:String x:Key="Text.License.Lock.TrialExpiredBody" xml:space="preserve">Kiriha ஐப் பயன்படுத்த செயல்படுத்தப்பட்ட உரிமம் தேவை (¥1,980, ஒரு முறை கொள்முதல்).</x:String>
   <x:String x:Key="Text.License.Lock.TrialExpiredTitle" xml:space="preserve">சோதனைக் காலம் முடிந்தது</x:String>
   <x:String x:Key="Text.License.Msg.Activated" xml:space="preserve">உரிமம் செயல்படுத்தப்பட்டது 🎉 மிக்க நன்றி!</x:String>
   <x:String x:Key="Text.License.Msg.CheckOk" xml:space="preserve">சரிபார்ப்பு முடிந்தது. Kiriha ஐப் பயன்படுத்தியதற்கு நன்றி!</x:String>
@@ -153,8 +153,8 @@
   <x:String x:Key="Text.License.Msg.Sending" xml:space="preserve">உறுதிப்படுத்தல் குறியீடு அனுப்பப்படுகிறது…</x:String>
   <x:String x:Key="Text.License.Msg.ServerUnreachable" xml:space="preserve">சேவையகத்தை அணுக முடியவில்லை. உங்கள் இணைய இணைப்பைச் சரிபார்த்து மீண்டும் முயலவும்.</x:String>
   <x:String x:Key="Text.License.Msg.Verifying" xml:space="preserve">சரிபார்க்கிறது…</x:String>
-  <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">கொள்முதல் பக்கத்தைத் திற (¥980, ஒரு முறை)</x:String>
-  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">கணக்கு பதிவு அல்லது கடவுச்சொல் தேவையில்லை. ¥980 ஒரே முறை கொள்முதல், கணினிகளின் எண்ணிக்கையில் வரம்பு இல்லை.</x:String>
+  <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">கொள்முதல் பக்கத்தைத் திற (¥1,980, ஒரு முறை)</x:String>
+  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">கணக்கு பதிவு அல்லது கடவுச்சொல் தேவையில்லை. ¥1,980 ஒரே முறை கொள்முதல், கணினிகளின் எண்ணிக்கையில் வரம்பு இல்லை.</x:String>
   <x:String x:Key="Text.License.Recheck" xml:space="preserve">மீண்டும் ஆன்லைனில் சரிபார்</x:String>
   <x:String x:Key="Text.License.RecoverNote" xml:space="preserve">வாங்கும்போது பயன்படுத்திய மின்னஞ்சலுக்கு உறுதிப்படுத்தல் குறியீட்டை அனுப்புவோம். உரிம விசை தேவையில்லை.</x:String>
   <x:String x:Key="Text.License.ResendCode" xml:space="preserve">குறியீட்டை மீண்டும் அனுப்பு</x:String>

@@ -133,7 +133,7 @@
   <x:String x:Key="Text.License.KeyPlaceholder" xml:space="preserve">Лицензионный ключ, начинающийся с KIRIHA-</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckBody" xml:space="preserve">Лицензия не проверялась онлайн более 30 дней. Подключитесь к интернету и нажмите «Проверить онлайн ещё раз».</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckTitle" xml:space="preserve">Лицензию нужно проверить онлайн</x:String>
-  <x:String x:Key="Text.License.Lock.TrialExpiredBody" xml:space="preserve">Для работы с Kiriha нужна активированная лицензия (¥980, разовая покупка).</x:String>
+  <x:String x:Key="Text.License.Lock.TrialExpiredBody" xml:space="preserve">Для работы с Kiriha нужна активированная лицензия (¥1,980, разовая покупка).</x:String>
   <x:String x:Key="Text.License.Lock.TrialExpiredTitle" xml:space="preserve">Пробный период закончился</x:String>
   <x:String x:Key="Text.License.Msg.Activated" xml:space="preserve">Лицензия активирована 🎉 Большое спасибо!</x:String>
   <x:String x:Key="Text.License.Msg.CheckOk" xml:space="preserve">Проверка завершена. Спасибо, что пользуетесь Kiriha!</x:String>
@@ -153,8 +153,8 @@
   <x:String x:Key="Text.License.Msg.Sending" xml:space="preserve">Отправка кода подтверждения…</x:String>
   <x:String x:Key="Text.License.Msg.ServerUnreachable" xml:space="preserve">Не удалось связаться с сервером. Проверьте подключение к сети и повторите попытку.</x:String>
   <x:String x:Key="Text.License.Msg.Verifying" xml:space="preserve">Проверка…</x:String>
-  <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">Открыть страницу покупки (¥980, разово)</x:String>
-  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">Учётная запись и пароль не нужны. Разовая покупка за ¥980, без ограничения по числу компьютеров.</x:String>
+  <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">Открыть страницу покупки (¥1,980, разово)</x:String>
+  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">Учётная запись и пароль не нужны. Разовая покупка за ¥1,980, без ограничения по числу компьютеров.</x:String>
   <x:String x:Key="Text.License.Recheck" xml:space="preserve">Проверить онлайн ещё раз</x:String>
   <x:String x:Key="Text.License.RecoverNote" xml:space="preserve">Мы отправим код подтверждения на адрес, указанный при покупке. Лицензионный ключ не нужен.</x:String>
   <x:String x:Key="Text.License.ResendCode" xml:space="preserve">Отправить код снова</x:String>

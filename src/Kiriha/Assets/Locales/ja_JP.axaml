@@ -133,7 +133,7 @@
   <x:String x:Key="Text.License.KeyPlaceholder" xml:space="preserve">KIRIHA- で始まるライセンスキー</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckBody" xml:space="preserve">30 日以上オンライン確認ができていません。インターネットに接続して「再確認」を押してください。</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckTitle" xml:space="preserve">ライセンスのオンライン確認が必要です</x:String>
-  <x:String x:Key="Text.License.Lock.TrialExpiredBody" xml:space="preserve">Kiriha のご利用にはライセンス認証（¥980 買い切り）が必要です。</x:String>
+  <x:String x:Key="Text.License.Lock.TrialExpiredBody" xml:space="preserve">Kiriha のご利用にはライセンス認証（¥1,980 買い切り）が必要です。</x:String>
   <x:String x:Key="Text.License.Lock.TrialExpiredTitle" xml:space="preserve">試用期間が終了しました</x:String>
   <x:String x:Key="Text.License.Msg.Activated" xml:space="preserve">ライセンス認証が完了しました 🎉 ありがとうございます！</x:String>
   <x:String x:Key="Text.License.Msg.CheckOk" xml:space="preserve">確認が完了しました。ご利用ありがとうございます！</x:String>
@@ -153,8 +153,8 @@
   <x:String x:Key="Text.License.Msg.Sending" xml:space="preserve">確認コードを送っています…</x:String>
   <x:String x:Key="Text.License.Msg.ServerUnreachable" xml:space="preserve">サーバーに接続できませんでした。ネットワーク接続を確認してもう一度お試しください。</x:String>
   <x:String x:Key="Text.License.Msg.Verifying" xml:space="preserve">確認しています…</x:String>
-  <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">購入ページを開く（¥980 買い切り）</x:String>
-  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">アカウント登録やパスワードは不要です。¥980 の買い切りで、使える台数に制限はありません。</x:String>
+  <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">購入ページを開く（¥1,980 買い切り）</x:String>
+  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">アカウント登録やパスワードは不要です。¥1,980 の買い切りで、使える台数に制限はありません。</x:String>
   <x:String x:Key="Text.License.Recheck" xml:space="preserve">オンラインで再確認する</x:String>
   <x:String x:Key="Text.License.RecoverNote" xml:space="preserve">購入時のメールアドレスに確認コードを送ります。ライセンスキーの入力は不要です。</x:String>
   <x:String x:Key="Text.License.ResendCode" xml:space="preserve">コードを再送</x:String>

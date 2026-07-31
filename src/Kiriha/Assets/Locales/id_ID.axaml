@@ -133,7 +133,7 @@
   <x:String x:Key="Text.License.KeyPlaceholder" xml:space="preserve">Kunci lisensi yang diawali KIRIHA-</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckBody" xml:space="preserve">Lisensi belum diverifikasi secara daring selama lebih dari 30 hari. Sambungkan ke internet lalu tekan “Verifikasi ulang secara daring”.</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckTitle" xml:space="preserve">Lisensi perlu diverifikasi secara daring</x:String>
-  <x:String x:Key="Text.License.Lock.TrialExpiredBody" xml:space="preserve">Untuk memakai Kiriha diperlukan lisensi yang aktif (¥980, sekali beli).</x:String>
+  <x:String x:Key="Text.License.Lock.TrialExpiredBody" xml:space="preserve">Untuk memakai Kiriha diperlukan lisensi yang aktif (¥1,980, sekali beli).</x:String>
   <x:String x:Key="Text.License.Lock.TrialExpiredTitle" xml:space="preserve">Masa uji coba Anda telah berakhir</x:String>
   <x:String x:Key="Text.License.Msg.Activated" xml:space="preserve">Lisensi Anda telah diaktifkan 🎉 Terima kasih!</x:String>
   <x:String x:Key="Text.License.Msg.CheckOk" xml:space="preserve">Verifikasi selesai. Terima kasih telah memakai Kiriha!</x:String>
@@ -153,8 +153,8 @@
   <x:String x:Key="Text.License.Msg.Sending" xml:space="preserve">Mengirim kode konfirmasi…</x:String>
   <x:String x:Key="Text.License.Msg.ServerUnreachable" xml:space="preserve">Server tidak dapat dihubungi. Periksa koneksi jaringan Anda lalu coba lagi.</x:String>
   <x:String x:Key="Text.License.Msg.Verifying" xml:space="preserve">Memverifikasi…</x:String>
-  <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">Buka halaman pembelian (¥980, sekali beli)</x:String>
-  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">Tidak perlu akun atau kata sandi. Sekali beli ¥980, tanpa batas jumlah komputer.</x:String>
+  <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">Buka halaman pembelian (¥1,980, sekali beli)</x:String>
+  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">Tidak perlu akun atau kata sandi. Sekali beli ¥1,980, tanpa batas jumlah komputer.</x:String>
   <x:String x:Key="Text.License.Recheck" xml:space="preserve">Verifikasi ulang secara daring</x:String>
   <x:String x:Key="Text.License.RecoverNote" xml:space="preserve">Kami akan mengirim kode konfirmasi ke email yang Anda pakai saat membeli. Kunci lisensi tidak diperlukan.</x:String>
   <x:String x:Key="Text.License.ResendCode" xml:space="preserve">Kirim ulang kode</x:String>

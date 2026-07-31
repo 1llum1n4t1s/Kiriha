@@ -133,7 +133,7 @@
   <x:String x:Key="Text.License.KeyPlaceholder" xml:space="preserve">Chave de licença começando com KIRIHA-</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckBody" xml:space="preserve">A licença não é verificada on-line há mais de 30 dias. Conecte-se à internet e clique em “Verificar novamente on-line”.</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckTitle" xml:space="preserve">A licença precisa ser verificada on-line</x:String>
-  <x:String x:Key="Text.License.Lock.TrialExpiredBody" xml:space="preserve">Para usar o Kiriha é necessária uma licença ativada (¥980, compra única).</x:String>
+  <x:String x:Key="Text.License.Lock.TrialExpiredBody" xml:space="preserve">Para usar o Kiriha é necessária uma licença ativada (¥1,980, compra única).</x:String>
   <x:String x:Key="Text.License.Lock.TrialExpiredTitle" xml:space="preserve">Seu período de avaliação terminou</x:String>
   <x:String x:Key="Text.License.Msg.Activated" xml:space="preserve">Sua licença foi ativada 🎉 Muito obrigado!</x:String>
   <x:String x:Key="Text.License.Msg.CheckOk" xml:space="preserve">Verificação concluída. Obrigado por usar o Kiriha!</x:String>
@@ -153,8 +153,8 @@
   <x:String x:Key="Text.License.Msg.Sending" xml:space="preserve">Enviando o código de confirmação…</x:String>
   <x:String x:Key="Text.License.Msg.ServerUnreachable" xml:space="preserve">Não foi possível acessar o servidor. Verifique sua conexão de rede e tente de novo.</x:String>
   <x:String x:Key="Text.License.Msg.Verifying" xml:space="preserve">Verificando…</x:String>
-  <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">Abrir a página de compra (¥980, compra única)</x:String>
-  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">Não é preciso conta nem senha. Compra única de ¥980, sem limite de computadores.</x:String>
+  <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">Abrir a página de compra (¥1,980, compra única)</x:String>
+  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">Não é preciso conta nem senha. Compra única de ¥1,980, sem limite de computadores.</x:String>
   <x:String x:Key="Text.License.Recheck" xml:space="preserve">Verificar novamente on-line</x:String>
   <x:String x:Key="Text.License.RecoverNote" xml:space="preserve">Enviaremos um código de confirmação para o e-mail usado na compra. Não é preciso a chave de licença.</x:String>
   <x:String x:Key="Text.License.ResendCode" xml:space="preserve">Reenviar código</x:String>

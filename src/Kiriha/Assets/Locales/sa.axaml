@@ -133,7 +133,7 @@
   <x:String x:Key="Text.License.KeyPlaceholder" xml:space="preserve">KIRIHA- इत्यनेन आरभमाणा अनुज्ञाकुञ्चिका</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckBody" xml:space="preserve">त्रिंशद्दिनेभ्यः अधिकं यावत् अनुज्ञापत्रं जालमाध्यमेन न परीक्षितम्। अन्तर्जालेन संयोज्य “पुनः जालमाध्यमेन परीक्षय” इति नुद।</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckTitle" xml:space="preserve">अनुज्ञापत्रस्य जालपरीक्षा आवश्यका</x:String>
-  <x:String x:Key="Text.License.Lock.TrialExpiredBody" xml:space="preserve">Kiriha इत्यस्य उपयोगाय सक्रियम् अनुज्ञापत्रम् आवश्यकम् (¥980, एकवारक्रयः)।</x:String>
+  <x:String x:Key="Text.License.Lock.TrialExpiredBody" xml:space="preserve">Kiriha इत्यस्य उपयोगाय सक्रियम् अनुज्ञापत्रम् आवश्यकम् (¥1,980, एकवारक्रयः)।</x:String>
   <x:String x:Key="Text.License.Lock.TrialExpiredTitle" xml:space="preserve">परीक्षाकालः समाप्तः</x:String>
   <x:String x:Key="Text.License.Msg.Activated" xml:space="preserve">अनुज्ञापत्रं सक्रियं जातम् 🎉 बहु धन्यवादाः!</x:String>
   <x:String x:Key="Text.License.Msg.CheckOk" xml:space="preserve">परीक्षा समाप्ता। Kiriha इत्यस्य उपयोगाय धन्यवादाः!</x:String>
@@ -153,8 +153,8 @@
   <x:String x:Key="Text.License.Msg.Sending" xml:space="preserve">सत्यापनसङ्केतः प्रेष्यते…</x:String>
   <x:String x:Key="Text.License.Msg.ServerUnreachable" xml:space="preserve">सेवकः न प्राप्तः। जालसंयोगं परीक्ष्य पुनः प्रयत्नं कुरु।</x:String>
   <x:String x:Key="Text.License.Msg.Verifying" xml:space="preserve">सत्यापनं क्रियते…</x:String>
-  <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">क्रयपृष्ठम् उद्घाटय (¥980, एकवारम्)</x:String>
-  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">लेखा-पञ्जीकरणं गुप्तशब्दो वा न आवश्यकः। ¥980 एकवारं क्रयः, गणकयन्त्राणां संख्यायां सीमा नास्ति।</x:String>
+  <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">क्रयपृष्ठम् उद्घाटय (¥1,980, एकवारम्)</x:String>
+  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">लेखा-पञ्जीकरणं गुप्तशब्दो वा न आवश्यकः। ¥1,980 एकवारं क्रयः, गणकयन्त्राणां संख्यायां सीमा नास्ति।</x:String>
   <x:String x:Key="Text.License.Recheck" xml:space="preserve">पुनः जालमाध्यमेन परीक्षय</x:String>
   <x:String x:Key="Text.License.RecoverNote" xml:space="preserve">क्रयकाले प्रयुक्ताय विद्युत्पत्राय सत्यापनसङ्केतं प्रेषयिष्यामः। अनुज्ञाकुञ्चिका न आवश्यका।</x:String>
   <x:String x:Key="Text.License.ResendCode" xml:space="preserve">सङ्केतं पुनः प्रेषयतु</x:String>

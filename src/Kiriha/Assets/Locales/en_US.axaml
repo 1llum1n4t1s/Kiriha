@@ -133,7 +133,7 @@
   <x:String x:Key="Text.License.KeyPlaceholder" xml:space="preserve">License key starting with KIRIHA-</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckBody" xml:space="preserve">The license has not been verified online for more than 30 days. Connect to the internet and press "Verify again".</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckTitle" xml:space="preserve">The license needs to be verified online</x:String>
-  <x:String x:Key="Text.License.Lock.TrialExpiredBody" xml:space="preserve">Using Kiriha requires an activated license (¥980, one-time purchase).</x:String>
+  <x:String x:Key="Text.License.Lock.TrialExpiredBody" xml:space="preserve">Using Kiriha requires an activated license (¥1,980, one-time purchase).</x:String>
   <x:String x:Key="Text.License.Lock.TrialExpiredTitle" xml:space="preserve">Your trial period has ended</x:String>
   <x:String x:Key="Text.License.Msg.Activated" xml:space="preserve">Your license has been activated 🎉 Thank you!</x:String>
   <x:String x:Key="Text.License.Msg.CheckOk" xml:space="preserve">Verification complete. Thank you for using Kiriha!</x:String>
@@ -153,8 +153,8 @@
   <x:String x:Key="Text.License.Msg.Sending" xml:space="preserve">Sending the confirmation code…</x:String>
   <x:String x:Key="Text.License.Msg.ServerUnreachable" xml:space="preserve">Could not reach the server. Check your network connection and try again.</x:String>
   <x:String x:Key="Text.License.Msg.Verifying" xml:space="preserve">Verifying…</x:String>
-  <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">Open purchase page (¥980, one-time)</x:String>
-  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">No account or password required. A one-time ¥980 purchase, usable on any number of computers.</x:String>
+  <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">Open purchase page (¥1,980, one-time)</x:String>
+  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">No account or password required. A one-time ¥1,980 purchase, usable on any number of computers.</x:String>
   <x:String x:Key="Text.License.Recheck" xml:space="preserve">Verify again online</x:String>
   <x:String x:Key="Text.License.RecoverNote" xml:space="preserve">We'll email a confirmation code to the address you used at purchase. No license key needed.</x:String>
   <x:String x:Key="Text.License.ResendCode" xml:space="preserve">Resend code</x:String>

@@ -133,7 +133,7 @@
   <x:String x:Key="Text.License.KeyPlaceholder" xml:space="preserve">Clavis licentiae a KIRIHA- incipiens</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckBody" xml:space="preserve">Licentia plus quam XXX dies in linea non verificata est. Ad interrete te coniunge et «Iterum in linea verificare» preme.</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckTitle" xml:space="preserve">Licentia in linea verificanda est</x:String>
-  <x:String x:Key="Text.License.Lock.TrialExpiredBody" xml:space="preserve">Ad Kiriha utendum licentia activata requiritur (¥980, emptio unica).</x:String>
+  <x:String x:Key="Text.License.Lock.TrialExpiredBody" xml:space="preserve">Ad Kiriha utendum licentia activata requiritur (¥1,980, emptio unica).</x:String>
   <x:String x:Key="Text.License.Lock.TrialExpiredTitle" xml:space="preserve">Tempus probationis finitum est</x:String>
   <x:String x:Key="Text.License.Msg.Activated" xml:space="preserve">Licentia activata est 🎉 Gratias plurimas!</x:String>
   <x:String x:Key="Text.License.Msg.CheckOk" xml:space="preserve">Verificatio perfecta est. Gratias quod Kiriha uteris!</x:String>
@@ -153,8 +153,8 @@
   <x:String x:Key="Text.License.Msg.Sending" xml:space="preserve">Codex confirmationis mittitur…</x:String>
   <x:String x:Key="Text.License.Msg.ServerUnreachable" xml:space="preserve">Servitor attingi non potuit. Coniunctionem retis inspice et itera.</x:String>
   <x:String x:Key="Text.License.Msg.Verifying" xml:space="preserve">Verificatur…</x:String>
-  <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">Paginam emptionis aperire (¥980, semel)</x:String>
-  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">Ratio nec tessera requiritur. Emptio unica ¥980, in quotlibet computatris usurpanda.</x:String>
+  <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">Paginam emptionis aperire (¥1,980, semel)</x:String>
+  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">Ratio nec tessera requiritur. Emptio unica ¥1,980, in quotlibet computatris usurpanda.</x:String>
   <x:String x:Key="Text.License.Recheck" xml:space="preserve">Iterum in linea verificare</x:String>
   <x:String x:Key="Text.License.RecoverNote" xml:space="preserve">Codicem confirmationis ad inscriptionem in emptione adhibitam mittemus. Clavis licentiae non requiritur.</x:String>
   <x:String x:Key="Text.License.ResendCode" xml:space="preserve">Codicem iterum mittere</x:String>

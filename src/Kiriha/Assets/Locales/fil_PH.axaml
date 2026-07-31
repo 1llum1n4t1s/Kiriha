@@ -133,7 +133,7 @@
   <x:String x:Key="Text.License.KeyPlaceholder" xml:space="preserve">License key na nagsisimula sa KIRIHA-</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckBody" xml:space="preserve">Mahigit 30 araw nang hindi na-verify online ang lisensya. Kumonekta sa internet at pindutin ang “I-verify ulit online”.</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckTitle" xml:space="preserve">Kailangang i-verify online ang lisensya</x:String>
-  <x:String x:Key="Text.License.Lock.TrialExpiredBody" xml:space="preserve">Kailangan ng aktibong lisensya para gamitin ang Kiriha (¥980, isahang bayad).</x:String>
+  <x:String x:Key="Text.License.Lock.TrialExpiredBody" xml:space="preserve">Kailangan ng aktibong lisensya para gamitin ang Kiriha (¥1,980, isahang bayad).</x:String>
   <x:String x:Key="Text.License.Lock.TrialExpiredTitle" xml:space="preserve">Tapos na ang iyong panahon ng pagsubok</x:String>
   <x:String x:Key="Text.License.Msg.Activated" xml:space="preserve">Na-activate na ang iyong lisensya 🎉 Maraming salamat!</x:String>
   <x:String x:Key="Text.License.Msg.CheckOk" xml:space="preserve">Tapos na ang pag-verify. Salamat sa paggamit ng Kiriha!</x:String>
@@ -153,8 +153,8 @@
   <x:String x:Key="Text.License.Msg.Sending" xml:space="preserve">Ipinapadala ang confirmation code…</x:String>
   <x:String x:Key="Text.License.Msg.ServerUnreachable" xml:space="preserve">Hindi maabot ang server. Tingnan ang iyong koneksyon sa network at subukan ulit.</x:String>
   <x:String x:Key="Text.License.Msg.Verifying" xml:space="preserve">Bineberipika…</x:String>
-  <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">Buksan ang pahina ng pagbili (¥980, isahang bayad)</x:String>
-  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">Walang kailangang account o password. Isang beses na bayad na ¥980, walang limitasyon sa bilang ng computer.</x:String>
+  <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">Buksan ang pahina ng pagbili (¥1,980, isahang bayad)</x:String>
+  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">Walang kailangang account o password. Isang beses na bayad na ¥1,980, walang limitasyon sa bilang ng computer.</x:String>
   <x:String x:Key="Text.License.Recheck" xml:space="preserve">I-verify ulit online</x:String>
   <x:String x:Key="Text.License.RecoverNote" xml:space="preserve">Magpapadala kami ng confirmation code sa email na ginamit mo sa pagbili. Hindi na kailangan ng license key.</x:String>
   <x:String x:Key="Text.License.ResendCode" xml:space="preserve">Ipadala ulit ang code</x:String>

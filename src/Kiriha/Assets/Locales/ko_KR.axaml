@@ -133,7 +133,7 @@
   <x:String x:Key="Text.License.KeyPlaceholder" xml:space="preserve">KIRIHA- 로 시작하는 라이선스 키</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckBody" xml:space="preserve">30일 넘게 온라인 확인이 되지 않았습니다. 인터넷에 연결한 뒤 「온라인으로 다시 확인」을 눌러 주세요.</x:String>
   <x:String x:Key="Text.License.Lock.OnlineCheckTitle" xml:space="preserve">라이선스의 온라인 확인이 필요합니다</x:String>
-  <x:String x:Key="Text.License.Lock.TrialExpiredBody" xml:space="preserve">Kiriha를 사용하려면 인증된 라이선스가 필요합니다(¥980, 1회 구매).</x:String>
+  <x:String x:Key="Text.License.Lock.TrialExpiredBody" xml:space="preserve">Kiriha를 사용하려면 인증된 라이선스가 필요합니다(¥1,980, 1회 구매).</x:String>
   <x:String x:Key="Text.License.Lock.TrialExpiredTitle" xml:space="preserve">체험 기간이 끝났습니다</x:String>
   <x:String x:Key="Text.License.Msg.Activated" xml:space="preserve">라이선스 인증이 완료되었습니다 🎉 감사합니다!</x:String>
   <x:String x:Key="Text.License.Msg.CheckOk" xml:space="preserve">확인이 완료되었습니다. Kiriha를 이용해 주셔서 감사합니다!</x:String>
@@ -153,8 +153,8 @@
   <x:String x:Key="Text.License.Msg.Sending" xml:space="preserve">확인 코드를 보내는 중…</x:String>
   <x:String x:Key="Text.License.Msg.ServerUnreachable" xml:space="preserve">서버에 연결하지 못했습니다. 네트워크 연결을 확인한 뒤 다시 시도해 주세요.</x:String>
   <x:String x:Key="Text.License.Msg.Verifying" xml:space="preserve">확인하는 중…</x:String>
-  <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">구매 페이지 열기(¥980, 1회 구매)</x:String>
-  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">계정 등록이나 비밀번호가 필요 없습니다. ¥980 한 번 결제로 대수 제한 없이 사용할 수 있습니다.</x:String>
+  <x:String x:Key="Text.License.OpenPurchase" xml:space="preserve">구매 페이지 열기(¥1,980, 1회 구매)</x:String>
+  <x:String x:Key="Text.License.PurchaseNote" xml:space="preserve">계정 등록이나 비밀번호가 필요 없습니다. ¥1,980 한 번 결제로 대수 제한 없이 사용할 수 있습니다.</x:String>
   <x:String x:Key="Text.License.Recheck" xml:space="preserve">온라인으로 다시 확인</x:String>
   <x:String x:Key="Text.License.RecoverNote" xml:space="preserve">구매 시 사용한 이메일 주소로 확인 코드를 보냅니다. 라이선스 키는 필요하지 않습니다.</x:String>
   <x:String x:Key="Text.License.ResendCode" xml:space="preserve">코드 다시 보내기</x:String>
