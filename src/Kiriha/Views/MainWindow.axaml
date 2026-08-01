@@ -327,7 +327,7 @@
 
                         <!-- ナビゲーション + アドレスバー（パンくず） + 検索。ギャラリー表示でも残し、
                              全画面表示のときだけ行ごと畳む（見ている場所と戻る手段を常に出しておく）。 -->
-                        <Grid Grid.Row="0" Height="48" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto,Auto"
+                        <Grid Grid.Row="0" Height="48" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto,Auto,Auto"
                               Background="{DynamicResource TabActiveBg}"
                               IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsGalleryChromeVisible}">
                             <Button Grid.Column="0" Classes="nav" Content="&#xE72B;" Margin="8,0,0,0"
@@ -356,7 +356,7 @@
                                     VerticalAlignment="Center" />
 
                             <Border Grid.Column="5" Background="{DynamicResource OmniboxBg}" CornerRadius="17"
-                                    Height="34" Margin="8,0,12,0" VerticalAlignment="Center"
+                                    Height="34" Margin="8,0,4,0" VerticalAlignment="Center"
                                     PointerPressed="BreadcrumbBar_PointerPressed"
                                     PointerReleased="BreadcrumbBar_PointerReleased">
 
@@ -441,13 +441,21 @@
                                 </Grid>
                             </Border>
 
+                            <!-- 選択のパスをコピー。アドレスバーのクリックはクリップボードへ触れなくなったので
+                                 （パスを貼り付けたいときに上書きされてしまうため）、コピーはこのボタンで明示的に行う。 -->
+                            <Button Grid.Column="6" Classes="nav" Content="&#xE71B;" Margin="0,0,8,0"
+                                    ToolTip.Tip="{DynamicResource Text.Command.CopyPathTip}"
+                                    AutomationProperties.Name="{DynamicResource Text.Command.CopyPath}"
+                                    IsEnabled="{Binding CanCopySelectedPaths}"
+                                    VerticalAlignment="Center" Click="CopyPath_Click" />
+
                             <!-- 検索ボックス幅の変更 -->
-                            <Thumb Grid.Column="6" Classes="searchsplit"
+                            <Thumb Grid.Column="7" Classes="searchsplit"
                                    DragDelta="SearchBoxThumb_DragDelta" />
 
                             <!-- 検索ボックス（入力でサブフォルダーを含む検索。現在のフォルダーの即時絞り込み表示後に
                                  再帰検索結果へ置き換わる。Enter はデバウンスを待たない即時実行） -->
-                            <Border Grid.Column="7"
+                            <Border Grid.Column="8"
                                     Width="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SearchBoxWidth}"
                                     Height="34"
                                     Background="{DynamicResource OmniboxBg}" CornerRadius="17"
@@ -563,12 +571,6 @@
                                         VerticalAlignment="Center" Command="{Binding CutCommand}" />
                                 <Button Classes="cmd cmdicon" Content="&#xE8C8;" ToolTip.Tip="{DynamicResource Text.Command.CopyTip}" AutomationProperties.Name="{DynamicResource Text.Common.Copy}"
                                         VerticalAlignment="Center" Command="{Binding CopyCommand}" />
-                                <!-- 選択のパスをコピー。アドレスバークリック（＝現在フォルダーのパス）とは別で、
-                                     選択中のファイル / フォルダーのフルパスをクリップボードへ入れる。 -->
-                                <Button Classes="cmd cmdicon" Content="&#xE71B;" ToolTip.Tip="{DynamicResource Text.Command.CopyPathTip}"
-                                        AutomationProperties.Name="{DynamicResource Text.Command.CopyPath}"
-                                        IsEnabled="{Binding CanCopySelectedPaths}"
-                                        VerticalAlignment="Center" Click="CopyPath_Click" />
                                 <Button Classes="cmd cmdicon" Content="&#xE77F;" ToolTip.Tip="{DynamicResource Text.Command.PasteTip}" AutomationProperties.Name="{DynamicResource Text.Command.Paste}"
                                         VerticalAlignment="Center" Command="{Binding PasteCommand}" />
                                 <Button Classes="cmd cmdicon" Content="&#xE8AC;" ToolTip.Tip="{DynamicResource Text.Command.RenameTip}" AutomationProperties.Name="{DynamicResource Text.Command.Rename}"

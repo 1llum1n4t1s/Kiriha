@@ -684,7 +684,12 @@ public partial class MainWindow : Window
         }
     }
 
-    private async void FocusPathBox(TabViewModel? tab)
+    /// <summary>
+    /// アドレスバーを直接入力モードにしてフォーカスする。
+    /// ここでクリップボードへは触れない（触ると、貼り付けたいパスを自分で上書きしてしまう）。
+    /// 現在パスのコピーは右クリックメニューの「アドレスのコピー」で明示的に行う。
+    /// </summary>
+    private void FocusPathBox(TabViewModel? tab)
     {
         if (tab is null)
         {
@@ -692,7 +697,6 @@ public partial class MainWindow : Window
         }
 
         tab.IsEditingPath = true;
-        var copyTask = CopyCurrentPathToClipboardAsync(tab);
         Dispatcher.UIThread.Post(() =>
         {
             var box = this.GetVisualDescendants().OfType<TextBox>()
@@ -700,16 +704,6 @@ public partial class MainWindow : Window
             box?.Focus();
             box?.SelectAll();
         });
-        try
-        {
-            await copyTask;
-        }
-        catch (Exception ex)
-        {
-            // クリップボード確保失敗はフォーカス動作を妨げない。async void なので未捕捉のまま落とさない。
-            Logger.LogException("現在パスのクリップボードコピーに失敗しました", ex);
-            tab.StatusText = LocalizationService.Text("Text.Clipboard.CopyFailed");
-        }
     }
 
     private void FocusSearchBox()
@@ -1452,12 +1446,19 @@ public partial class MainWindow : Window
         e.Handled = true;
         var flyout = new MenuFlyout();
 
+        // アドレスバーのクリックでは自動コピーしなくなったため、現在パスのコピーはここが正規の入口。
         var copy = new MenuItem { Header = LocalizationService.Text("Text.Address.Copy") };
         copy.Click += async (_, _) =>
         {
-            if (Clipboard is not null)
+            try
             {
-                await Clipboard.SetTextAsync(tab.CurrentPath == FileSystemService.ComputerPath ? "PC" : tab.CurrentPath);
+                await CopyCurrentPathToClipboardAsync(tab);
+            }
+            catch (Exception ex)
+            {
+                // 他プロセスがクリップボードを掴んでいる場合など。async void なので未捕捉のまま落とさない。
+                Logger.LogException("現在パスのクリップボードコピーに失敗しました", ex);
+                tab.StatusText = LocalizationService.Text("Text.Clipboard.CopyFailed");
             }
         };
         flyout.Items.Add(copy);
@@ -1563,7 +1564,11 @@ public partial class MainWindow : Window
 
     // ===== アドレスバー（パンくず / 直接入力） =====
 
-    private async void BreadcrumbBar_PointerPressed(object? sender, PointerPressedEventArgs e)
+    /// <summary>
+    /// アドレスバーのクリックで直接入力モードへ切り替える。
+    /// クリップボードへは触れない（<see cref="FocusPathBox"/> と同じ理由）。
+    /// </summary>
+    private void BreadcrumbBar_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (e.Source is Visual visual && visual.FindAncestorOfType<Button>() is not null)
         {
@@ -1574,7 +1579,6 @@ public partial class MainWindow : Window
         {
             tab.IsEditingPath = true;
             e.Handled = true;
-            var copyTask = CopyCurrentPathToClipboardAsync(tab);
             Dispatcher.UIThread.Post(() =>
             {
                 var box = border.GetVisualDescendants().OfType<TextBox>().FirstOrDefault();
@@ -1584,7 +1588,6 @@ public partial class MainWindow : Window
                     box.SelectAll();
                 }
             });
-            await copyTask;
         }
     }
 
