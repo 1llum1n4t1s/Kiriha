@@ -2099,6 +2099,7 @@ public partial class TabViewModel : ObservableObject
             {
                 OnPropertyChanged(nameof(IsComputerRoot));
                 OnPropertyChanged(nameof(CanChangeViewMode));
+                OnPropertyChanged(nameof(CanCopyPath));
             }
         }
     }
@@ -3087,7 +3088,7 @@ public partial class TabViewModel : ObservableObject
         DeleteCommand.NotifyCanExecuteChanged();
         DeletePermanentCommand.NotifyCanExecuteChanged();
         RenameCommand.NotifyCanExecuteChanged();
-        OnPropertyChanged(nameof(CanCopySelectedPaths));
+        OnPropertyChanged(nameof(CanCopyPath));
 
         if (selection.Count == 0)
         {
@@ -3143,10 +3144,12 @@ public partial class TabViewModel : ObservableObject
     private bool HasSelection => _selection.Count > 0;
 
     /// <summary>
-    /// 「選択のパスをコピー」が使えるか。コピー自体はクリップボードを持つ View 側
+    /// 「パスをコピー」が使えるか。選択があればその選択、無ければ現在のフォルダーをコピーする
+    /// （エクスプローラーの Ctrl+Shift+C と同じ）ので、選択なしでも有効。ドライブ一覧の「PC」は
+    /// コピーできる実体のパスが無いので除く。コピー自体はクリップボードを持つ View 側
     /// （<c>MainWindow.CopySelectedPaths</c>）が行うため、コマンドではなく活性判定だけを公開する。
     /// </summary>
-    public bool CanCopySelectedPaths => HasSelection;
+    public bool CanCopyPath => !IsSettingsTab && (HasSelection || (!IsComputerRoot && CurrentPath.Length > 0));
 
     /// <summary>
     /// ドライブは切り取り / コピー / 削除 / 名前変更の対象にしない（誤操作防止）。

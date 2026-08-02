@@ -660,15 +660,32 @@ public partial class MainWindow : Window
         base.OnPointerWheelChanged(e);
     }
 
-    /// <summary>選択項目のフルパスをテキストとしてコピー（エクスプローラーの「パスのコピー」）。</summary>
+    /// <summary>
+    /// 選択項目のフルパスをテキストとしてコピー（エクスプローラーの「パスのコピー」）。
+    /// 選択が無いときは現在のフォルダーのパスをコピーする（エクスプローラーで何も選ばずに
+    /// Ctrl+Shift+C を押したときと同じ）。「PC」（ドライブ一覧）は実体のパスが無いので何もしない。
+    /// </summary>
     private async void CopySelectedPaths(TabViewModel? tab)
     {
-        if (tab is null || tab.Selection.Count == 0 || Clipboard is null)
+        if (tab is null || Clipboard is null || tab.IsSettingsTab)
         {
             return;
         }
 
-        var text = string.Join(Environment.NewLine, tab.Selection.Select(s => $"\"{s.FullPath}\""));
+        string text;
+        if (tab.Selection.Count > 0)
+        {
+            text = string.Join(Environment.NewLine, tab.Selection.Select(s => $"\"{s.FullPath}\""));
+        }
+        else if (!tab.IsComputerRoot && tab.CurrentPath.Length > 0)
+        {
+            text = $"\"{tab.CurrentPath}\"";
+        }
+        else
+        {
+            return;
+        }
+
         try
         {
             await Clipboard.SetTextAsync(text);

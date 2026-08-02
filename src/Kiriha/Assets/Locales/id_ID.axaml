@@ -31,8 +31,8 @@
   <x:String x:Key="Text.Column.Name" xml:space="preserve">Nama</x:String>
   <x:String x:Key="Text.Column.Size" xml:space="preserve">Ukuran</x:String>
   <x:String x:Key="Text.Column.Type" xml:space="preserve">Jenis</x:String>
-  <x:String x:Key="Text.Command.CopyPath" xml:space="preserve">Salin jalur pilihan</x:String>
-  <x:String x:Key="Text.Command.CopyPathTip" xml:space="preserve">Salin jalur pilihan (Ctrl+Shift+C)</x:String>
+  <x:String x:Key="Text.Command.CopyPath" xml:space="preserve">Salin jalur</x:String>
+  <x:String x:Key="Text.Command.CopyPathTip" xml:space="preserve">Salin jalur (Ctrl+Shift+C)</x:String>
   <x:String x:Key="Text.Command.CopyTip" xml:space="preserve">Salin (Ctrl+C)</x:String>
   <x:String x:Key="Text.Command.Cut" xml:space="preserve">Potong</x:String>
   <x:String x:Key="Text.Command.CutTip" xml:space="preserve">Potong (Ctrl+X)</x:String>

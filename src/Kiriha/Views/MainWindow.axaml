@@ -446,7 +446,7 @@
                             <Button Grid.Column="6" Classes="nav" Content="&#xE71B;" Margin="0,0,8,0"
                                     ToolTip.Tip="{DynamicResource Text.Command.CopyPathTip}"
                                     AutomationProperties.Name="{DynamicResource Text.Command.CopyPath}"
-                                    IsEnabled="{Binding CanCopySelectedPaths}"
+                                    IsEnabled="{Binding CanCopyPath}"
                                     VerticalAlignment="Center" Click="CopyPath_Click" />
 
                             <!-- 検索ボックス幅の変更 -->

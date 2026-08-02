@@ -31,8 +31,8 @@
   <x:String x:Key="Text.Column.Name" xml:space="preserve">Nombre</x:String>
   <x:String x:Key="Text.Column.Size" xml:space="preserve">Tamaño</x:String>
   <x:String x:Key="Text.Column.Type" xml:space="preserve">Tipo</x:String>
-  <x:String x:Key="Text.Command.CopyPath" xml:space="preserve">Copiar ruta de la selección</x:String>
-  <x:String x:Key="Text.Command.CopyPathTip" xml:space="preserve">Copiar ruta de la selección (Ctrl+Mayús+C)</x:String>
+  <x:String x:Key="Text.Command.CopyPath" xml:space="preserve">Copiar ruta</x:String>
+  <x:String x:Key="Text.Command.CopyPathTip" xml:space="preserve">Copiar ruta (Ctrl+Mayús+C)</x:String>
   <x:String x:Key="Text.Command.CopyTip" xml:space="preserve">Copiar (Ctrl+C)</x:String>
   <x:String x:Key="Text.Command.Cut" xml:space="preserve">Cortar</x:String>
   <x:String x:Key="Text.Command.CutTip" xml:space="preserve">Cortar (Ctrl+X)</x:String>
