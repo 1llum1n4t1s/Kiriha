@@ -31,6 +31,8 @@
   <x:String x:Key="Text.Column.Name" xml:space="preserve">Nome</x:String>
   <x:String x:Key="Text.Column.Size" xml:space="preserve">Tamanho</x:String>
   <x:String x:Key="Text.Column.Type" xml:space="preserve">Tipo</x:String>
+  <x:String x:Key="Text.Command.CopyFolderPath" xml:space="preserve">Copiar link</x:String>
+  <x:String x:Key="Text.Command.CopyFolderPathTip" xml:space="preserve">Copiar o caminho da pasta atual</x:String>
   <x:String x:Key="Text.Command.CopyPath" xml:space="preserve">Copiar caminho</x:String>
   <x:String x:Key="Text.Command.CopyPathTip" xml:space="preserve">Copiar caminho (Ctrl+Shift+C)</x:String>
   <x:String x:Key="Text.Command.CopyTip" xml:space="preserve">Copiar (Ctrl+C)</x:String>

@@ -2100,6 +2100,7 @@ public partial class TabViewModel : ObservableObject
                 OnPropertyChanged(nameof(IsComputerRoot));
                 OnPropertyChanged(nameof(CanChangeViewMode));
                 OnPropertyChanged(nameof(CanCopyPath));
+                OnPropertyChanged(nameof(CanCopyFolderPath));
             }
         }
     }
@@ -3089,6 +3090,7 @@ public partial class TabViewModel : ObservableObject
         DeletePermanentCommand.NotifyCanExecuteChanged();
         RenameCommand.NotifyCanExecuteChanged();
         OnPropertyChanged(nameof(CanCopyPath));
+        OnPropertyChanged(nameof(CanCopySelectedPath));
 
         if (selection.Count == 0)
         {
@@ -3144,12 +3146,24 @@ public partial class TabViewModel : ObservableObject
     private bool HasSelection => _selection.Count > 0;
 
     /// <summary>
-    /// 「パスをコピー」が使えるか。選択があればその選択、無ければ現在のフォルダーをコピーする
-    /// （エクスプローラーの Ctrl+Shift+C と同じ）ので、選択なしでも有効。ドライブ一覧の「PC」は
-    /// コピーできる実体のパスが無いので除く。コピー自体はクリップボードを持つ View 側
+    /// 「パスをコピー」（Ctrl+Shift+C）が使えるか。選択があればその選択、無ければ現在のフォルダーを
+    /// コピーする（エクスプローラーの Ctrl+Shift+C と同じ）ので、選択なしでも有効。ドライブ一覧の
+    /// 「PC」はコピーできる実体のパスが無いので除く。コピー自体はクリップボードを持つ View 側
     /// （<c>MainWindow.CopySelectedPaths</c>）が行うため、コマンドではなく活性判定だけを公開する。
     /// </summary>
-    public bool CanCopyPath => !IsSettingsTab && (HasSelection || (!IsComputerRoot && CurrentPath.Length > 0));
+    public bool CanCopyPath => !IsSettingsTab && (HasSelection || CanCopyFolderPath);
+
+    /// <summary>
+    /// アドレスバー隣の「リンクをコピー」が使えるか。こちらは選択に関係なく現在のフォルダー
+    /// そのもののパスをコピーするボタンなので、選択の有無では変化しない。
+    /// </summary>
+    public bool CanCopyFolderPath => !IsSettingsTab && !IsComputerRoot && CurrentPath.Length > 0;
+
+    /// <summary>
+    /// コマンドバーの「パスのコピー」が使えるか。アドレスバー隣のボタンと役割を分けるため、
+    /// こちらは選択した項目専用でフォルダーへのフォールバックを持たない。
+    /// </summary>
+    public bool CanCopySelectedPath => !IsSettingsTab && HasSelection;
 
     /// <summary>
     /// ドライブは切り取り / コピー / 削除 / 名前変更の対象にしない（誤操作防止）。

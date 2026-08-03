@@ -31,6 +31,8 @@
   <x:String x:Key="Text.Column.Name" xml:space="preserve">பெயர்</x:String>
   <x:String x:Key="Text.Column.Size" xml:space="preserve">அளவு</x:String>
   <x:String x:Key="Text.Column.Type" xml:space="preserve">வகை</x:String>
+  <x:String x:Key="Text.Command.CopyFolderPath" xml:space="preserve">இணைப்பை நகலெடு</x:String>
+  <x:String x:Key="Text.Command.CopyFolderPathTip" xml:space="preserve">தற்போதைய கோப்புறையின் பாதையை நகலெடு</x:String>
   <x:String x:Key="Text.Command.CopyPath" xml:space="preserve">பாதையை நகலெடு</x:String>
   <x:String x:Key="Text.Command.CopyPathTip" xml:space="preserve">பாதையை நகலெடு (Ctrl+Shift+C)</x:String>
   <x:String x:Key="Text.Command.CopyTip" xml:space="preserve">நகலெடு (Ctrl+C)</x:String>

@@ -31,6 +31,8 @@
   <x:String x:Key="Text.Column.Name" xml:space="preserve">名稱</x:String>
   <x:String x:Key="Text.Column.Size" xml:space="preserve">大小</x:String>
   <x:String x:Key="Text.Column.Type" xml:space="preserve">類型</x:String>
+  <x:String x:Key="Text.Command.CopyFolderPath" xml:space="preserve">複製連結</x:String>
+  <x:String x:Key="Text.Command.CopyFolderPathTip" xml:space="preserve">複製目前資料夾的路徑</x:String>
   <x:String x:Key="Text.Command.CopyPath" xml:space="preserve">複製路徑</x:String>
   <x:String x:Key="Text.Command.CopyPathTip" xml:space="preserve">複製路徑 (Ctrl+Shift+C)</x:String>
   <x:String x:Key="Text.Command.CopyTip" xml:space="preserve">複製 (Ctrl+C)</x:String>

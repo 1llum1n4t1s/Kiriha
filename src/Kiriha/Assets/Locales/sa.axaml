@@ -31,6 +31,8 @@
   <x:String x:Key="Text.Column.Name" xml:space="preserve">नाम</x:String>
   <x:String x:Key="Text.Column.Size" xml:space="preserve">परिमाणम्</x:String>
   <x:String x:Key="Text.Column.Type" xml:space="preserve">प्रकारः</x:String>
+  <x:String x:Key="Text.Command.CopyFolderPath" xml:space="preserve">सम्पर्कं प्रतिलिख</x:String>
+  <x:String x:Key="Text.Command.CopyFolderPathTip" xml:space="preserve">वर्तमानसञ्चिकायाः मार्गं प्रतिलिख</x:String>
   <x:String x:Key="Text.Command.CopyPath" xml:space="preserve">मार्गं प्रतिलिख</x:String>
   <x:String x:Key="Text.Command.CopyPathTip" xml:space="preserve">मार्गं प्रतिलिख (Ctrl+Shift+C)</x:String>
   <x:String x:Key="Text.Command.CopyTip" xml:space="preserve">प्रतिलिख (Ctrl+C)</x:String>

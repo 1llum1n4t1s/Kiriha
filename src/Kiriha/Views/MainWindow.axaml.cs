@@ -686,6 +686,31 @@ public partial class MainWindow : Window
             return;
         }
 
+        await CopyPathTextAsync(tab, text);
+    }
+
+    /// <summary>
+    /// 現在開いているフォルダーのパスだけをコピーする（アドレスバー隣の「リンクをコピー」）。
+    /// 選択項目のパスをコピーするコマンドバーのボタンと役割を分けるため、選択は見ない。
+    /// </summary>
+    private async void CopyFolderPath(TabViewModel? tab)
+    {
+        if (tab is null || Clipboard is null || !tab.CanCopyFolderPath)
+        {
+            return;
+        }
+
+        await CopyPathTextAsync(tab, $"\"{tab.CurrentPath}\"");
+    }
+
+    /// <summary>パス文字列をクリップボードへ載せ、結果をステータスバーへ返す。</summary>
+    private async Task CopyPathTextAsync(TabViewModel tab, string text)
+    {
+        if (Clipboard is null)
+        {
+            return;
+        }
+
         try
         {
             await Clipboard.SetTextAsync(text);
@@ -1578,6 +1603,9 @@ public partial class MainWindow : Window
 
     private void CopyPath_Click(object? sender, RoutedEventArgs e)
         => CopySelectedPaths(ViewModel?.SelectedTab);
+
+    private void CopyFolderPath_Click(object? sender, RoutedEventArgs e)
+        => CopyFolderPath(ViewModel?.SelectedTab);
 
     // ===== アドレスバー（パンくず / 直接入力） =====
 

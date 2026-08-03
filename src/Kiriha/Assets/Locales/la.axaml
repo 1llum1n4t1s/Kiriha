@@ -31,6 +31,8 @@
   <x:String x:Key="Text.Column.Name" xml:space="preserve">Nomen</x:String>
   <x:String x:Key="Text.Column.Size" xml:space="preserve">Magnitudo</x:String>
   <x:String x:Key="Text.Column.Type" xml:space="preserve">Genus</x:String>
+  <x:String x:Key="Text.Command.CopyFolderPath" xml:space="preserve">Nexum exscribere</x:String>
+  <x:String x:Key="Text.Command.CopyFolderPathTip" xml:space="preserve">Semitam plicae currentis exscribere</x:String>
   <x:String x:Key="Text.Command.CopyPath" xml:space="preserve">Semitam exscribere</x:String>
   <x:String x:Key="Text.Command.CopyPathTip" xml:space="preserve">Semitam exscribere (Ctrl+Shift+C)</x:String>
   <x:String x:Key="Text.Command.CopyTip" xml:space="preserve">Exscribere (Ctrl+C)</x:String>

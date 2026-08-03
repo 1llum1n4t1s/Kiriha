@@ -441,13 +441,14 @@
                                 </Grid>
                             </Border>
 
-                            <!-- 選択のパスをコピー。アドレスバーのクリックはクリップボードへ触れなくなったので
-                                 （パスを貼り付けたいときに上書きされてしまうため）、コピーはこのボタンで明示的に行う。 -->
+                            <!-- 今開いているフォルダーのパスをコピー。アドレスバーのクリックはクリップボードへ
+                                 触れなくなったので（パスを貼り付けたいときに上書きされてしまうため）、コピーは
+                                 このボタンで明示的に行う。選択項目のパスはコマンドバー側のボタンが担当する。 -->
                             <Button Grid.Column="6" Classes="nav" Content="&#xE71B;" Margin="0,0,8,0"
-                                    ToolTip.Tip="{DynamicResource Text.Command.CopyPathTip}"
-                                    AutomationProperties.Name="{DynamicResource Text.Command.CopyPath}"
-                                    IsEnabled="{Binding CanCopyPath}"
-                                    VerticalAlignment="Center" Click="CopyPath_Click" />
+                                    ToolTip.Tip="{DynamicResource Text.Command.CopyFolderPathTip}"
+                                    AutomationProperties.Name="{DynamicResource Text.Command.CopyFolderPath}"
+                                    IsEnabled="{Binding CanCopyFolderPath}"
+                                    VerticalAlignment="Center" Click="CopyFolderPath_Click" />
 
                             <!-- 検索ボックス幅の変更 -->
                             <Thumb Grid.Column="7" Classes="searchsplit"
@@ -571,6 +572,10 @@
                                         VerticalAlignment="Center" Command="{Binding CutCommand}" />
                                 <Button Classes="cmd cmdicon" Content="&#xE8C8;" ToolTip.Tip="{DynamicResource Text.Command.CopyTip}" AutomationProperties.Name="{DynamicResource Text.Common.Copy}"
                                         VerticalAlignment="Center" Command="{Binding CopyCommand}" />
+                                <!-- 選択した項目のパスをコピー（アドレスバー隣のボタンはフォルダー専用なので、
+                                     選択項目のパスはここから取る）。選択が無いときは無効。 -->
+                                <Button Classes="cmd cmdicon" Content="&#xE71B;" ToolTip.Tip="{DynamicResource Text.Command.CopyPathTip}" AutomationProperties.Name="{DynamicResource Text.Command.CopyPath}"
+                                        VerticalAlignment="Center" IsEnabled="{Binding CanCopySelectedPath}" Click="CopyPath_Click" />
                                 <Button Classes="cmd cmdicon" Content="&#xE77F;" ToolTip.Tip="{DynamicResource Text.Command.PasteTip}" AutomationProperties.Name="{DynamicResource Text.Command.Paste}"
                                         VerticalAlignment="Center" Command="{Binding PasteCommand}" />
                                 <Button Classes="cmd cmdicon" Content="&#xE8AC;" ToolTip.Tip="{DynamicResource Text.Command.RenameTip}" AutomationProperties.Name="{DynamicResource Text.Command.Rename}"

@@ -31,6 +31,8 @@
   <x:String x:Key="Text.Column.Name" xml:space="preserve">Pangalan</x:String>
   <x:String x:Key="Text.Column.Size" xml:space="preserve">Laki</x:String>
   <x:String x:Key="Text.Column.Type" xml:space="preserve">Uri</x:String>
+  <x:String x:Key="Text.Command.CopyFolderPath" xml:space="preserve">Kopyahin ang link</x:String>
+  <x:String x:Key="Text.Command.CopyFolderPathTip" xml:space="preserve">Kopyahin ang path ng kasalukuyang folder</x:String>
   <x:String x:Key="Text.Command.CopyPath" xml:space="preserve">Kopyahin ang path</x:String>
   <x:String x:Key="Text.Command.CopyPathTip" xml:space="preserve">Kopyahin ang path (Ctrl+Shift+C)</x:String>
   <x:String x:Key="Text.Command.CopyTip" xml:space="preserve">Kopyahin (Ctrl+C)</x:String>
