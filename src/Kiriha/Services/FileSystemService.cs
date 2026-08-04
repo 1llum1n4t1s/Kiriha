@@ -32,33 +32,101 @@ public static class FileSystemService
         }
     }
 
+    /// <summary>
+    /// ドライブ 1 台ぶんの容量表示（"空き 180 GB / 全体 476 GB"）と使用率。
+    /// <see cref="DriveInfo.AvailableFreeSpace"/> / <see cref="DriveInfo.TotalSize"/> は同期 P/Invoke で、
+    /// 切断中のネットワークドライブなどでは例外になりうる（TabViewModel.UpdateFreeSpace も同じ理由で
+    /// try/catch している）。ここで握らないと 1 台の異常で PC ビュー全体が開けなくなるため、
+    /// 失敗したドライブは容量表示なしで一覧に残す。
+    /// </summary>
+    public static (string SizeText, double UsedPercent) GetDriveSpace(DriveInfo drive)
+    {
+        try
+        {
+            var free = drive.AvailableFreeSpace;
+            var total = drive.TotalSize;
+            return (
+                // 単位付きの数値はエクスプローラーと同じ丸め（180 GB / 0.98 TB）にしたいので
+                // Windows の StrFormatByteSize に任せる。FormatSize は GB 止まりで桁も違う。
+                LocalizationService.Text(
+                    "Text.Drive.FreeOfTotal",
+                    ShellDisplayService.FormatByteSize(free),
+                    ShellDisplayService.FormatByteSize(total)),
+                total > 0 ? (total - free) * 100.0 / total : 0);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException($"ドライブの容量を取得できませんでした: {drive.Name}", ex);
+            return ("", 0);
+        }
+    }
+
+    /// <summary>準備済みのドライブを列挙する。1 台の異常で列挙全体を落とさない。</summary>
+    public static List<DriveInfo> GetReadyDrives()
+    {
+        var drives = new List<DriveInfo>();
+        DriveInfo[] all;
+        try
+        {
+            all = DriveInfo.GetDrives();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException("ドライブ一覧を取得できませんでした", ex);
+            return drives;
+        }
+
+        foreach (var drive in all)
+        {
+            try
+            {
+                if (drive.IsReady)
+                {
+                    drives.Add(drive);
+                }
+            }
+            catch (Exception ex)
+            {
+                // 切断されたネットワークドライブなど。その 1 台だけ諦めて残りを表示する
+                Logger.LogException($"ドライブの状態を取得できませんでした: {drive.Name}", ex);
+            }
+        }
+
+        return drives;
+    }
+
     /// <summary>指定パスのエントリ一覧を返す（フォルダー優先・名前順）。ComputerPath はドライブ一覧。</summary>
     public static List<FileSystemEntry> GetEntries(string path, ShellOptions options)
     {
         if (path == ComputerPath)
         {
-            return DriveInfo.GetDrives()
-                .Where(d => d.IsReady)
-                .Select(d => new FileSystemEntry
+            var drives = new List<FileSystemEntry>();
+            foreach (var drive in GetReadyDrives())
+            {
+                try
                 {
-                    Name = GetDriveLabel(d),
-                    DisplayName = GetDriveLabel(d),
-                    FullPath = d.RootDirectory.FullName,
-                    IsDirectory = true,
-                    IsDrive = true,
-                    MaterialIconKey = "", // MaterialIcon は IsDrive で常に null になるため未使用
-                    // 単位付きの数値はエクスプローラーと同じ丸め（180 GB / 0.98 TB）にしたいので
-                    // Windows の StrFormatByteSize に任せる。FormatSize は GB 止まりで桁も違う。
-                    SizeTextOverride = LocalizationService.Text(
-                        "Text.Drive.FreeOfTotal",
-                        ShellDisplayService.FormatByteSize(d.AvailableFreeSpace),
-                        ShellDisplayService.FormatByteSize(d.TotalSize)),
-                    DriveFormat = TryGetDriveFormat(d),
-                    DriveUsedPercent = d.TotalSize > 0
-                        ? (d.TotalSize - d.AvailableFreeSpace) * 100.0 / d.TotalSize
-                        : 0,
-                })
-                .ToList();
+                    var label = GetDriveLabel(drive);
+                    var (sizeText, usedPercent) = GetDriveSpace(drive);
+                    drives.Add(new FileSystemEntry
+                    {
+                        Name = label,
+                        DisplayName = label,
+                        FullPath = drive.RootDirectory.FullName,
+                        IsDirectory = true,
+                        IsDrive = true,
+                        MaterialIconKey = "", // MaterialIcon は IsDrive で常に null になるため未使用
+                        SizeTextOverride = sizeText,
+                        DriveFormat = TryGetDriveFormat(drive),
+                        DriveUsedPercent = usedPercent,
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogException($"ドライブを一覧に追加できませんでした: {drive.Name}", ex);
+                }
+            }
+
+            return drives;
         }
 
         // テーマ判定は列挙全体で 1 回だけ（行ごとに問い合わせない）
@@ -68,6 +136,13 @@ public static class FileSystemService
         var info = new DirectoryInfo(path);
         var entries = new List<FileSystemEntry>();
 
+        // ここは既定の列挙（EnumerationOptions.Compatible）のままにする。
+        // EnumerationOptions を自前で渡すと、既定の AttributesToSkip が Hidden|System のため
+        // 「隠しファイルを表示」が効かなくなる（実測: C:\ 直下が 15 件 → 9 件）。
+        // IgnoreInaccessible = true も足さない。非再帰の列挙では読めない子があっても例外にならず
+        // （実測: System Volume Information を含む C:\ は正常に列挙できる）、効くのは
+        // 「対象フォルダー自体が拒否」のときで、そこは例外のまま NavigateToAsync に
+        // 「開けませんでした」を出させるのが正しい（true にすると空フォルダーに見えてしまう）。
         foreach (var dir in info.EnumerateDirectories())
         {
             var attributes = dir.Attributes;

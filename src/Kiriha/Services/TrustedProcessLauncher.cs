@@ -54,9 +54,15 @@ internal static class TrustedProcessLauncher
                 "Microsoft", "WindowsApps", "wt.exe"),
             _ => null,
         };
-        if (trustedSystemPath is not null && File.Exists(trustedSystemPath))
+        if (trustedSystemPath is not null)
         {
-            return trustedSystemPath;
+            // 既知の実行ファイルは固定パスだけを正とし、PATH へは落とさない。
+            // 落とすと「Windows Terminal 未インストール」のような正常な状態で PATH 上の同名が
+            // 採用され、PATH 先頭を書き換えられるだけで任意コード起動になってしまう。
+            // 見つからないときは例外にして、呼び出し側の代替手段（wt.exe → cmd.exe）へ渡す。
+            return File.Exists(trustedSystemPath)
+                ? trustedSystemPath
+                : throw new FileNotFoundException($"実行ファイルが見つかりません: {trustedSystemPath}");
         }
 
         if (Path.IsPathRooted(fileName) && File.Exists(fileName))

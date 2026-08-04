@@ -299,33 +299,11 @@ public static class SettingsService
     {
         try
         {
-            var directory = Path.GetDirectoryName(SettingsPath)!;
-            Directory.CreateDirectory(directory);
-            var temporary = Path.Combine(directory, $"settings-{Guid.NewGuid():N}.tmp");
-            try
-            {
-                var json = JsonSerializer.Serialize(settings, SettingsJsonContext.Default.AppSettings);
-                using (var stream = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None))
-                using (var writer = new StreamWriter(stream, new System.Text.UTF8Encoding(false)))
-                {
-                    writer.Write(json);
-                    writer.Flush();
-                    stream.Flush(flushToDisk: true);
-                }
-
-                if (File.Exists(SettingsPath))
-                {
-                    File.Replace(temporary, SettingsPath, BackupPath, ignoreMetadataErrors: true);
-                }
-                else
-                {
-                    File.Move(temporary, SettingsPath);
-                }
-            }
-            finally
-            {
-                File.Delete(temporary);
-            }
+            // 書き込みは AtomicFile に任せる（一時ファイル → 置き換え、失敗時は移動で退避）。
+            // ReplaceFile を実装しないファイルシステムでも保存が黙って落ちないようにするため、
+            // 自前の File.Replace 直書きはやめてこちらに寄せている。
+            var json = JsonSerializer.Serialize(settings, SettingsJsonContext.Default.AppSettings);
+            AtomicFile.WriteAllText(SettingsPath, json, BackupPath);
         }
         catch (Exception ex)
         {

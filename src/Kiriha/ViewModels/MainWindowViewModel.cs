@@ -398,7 +398,11 @@ public partial class MainWindowViewModel : ObservableObject
     /// VSCode と同じく、選択中のフォルダーの直下へ作成する。ルートの PC はドライブ一覧であって
     /// 実在するフォルダーではないため、そこが選択されているときは何もしない。
     /// </summary>
-    public async Task BeginNewTreeItemAsync(bool isFile)
+    /// <param name="node">
+    /// 作成先フォルダー。右クリックメニューから呼ぶときは、選択とは別の対象になり得るため明示する。
+    /// null なら従来どおり選択中のノードへ作成する。
+    /// </param>
+    public async Task BeginNewTreeItemAsync(bool isFile, Models.FolderTreeNode? node = null)
     {
         if (!ShowSidebarTree || SidebarTreeRoots.Count == 0)
         {
@@ -406,7 +410,7 @@ public partial class MainWindowViewModel : ObservableObject
         }
 
         CancelNewTreeItem();
-        if (SidebarTreeSelectedItem is not Models.FolderTreeNode { Path.Length: > 0 } target
+        if ((node ?? SidebarTreeSelectedItem) is not Models.FolderTreeNode { Path.Length: > 0 } target
             || target is Models.NewTreeItemNode)
         {
             return;
@@ -2584,15 +2588,21 @@ public partial class MainWindowViewModel : ObservableObject
     private static List<DriveDisplay> GetDriveDisplays()
     {
         var result = new List<DriveDisplay>();
-        foreach (var drive in DriveInfo.GetDrives().Where(d => d.IsReady))
+        // 列挙も容量取得もドライブ単位で失敗を隔離する（PC ビューの GetEntries と同じ契約）。
+        // ここは Task.Run の中なので、1 台の例外を漏らすとサイドバー更新ごと落ちて未観測例外になる。
+        foreach (var drive in FileSystemService.GetReadyDrives())
         {
-            result.Add(new DriveDisplay(
-                FileSystemService.GetDriveLabel(drive),
-                drive.RootDirectory.FullName,
-                LocalizationService.Text(
-                    "Text.Drive.FreeOfTotal",
-                    Services.ShellDisplayService.FormatByteSize(drive.AvailableFreeSpace),
-                    Services.ShellDisplayService.FormatByteSize(drive.TotalSize))));
+            try
+            {
+                result.Add(new DriveDisplay(
+                    FileSystemService.GetDriveLabel(drive),
+                    drive.RootDirectory.FullName,
+                    FileSystemService.GetDriveSpace(drive).SizeText));
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException($"ドライブをサイドバーに追加できませんでした: {drive.Name}", ex);
+            }
         }
 
         return result;

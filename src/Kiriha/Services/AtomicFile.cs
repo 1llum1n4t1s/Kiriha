@@ -18,7 +18,11 @@ namespace Kiriha.Services;
 internal static class AtomicFile
 {
     /// <summary>バイト列を原子的に書き込む。失敗時は例外を投げ、元ファイルは触らない。</summary>
-    public static void WriteAllBytes(string path, byte[] bytes)
+    /// <param name="backupPath">
+    /// 置き換え前の内容を残す先（設定 JSON のように壊れたとき読み戻したいもの向け）。
+    /// null なら残さない。退避路の移動になった場合は作られない。
+    /// </param>
+    public static void WriteAllBytes(string path, byte[] bytes, string? backupPath = null)
     {
         var full = Path.GetFullPath(path);
         var directory = Path.GetDirectoryName(full)
@@ -35,7 +39,7 @@ internal static class AtomicFile
                 stream.Flush(flushToDisk: true);
             }
 
-            Replace(temporary, full);
+            Replace(temporary, full, backupPath);
         }
         finally
         {
@@ -52,11 +56,11 @@ internal static class AtomicFile
     }
 
     /// <summary>文字列を UTF-8（BOM なし）で原子的に書き込む。</summary>
-    public static void WriteAllText(string path, string text)
-        => WriteAllBytes(path, new UTF8Encoding(false).GetBytes(text));
+    public static void WriteAllText(string path, string text, string? backupPath = null)
+        => WriteAllBytes(path, new UTF8Encoding(false).GetBytes(text), backupPath);
 
     /// <summary>一時ファイルを本ファイルへ差し替える。</summary>
-    private static void Replace(string temporary, string destination)
+    private static void Replace(string temporary, string destination, string? backupPath)
     {
         if (!File.Exists(destination))
         {
@@ -67,7 +71,7 @@ internal static class AtomicFile
         try
         {
             // File.Replace は元ファイルの属性・ACL・作成日時を引き継ぐ（写真の書き戻しではこちらが望ましい）。
-            File.Replace(temporary, destination, destinationBackupFileName: null, ignoreMetadataErrors: true);
+            File.Replace(temporary, destination, backupPath, ignoreMetadataErrors: true);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or PlatformNotSupportedException)
         {

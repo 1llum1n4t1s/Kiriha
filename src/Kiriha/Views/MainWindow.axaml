@@ -708,6 +708,7 @@
                                      アイコンは VSCode の codicon のパスデータ（CC BY 4.0、
                                      Assets/Codicons/NOTICE.md 参照）。 -->
                                 <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="2" Margin="8,2,8,0"
+                                            HorizontalAlignment="Right"
                                             IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ShowSidebarTree}">
                                     <Button Classes="treehdr" Click="TreeNewFile_Click"
                                             ToolTip.Tip="{DynamicResource Text.Tree.NewFile}"
@@ -752,7 +753,8 @@
                                           ItemsSource="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SidebarTreeRoots}"
                                           SelectedItem="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SidebarTreeSelectedItem, Mode=TwoWay}"
                                           AutoScrollToSelectedItem="True"
-                                          SelectionChanged="SidebarTree_SelectionChanged">
+                                          SelectionChanged="SidebarTree_SelectionChanged"
+                                          PointerReleased="SidebarTree_PointerReleased">
                                     <TreeView.Resources>
                                         <!-- Fluent テーマは Level × TreeViewItemIndent (DynamicResource、既定 16) でインデントを
                                              計算するため、このツリーだけ半分の 8px に上書きする -->

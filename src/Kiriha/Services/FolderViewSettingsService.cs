@@ -280,35 +280,12 @@ internal sealed class FolderViewSettingsService : IDisposable
     {
         try
         {
-            Directory.CreateDirectory(SettingsDirectory);
-            var temporary = Path.Combine(SettingsDirectory, $"folder-views-{Guid.NewGuid():N}.tmp");
-            try
-            {
-                var json = JsonSerializer.Serialize(
-                    store,
-                    FolderViewSettingsJsonContext.Default.FolderViewSettingsStore);
-                using (var stream = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None))
-                using (var writer = new StreamWriter(stream, new System.Text.UTF8Encoding(false)))
-                {
-                    writer.Write(json);
-                    writer.Flush();
-                    stream.Flush(flushToDisk: true);
-                }
-
-                if (File.Exists(SettingsPath))
-                {
-                    File.Replace(temporary, SettingsPath, BackupPath, ignoreMetadataErrors: true);
-                }
-                else
-                {
-                    File.Move(temporary, SettingsPath);
-                }
-            }
-            finally
-            {
-                File.Delete(temporary);
-            }
-
+            // 書き込みは AtomicFile に任せる（設定 JSON と同じ契約。置き換えできない
+            // ファイルシステムでは移動で退避するので、保存が黙って落ちない）
+            var json = JsonSerializer.Serialize(
+                store,
+                FolderViewSettingsJsonContext.Default.FolderViewSettingsStore);
+            AtomicFile.WriteAllText(SettingsPath, json, BackupPath);
             return true;
         }
         catch (Exception ex)

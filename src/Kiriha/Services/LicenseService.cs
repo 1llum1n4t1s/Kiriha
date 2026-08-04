@@ -452,6 +452,21 @@ public static class LicenseService
         }
     }
 
+    /// <summary>
+    /// 現在保持しているキーの購入 ID（未認証・検証不能なら null）。
+    /// 失効照会の応答を適用してよいかの判定に使う。Monitor は再入可能なので、
+    /// <c>Gate</c> を持ったままでも呼べる。
+    /// </summary>
+    private static string? CurrentPurchaseId()
+    {
+        lock (Gate)
+        {
+            return _persisted.Key is { } key && TryParseAndVerify(key, out var payload)
+                ? payload.PurchaseId
+                : null;
+        }
+    }
+
     private static byte[] FromBase64Url(string value)
     {
         var s = value.Replace('-', '+').Replace('_', '/');
@@ -461,12 +476,7 @@ public static class LicenseService
     /// <summary>失効リストの照会。成功したら猶予期間を更新し、失効していたらライセンスを無効化する。</summary>
     public static async Task<bool> CheckRevocationAsync(CancellationToken ct = default)
     {
-        string? purchaseId = null;
-        if (_persisted.Key is { } key && TryParseAndVerify(key, out var payload))
-        {
-            purchaseId = payload.PurchaseId;
-        }
-
+        var purchaseId = CurrentPurchaseId();
         if (purchaseId is null)
         {
             return false;
@@ -484,11 +494,28 @@ public static class LicenseService
             if (check is { Valid: false })
             {
                 // 返金等で失効。ローカルのライセンスを破棄して試用状態へ戻す
-                Logger.Log("ライセンスが失効しています（返金等）。ローカルのキーを無効化します", LogLevel.Warning);
+                var revoked = false;
                 lock (Gate)
                 {
-                    _persisted = new PersistedLicense { MaxSeenUtc = DateTime.UtcNow.ToString("O") };
-                    Save();
+                    // 照会中に別のキーが有効化された（再認証・別購入の有効化・Deactivate）場合、
+                    // この応答は今のキーについてのものではない。適用すると有効なキーを消して
+                    // 購入済みユーザーを試用切れへ落としてしまうので、購入 ID の一致を必ず確かめる。
+                    if (CurrentPurchaseId() == purchaseId)
+                    {
+                        Logger.Log("ライセンスが失効しています（返金等）。ローカルのキーを無効化します", LogLevel.Warning);
+                        _persisted = new PersistedLicense { MaxSeenUtc = DateTime.UtcNow.ToString("O") };
+                        Save();
+                        revoked = true;
+                    }
+                    else
+                    {
+                        Logger.Log("失効応答が現在のキーと一致しないため適用しません（照会中にキーが変わりました）", LogLevel.Debug);
+                    }
+                }
+
+                if (!revoked)
+                {
+                    return true;
                 }
 
                 RecomputeState();
@@ -499,6 +526,12 @@ public static class LicenseService
             var previousState = State;
             lock (Gate)
             {
+                // 猶予期間の延長も、照会したキーが今も有効なキーであるときだけ行う
+                if (CurrentPurchaseId() != purchaseId)
+                {
+                    return true;
+                }
+
                 _persisted.LastOnlineCheckUtc = DateTime.UtcNow.ToString("O");
                 Save();
             }
