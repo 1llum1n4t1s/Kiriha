@@ -385,9 +385,17 @@
   <x:String x:Key="Text.Tooltip.Type" xml:space="preserve">種類: {0}</x:String>
   <x:String x:Key="Text.Tray.Exit" xml:space="preserve">終了</x:String>
   <x:String x:Key="Text.Tray.Open" xml:space="preserve">Kiriha を開く</x:String>
+  <x:String x:Key="Text.Tree.Computer" xml:space="preserve">PC</x:String>
+  <x:String x:Key="Text.Tree.CollapseAll" xml:space="preserve">すべて折りたたむ</x:String>
+  <x:String x:Key="Text.Tree.CreateFailed" xml:space="preserve">作成できませんでした: {0}</x:String>
   <x:String x:Key="Text.Tree.Loading" xml:space="preserve">読み込み中...</x:String>
-  <x:String x:Key="Text.Tree.MyComputer" xml:space="preserve">マイ コンピュータ</x:String>
-  <x:String x:Key="Text.Tree.MyDocuments" xml:space="preserve">マイ ドキュメント</x:String>
+  <x:String x:Key="Text.Tree.NewFile" xml:space="preserve">新しいファイル</x:String>
+  <x:String x:Key="Text.Tree.NewFolder" xml:space="preserve">新しいフォルダー</x:String>
+  <x:String x:Key="Text.Tree.NewItemEmpty" xml:space="preserve">ファイル名またはフォルダー名を入力してください。</x:String>
+  <x:String x:Key="Text.Tree.NewItemExists" xml:space="preserve">名前 '{0}' のファイルまたはフォルダーはこの場所に既に存在します。別の名前を指定してください。</x:String>
+  <x:String x:Key="Text.Tree.NewItemInvalid" xml:space="preserve">名前 '{0}' はファイル名またはフォルダー名として使用できません。別の名前を指定してください。</x:String>
+  <x:String x:Key="Text.Tree.Refresh" xml:space="preserve">最新の情報に更新</x:String>
+  <x:String x:Key="Text.Tree.SyncActive" xml:space="preserve">アクティブ ドキュメントとの同期</x:String>
   <x:String x:Key="Text.Type.ExtFile" xml:space="preserve">{0} ファイル</x:String>
   <x:String x:Key="Text.Type.File" xml:space="preserve">ファイル</x:String>
   <x:String x:Key="Text.Type.FileFolder" xml:space="preserve">ファイル フォルダー</x:String>

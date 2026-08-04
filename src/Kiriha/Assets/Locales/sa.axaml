@@ -385,9 +385,17 @@
   <x:String x:Key="Text.Tooltip.Type" xml:space="preserve">प्रकारः: {0}</x:String>
   <x:String x:Key="Text.Tray.Exit" xml:space="preserve">निर्गमः</x:String>
   <x:String x:Key="Text.Tray.Open" xml:space="preserve">Kiriha उद्घाटय</x:String>
+  <x:String x:Key="Text.Tree.Computer" xml:space="preserve">PC</x:String>
+  <x:String x:Key="Text.Tree.CollapseAll" xml:space="preserve">सर्वं संकोचय</x:String>
+  <x:String x:Key="Text.Tree.CreateFailed" xml:space="preserve">निर्मातुं न शक्यते: {0}</x:String>
   <x:String x:Key="Text.Tree.Loading" xml:space="preserve">आरोप्यते...</x:String>
-  <x:String x:Key="Text.Tree.MyComputer" xml:space="preserve">मम गणकः</x:String>
-  <x:String x:Key="Text.Tree.MyDocuments" xml:space="preserve">मम लेखपत्राणि</x:String>
+  <x:String x:Key="Text.Tree.NewFile" xml:space="preserve">नवीना सञ्चिका</x:String>
+  <x:String x:Key="Text.Tree.NewFolder" xml:space="preserve">नवीनं सञ्चिकाकोष्ठम्</x:String>
+  <x:String x:Key="Text.Tree.NewItemEmpty" xml:space="preserve">सञ्चिकायाः कोष्ठस्य वा नाम देयम्।</x:String>
+  <x:String x:Key="Text.Tree.NewItemExists" xml:space="preserve">'{0}' इति नाम्ना सञ्चिका कोष्ठं वा अत्र पूर्वमेव विद्यते। अन्यत् नाम चिनु।</x:String>
+  <x:String x:Key="Text.Tree.NewItemInvalid" xml:space="preserve">'{0}' इति नाम सञ्चिकायाः कोष्ठस्य वा नामरूपेण अयोग्यम्। अन्यत् नाम चिनु।</x:String>
+  <x:String x:Key="Text.Tree.Refresh" xml:space="preserve">नवीकुरु</x:String>
+  <x:String x:Key="Text.Tree.SyncActive" xml:space="preserve">सक्रियसञ्चिकानुसरणम्</x:String>
   <x:String x:Key="Text.Type.ExtFile" xml:space="preserve">{0} सञ्चिका</x:String>
   <x:String x:Key="Text.Type.File" xml:space="preserve">सञ्चिका</x:String>
   <x:String x:Key="Text.Type.FileFolder" xml:space="preserve">सञ्चिकाकोष्ठम्</x:String>

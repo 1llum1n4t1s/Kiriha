@@ -385,9 +385,17 @@
   <x:String x:Key="Text.Tooltip.Type" xml:space="preserve">Tipo: {0}</x:String>
   <x:String x:Key="Text.Tray.Exit" xml:space="preserve">Sair</x:String>
   <x:String x:Key="Text.Tray.Open" xml:space="preserve">Abrir o Kiriha</x:String>
+  <x:String x:Key="Text.Tree.Computer" xml:space="preserve">PC</x:String>
+  <x:String x:Key="Text.Tree.CollapseAll" xml:space="preserve">Recolher tudo</x:String>
+  <x:String x:Key="Text.Tree.CreateFailed" xml:space="preserve">Não foi possível criar: {0}</x:String>
   <x:String x:Key="Text.Tree.Loading" xml:space="preserve">Carregando...</x:String>
-  <x:String x:Key="Text.Tree.MyComputer" xml:space="preserve">Meu computador</x:String>
-  <x:String x:Key="Text.Tree.MyDocuments" xml:space="preserve">Meus documentos</x:String>
+  <x:String x:Key="Text.Tree.NewFile" xml:space="preserve">Novo arquivo</x:String>
+  <x:String x:Key="Text.Tree.NewFolder" xml:space="preserve">Nova pasta</x:String>
+  <x:String x:Key="Text.Tree.NewItemEmpty" xml:space="preserve">Um nome de arquivo ou pasta deve ser informado.</x:String>
+  <x:String x:Key="Text.Tree.NewItemExists" xml:space="preserve">Já existe um arquivo ou pasta '{0}' neste local. Escolha outro nome.</x:String>
+  <x:String x:Key="Text.Tree.NewItemInvalid" xml:space="preserve">O nome '{0}' não é válido como nome de arquivo ou pasta. Escolha outro nome.</x:String>
+  <x:String x:Key="Text.Tree.Refresh" xml:space="preserve">Atualizar</x:String>
+  <x:String x:Key="Text.Tree.SyncActive" xml:space="preserve">Sincronizar com o documento ativo</x:String>
   <x:String x:Key="Text.Type.ExtFile" xml:space="preserve">Arquivo {0}</x:String>
   <x:String x:Key="Text.Type.File" xml:space="preserve">Arquivo</x:String>
   <x:String x:Key="Text.Type.FileFolder" xml:space="preserve">Pasta de arquivos</x:String>

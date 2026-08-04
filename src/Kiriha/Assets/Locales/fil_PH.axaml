@@ -385,9 +385,17 @@
   <x:String x:Key="Text.Tooltip.Type" xml:space="preserve">Uri: {0}</x:String>
   <x:String x:Key="Text.Tray.Exit" xml:space="preserve">Lumabas</x:String>
   <x:String x:Key="Text.Tray.Open" xml:space="preserve">Buksan ang Kiriha</x:String>
+  <x:String x:Key="Text.Tree.Computer" xml:space="preserve">PC</x:String>
+  <x:String x:Key="Text.Tree.CollapseAll" xml:space="preserve">I-collapse lahat</x:String>
+  <x:String x:Key="Text.Tree.CreateFailed" xml:space="preserve">Hindi malikha: {0}</x:String>
   <x:String x:Key="Text.Tree.Loading" xml:space="preserve">Naglo-load...</x:String>
-  <x:String x:Key="Text.Tree.MyComputer" xml:space="preserve">My Computer</x:String>
-  <x:String x:Key="Text.Tree.MyDocuments" xml:space="preserve">My Documents</x:String>
+  <x:String x:Key="Text.Tree.NewFile" xml:space="preserve">Bagong file</x:String>
+  <x:String x:Key="Text.Tree.NewFolder" xml:space="preserve">Bagong folder</x:String>
+  <x:String x:Key="Text.Tree.NewItemEmpty" xml:space="preserve">Kailangang maglagay ng pangalan ng file o folder.</x:String>
+  <x:String x:Key="Text.Tree.NewItemExists" xml:space="preserve">May file o folder nang '{0}' sa lokasyong ito. Pumili ng ibang pangalan.</x:String>
+  <x:String x:Key="Text.Tree.NewItemInvalid" xml:space="preserve">Ang pangalang '{0}' ay hindi maaaring gamitin bilang pangalan ng file o folder. Pumili ng ibang pangalan.</x:String>
+  <x:String x:Key="Text.Tree.Refresh" xml:space="preserve">I-refresh</x:String>
+  <x:String x:Key="Text.Tree.SyncActive" xml:space="preserve">I-sync sa aktibong dokumento</x:String>
   <x:String x:Key="Text.Type.ExtFile" xml:space="preserve">{0} File</x:String>
   <x:String x:Key="Text.Type.File" xml:space="preserve">File</x:String>
   <x:String x:Key="Text.Type.FileFolder" xml:space="preserve">File folder</x:String>

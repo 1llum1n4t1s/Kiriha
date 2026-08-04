@@ -385,9 +385,17 @@
   <x:String x:Key="Text.Tooltip.Type" xml:space="preserve">类型: {0}</x:String>
   <x:String x:Key="Text.Tray.Exit" xml:space="preserve">退出</x:String>
   <x:String x:Key="Text.Tray.Open" xml:space="preserve">打开 Kiriha</x:String>
+  <x:String x:Key="Text.Tree.Computer" xml:space="preserve">PC</x:String>
+  <x:String x:Key="Text.Tree.CollapseAll" xml:space="preserve">全部折叠</x:String>
+  <x:String x:Key="Text.Tree.CreateFailed" xml:space="preserve">无法创建: {0}</x:String>
   <x:String x:Key="Text.Tree.Loading" xml:space="preserve">正在加载...</x:String>
-  <x:String x:Key="Text.Tree.MyComputer" xml:space="preserve">我的电脑</x:String>
-  <x:String x:Key="Text.Tree.MyDocuments" xml:space="preserve">我的文档</x:String>
+  <x:String x:Key="Text.Tree.NewFile" xml:space="preserve">新建文件</x:String>
+  <x:String x:Key="Text.Tree.NewFolder" xml:space="preserve">新建文件夹</x:String>
+  <x:String x:Key="Text.Tree.NewItemEmpty" xml:space="preserve">必须提供文件名或文件夹名。</x:String>
+  <x:String x:Key="Text.Tree.NewItemExists" xml:space="preserve">此位置已存在文件或文件夹“{0}”。请使用其他名称。</x:String>
+  <x:String x:Key="Text.Tree.NewItemInvalid" xml:space="preserve">名称“{0}”不能用作文件名或文件夹名。请使用其他名称。</x:String>
+  <x:String x:Key="Text.Tree.Refresh" xml:space="preserve">刷新</x:String>
+  <x:String x:Key="Text.Tree.SyncActive" xml:space="preserve">与活动文档同步</x:String>
   <x:String x:Key="Text.Type.ExtFile" xml:space="preserve">{0} 文件</x:String>
   <x:String x:Key="Text.Type.File" xml:space="preserve">文件</x:String>
   <x:String x:Key="Text.Type.FileFolder" xml:space="preserve">文件夹</x:String>

@@ -5,10 +5,12 @@ using Kiriha.Services;
 
 namespace Kiriha.Models;
 
-/// <summary>サイドバーのツリービュー 1 ノード。Windows XP 時代の
-/// 「デスクトップ > マイ ドキュメント / マイ コンピュータ（ドライブ）」構成で、
-/// フォルダーのみを展開時に遅延列挙する。</summary>
-public sealed partial class FolderTreeNode : ObservableObject
+/// <summary>サイドバーのツリービュー 1 ノード。ルートの PC からドライブ、その配下の実フォルダーへと
+/// 物理パスのとおりに降りる構成（PC > C: > Users > IMT > Desktop）で、フォルダーのみを展開時に遅延列挙する。
+/// 以前は XP 風に「デスクトップ > マイ ドキュメント / マイ コンピュータ」という仮想ルートを挟んでいたが、
+/// ツリーの階層とアドレスバーのパスが一致しないため 2026-08-05 に実パス構成へ変更した。
+/// （sealed でないのは、インライン新規作成の入力行 <see cref="NewTreeItemNode"/> が継承するため）</summary>
+public partial class FolderTreeNode : ObservableObject
 {
     /// <summary>ノードの種別（子の列挙方法が変わる）。</summary>
     public enum NodeKind
@@ -16,16 +18,13 @@ public sealed partial class FolderTreeNode : ObservableObject
         /// <summary>通常フォルダー（サブフォルダーを列挙）。</summary>
         Folder,
 
-        /// <summary>ルートのデスクトップ（マイ ドキュメント + マイ コンピュータ + デスクトップ配下）。</summary>
-        Desktop,
-
-        /// <summary>マイ コンピュータ（ドライブを列挙）。</summary>
+        /// <summary>ルートの PC（ドライブを列挙）。</summary>
         Computer,
     }
 
     public required string Name { get; init; }
 
-    /// <summary>ナビゲーション先パス。マイ コンピュータは FileSystemService.ComputerPath（空文字）。</summary>
+    /// <summary>ナビゲーション先パス。PC は FileSystemService.ComputerPath（空文字）。</summary>
     public required string Path { get; init; }
 
     public required string Icon { get; init; }
@@ -56,6 +55,17 @@ public sealed partial class FolderTreeNode : ObservableObject
     public Task EnsureChildrenAsync()
         => _loadTask ??= LoadChildrenAsync();
 
+    /// <summary>子を一度でも列挙し始めたか（「最新の情報に更新」で再列挙すべきノードの判定に使う）。</summary>
+    public bool HasLoadedChildren => _loadTask is not null;
+
+    /// <summary>子フォルダーを列挙し直す（「最新の情報に更新」用。キャッシュ済みでもやり直す）。
+    /// UI スレッドから呼ぶこと。</summary>
+    public Task ReloadChildrenAsync()
+    {
+        _loadTask = LoadChildrenAsync();
+        return _loadTask;
+    }
+
     private async Task LoadChildrenAsync()
     {
         var kind = Kind;
@@ -84,34 +94,9 @@ public sealed partial class FolderTreeNode : ObservableObject
     private static List<FolderTreeNode> BuildChildren(NodeKind kind, string path)
         => kind switch
         {
-            NodeKind.Desktop => BuildDesktopChildren(path),
             NodeKind.Computer => BuildDriveChildren(),
             _ => BuildFolderChildren(path),
         };
-
-    /// <summary>XP のツリー構成: マイ ドキュメント → マイ コンピュータ → デスクトップ上のフォルダー。</summary>
-    private static List<FolderTreeNode> BuildDesktopChildren(string desktopPath)
-    {
-        var children = new List<FolderTreeNode>();
-        var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        if (documents.Length > 0)
-        {
-            children.Add(CreateFolderNode(documents, LocalizationService.Text("Text.Tree.MyDocuments"), "📄"));
-        }
-
-        var computer = new FolderTreeNode
-        {
-            Name = LocalizationService.Text("Text.Tree.MyComputer"),
-            Path = FileSystemService.ComputerPath,
-            Icon = "💻",
-            Kind = NodeKind.Computer,
-        };
-        computer.AddPlaceholder();
-        children.Add(computer);
-
-        children.AddRange(EnumerateSubfolderNodes(desktopPath));
-        return children;
-    }
 
     private static List<FolderTreeNode> BuildDriveChildren()
     {

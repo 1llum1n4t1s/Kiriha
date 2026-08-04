@@ -385,9 +385,17 @@
   <x:String x:Key="Text.Tooltip.Type" xml:space="preserve">வகை: {0}</x:String>
   <x:String x:Key="Text.Tray.Exit" xml:space="preserve">வெளியேறு</x:String>
   <x:String x:Key="Text.Tray.Open" xml:space="preserve">Kiriha ஐத் திற</x:String>
+  <x:String x:Key="Text.Tree.Computer" xml:space="preserve">PC</x:String>
+  <x:String x:Key="Text.Tree.CollapseAll" xml:space="preserve">அனைத்தையும் சுருக்கு</x:String>
+  <x:String x:Key="Text.Tree.CreateFailed" xml:space="preserve">உருவாக்க முடியவில்லை: {0}</x:String>
   <x:String x:Key="Text.Tree.Loading" xml:space="preserve">ஏற்றுகிறது...</x:String>
-  <x:String x:Key="Text.Tree.MyComputer" xml:space="preserve">என் கணினி</x:String>
-  <x:String x:Key="Text.Tree.MyDocuments" xml:space="preserve">என் ஆவணங்கள்</x:String>
+  <x:String x:Key="Text.Tree.NewFile" xml:space="preserve">புதிய கோப்பு</x:String>
+  <x:String x:Key="Text.Tree.NewFolder" xml:space="preserve">புதிய கோப்புறை</x:String>
+  <x:String x:Key="Text.Tree.NewItemEmpty" xml:space="preserve">கோப்பு அல்லது கோப்புறை பெயரை உள்ளிட வேண்டும்.</x:String>
+  <x:String x:Key="Text.Tree.NewItemExists" xml:space="preserve">'{0}' என்ற பெயரில் கோப்பு அல்லது கோப்புறை இந்த இடத்தில் ஏற்கனவே உள்ளது. வேறு பெயரைத் தேர்ந்தெடுக்கவும்.</x:String>
+  <x:String x:Key="Text.Tree.NewItemInvalid" xml:space="preserve">'{0}' என்ற பெயரை கோப்பு அல்லது கோப்புறை பெயராகப் பயன்படுத்த முடியாது. வேறு பெயரைத் தேர்ந்தெடுக்கவும்.</x:String>
+  <x:String x:Key="Text.Tree.Refresh" xml:space="preserve">புதுப்பி</x:String>
+  <x:String x:Key="Text.Tree.SyncActive" xml:space="preserve">செயலில் உள்ள ஆவணத்துடன் ஒத்திசை</x:String>
   <x:String x:Key="Text.Type.ExtFile" xml:space="preserve">{0} கோப்பு</x:String>
   <x:String x:Key="Text.Type.File" xml:space="preserve">கோப்பு</x:String>
   <x:String x:Key="Text.Type.FileFolder" xml:space="preserve">கோப்புக் கோப்புறை</x:String>

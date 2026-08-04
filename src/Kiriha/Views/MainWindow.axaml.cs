@@ -945,6 +945,64 @@ public partial class MainWindow : Window
         }
     }
 
+    // ===== ツリーのヘッダー操作（VSCode のエクスプローラーと同じ 4 ボタン） =====
+
+    private void TreeNewFile_Click(object? sender, RoutedEventArgs e)
+        => _ = ViewModel?.BeginNewTreeItemAsync(isFile: true);
+
+    private void TreeNewFolder_Click(object? sender, RoutedEventArgs e)
+        => _ = ViewModel?.BeginNewTreeItemAsync(isFile: false);
+
+    private void TreeRefresh_Click(object? sender, RoutedEventArgs e)
+        => _ = ViewModel?.RefreshSidebarTreeAsync();
+
+    private void TreeCollapse_Click(object? sender, RoutedEventArgs e)
+        => ViewModel?.CollapseSidebarTree();
+
+    /// <summary>インライン新規作成の入力欄が現れたらフォーカスして見える位置へスクロールする。</summary>
+    private void NewTreeItemBox_Loaded(object? sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox box)
+        {
+            box.Focus();
+            (box.FindAncestorOfType<TreeViewItem>() ?? (Control)box).BringIntoView();
+        }
+    }
+
+    private async void NewTreeItemBox_KeyDown(object? sender, KeyEventArgs e)
+    {
+        if (ViewModel is not { } vm)
+        {
+            return;
+        }
+
+        if (e.Key is Key.Enter)
+        {
+            e.Handled = true;
+            // 検証エラー時は false（入力継続）。エラーは入力欄の下に表示済み
+            await vm.CommitNewTreeItemAsync();
+        }
+        else if (e.Key is Key.Escape)
+        {
+            e.Handled = true;
+            vm.CancelNewTreeItem();
+        }
+    }
+
+    /// <summary>VSCode と同じく、フォーカスが外れたら有効な入力は確定し、それ以外は取り消す。</summary>
+    private async void NewTreeItemBox_LostFocus(object? sender, RoutedEventArgs e)
+    {
+        if (ViewModel is not { } vm)
+        {
+            return;
+        }
+
+        if (!await vm.CommitNewTreeItemAsync())
+        {
+            vm.CancelNewTreeItem();
+        }
+    }
+
     /// <summary>ツリービューの選択で選択中タブを該当フォルダーへ移動する（XP のツリーと同じ操作感）。</summary>
     private void SidebarTree_SelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
@@ -1384,7 +1442,7 @@ public partial class MainWindow : Window
     /// 幅に収まらず畳まれた上位フォルダーを一覧で出す。
     ///
     /// 畳んだ個数は <see cref="BreadcrumbPanel"/> が兄弟の ItemsControl へ添付プロパティで
-    /// 載せている。ここはアドレスバー（＝タブごとの DataTemplate の中）なので、コードから
+    /// 載せている。ここはステータスバー（＝タブごとの DataTemplate の中）なので、コードから
     /// x:Name で ItemsControl を引けない。同じ Grid の子から型で拾う。
     /// </summary>
     private void BreadcrumbOverflow_Click(object? sender, RoutedEventArgs e)
@@ -1402,7 +1460,8 @@ public partial class MainWindow : Window
             return;
         }
 
-        var flyout = new MenuFlyout { Placement = PlacementMode.BottomEdgeAlignedLeft };
+        // ステータスバーは画面下端にあるため、ドロップダウンは上へ開く
+        var flyout = new MenuFlyout { Placement = PlacementMode.TopEdgeAlignedLeft };
         foreach (var segment in tab.Breadcrumbs.Take(count))
         {
             var captured = segment.Path;
@@ -1424,7 +1483,8 @@ public partial class MainWindow : Window
             return;
         }
 
-        var flyout = new MenuFlyout { Placement = PlacementMode.BottomEdgeAlignedLeft };
+        // ステータスバーは画面下端にあるため、ドロップダウンは上へ開く
+        var flyout = new MenuFlyout { Placement = PlacementMode.TopEdgeAlignedLeft };
         try
         {
             IEnumerable<(string Name, string Path)> children;
@@ -1651,7 +1711,8 @@ public partial class MainWindow : Window
         }
         else if (e.Key is Key.Escape)
         {
-            tab.IsEditingPath = false;
+            // 入力途中のテキストは通常表示にそのまま出てしまうため、現在地の表記へ戻す
+            tab.CancelPathEditing();
             e.Handled = true;
         }
     }
@@ -1660,7 +1721,7 @@ public partial class MainWindow : Window
     {
         if (sender is TextBox { DataContext: TabViewModel tab })
         {
-            tab.IsEditingPath = false;
+            tab.CancelPathEditing();
         }
     }
 

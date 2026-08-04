@@ -55,7 +55,10 @@ public partial class MainWindowViewModel : ObservableObject
 
         OnPropertyChanged(nameof(WindowTitle));
         newValue?.EnsureCurrentPathAvailable();
-        _ = SyncSidebarTreeToCurrentPathAsync();
+        if (SidebarTreeSyncActive)
+        {
+            _ = SyncSidebarTreeToCurrentPathAsync();
+        }
 
         oldValue?.SuspendGalleryVideo();
         newValue?.ResumeGalleryVideo();
@@ -201,6 +204,24 @@ public partial class MainWindowViewModel : ObservableObject
         if (value)
         {
             EnsureSidebarTree();
+            if (SidebarTreeSyncActive)
+            {
+                _ = SyncSidebarTreeToCurrentPathAsync();
+            }
+        }
+    }
+
+    /// <summary>ツリーを現在のフォルダーへ自動追従させる（VS のソリューションエクスプローラーの
+    /// 「アクティブ ドキュメントとの同期」と同じトグル）。オンにした瞬間にも 1 回同期する。</summary>
+    [ObservableProperty]
+    private bool _sidebarTreeSyncActive = true;
+
+    partial void OnSidebarTreeSyncActiveChanged(bool value)
+    {
+        _settings.SidebarTreeSyncActive = value;
+        SettingsService.Save(_settings);
+        if (value)
+        {
             _ = SyncSidebarTreeToCurrentPathAsync();
         }
     }
@@ -233,7 +254,10 @@ public partial class MainWindowViewModel : ObservableObject
         return true;
     }
 
-    /// <summary>選択中タブの現在フォルダーまでツリーを展開して選択状態にする。</summary>
+    /// <summary>選択中タブの現在フォルダーまでツリーを展開して選択状態にする。
+    /// 呼び出し元は「アクティブ ドキュメントとの同期」（<see cref="SidebarTreeSyncActive"/>）が
+    /// オンのときのナビゲーション・タブ切り替え、トグルをオンへ切り替えた瞬間、
+    /// ツリー表示をオンにした瞬間の初期位置決め。</summary>
     public async Task SyncSidebarTreeToCurrentPathAsync()
     {
         _sidebarTreeSyncDepth++;
@@ -263,6 +287,14 @@ public partial class MainWindowViewModel : ObservableObject
         var path = tab.CurrentPath;
         var generation = Interlocked.Increment(ref _treeSyncGeneration);
         var node = SidebarTreeRoots[0];
+
+        // PC（ドライブ一覧）はルートそのもの
+        if (path == FileSystemService.ComputerPath)
+        {
+            SelectTreeNode(node);
+            return;
+        }
+
         node.IsExpanded = true;
         await node.EnsureChildrenAsync();
         if (generation != _treeSyncGeneration)
@@ -270,21 +302,10 @@ public partial class MainWindowViewModel : ObservableObject
             return;
         }
 
-        // PC（ドライブ一覧）はマイ コンピュータを選択する
-        if (path == FileSystemService.ComputerPath)
-        {
-            SelectTreeNode(node.Children.FirstOrDefault(c => c.Kind == Models.FolderTreeNode.NodeKind.Computer));
-            return;
-        }
-
+        // ルートの PC からドライブ → 実フォルダーへと、物理パスをそのまま 1 段ずつ降りる
         while (!WindowsPathIdentity.Instance.Equals(node.Path, path))
         {
-            // デスクトップ直下はマイ ドキュメント → デスクトップ配下の実フォルダーの順で優先し、
-            // どれにも該当しないパスはマイ コンピュータ（ドライブ）経由で辿る。
-            var next = node.Children.FirstOrDefault(c => IsSelfOrAncestorOf(c.Path, path))
-                       ?? (node.Kind == Models.FolderTreeNode.NodeKind.Desktop
-                           ? node.Children.FirstOrDefault(c => c.Kind == Models.FolderTreeNode.NodeKind.Computer)
-                           : null);
+            var next = node.Children.FirstOrDefault(c => IsSelfOrAncestorOf(c.Path, path));
             if (next is null)
             {
                 Logger.Log(
@@ -348,16 +369,376 @@ public partial class MainWindowViewModel : ObservableObject
             return;
         }
 
+        // ツリーの階層は物理パスと一致させる（PC > C: > Users > … ）。仮想フォルダーは挟まない。
         var root = new Models.FolderTreeNode
         {
-            Name = LocalizationService.Text("Text.Folder.Desktop"),
-            Path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-            Icon = "🖥",
-            Kind = Models.FolderTreeNode.NodeKind.Desktop,
+            Name = LocalizationService.Text("Text.Tree.Computer"),
+            Path = FileSystemService.ComputerPath,
+            Icon = "💻",
+            Kind = Models.FolderTreeNode.NodeKind.Computer,
         };
         SidebarTreeRoots.Add(root);
-        // XP と同じく既定で展開する（子はここで遅延ロードされる）
+        // 既定でドライブ一覧まで開く（子はここで遅延ロードされる）
         root.IsExpanded = true;
+    }
+
+    // ===== ツリーのヘッダー操作（VSCode のエクスプローラーと同じ 4 ボタン） =====
+
+    /// <summary>表示中のインライン新規作成入力行（無ければ null）。</summary>
+    private Models.NewTreeItemNode? _treeInputNode;
+
+    /// <summary>入力行を挿入した親ノード（作成先フォルダー）。</summary>
+    private Models.FolderTreeNode? _treeInputParent;
+
+    /// <summary>確定処理の再入ガード（Enter の確定中に LostFocus の確定が重ならないように）。</summary>
+    private bool _isCommittingNewTreeItem;
+
+    /// <summary>
+    /// 「新しいファイル / 新しいフォルダー」の入力行をツリーへ挿入する。
+    /// VSCode と同じく、選択中のフォルダーの直下へ作成する。ルートの PC はドライブ一覧であって
+    /// 実在するフォルダーではないため、そこが選択されているときは何もしない。
+    /// </summary>
+    public async Task BeginNewTreeItemAsync(bool isFile)
+    {
+        if (!ShowSidebarTree || SidebarTreeRoots.Count == 0)
+        {
+            return;
+        }
+
+        CancelNewTreeItem();
+        if (SidebarTreeSelectedItem is not Models.FolderTreeNode { Path.Length: > 0 } target
+            || target is Models.NewTreeItemNode)
+        {
+            return;
+        }
+
+        // 展開・子の列挙で発火する SelectionChanged をユーザー操作と取り違えないようにする
+        _sidebarTreeSyncDepth++;
+        try
+        {
+            target.IsExpanded = true;
+            await target.EnsureChildrenAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException($"新規作成先の子フォルダーを列挙できませんでした: {target.Path}", ex);
+        }
+        finally
+        {
+            _sidebarTreeSyncDepth--;
+        }
+
+        var input = new Models.NewTreeItemNode
+        {
+            Name = "",
+            Path = "",
+            Icon = isFile ? "📄" : "📁",
+            IsFile = isFile,
+        };
+        input.PropertyChanged += TreeInputNode_PropertyChanged;
+        _treeInputNode = input;
+        _treeInputParent = target;
+        target.Children.Insert(0, input);
+    }
+
+    /// <summary>入力中の逐次検証（VSCode と同じく、無効な名前や重複はその場でエラー表示する）。</summary>
+    private void TreeInputNode_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(Models.NewTreeItemNode.EditText)
+            && sender is Models.NewTreeItemNode node
+            && ReferenceEquals(node, _treeInputNode)
+            && _treeInputParent is { } parent)
+        {
+            node.ValidationError = ValidateNewTreeItemName(parent.Path, node.EditText);
+        }
+    }
+
+    /// <summary>入力行を確定せずに取り除く（Esc・別操作の開始時）。</summary>
+    public void CancelNewTreeItem()
+    {
+        if (_treeInputNode is not { } node)
+        {
+            return;
+        }
+
+        node.PropertyChanged -= TreeInputNode_PropertyChanged;
+        _treeInputParent?.Children.Remove(node);
+        _treeInputNode = null;
+        _treeInputParent = null;
+    }
+
+    /// <summary>
+    /// 入力行を確定して実際に作成する。VSCode と同じく「a/b/c」のような入力は中間フォルダーごと作る。
+    /// 戻り値 false は入力継続（検証エラーや作成失敗をその場に表示したまま）。
+    /// </summary>
+    public async Task<bool> CommitNewTreeItemAsync()
+    {
+        if (_isCommittingNewTreeItem)
+        {
+            return true;
+        }
+
+        if (_treeInputNode is not { } node || _treeInputParent is not { } parent)
+        {
+            return true;
+        }
+
+        var name = node.EditText.Trim();
+        if (name.Length == 0)
+        {
+            node.ValidationError = LocalizationService.Text("Text.Tree.NewItemEmpty");
+            return false;
+        }
+
+        if (ValidateNewTreeItemName(parent.Path, name) is { } error)
+        {
+            node.ValidationError = error;
+            return false;
+        }
+
+        _isCommittingNewTreeItem = true;
+        try
+        {
+            var segments = name.Split(TreeInputSeparators, StringSplitOptions.RemoveEmptyEntries);
+            var isFile = node.IsFile;
+            try
+            {
+                await Task.Run(() =>
+                {
+                    var dirPath = isFile
+                        ? Path.Combine([parent.Path, .. segments[..^1]])
+                        : Path.Combine([parent.Path, .. segments]);
+                    Directory.CreateDirectory(dirPath);
+                    if (isFile)
+                    {
+                        // CreateNew: 検証後に外から同名ファイルが作られていても上書きしない
+                        using var stream = new FileStream(
+                            Path.Combine(dirPath, segments[^1]), FileMode.CreateNew);
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException($"ツリーからの新規作成に失敗しました: {parent.Path} / {name}", ex);
+                node.ValidationError = LocalizationService.Text("Text.Tree.CreateFailed", ex.Message);
+                return false;
+            }
+
+            // 成功: 入力行を外し、親を再列挙して作成したフォルダーを選択状態で見せる
+            // （ファイル自体はツリーに出ないため、フォルダー階層ぶんだけ辿る）
+            CancelNewTreeItem();
+            _sidebarTreeSyncDepth++;
+            try
+            {
+                await parent.ReloadChildrenAsync();
+                var current = parent;
+                var walked = parent.Path;
+                Models.FolderTreeNode? reveal = null;
+                var folderDepth = isFile ? segments.Length - 1 : segments.Length;
+                for (var i = 0; i < folderDepth; i++)
+                {
+                    walked = Path.Combine(walked, segments[i]);
+                    await current.EnsureChildrenAsync();
+                    var child = current.Children.FirstOrDefault(
+                        c => WindowsPathIdentity.Instance.Equals(c.Path, walked));
+                    if (child is null)
+                    {
+                        break;
+                    }
+
+                    reveal = child;
+                    current = child;
+                }
+
+                SelectTreeNode(reveal);
+            }
+            finally
+            {
+                _sidebarTreeSyncDepth--;
+            }
+
+            return true;
+        }
+        finally
+        {
+            _isCommittingNewTreeItem = false;
+        }
+    }
+
+    private static readonly char[] TreeInputSeparators = ['/', '\\'];
+
+    /// <summary>Windows で予約されているデバイス名（拡張子を付けても不可）。</summary>
+    private static readonly string[] ReservedDeviceNames =
+    [
+        "CON", "PRN", "AUX", "NUL",
+        "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
+        "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9",
+    ];
+
+    /// <summary>VSCode と同じ観点の名前検証（空 / 無効文字 / 予約名 / 既存）。問題なければ null。</summary>
+    private static string? ValidateNewTreeItemName(string parentPath, string input)
+    {
+        var name = input.Trim();
+        if (name.Length == 0)
+        {
+            return LocalizationService.Text("Text.Tree.NewItemEmpty");
+        }
+
+        var segments = name.Split(TreeInputSeparators, StringSplitOptions.RemoveEmptyEntries);
+        if (segments.Length == 0)
+        {
+            return LocalizationService.Text("Text.Tree.NewItemInvalid", name);
+        }
+
+        foreach (var segment in segments)
+        {
+            if (segment is "." or ".."
+                || segment.EndsWith('.') || segment.EndsWith(' ')
+                || segment.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0
+                || ReservedDeviceNames.Contains(
+                    segment.Split('.')[0].TrimEnd(), StringComparer.OrdinalIgnoreCase))
+            {
+                return LocalizationService.Text("Text.Tree.NewItemInvalid", segment);
+            }
+        }
+
+        var fullPath = Path.Combine([parentPath, .. segments]);
+        if (File.Exists(fullPath) || Directory.Exists(fullPath))
+        {
+            return LocalizationService.Text("Text.Tree.NewItemExists", name);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// ツリーを再列挙する（「最新の情報に更新」）。展開状態と選択パスは可能な範囲で引き継ぐ。
+    /// ツリーはファイルシステムの監視を持たないため、これが唯一の内容更新経路。
+    /// </summary>
+    public async Task RefreshSidebarTreeAsync()
+    {
+        if (SidebarTreeRoots.Count == 0)
+        {
+            return;
+        }
+
+        CancelNewTreeItem();
+        var selectedPath = SidebarTreeSelectedItem?.Path;
+        _sidebarTreeSyncDepth++;
+        try
+        {
+            var root = SidebarTreeRoots[0];
+            await ReloadNodeRecursivelyAsync(root, root);
+            if (selectedPath is { Length: > 0 }
+                && FindLoadedNodeByPath(root, selectedPath) is { } node)
+            {
+                _syncedTreeNodeEcho = node;
+                SidebarTreeSelectedItem = node;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException("ツリーの再列挙に失敗しました", ex);
+        }
+        finally
+        {
+            _sidebarTreeSyncDepth--;
+        }
+    }
+
+    /// <summary>fresh の子を列挙し直し、previous（再列挙前の同じパスのノード）の展開状態を
+    /// 同じパスの新しい子へ引き継ぐ。列挙済みだった子は同様に再帰で列挙し直す。</summary>
+    private static async Task ReloadNodeRecursivelyAsync(
+        Models.FolderTreeNode fresh, Models.FolderTreeNode previous)
+    {
+        if (!previous.HasLoadedChildren)
+        {
+            return;
+        }
+
+        var old = new Dictionary<string, Models.FolderTreeNode>(WindowsPathIdentity.Instance);
+        foreach (var child in previous.Children)
+        {
+            if (ReloadKeyOf(child) is { } key)
+            {
+                old[key] = child;
+            }
+        }
+
+        await fresh.ReloadChildrenAsync();
+        foreach (var child in fresh.Children)
+        {
+            if (ReloadKeyOf(child) is not { } key || !old.TryGetValue(key, out var prev))
+            {
+                continue;
+            }
+
+            if (prev.HasLoadedChildren)
+            {
+                await ReloadNodeRecursivelyAsync(child, prev);
+            }
+
+            child.IsExpanded = prev.IsExpanded;
+        }
+    }
+
+    /// <summary>再列挙の前後でノードを対応付けるキー。マイ コンピュータは Path が空
+    /// （<see cref="FileSystemService.ComputerPath"/>）なので Kind で照合する。
+    /// プレースホルダーや入力行（どちらも Path が空の Folder）は対応付けない。</summary>
+    private static string? ReloadKeyOf(Models.FolderTreeNode node)
+        => node.Path.Length > 0
+            ? node.Path
+            : node.Kind == Models.FolderTreeNode.NodeKind.Computer ? "\0computer" : null;
+
+    /// <summary>読み込み済みのノードから path に一致するものを探す（見つからなければ null）。</summary>
+    private static Models.FolderTreeNode? FindLoadedNodeByPath(Models.FolderTreeNode node, string path)
+    {
+        if (node.Path.Length > 0 && WindowsPathIdentity.Instance.Equals(node.Path, path))
+        {
+            return node;
+        }
+
+        foreach (var child in node.Children)
+        {
+            if (FindLoadedNodeByPath(child, path) is { } found)
+            {
+                return found;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>ツリーの全ノードを畳む。ルートのデスクトップは VSCode のワークスペースルートに
+    /// 相当するため展開したまま残す（VSCode の「フォルダーを折りたたむ」と同じ見え方）。</summary>
+    public void CollapseSidebarTree()
+    {
+        CancelNewTreeItem();
+        _sidebarTreeSyncDepth++;
+        try
+        {
+            foreach (var root in SidebarTreeRoots)
+            {
+                foreach (var child in root.Children)
+                {
+                    CollapseRecursively(child);
+                }
+            }
+        }
+        finally
+        {
+            _sidebarTreeSyncDepth--;
+        }
+    }
+
+    private static void CollapseRecursively(Models.FolderTreeNode node)
+    {
+        foreach (var child in node.Children)
+        {
+            CollapseRecursively(child);
+        }
+
+        node.IsExpanded = false;
     }
 
     partial void OnPreviewWidthChanged(double value)
@@ -1054,6 +1435,7 @@ public partial class MainWindowViewModel : ObservableObject
         };
         _showStatusBar = _settings.ShowStatusBar;
         _showSidebarTree = _settings.SidebarShowTree;
+        _sidebarTreeSyncActive = _settings.SidebarTreeSyncActive;
         if (_showSidebarTree)
         {
             EnsureSidebarTree();
@@ -1487,8 +1869,9 @@ public partial class MainWindowViewModel : ObservableObject
         }
         else if (e.PropertyName == nameof(TabViewModel.CurrentPath))
         {
-            // 選択中タブのフォルダー移動へツリービューの展開・選択を追従させる
-            if (ReferenceEquals(tab, SelectedTab))
+            // 「アクティブ ドキュメントとの同期」がオンのときだけ、選択中タブのフォルダー移動へ
+            // ツリービューの展開・選択を追従させる
+            if (SidebarTreeSyncActive && ReferenceEquals(tab, SelectedTab))
             {
                 _ = SyncSidebarTreeToCurrentPathAsync();
             }

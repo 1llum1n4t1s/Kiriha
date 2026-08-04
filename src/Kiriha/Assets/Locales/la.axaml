@@ -385,9 +385,17 @@
   <x:String x:Key="Text.Tooltip.Type" xml:space="preserve">Genus: {0}</x:String>
   <x:String x:Key="Text.Tray.Exit" xml:space="preserve">Exire</x:String>
   <x:String x:Key="Text.Tray.Open" xml:space="preserve">Kiriha aperire</x:String>
+  <x:String x:Key="Text.Tree.Computer" xml:space="preserve">PC</x:String>
+  <x:String x:Key="Text.Tree.CollapseAll" xml:space="preserve">Omnia complicare</x:String>
+  <x:String x:Key="Text.Tree.CreateFailed" xml:space="preserve">Creari non potuit: {0}</x:String>
   <x:String x:Key="Text.Tree.Loading" xml:space="preserve">Oneratur...</x:String>
-  <x:String x:Key="Text.Tree.MyComputer" xml:space="preserve">Computatrum meum</x:String>
-  <x:String x:Key="Text.Tree.MyDocuments" xml:space="preserve">Documenta mea</x:String>
+  <x:String x:Key="Text.Tree.NewFile" xml:space="preserve">Fasciculus novus</x:String>
+  <x:String x:Key="Text.Tree.NewFolder" xml:space="preserve">Plica nova</x:String>
+  <x:String x:Key="Text.Tree.NewItemEmpty" xml:space="preserve">Nomen fasciculi vel plicae dandum est.</x:String>
+  <x:String x:Key="Text.Tree.NewItemExists" xml:space="preserve">Fasciculus vel plica nomine '{0}' hoc loco iam exstat. Aliud nomen elige.</x:String>
+  <x:String x:Key="Text.Tree.NewItemInvalid" xml:space="preserve">Nomen '{0}' pro fasciculo vel plica non valet. Aliud nomen elige.</x:String>
+  <x:String x:Key="Text.Tree.Refresh" xml:space="preserve">Renovare</x:String>
+  <x:String x:Key="Text.Tree.SyncActive" xml:space="preserve">Cum fasciculo activo synchronizare</x:String>
   <x:String x:Key="Text.Type.ExtFile" xml:space="preserve">Fasciculus {0}</x:String>
   <x:String x:Key="Text.Type.File" xml:space="preserve">Fasciculus</x:String>
   <x:String x:Key="Text.Type.FileFolder" xml:space="preserve">Plica fasciculorum</x:String>

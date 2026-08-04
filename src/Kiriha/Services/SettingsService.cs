@@ -75,6 +75,10 @@ public sealed class AppSettings
     /// <summary>左ペインにクイックアクセスの代わりに XP 風フォルダーツリーを表示する。</summary>
     public bool SidebarShowTree { get; set; }
 
+    /// <summary>ツリー表示を現在のフォルダーへ自動追従させる
+    /// （VS の「アクティブ ドキュメントとの同期」トグル。既定はオン）。</summary>
+    public bool SidebarTreeSyncActive { get; set; } = true;
+
     /// <summary>左ペインの幅。</summary>
     public double SidebarWidth { get; set; } = 230;
 

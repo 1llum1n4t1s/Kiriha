@@ -385,9 +385,17 @@
   <x:String x:Key="Text.Tooltip.Type" xml:space="preserve">Jenis: {0}</x:String>
   <x:String x:Key="Text.Tray.Exit" xml:space="preserve">Keluar</x:String>
   <x:String x:Key="Text.Tray.Open" xml:space="preserve">Buka Kiriha</x:String>
+  <x:String x:Key="Text.Tree.Computer" xml:space="preserve">PC</x:String>
+  <x:String x:Key="Text.Tree.CollapseAll" xml:space="preserve">Ciutkan semua</x:String>
+  <x:String x:Key="Text.Tree.CreateFailed" xml:space="preserve">Tidak dapat membuat: {0}</x:String>
   <x:String x:Key="Text.Tree.Loading" xml:space="preserve">Memuat...</x:String>
-  <x:String x:Key="Text.Tree.MyComputer" xml:space="preserve">Komputer Saya</x:String>
-  <x:String x:Key="Text.Tree.MyDocuments" xml:space="preserve">Dokumen Saya</x:String>
+  <x:String x:Key="Text.Tree.NewFile" xml:space="preserve">File baru</x:String>
+  <x:String x:Key="Text.Tree.NewFolder" xml:space="preserve">Folder baru</x:String>
+  <x:String x:Key="Text.Tree.NewItemEmpty" xml:space="preserve">Nama file atau folder harus diisi.</x:String>
+  <x:String x:Key="Text.Tree.NewItemExists" xml:space="preserve">File atau folder '{0}' sudah ada di lokasi ini. Pilih nama lain.</x:String>
+  <x:String x:Key="Text.Tree.NewItemInvalid" xml:space="preserve">Nama '{0}' tidak valid sebagai nama file atau folder. Pilih nama lain.</x:String>
+  <x:String x:Key="Text.Tree.Refresh" xml:space="preserve">Segarkan</x:String>
+  <x:String x:Key="Text.Tree.SyncActive" xml:space="preserve">Sinkronkan dengan dokumen aktif</x:String>
   <x:String x:Key="Text.Type.ExtFile" xml:space="preserve">Berkas {0}</x:String>
   <x:String x:Key="Text.Type.File" xml:space="preserve">Berkas</x:String>
   <x:String x:Key="Text.Type.FileFolder" xml:space="preserve">Folder berkas</x:String>

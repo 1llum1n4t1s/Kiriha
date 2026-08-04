@@ -234,12 +234,14 @@ public static class LicenseService
         var now = DateTime.UtcNow.ToString("O");
         lock (Gate)
         {
+            // LastOnlineCheckUtc は「失効照会に成功した時刻」なので、ここでは立てない
+            // （有効化はオフラインでも完結するため、成功したとは限らない）。オフライン猶予の
+            // 起点は RecomputeState が ActivatedAtUtc で代用するので、猶予の長さは変わらない。
             _persisted = new PersistedLicense
             {
                 Key = trimmed,
                 MaxSeenUtc = now,
                 ActivatedAtUtc = now,
-                LastOnlineCheckUtc = now,
             };
             Save();
         }
@@ -554,8 +556,11 @@ public static class LicenseService
     {
         try
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(StatePath)!);
-            File.WriteAllText(StatePath, JsonSerializer.Serialize(_persisted, LicenseJsonContext.Default.PersistedLicense));
+            // 直書きだと書き込み中の異常終了で license.json が空・途中切れになり、次回起動の
+            // 読み込み失敗（= 試用状態へフォールバック）で購入済みユーザーが再認証を強いられる。
+            // 設定ファイルと同じく一時ファイル + 置き換えで、失敗しても直前の内容を残す。
+            AtomicFile.WriteAllText(
+                StatePath, JsonSerializer.Serialize(_persisted, LicenseJsonContext.Default.PersistedLicense));
         }
         catch (Exception ex)
         {

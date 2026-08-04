@@ -385,9 +385,17 @@
   <x:String x:Key="Text.Tooltip.Type" xml:space="preserve">Тип: {0}</x:String>
   <x:String x:Key="Text.Tray.Exit" xml:space="preserve">Вийти</x:String>
   <x:String x:Key="Text.Tray.Open" xml:space="preserve">Відкрити Kiriha</x:String>
+  <x:String x:Key="Text.Tree.Computer" xml:space="preserve">PC</x:String>
+  <x:String x:Key="Text.Tree.CollapseAll" xml:space="preserve">Згорнути все</x:String>
+  <x:String x:Key="Text.Tree.CreateFailed" xml:space="preserve">Не вдалося створити: {0}</x:String>
   <x:String x:Key="Text.Tree.Loading" xml:space="preserve">Завантаження...</x:String>
-  <x:String x:Key="Text.Tree.MyComputer" xml:space="preserve">Мій комп'ютер</x:String>
-  <x:String x:Key="Text.Tree.MyDocuments" xml:space="preserve">Мої документи</x:String>
+  <x:String x:Key="Text.Tree.NewFile" xml:space="preserve">Новий файл</x:String>
+  <x:String x:Key="Text.Tree.NewFolder" xml:space="preserve">Нова папка</x:String>
+  <x:String x:Key="Text.Tree.NewItemEmpty" xml:space="preserve">Потрібно вказати ім'я файлу або папки.</x:String>
+  <x:String x:Key="Text.Tree.NewItemExists" xml:space="preserve">Файл або папка «{0}» вже існує в цьому розташуванні. Виберіть інше ім'я.</x:String>
+  <x:String x:Key="Text.Tree.NewItemInvalid" xml:space="preserve">Ім'я «{0}» неприпустиме як ім'я файлу або папки. Виберіть інше ім'я.</x:String>
+  <x:String x:Key="Text.Tree.Refresh" xml:space="preserve">Оновити</x:String>
+  <x:String x:Key="Text.Tree.SyncActive" xml:space="preserve">Синхронізація з активним документом</x:String>
   <x:String x:Key="Text.Type.ExtFile" xml:space="preserve">Файл {0}</x:String>
   <x:String x:Key="Text.Type.File" xml:space="preserve">Файл</x:String>
   <x:String x:Key="Text.Type.FileFolder" xml:space="preserve">Папка з файлами</x:String>

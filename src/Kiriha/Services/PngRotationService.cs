@@ -44,7 +44,8 @@ internal static class PngRotationService
                 return false;
             }
 
-            File.WriteAllBytes(path, rotated);
+            // 直書き（WriteAllBytes）は先に元ファイルを切り詰めるため、途中で落ちると写真が壊れる。
+            AtomicFile.WriteAllBytes(path, rotated);
             return true;
         }
         catch (Exception ex)

@@ -385,9 +385,17 @@
   <x:String x:Key="Text.Tooltip.Type" xml:space="preserve">Type: {0}</x:String>
   <x:String x:Key="Text.Tray.Exit" xml:space="preserve">Exit</x:String>
   <x:String x:Key="Text.Tray.Open" xml:space="preserve">Open Kiriha</x:String>
+  <x:String x:Key="Text.Tree.Computer" xml:space="preserve">PC</x:String>
+  <x:String x:Key="Text.Tree.CollapseAll" xml:space="preserve">Collapse All</x:String>
+  <x:String x:Key="Text.Tree.CreateFailed" xml:space="preserve">Could not create: {0}</x:String>
   <x:String x:Key="Text.Tree.Loading" xml:space="preserve">Loading...</x:String>
-  <x:String x:Key="Text.Tree.MyComputer" xml:space="preserve">My Computer</x:String>
-  <x:String x:Key="Text.Tree.MyDocuments" xml:space="preserve">My Documents</x:String>
+  <x:String x:Key="Text.Tree.NewFile" xml:space="preserve">New File</x:String>
+  <x:String x:Key="Text.Tree.NewFolder" xml:space="preserve">New Folder</x:String>
+  <x:String x:Key="Text.Tree.NewItemEmpty" xml:space="preserve">A file or folder name must be provided.</x:String>
+  <x:String x:Key="Text.Tree.NewItemExists" xml:space="preserve">A file or folder '{0}' already exists at this location. Please choose a different name.</x:String>
+  <x:String x:Key="Text.Tree.NewItemInvalid" xml:space="preserve">The name '{0}' is not valid as a file or folder name. Please choose a different name.</x:String>
+  <x:String x:Key="Text.Tree.Refresh" xml:space="preserve">Refresh</x:String>
+  <x:String x:Key="Text.Tree.SyncActive" xml:space="preserve">Sync with Active Document</x:String>
   <x:String x:Key="Text.Type.ExtFile" xml:space="preserve">{0} File</x:String>
   <x:String x:Key="Text.Type.File" xml:space="preserve">File</x:String>
   <x:String x:Key="Text.Type.FileFolder" xml:space="preserve">File folder</x:String>

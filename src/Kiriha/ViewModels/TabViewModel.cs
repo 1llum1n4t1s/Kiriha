@@ -3055,6 +3055,16 @@ public partial class TabViewModel : ObservableObject
         NavigateTo(input);
     }
 
+    /// <summary>
+    /// アドレス入力を確定せずに終える（Esc / フォーカス喪失）。
+    /// 通常表示は PathText をそのまま出すため、入力途中のテキストを現在地の表記へ戻す。
+    /// </summary>
+    public void CancelPathEditing()
+    {
+        IsEditingPath = false;
+        PathText = CurrentPath == FileSystemService.ComputerPath ? "PC" : CurrentPath;
+    }
+
     /// <summary>エクスプローラーと同じ規則で並べ替える（フォルダー優先）。</summary>
     private IEnumerable<FileSystemEntry> ApplySort(List<FileSystemEntry> entries)
     {

@@ -129,7 +129,9 @@ internal static class ExifOrientationService
         Buffer.BlockCopy(segment, 0, output, 2, segment.Length);
         Buffer.BlockCopy(bytes, 2, output, 2 + segment.Length, bytes.Length - 2);
 
-        File.WriteAllBytes(path, output);
+        // ファイル全体を書き直す経路なので、途中で落ちても元画像が残るよう原子的に置き換える
+        // （2 バイトだけ書き換える WriteOrientationInPlace と違い、直書きは失敗が即データ損失になる）。
+        AtomicFile.WriteAllBytes(path, output);
     }
 
     /// <summary>Exif Orientation の位置と現在値。</summary>

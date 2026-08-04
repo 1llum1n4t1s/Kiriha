@@ -290,6 +290,62 @@
             <Setter Property="Background" Value="{DynamicResource CrumbHoverBg}" />
         </Style>
 
+        <!-- ツリーのヘッダー操作ボタン（VSCode のエクスプローラーと同じ 16px アイコンの小型ボタン） -->
+        <Style Selector="Button.treehdr">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Width" Value="24" />
+            <Setter Property="Height" Value="22" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style Selector="Button.treehdr:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource HoverBg}" />
+        </Style>
+        <!-- 同上のトグル版（「アクティブ ドキュメントとの同期」）。Fluent の ToggleButton テーマは
+             チェック状態でアクセント色をボタン全面に塗るため、chip と同じくテンプレートごと差し替えて
+             「背景は控えめ・アイコンだけアクセント色」の VS 風トグルにする。 -->
+        <Style Selector="ToggleButton.treehdr">
+            <Setter Property="MinHeight" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Width" Value="24" />
+            <Setter Property="Height" Value="22" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <ContentPresenter Name="PART_ContentPresenter"
+                                      Background="{TemplateBinding Background}"
+                                      BorderBrush="{TemplateBinding BorderBrush}"
+                                      BorderThickness="{TemplateBinding BorderThickness}"
+                                      CornerRadius="{TemplateBinding CornerRadius}"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      Padding="{TemplateBinding Padding}"
+                                      HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="ToggleButton.treehdr:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource HoverBg}" />
+        </Style>
+        <Style Selector="ToggleButton.treehdr:checked /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource HoverBg}" />
+        </Style>
+        <Style Selector="ToggleButton.treehdr Path">
+            <Setter Property="Fill" Value="{DynamicResource TextSecondary}" />
+        </Style>
+        <Style Selector="ToggleButton.treehdr:checked Path">
+            <Setter Property="Fill" Value="{DynamicResource SystemAccentColor}" />
+        </Style>
+
         <!-- 詳細表示のカラムヘッダー -->
         <Style Selector="Button.colhead">
             <Setter Property="Background" Value="Transparent" />

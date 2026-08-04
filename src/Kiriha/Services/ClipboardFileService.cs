@@ -124,9 +124,18 @@ internal static partial class ClipboardFileService
             }
 
             var count = DragQueryFileW(hDrop, 0xFFFFFFFF, 0, 0);
-            var buffer = new char[520];
             for (uint i = 0; i < count; i++)
             {
+                // 固定長バッファ（旧実装は 520 文字）だと、それを超えるパスが黙って切り詰められ、
+                // 存在しない別のパスとして扱われてしまう（\\?\ 付きや深いクラウド同期のパスは
+                // 32767 文字まであり得る）。項目ごとに必要な長さを問い合わせてから確保する。
+                var needed = DragQueryFileW(hDrop, i, 0, 0);
+                if (needed == 0)
+                {
+                    continue;
+                }
+
+                var buffer = new char[needed + 1]; // 終端 NUL の分
                 uint len;
                 unsafe
                 {
@@ -138,7 +147,7 @@ internal static partial class ClipboardFileService
 
                 if (len > 0)
                 {
-                    result.Add(new string(buffer, 0, (int)len));
+                    result.Add(new string(buffer, 0, (int)Math.Min(len, needed)));
                 }
             }
 

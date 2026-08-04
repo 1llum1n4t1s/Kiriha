@@ -385,9 +385,17 @@
   <x:String x:Key="Text.Tooltip.Type" xml:space="preserve">Tipo: {0}</x:String>
   <x:String x:Key="Text.Tray.Exit" xml:space="preserve">Salir</x:String>
   <x:String x:Key="Text.Tray.Open" xml:space="preserve">Abrir Kiriha</x:String>
+  <x:String x:Key="Text.Tree.Computer" xml:space="preserve">PC</x:String>
+  <x:String x:Key="Text.Tree.CollapseAll" xml:space="preserve">Contraer todo</x:String>
+  <x:String x:Key="Text.Tree.CreateFailed" xml:space="preserve">No se pudo crear: {0}</x:String>
   <x:String x:Key="Text.Tree.Loading" xml:space="preserve">Cargando...</x:String>
-  <x:String x:Key="Text.Tree.MyComputer" xml:space="preserve">Mi PC</x:String>
-  <x:String x:Key="Text.Tree.MyDocuments" xml:space="preserve">Mis documentos</x:String>
+  <x:String x:Key="Text.Tree.NewFile" xml:space="preserve">Nuevo archivo</x:String>
+  <x:String x:Key="Text.Tree.NewFolder" xml:space="preserve">Nueva carpeta</x:String>
+  <x:String x:Key="Text.Tree.NewItemEmpty" xml:space="preserve">Se debe proporcionar un nombre de archivo o carpeta.</x:String>
+  <x:String x:Key="Text.Tree.NewItemExists" xml:space="preserve">Ya existe un archivo o carpeta '{0}' en esta ubicación. Elija otro nombre.</x:String>
+  <x:String x:Key="Text.Tree.NewItemInvalid" xml:space="preserve">El nombre '{0}' no es válido como nombre de archivo o carpeta. Elija otro nombre.</x:String>
+  <x:String x:Key="Text.Tree.Refresh" xml:space="preserve">Actualizar</x:String>
+  <x:String x:Key="Text.Tree.SyncActive" xml:space="preserve">Sincronizar con el documento activo</x:String>
   <x:String x:Key="Text.Type.ExtFile" xml:space="preserve">Archivo {0}</x:String>
   <x:String x:Key="Text.Type.File" xml:space="preserve">Archivo</x:String>
   <x:String x:Key="Text.Type.FileFolder" xml:space="preserve">Carpeta de archivos</x:String>

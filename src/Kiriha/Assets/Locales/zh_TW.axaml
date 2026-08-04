@@ -385,9 +385,17 @@
   <x:String x:Key="Text.Tooltip.Type" xml:space="preserve">類型: {0}</x:String>
   <x:String x:Key="Text.Tray.Exit" xml:space="preserve">結束</x:String>
   <x:String x:Key="Text.Tray.Open" xml:space="preserve">開啟 Kiriha</x:String>
+  <x:String x:Key="Text.Tree.Computer" xml:space="preserve">PC</x:String>
+  <x:String x:Key="Text.Tree.CollapseAll" xml:space="preserve">全部摺疊</x:String>
+  <x:String x:Key="Text.Tree.CreateFailed" xml:space="preserve">無法建立: {0}</x:String>
   <x:String x:Key="Text.Tree.Loading" xml:space="preserve">載入中...</x:String>
-  <x:String x:Key="Text.Tree.MyComputer" xml:space="preserve">我的電腦</x:String>
-  <x:String x:Key="Text.Tree.MyDocuments" xml:space="preserve">我的文件</x:String>
+  <x:String x:Key="Text.Tree.NewFile" xml:space="preserve">新增檔案</x:String>
+  <x:String x:Key="Text.Tree.NewFolder" xml:space="preserve">新增資料夾</x:String>
+  <x:String x:Key="Text.Tree.NewItemEmpty" xml:space="preserve">必須提供檔案或資料夾名稱。</x:String>
+  <x:String x:Key="Text.Tree.NewItemExists" xml:space="preserve">此位置已存在名為「{0}」的檔案或資料夾。請改用其他名稱。</x:String>
+  <x:String x:Key="Text.Tree.NewItemInvalid" xml:space="preserve">名稱「{0}」無法作為檔案或資料夾名稱。請改用其他名稱。</x:String>
+  <x:String x:Key="Text.Tree.Refresh" xml:space="preserve">重新整理</x:String>
+  <x:String x:Key="Text.Tree.SyncActive" xml:space="preserve">與使用中文件同步</x:String>
   <x:String x:Key="Text.Type.ExtFile" xml:space="preserve">{0} 檔案</x:String>
   <x:String x:Key="Text.Type.File" xml:space="preserve">檔案</x:String>
   <x:String x:Key="Text.Type.FileFolder" xml:space="preserve">檔案資料夾</x:String>

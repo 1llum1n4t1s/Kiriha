@@ -385,9 +385,17 @@
   <x:String x:Key="Text.Tooltip.Type" xml:space="preserve">유형: {0}</x:String>
   <x:String x:Key="Text.Tray.Exit" xml:space="preserve">종료</x:String>
   <x:String x:Key="Text.Tray.Open" xml:space="preserve">Kiriha 열기</x:String>
+  <x:String x:Key="Text.Tree.Computer" xml:space="preserve">PC</x:String>
+  <x:String x:Key="Text.Tree.CollapseAll" xml:space="preserve">모두 축소</x:String>
+  <x:String x:Key="Text.Tree.CreateFailed" xml:space="preserve">만들지 못했습니다: {0}</x:String>
   <x:String x:Key="Text.Tree.Loading" xml:space="preserve">불러오는 중...</x:String>
-  <x:String x:Key="Text.Tree.MyComputer" xml:space="preserve">내 컴퓨터</x:String>
-  <x:String x:Key="Text.Tree.MyDocuments" xml:space="preserve">내 문서</x:String>
+  <x:String x:Key="Text.Tree.NewFile" xml:space="preserve">새 파일</x:String>
+  <x:String x:Key="Text.Tree.NewFolder" xml:space="preserve">새 폴더</x:String>
+  <x:String x:Key="Text.Tree.NewItemEmpty" xml:space="preserve">파일 또는 폴더 이름을 입력해야 합니다.</x:String>
+  <x:String x:Key="Text.Tree.NewItemExists" xml:space="preserve">이 위치에 '{0}' 이름의 파일 또는 폴더가 이미 있습니다. 다른 이름을 선택하세요.</x:String>
+  <x:String x:Key="Text.Tree.NewItemInvalid" xml:space="preserve">'{0}'은(는) 파일 또는 폴더 이름으로 사용할 수 없습니다. 다른 이름을 선택하세요.</x:String>
+  <x:String x:Key="Text.Tree.Refresh" xml:space="preserve">새로 고침</x:String>
+  <x:String x:Key="Text.Tree.SyncActive" xml:space="preserve">활성 문서와 동기화</x:String>
   <x:String x:Key="Text.Type.ExtFile" xml:space="preserve">{0} 파일</x:String>
   <x:String x:Key="Text.Type.File" xml:space="preserve">파일</x:String>
   <x:String x:Key="Text.Type.FileFolder" xml:space="preserve">파일 폴더</x:String>
