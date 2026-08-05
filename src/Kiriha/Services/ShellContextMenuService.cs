@@ -364,6 +364,11 @@ internal static partial class ShellContextMenuService
         IReadOnlyList<ShellMenuExtraItem> extraItems,
         string? workingDirectory)
     {
+        // プロセス内で最初の QueryContextMenu は Windows 11 系のハンドラーが欠けるため、
+        // 起動時の先読みが走っている最中ならその完了を待つ（ShellMenuSession.WarmUp 参照）。
+        // このパス（設定「Windows 標準」）も同じ制約を受けるので同じ待ちを通す。
+        ShellMenuSession.WaitForWarmUp();
+
         // シェル拡張（クラウドストレージ・AV 等）の不調で QueryContextMenu が数十秒ブロックすることが
         // あるため、所要時間を計測して遅延時だけ記録する（犯人特定の手掛かりを残す）。
         var sw = System.Diagnostics.Stopwatch.StartNew();

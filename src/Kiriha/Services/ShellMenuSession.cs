@@ -122,6 +122,114 @@ internal sealed partial class ShellMenuSession : IDisposable
     /// <summary>対象パスの件数。複数選択のプロパティ表示の分岐に使う。</summary>
     public int PathCount => _pidls.Count;
 
+    /// <summary>先読みを二重に走らせないための実行済みフラグ（0 = 未起動）。</summary>
+    private static int _warmedUp;
+
+    /// <summary>先読みの完了（成功・失敗どちらでも）を待つための合図。</summary>
+    private static readonly ManualResetEventSlim WarmUpCompleted = new(initialState: false);
+
+    /// <summary>いま実行中のスレッドが先読みスレッド自身か。先読みは <see cref="Create"/> を
+    /// 呼ぶので、これが無いと自分の完了を自分で待って永久に固まる。</summary>
+    [ThreadStatic]
+    private static bool _isWarmUpThread;
+
+    /// <summary>先読み待ちの上限。壊れたシェル拡張が固まっても UI を巻き込まないための保険で、
+    /// 待ち切れなかった場合は温まっていない可能性を承知でそのまま進む。</summary>
+    private static readonly TimeSpan WarmUpWaitTimeout = TimeSpan.FromSeconds(5);
+
+    /// <summary>
+    /// シェルメニューの先読み。プロセス内で最初の <c>QueryContextMenu</c> だけ、Windows 11 系の
+    /// <c>IExplorerCommand</c> / パッケージ登録型ハンドラー（「ターミナルで開く」「Code で開く」等）が
+    /// 列挙に間に合わず結果から丸ごと抜け落ちる。2 回目以降は同じ引数でも全部そろうため、
+    /// 起動直後に捨て呼び出しを 1 回だけ済ませて、ユーザーの最初の右クリックを 2 回目にする。
+    /// </summary>
+    /// <remarks>
+    /// 実測（同一プロセス内で条件を変えて計測）:
+    /// 初回のみ 26 項目・240ms、2 回目以降は 30 項目・42〜51ms。CMF フラグや
+    /// <c>WM_INITMENUPOPUP</c> の有無は無関係で、「プロセス内で 2 回目かどうか」だけが効く。
+    /// 5 秒待ってから初回を呼んでも欠けたままなので、時間ではなく呼び出しが引き金。
+    /// 温まりはプロセス単位なので、対象パスは実際に右クリックするフォルダーでなくてよい。
+    /// <para>
+    /// シェル拡張は STA を要求するものが多いので専用 STA スレッドで動かす
+    /// （<see cref="QuickAccessService"/> と同じ理由）。起動を遅らせないため Join はしない。
+    /// </para>
+    /// </remarks>
+    public static void WarmUp()
+    {
+        if (Interlocked.Exchange(ref _warmedUp, 1) != 0)
+        {
+            return;
+        }
+
+        var thread = new Thread(WarmUpCore)
+        {
+            IsBackground = true,
+            Name = "Kiriha-ShellMenuWarmUp",
+        };
+        thread.SetApartmentState(ApartmentState.STA);
+        thread.Start();
+    }
+
+    /// <summary>
+    /// 先読みが走っている最中なら、その完了まで待つ。起動直後（先読みは実測 ~290ms）に
+    /// ユーザーが右クリックした場合だけ効き、それ以外は即座に返る。
+    /// 待たずに進むと、その 1 回だけ「ターミナルで開く」等が欠けたメニューになる。
+    /// </summary>
+    internal static void WaitForWarmUp()
+    {
+        // 先読みを起動していない（テストや先読み前）、既に完了、先読みスレッド自身なら待たない
+        if (Volatile.Read(ref _warmedUp) == 0 || WarmUpCompleted.IsSet || _isWarmUpThread)
+        {
+            return;
+        }
+
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+        var completed = WarmUpCompleted.Wait(WarmUpWaitTimeout);
+        Logger.Log(
+            completed
+                ? $"シェルメニューの先読み完了を待機: {sw.ElapsedMilliseconds}ms"
+                : $"シェルメニューの先読み待ちがタイムアウト: {sw.ElapsedMilliseconds}ms"
+                  + "（このメニューだけ一部のシェル拡張が出ない可能性）",
+            completed ? LogLevel.Info : LogLevel.Warning);
+    }
+
+    private static void WarmUpCore()
+    {
+        _isWarmUpThread = true;
+        try
+        {
+            // 対象は「必ず存在してシェル拡張が普通に反応するフォルダー」であれば何でもよい。
+            var path = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            if (path.Length == 0 || !Directory.Exists(path))
+            {
+                path = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+            }
+
+            if (path.Length == 0)
+            {
+                return;
+            }
+
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            using var session = Create(0, [path], extendedVerbs: false);
+            Logger.Log(
+                session is null
+                    ? "シェルメニューの先読みに失敗（初回の右クリックで一部のシェル拡張が出ない可能性）"
+                    : $"シェルメニューを先読み: {sw.ElapsedMilliseconds}ms, {session.Items.Count} 項目",
+                session is null ? LogLevel.Warning : LogLevel.Info);
+        }
+        catch (Exception ex)
+        {
+            // 先読みは無くても動くので、失敗しても起動は続ける
+            Logger.Log($"シェルメニューの先読みに失敗: {ex.Message}", LogLevel.Warning);
+        }
+        finally
+        {
+            // 失敗しても必ず合図する（待っている右クリックを取り残さない）
+            WarmUpCompleted.Set();
+        }
+    }
+
     /// <summary>
     /// 指定パス（同一フォルダー内の複数選択可）のシェルメニューを組み立てて中身を取り出す。
     /// 失敗したら null を返すので、呼び出し側は Win32 表示へフォールバックする。
@@ -129,6 +237,10 @@ internal sealed partial class ShellMenuSession : IDisposable
     /// <param name="extendedVerbs">Shift 押下時。エクスプローラーと同じく拡張 verb も含める。</param>
     public static ShellMenuSession? Create(nint hwnd, IReadOnlyList<string> paths, bool extendedVerbs)
     {
+        // 起動直後に右クリックされた場合だけ、先読みの完了を待ってから組み立てる
+        // （待たないと、その 1 回だけ Windows 11 系のハンドラーが欠ける）。
+        WaitForWarmUp();
+
         var pidls = new List<nint>(paths.Count);
         try
         {

@@ -64,6 +64,11 @@ public partial class App : Application
             {
                 mainWindow.Opened -= onFirstOpened;
 
+                // 右クリックメニューの先読み。プロセス内で最初の QueryContextMenu だけ
+                // 「ターミナルで開く」等の Windows 11 系ハンドラーが抜けるため、ユーザーが
+                // 実際に右クリックする前に捨て呼び出しを済ませておく（詳細は WarmUp のコメント）。
+                Services.ShellMenuSession.WarmUp();
+
                 // 「起動時にタスクトレイに格納する」ON: 開いた直後に隠す（Discord 相当）。
                 var startingMinimizedToTray = viewModel.OptStartMinimizedToTray && !Program.StartupArgs.Any(Directory.Exists);
                 if (startingMinimizedToTray)
