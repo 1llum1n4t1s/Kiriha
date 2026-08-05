@@ -1,7 +1,9 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:String x:Key="StringTextFlyoutCopyText" xml:space="preserve">Копіювати</x:String>
+  <x:String x:Key="StringTextFlyoutCutText" xml:space="preserve">Вирізати</x:String>
+  <x:String x:Key="StringTextFlyoutPasteText" xml:space="preserve">Вставити</x:String>
   <x:String x:Key="Text.A11y.OpenSubfolders" xml:space="preserve">Показати підпапки</x:String>
   <x:String x:Key="Text.A11y.ResizeVerticalTabs" xml:space="preserve">Змінити ширину вертикальної панелі вкладок</x:String>
-  <x:String x:Key="Text.A11y.SwitchToTree" xml:space="preserve">Перейти до дерева папок</x:String>
   <x:String x:Key="Text.A11y.ToggleSidebar" xml:space="preserve">Показати або сховати бічну панель</x:String>
   <x:String x:Key="Text.A11y.VerticalTabs" xml:space="preserve">Вертикальні вкладки</x:String>
   <x:String x:Key="Text.Address.Copy" xml:space="preserve">Копіювати адресу</x:String>
@@ -10,7 +12,6 @@
   <x:String x:Key="Text.Bookmarks.AddFolderMenu" xml:space="preserve">Додати папку...</x:String>
   <x:String x:Key="Text.Bookmarks.AddFolderTitle" xml:space="preserve">Додати папку</x:String>
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">Перетягніть сюди папку, щоб додати її до закладок</x:String>
-  <x:String x:Key="Text.Bookmarks.Hide" xml:space="preserve">Сховати панель закладок</x:String>
   <x:String x:Key="Text.Bookmarks.NewFolderName" xml:space="preserve">Нова папка</x:String>
   <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">Перейменувати...</x:String>
   <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">Перейменувати закладку</x:String>
@@ -168,7 +169,6 @@
   <x:String x:Key="Text.License.Status.TrialExpired" xml:space="preserve">Пробний період завершено (потрібна ліцензія)</x:String>
   <x:String x:Key="Text.Menu.About" xml:space="preserve">Про Kiriha</x:String>
   <x:String x:Key="Text.Menu.AccessDenied" xml:space="preserve">(Немає доступу)</x:String>
-  <x:String x:Key="Text.Menu.BookmarksBar" xml:space="preserve">Панель закладок</x:String>
   <x:String x:Key="Text.Menu.CheckUpdate" xml:space="preserve">Перевірити оновлення</x:String>
   <x:String x:Key="Text.Menu.Empty" xml:space="preserve">(Порожньо)</x:String>
   <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">Нове вікно</x:String>
@@ -290,7 +290,6 @@
   <x:String x:Key="Text.Settings.Shortcuts.Subtitle" xml:space="preserve">Комбінації клавіш для швидшої роботи</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.Tabs" xml:space="preserve">Вкладки</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.TabsBody" xml:space="preserve">Ctrl+T　Нова вкладка&#10;Ctrl+W　Закрити вкладку&#10;Ctrl+Shift+T　Відновити закриту вкладку&#10;Ctrl+Tab　Перемикання вкладок&#10;Ctrl+1..9　Вибрати певну вкладку</x:String>
-  <x:String x:Key="Text.Settings.ShowBookmarksBar" xml:space="preserve">Показувати панель закладок (Ctrl+Shift+B)</x:String>
   <x:String x:Key="Text.Settings.ShowCheckBoxes" xml:space="preserve">Показувати прапорці елементів</x:String>
   <x:String x:Key="Text.Settings.ShowExtensions" xml:space="preserve">Показувати розширення файлів</x:String>
   <x:String x:Key="Text.Settings.ShowHidden" xml:space="preserve">Показувати приховані файли</x:String>
@@ -324,12 +323,12 @@
   <x:String x:Key="Text.Share.OpenFailed" xml:space="preserve">Не вдалося відкрити панель спільного доступу</x:String>
   <x:String x:Key="Text.Share.PrepareFailed" xml:space="preserve">Не вдалося підготувати дані для надсилання</x:String>
   <x:String x:Key="Text.Share.SelectFiles" xml:space="preserve">Виберіть файли, якими хочете поділитися</x:String>
+  <x:String x:Key="Text.Sidebar.Bookmarks" xml:space="preserve">Закладки</x:String>
   <x:String x:Key="Text.Sidebar.Drives" xml:space="preserve">Диски</x:String>
   <x:String x:Key="Text.Sidebar.QuickAccess" xml:space="preserve">Швидкий доступ</x:String>
   <x:String x:Key="Text.Sidebar.RecentFiles" xml:space="preserve">Останні файли</x:String>
   <x:String x:Key="Text.Sidebar.RecycleBin" xml:space="preserve">Кошик</x:String>
   <x:String x:Key="Text.Sidebar.RecycleBinTip" xml:space="preserve">Відкрити Кошик у Провіднику</x:String>
-  <x:String x:Key="Text.Sidebar.ToggleTip" xml:space="preserve">Перемикання між Швидким доступом і деревом папок</x:String>
   <x:String x:Key="Text.Sidebar.TreeView" xml:space="preserve">Дерево папок</x:String>
   <x:String x:Key="Text.Sort.Ascending" xml:space="preserve">За зростанням</x:String>
   <x:String x:Key="Text.Sort.Descending" xml:space="preserve">За спаданням</x:String>

@@ -1,7 +1,9 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:String x:Key="StringTextFlyoutCopyText" xml:space="preserve">நகலெடு</x:String>
+  <x:String x:Key="StringTextFlyoutCutText" xml:space="preserve">வெட்டு</x:String>
+  <x:String x:Key="StringTextFlyoutPasteText" xml:space="preserve">ஒட்டு</x:String>
   <x:String x:Key="Text.A11y.OpenSubfolders" xml:space="preserve">துணைக் கோப்புறைகளைக் காட்டு</x:String>
   <x:String x:Key="Text.A11y.ResizeVerticalTabs" xml:space="preserve">செங்குத்து தாவல் பட்டையின் அகலத்தை மாற்று</x:String>
-  <x:String x:Key="Text.A11y.SwitchToTree" xml:space="preserve">மரக் காட்சிக்கு மாறு</x:String>
   <x:String x:Key="Text.A11y.ToggleSidebar" xml:space="preserve">பக்கப்பட்டியைக் காட்டு அல்லது மறை</x:String>
   <x:String x:Key="Text.A11y.VerticalTabs" xml:space="preserve">செங்குத்து தாவல்கள்</x:String>
   <x:String x:Key="Text.Address.Copy" xml:space="preserve">முகவரியை நகலெடு</x:String>
@@ -10,7 +12,6 @@
   <x:String x:Key="Text.Bookmarks.AddFolderMenu" xml:space="preserve">கோப்புறையைச் சேர்...</x:String>
   <x:String x:Key="Text.Bookmarks.AddFolderTitle" xml:space="preserve">கோப்புறையைச் சேர்</x:String>
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">புத்தகக்குறிகளில் சேர்க்க இங்கே ஒரு கோப்புறையை இழுத்து விடுங்கள்</x:String>
-  <x:String x:Key="Text.Bookmarks.Hide" xml:space="preserve">புத்தகக்குறிப் பட்டியை மறை</x:String>
   <x:String x:Key="Text.Bookmarks.NewFolderName" xml:space="preserve">புதிய கோப்புறை</x:String>
   <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">பெயர் மாற்று...</x:String>
   <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">புத்தகக்குறியின் பெயரை மாற்று</x:String>
@@ -168,7 +169,6 @@
   <x:String x:Key="Text.License.Status.TrialExpired" xml:space="preserve">சோதனை முடிந்தது (உரிமம் தேவை)</x:String>
   <x:String x:Key="Text.Menu.About" xml:space="preserve">Kiriha பற்றி</x:String>
   <x:String x:Key="Text.Menu.AccessDenied" xml:space="preserve">(அணுக முடியவில்லை)</x:String>
-  <x:String x:Key="Text.Menu.BookmarksBar" xml:space="preserve">புத்தகக்குறிப் பட்டி</x:String>
   <x:String x:Key="Text.Menu.CheckUpdate" xml:space="preserve">புதுப்பிப்புகளைச் சரிபார்</x:String>
   <x:String x:Key="Text.Menu.Empty" xml:space="preserve">(காலி)</x:String>
   <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">புதிய சாளரம்</x:String>
@@ -290,7 +290,6 @@
   <x:String x:Key="Text.Settings.Shortcuts.Subtitle" xml:space="preserve">வேகமாக வேலை செய்யும் விசைப்பலகைக் குறுக்குவழிகள்</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.Tabs" xml:space="preserve">தாவல்கள்</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.TabsBody" xml:space="preserve">Ctrl+T　புதிய தாவல்&#10;Ctrl+W　தாவலை மூடு&#10;Ctrl+Shift+T　மூடிய தாவலை மீண்டும் திற&#10;Ctrl+Tab　தாவல்களை மாற்று&#10;Ctrl+1..9　குறிப்பிட்ட தாவலைத் தேர்ந்தெடு</x:String>
-  <x:String x:Key="Text.Settings.ShowBookmarksBar" xml:space="preserve">புத்தகக்குறிப் பட்டியைக் காட்டு (Ctrl+Shift+B)</x:String>
   <x:String x:Key="Text.Settings.ShowCheckBoxes" xml:space="preserve">உருப்படித் தேர்வுப்பெட்டிகளைக் காட்டு</x:String>
   <x:String x:Key="Text.Settings.ShowExtensions" xml:space="preserve">கோப்பு நீட்டிப்புகளைக் காட்டு</x:String>
   <x:String x:Key="Text.Settings.ShowHidden" xml:space="preserve">மறைந்த கோப்புகளைக் காட்டு</x:String>
@@ -324,12 +323,12 @@
   <x:String x:Key="Text.Share.OpenFailed" xml:space="preserve">பகிர்வுப் பலகத்தைத் திறக்க முடியவில்லை</x:String>
   <x:String x:Key="Text.Share.PrepareFailed" xml:space="preserve">பகிரும் தரவைத் தயாரிக்க முடியவில்லை</x:String>
   <x:String x:Key="Text.Share.SelectFiles" xml:space="preserve">பகிர விரும்பும் கோப்புகளைத் தேர்ந்தெடுக்கவும்</x:String>
+  <x:String x:Key="Text.Sidebar.Bookmarks" xml:space="preserve">புத்தகக்குறிகள்</x:String>
   <x:String x:Key="Text.Sidebar.Drives" xml:space="preserve">இயக்ககங்கள்</x:String>
   <x:String x:Key="Text.Sidebar.QuickAccess" xml:space="preserve">விரைவு அணுகல்</x:String>
   <x:String x:Key="Text.Sidebar.RecentFiles" xml:space="preserve">சமீபத்திய கோப்புகள்</x:String>
   <x:String x:Key="Text.Sidebar.RecycleBin" xml:space="preserve">மறுசுழற்சிக் கூடை</x:String>
   <x:String x:Key="Text.Sidebar.RecycleBinTip" xml:space="preserve">மறுசுழற்சிக் கூடையை எக்ஸ்ப்ளோரரில் திற</x:String>
-  <x:String x:Key="Text.Sidebar.ToggleTip" xml:space="preserve">விரைவு அணுகலுக்கும் கோப்புறை மரத்திற்கும் இடையே மாற்றும்</x:String>
   <x:String x:Key="Text.Sidebar.TreeView" xml:space="preserve">மரக் காட்சி</x:String>
   <x:String x:Key="Text.Sort.Ascending" xml:space="preserve">ஏறுவரிசை</x:String>
   <x:String x:Key="Text.Sort.Descending" xml:space="preserve">இறங்குவரிசை</x:String>

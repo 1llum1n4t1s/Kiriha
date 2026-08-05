@@ -18,22 +18,35 @@ public partial class FileSystemEntry : ObservableObject
     /// <summary>ドライブ一覧（PC 表示）での 1 行かどうか。</summary>
     public bool IsDrive { get; init; }
 
-    /// <summary>ファイルサイズ（バイト）。フォルダー / ドライブは null。</summary>
-    public long? Size { get; init; }
+    // 以下は同じファイルでも読み直しのたびに変わりうる値。行を作り直さずその場で更新できるよう
+    // 変更通知付きにしてある（作り直すと一覧ごと差し替わって点滅するため。UpdateFrom を参照）。
 
-    public DateTime? Modified { get; init; }
+    /// <summary>ファイルサイズ（バイト）。フォルダー / ドライブは null。</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(SizeText), nameof(HasSizeText), nameof(RowTooltip))]
+    private long? _size;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ModifiedText), nameof(RowTooltip))]
+    private DateTime? _modified;
 
     /// <summary>作成日時（オプション列）。</summary>
-    public DateTime? Created { get; init; }
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CreatedText))]
+    private DateTime? _created;
 
     /// <summary>ドライブの使用率（0-100、ドライブ以外は 0）。</summary>
-    public double DriveUsedPercent { get; init; }
+    [ObservableProperty]
+    private double _driveUsedPercent;
 
     /// <summary>隠し属性（エクスプローラーと同じく薄く表示する）。</summary>
-    public bool IsHidden { get; init; }
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(RowOpacity))]
+    private bool _isHidden;
 
     /// <summary>読み取り専用属性（列挙時に取得済み。「読み取り専用項目を選択」で同期 I/O を避けるため）。</summary>
-    public bool IsReadOnly { get; init; }
+    [ObservableProperty]
+    private bool _isReadOnly;
 
     /// <summary>切り取り済み（エクスプローラーと同じく半透明表示する）。</summary>
     [ObservableProperty]
@@ -95,6 +108,37 @@ public partial class FileSystemEntry : ObservableObject
         WindowsIcon = null;
     }
 
+    /// <summary>読み直した項目が、この行と同じものとして扱えるか（パスは呼び出し側で突き合わせ済み）。
+    /// ここで見るのは行を作り直さないと反映できない値だけ。サイズや日時のように後から変わる値は
+    /// UpdateFrom がその場で更新するので、作り直す理由にはしない。</summary>
+    public bool IsSameRowAs(FileSystemEntry other)
+        => IsDirectory == other.IsDirectory
+           && IsDrive == other.IsDrive
+           && Name == other.Name
+           && DisplayName == other.DisplayName;
+
+    /// <summary>読み直した内容をこの行へ写す。行を作り直さないので、読み込み済みのサムネイル・
+    /// シェルアイコン・選択状態がそのまま残り、変わった値だけが差し替わる（＝一覧が点滅しない）。
+    /// 戻り値はファイルの中身が変わったか（＝サムネイルの読み直しが要るか）。</summary>
+    public bool UpdateFrom(FileSystemEntry fresh)
+    {
+        var contentChanged = Size != fresh.Size || Modified != fresh.Modified;
+        Size = fresh.Size;
+        Modified = fresh.Modified;
+        Created = fresh.Created;
+        IsHidden = fresh.IsHidden;
+        IsReadOnly = fresh.IsReadOnly;
+        IsCut = fresh.IsCut;
+        DriveUsedPercent = fresh.DriveUsedPercent;
+        SizeTextOverride = fresh.SizeTextOverride;
+        DriveFormat = fresh.DriveFormat;
+        MaterialIconKey = fresh.MaterialIconKey;
+        return contentChanged;
+    }
+
+    /// <summary>サムネイルを読み直させる。いま出ている画像は差し替わるまで残すので行が空欄にならない。</summary>
+    public void InvalidateThumbnail() => IsThumbnailFinal = false;
+
     /// <summary>設定切替時に、フォルダーを再列挙せず Material アイコンキーだけを更新する。</summary>
     public void UpdateMaterialIconKey(bool enabled, bool preferLight)
         => MaterialIconKey = enabled && !IsDrive
@@ -104,13 +148,16 @@ public partial class FileSystemEntry : ObservableObject
     /// <summary>切り取り / 隠し属性を反映した行の不透明度。</summary>
     public double RowOpacity => IsCut ? 0.45 : IsHidden ? 0.6 : 1.0;
 
-    public string Icon
+    public string Icon => ResolveEmojiIcon(Name, IsDirectory, IsDrive);
+
+    /// <summary>絵文字アイコンセット（<see cref="Services.FileIconSet.Original"/>）での表示文字。
+    /// お気に入りなど、ファイル一覧の行以外からも同じ見た目を出すために static で公開する。</summary>
+    public static string ResolveEmojiIcon(string name, bool isDirectory, bool isDrive = false)
     {
-        get
         {
-            if (IsDrive) return "💾";
-            if (IsDirectory) return "📁";
-            return Path.GetExtension(Name).ToLowerInvariant() switch
+            if (isDrive) return "💾";
+            if (isDirectory) return "📁";
+            return Path.GetExtension(name).ToLowerInvariant() switch
             {
                 ".jpg" or ".jpeg" or ".png" or ".gif" or ".bmp" or ".webp" or ".ico" or ".svg" => "🖼",
                 ".3fr" or ".ari" or ".arw" or ".bay" or ".cap" or ".cr2" or ".cr3" or ".crw"
@@ -137,7 +184,9 @@ public partial class FileSystemEntry : ObservableObject
     }
 
     /// <summary>サイズ列の表示を上書きする（ドライブの「空き / 合計」表示用）。</summary>
-    public string? SizeTextOverride { get; init; }
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(SizeText), nameof(HasSizeText), nameof(RowTooltip))]
+    private string? _sizeTextOverride;
 
     public string SizeText => SizeTextOverride ?? (Size is not { } size ? "" : FormatSize(size));
 
@@ -164,7 +213,9 @@ public partial class FileSystemEntry : ObservableObject
            + (Modified is { } m ? "\n" + LocalizationService.Text("Text.Tooltip.Modified", m.ToString("yyyy/MM/dd HH:mm:ss")) : "");
 
     /// <summary>ドライブのファイルシステム（NTFS 等）。</summary>
-    public string? DriveFormat { get; init; }
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TypeText), nameof(RowTooltip))]
+    private string? _driveFormat;
 
     public string TypeText
     {

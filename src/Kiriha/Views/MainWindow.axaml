@@ -322,7 +322,7 @@
                          ギャラリー表示で隠したとき行ごと畳むため -->
                     <!-- 最終行（ステータスバー）も Auto。高さは要素側の 28 で決め、隠したときは
                          行ごと畳む（固定 28 にすると、非表示でも下端に空の帯が残る）。 -->
-                    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" Background="{DynamicResource ContentBg}"
+                    <Grid RowDefinitions="Auto,Auto,*,Auto" Background="{DynamicResource ContentBg}"
                           IsVisible="{Binding IsNormalTab}">
 
                         <!-- ナビゲーション + アドレスバー（テキスト表示） + 検索。ギャラリー表示でも残し、
@@ -452,56 +452,8 @@
                             </Border>
                         </Grid>
 
-                        <!-- お気に入りバー（Ctrl+Shift+B で表示切替 / DnD 登録 / Chrome 互換右クリック）。ギャラリー表示中は隠す -->
-                        <Border Grid.Row="1" Classes="bookmarkbar" Height="32"
-                                Background="{DynamicResource TabActiveBg}"
-                                BorderBrush="{DynamicResource Divider}" BorderThickness="0,0,0,1"
-                                DragDrop.AllowDrop="True"
-                                PointerReleased="BookmarkBar_PointerReleased">
-                            <Border.IsVisible>
-                                <MultiBinding Converter="{x:Static BoolConverters.And}">
-                                    <Binding Path="$parent[Window].((vm:MainWindowViewModel)DataContext).ShowBookmarksBar" />
-                                    <Binding Path="!IsGalleryView" />
-                                </MultiBinding>
-                            </Border.IsVisible>
-                            <Panel>
-                            <TextBlock Text="{DynamicResource Text.Bookmarks.Empty}"
-                                       FontSize="11.5" Foreground="{DynamicResource TextSecondary}"
-                                       VerticalAlignment="Center" Margin="14,0"
-                                       IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).HasNoBookmarks}" />
-                            <ScrollViewer HorizontalScrollBarVisibility="Hidden"
-                                          VerticalScrollBarVisibility="Disabled"
-                                          VerticalAlignment="Center" Margin="8,0">
-                                <ItemsControl ItemsSource="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).BookmarkItems}">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <StackPanel Orientation="Horizontal" Spacing="2" />
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate x:DataType="m:BookmarkNode">
-                                            <Button Classes="bookmark"
-                                                    ToolTip.Tip="{Binding Path}"
-                                                    Click="Bookmark_Click"
-                                                    PointerReleased="BookmarkItem_PointerReleased">
-                                                <StackPanel Orientation="Horizontal" Spacing="6">
-                                                    <TextBlock Text="📁" FontSize="11" IsVisible="{Binding IsFolder}"
-                                                               VerticalAlignment="Center" />
-                                                    <TextBlock Text="⭐" FontSize="11" IsVisible="{Binding !IsFolder}"
-                                                               VerticalAlignment="Center" />
-                                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center"
-                                                               MaxWidth="160" TextTrimming="CharacterEllipsis" />
-                                                </StackPanel>
-                                            </Button>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </ScrollViewer>
-                            </Panel>
-                        </Border>
-
                         <!-- コマンドバー（エクスプローラー同等）。ギャラリー表示中は隠す -->
-                        <Border Grid.Row="2" Height="40" Background="{DynamicResource ContentBg}"
+                        <Border Grid.Row="1" Height="40" Background="{DynamicResource ContentBg}"
                                 BorderBrush="{DynamicResource Divider}" BorderThickness="0,0,0,1"
                                 IsVisible="{Binding !IsGalleryView}">
                             <StackPanel Orientation="Horizontal" Margin="10,0" Spacing="2">
@@ -663,9 +615,6 @@
                                             <Separator />
                                             <MenuItem Header="{DynamicResource Text.Common.CopyPath}" Click="CopyPath_Click" InputGesture="Ctrl+Shift+C" />
                                             <MenuItem Header="{DynamicResource Text.Common.Properties}" Command="{Binding ShowPropertiesCommand}" />
-                                            <MenuItem Header="{DynamicResource Text.Menu.BookmarksBar}" ToggleType="CheckBox"
-                                                      IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ShowBookmarksBar}"
-                                                      Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ToggleBookmarksBarCommand}" />
                                             <Separator />
                                             <MenuItem Header="{DynamicResource Text.Menu.NewWindow}" Click="NewWindow_Click" InputGesture="Ctrl+N" />
                                             <MenuItem Header="{DynamicResource Text.Menu.CheckUpdate}" Click="CheckUpdate_Click" />
@@ -678,7 +627,7 @@
                         </Border>
 
                         <!-- 左ペイン + ファイル一覧 + プレビュー -->
-                        <Grid Grid.Row="3" ColumnDefinitions="Auto,Auto,*,Auto,Auto">
+                        <Grid Grid.Row="2" ColumnDefinitions="Auto,Auto,*,Auto,Auto">
 
                             <!-- 左ペイン: Windows のクイックアクセス + PC -->
                             <!-- 右の仕切り線は隣の Thumb (colsplit) が描くため Border 側には引かない -->
@@ -691,17 +640,30 @@
                                     </MultiBinding>
                                 </Border.IsVisible>
                                 <Grid RowDefinitions="Auto,Auto,*">
-                                <!-- クイックアクセス / XP 風ツリーの切り替えトグル -->
-                                <ToggleButton Grid.Row="0" Classes="chip" Margin="8,8,8,2"
-                                              HorizontalAlignment="Stretch" FontSize="12"
-                                              IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ShowSidebarTree, Mode=TwoWay}"
-                                              AutomationProperties.Name="{DynamicResource Text.A11y.SwitchToTree}"
-                                              ToolTip.Tip="{DynamicResource Text.Sidebar.ToggleTip}">
-                                    <StackPanel Orientation="Horizontal" Spacing="6">
-                                        <TextBlock Classes="fico" Text="&#xEC0A;" FontSize="12" VerticalAlignment="Center" />
-                                        <TextBlock Text="{DynamicResource Text.Sidebar.TreeView}" VerticalAlignment="Center" />
-                                    </StackPanel>
-                                </ToggleButton>
+                                <!-- 左ペインの表示切り替え（クイックアクセス / ツリー表示 / お気に入り）。
+                                     3 つで 1 組のラジオ相当なので幅を等分する。ラベルはアイコンだけにしてある:
+                                     既定幅 230px を 3 分割すると「クイックアクセス」ですら入り切らず、17 言語には
+                                     日本語より長い表記もあるため、名前はツールチップと読み上げ名で出す。 -->
+                                <Grid Grid.Row="0" Margin="8,8,8,2" ColumnDefinitions="*,*,*" ColumnSpacing="4">
+                                    <ToggleButton Grid.Column="0" Classes="chip" HorizontalAlignment="Stretch"
+                                                  IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsSidebarQuickAccess, Mode=TwoWay}"
+                                                  AutomationProperties.Name="{DynamicResource Text.Sidebar.QuickAccess}"
+                                                  ToolTip.Tip="{DynamicResource Text.Sidebar.QuickAccess}">
+                                        <TextBlock Classes="fico" Text="&#xE718;" FontSize="13" VerticalAlignment="Center" />
+                                    </ToggleButton>
+                                    <ToggleButton Grid.Column="1" Classes="chip" HorizontalAlignment="Stretch"
+                                                  IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsSidebarTree, Mode=TwoWay}"
+                                                  AutomationProperties.Name="{DynamicResource Text.Sidebar.TreeView}"
+                                                  ToolTip.Tip="{DynamicResource Text.Sidebar.TreeView}">
+                                        <TextBlock Classes="fico" Text="&#xEC0A;" FontSize="13" VerticalAlignment="Center" />
+                                    </ToggleButton>
+                                    <ToggleButton Grid.Column="2" Classes="chip" HorizontalAlignment="Stretch"
+                                                  IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsSidebarBookmarks, Mode=TwoWay}"
+                                                  AutomationProperties.Name="{DynamicResource Text.Sidebar.Bookmarks}"
+                                                  ToolTip.Tip="{DynamicResource Text.Sidebar.Bookmarks}">
+                                        <TextBlock Classes="fico" Text="&#xE735;" FontSize="13" VerticalAlignment="Center" />
+                                    </ToggleButton>
+                                </Grid>
 
                                 <!-- ツリーのヘッダー操作（VSCode のエクスプローラーと同じ 4 ボタン:
                                      新しいファイル / 新しいフォルダー / 最新の情報に更新 / すべて折りたたむ）。
@@ -709,7 +671,7 @@
                                      Assets/Codicons/NOTICE.md 参照）。 -->
                                 <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="2" Margin="8,2,8,0"
                                             HorizontalAlignment="Right"
-                                            IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ShowSidebarTree}">
+                                            IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsSidebarTree}">
                                     <Button Classes="treehdr" Click="TreeNewFile_Click"
                                             ToolTip.Tip="{DynamicResource Text.Tree.NewFile}"
                                             AutomationProperties.Name="{DynamicResource Text.Tree.NewFile}">
@@ -749,7 +711,7 @@
                                 <!-- XP 風フォルダーツリー（デスクトップ > マイ ドキュメント / マイ コンピュータ） -->
                                 <TreeView Grid.Row="2" Margin="4,2,0,0"
                                           DragDrop.AllowDrop="True"
-                                          IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ShowSidebarTree}"
+                                          IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsSidebarTree}"
                                           ItemsSource="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SidebarTreeRoots}"
                                           SelectedItem="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SidebarTreeSelectedItem, Mode=TwoWay}"
                                           AutoScrollToSelectedItem="True"
@@ -802,7 +764,7 @@
                                 </TreeView>
 
                                 <ListBox Grid.Row="2" Classes="sidebar"
-                                         IsVisible="{Binding !$parent[Window].((vm:MainWindowViewModel)DataContext).ShowSidebarTree}"
+                                         IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsSidebarQuickAccess}"
                                          DragDrop.AllowDrop="True"
                                          ItemsSource="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SidebarItems}"
                                          Loaded="Sidebar_Loaded"
@@ -831,6 +793,54 @@
                                         </DataTemplate>
                                     </ListBox.DataTemplates>
                                 </ListBox>
+
+                                <!-- お気に入り（旧お気に入りバーの内容。フォルダーノードは入れ子で畳める）。
+                                     ドロップ受け入れとその見た目は bookmarkpane クラスで拾うので、
+                                     ここは Border ごと 1 つの領域として扱う。 -->
+                                <Border Grid.Row="2" Classes="bookmarkpane" Margin="4,2,4,0"
+                                        Background="Transparent" BorderThickness="0,0,0,3" BorderBrush="Transparent"
+                                        DragDrop.AllowDrop="True"
+                                        IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsSidebarBookmarks}"
+                                        PointerReleased="BookmarkPane_PointerReleased">
+                                    <Panel>
+                                        <TextBlock Text="{DynamicResource Text.Bookmarks.Empty}"
+                                                   FontSize="11.5" Foreground="{DynamicResource TextSecondary}"
+                                                   TextWrapping="Wrap" Margin="8,10" VerticalAlignment="Top"
+                                                   IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).HasNoBookmarks}" />
+                                        <TreeView ItemsSource="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).BookmarkItems}"
+                                                  SelectionChanged="BookmarkTree_SelectionChanged"
+                                                  PointerReleased="BookmarkTree_PointerReleased">
+                                            <TreeView.Resources>
+                                                <!-- ツリー表示側と同じくインデントは半分にする -->
+                                                <x:Double x:Key="TreeViewItemIndent">8</x:Double>
+                                            </TreeView.Resources>
+                                            <TreeView.Styles>
+                                                <Style Selector="TreeViewItem">
+                                                    <Setter Property="MinHeight" Value="26" />
+                                                </Style>
+                                            </TreeView.Styles>
+                                            <TreeView.ItemTemplate>
+                                                <!-- アイコンはクイックアクセスと同じ扱い。リンク項目は実体（フォルダー /
+                                                     ファイル）のアイコンを出し、お気に入り内のグループ分けフォルダーだけが
+                                                     📁 のまま（実体を持たないノードのため）。 -->
+                                                <TreeDataTemplate DataType="m:BookmarkNode" ItemsSource="{Binding Children}">
+                                                    <StackPanel Orientation="Horizontal" Spacing="8" Background="Transparent"
+                                                                ToolTip.Tip="{Binding Path}">
+                                                        <Image Source="{Binding IconImage}" Width="16" Height="16"
+                                                               IsVisible="{Binding HasIconImage}"
+                                                               VerticalAlignment="Center" />
+                                                        <TextBlock Text="{Binding Icon}" FontSize="13"
+                                                                   IsVisible="{Binding !HasIconImage}"
+                                                                   VerticalAlignment="Center" />
+                                                        <TextBlock Text="{Binding Name}" FontSize="13"
+                                                                   Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center"
+                                                                   TextTrimming="CharacterEllipsis" />
+                                                    </StackPanel>
+                                                </TreeDataTemplate>
+                                            </TreeView.ItemTemplate>
+                                        </TreeView>
+                                    </Panel>
+                                </Border>
                                 </Grid>
                             </Border>
 
@@ -900,7 +910,8 @@
                                              DoubleTapped="FileList_DoubleTapped"
                                              SelectionChanged="FileList_SelectionChanged"
                                              PointerReleased="FileList_PointerReleased"
-                                             KeyDown="FileList_KeyDown">
+                                             KeyDown="FileList_KeyDown"
+                                             TextInput="FileList_TextInput">
                                         <ListBox.ItemTemplate>
                                             <DataTemplate x:DataType="m:FileSystemEntry">
                                                 <ItemsControl Margin="8,0,0,0"
@@ -985,7 +996,8 @@
                                              DoubleTapped="FileList_DoubleTapped"
                                              SelectionChanged="FileList_SelectionChanged"
                                              PointerReleased="FileList_PointerReleased"
-                                             KeyDown="FileList_KeyDown">
+                                             KeyDown="FileList_KeyDown"
+                                             TextInput="FileList_TextInput">
                                         <ListBox.ItemsPanel>
                                             <ItemsPanelTemplate>
                                                 <c:VirtualizingWrapPanel Orientation="{Binding ListOrientation}"
@@ -1031,7 +1043,8 @@
                                              DoubleTapped="FileList_DoubleTapped"
                                              SelectionChanged="FileList_SelectionChanged"
                                              PointerReleased="FileList_PointerReleased"
-                                             KeyDown="FileList_KeyDown">
+                                             KeyDown="FileList_KeyDown"
+                                             TextInput="FileList_TextInput">
                                         <ListBox.ItemsPanel>
                                             <ItemsPanelTemplate>
                                                 <c:VirtualizingWrapPanel ItemWidth="254" ItemHeight="59" CacheRows="2" />
@@ -1108,7 +1121,8 @@
                                              DoubleTapped="FileList_DoubleTapped"
                                              SelectionChanged="FileList_SelectionChanged"
                                              PointerReleased="FileList_PointerReleased"
-                                             KeyDown="FileList_KeyDown">
+                                             KeyDown="FileList_KeyDown"
+                                             TextInput="FileList_TextInput">
                                         <ListBox.IsVisible>
                                             <MultiBinding Converter="{x:Static BoolConverters.And}">
                                                 <Binding Path="IsIconsView" />
@@ -1422,6 +1436,7 @@
                                                  SelectionChanged="FileList_SelectionChanged"
                                                  PointerReleased="FileList_PointerReleased"
                                                  KeyDown="FileList_KeyDown"
+                                             TextInput="FileList_TextInput"
                                                  ScrollViewer.VerticalScrollBarVisibility="Disabled"
                                                  ScrollViewer.HorizontalScrollBarVisibility="Auto">
                                             <ListBox.ItemsPanel>
@@ -1507,7 +1522,7 @@
                         </Grid>
 
                         <!-- ステータスバー（左: パンくず / 右: 項目数 | 選択情報 | 空き領域） -->
-                        <Border Grid.Row="4" Height="28" Background="{DynamicResource StatusBg}"
+                        <Border Grid.Row="3" Height="28" Background="{DynamicResource StatusBg}"
                                 BorderBrush="{DynamicResource Divider}" BorderThickness="0,1,0,0">
                             <!-- ギャラリーの全画面表示中は畳む（画像だけを見せる） -->
                             <Border.IsVisible>
@@ -1631,8 +1646,9 @@
 
     </Grid>
 
-    <!-- パスコピー等の一時通知トースト（ドラッグ中プレビューと同じ視覚言語で、アドレスバー直下に出す）。 -->
-    <Border x:Name="PathCopyToast" IsVisible="False" Opacity="0" ZIndex="900"
+    <!-- 切り取り / コピー / パス・リンクのコピーの結果を知らせる一時通知トースト
+         （ドラッグ中プレビューと同じ視覚言語で、アドレスバー直下に出す）。 -->
+    <Border x:Name="ActionToast" IsVisible="False" Opacity="0" ZIndex="900"
             HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,92,0,0"
             Padding="11,8" CornerRadius="13"
             Background="{DynamicResource ContentBg}"
@@ -1646,10 +1662,11 @@
         <StackPanel Orientation="Horizontal" Spacing="9">
             <Border MinWidth="52" Padding="8,4" CornerRadius="9"
                     Background="{DynamicResource AccentBrush}" VerticalAlignment="Center">
-                <TextBlock Text="{DynamicResource Text.Common.Copy}" FontSize="10.5" FontWeight="SemiBold" Foreground="White"
+                <TextBlock x:Name="ActionToastLabel" Text="{DynamicResource Text.Common.Copy}"
+                           FontSize="10.5" FontWeight="SemiBold" Foreground="White"
                            HorizontalAlignment="Center" />
             </Border>
-            <TextBlock x:Name="PathCopyToastText" FontSize="12.5" FontWeight="SemiBold"
+            <TextBlock x:Name="ActionToastText" FontSize="12.5" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center"
                        MaxWidth="520" TextTrimming="CharacterEllipsis" />
         </StackPanel>

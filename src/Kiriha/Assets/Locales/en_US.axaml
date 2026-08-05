@@ -1,7 +1,9 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:String x:Key="StringTextFlyoutCopyText" xml:space="preserve">Copy</x:String>
+  <x:String x:Key="StringTextFlyoutCutText" xml:space="preserve">Cut</x:String>
+  <x:String x:Key="StringTextFlyoutPasteText" xml:space="preserve">Paste</x:String>
   <x:String x:Key="Text.A11y.OpenSubfolders" xml:space="preserve">Show subfolders</x:String>
   <x:String x:Key="Text.A11y.ResizeVerticalTabs" xml:space="preserve">Resize the vertical tab bar</x:String>
-  <x:String x:Key="Text.A11y.SwitchToTree" xml:space="preserve">Switch to tree view</x:String>
   <x:String x:Key="Text.A11y.ToggleSidebar" xml:space="preserve">Toggle sidebar</x:String>
   <x:String x:Key="Text.A11y.VerticalTabs" xml:space="preserve">Vertical tabs</x:String>
   <x:String x:Key="Text.Address.Copy" xml:space="preserve">Copy address</x:String>
@@ -10,7 +12,6 @@
   <x:String x:Key="Text.Bookmarks.AddFolderMenu" xml:space="preserve">Add folder...</x:String>
   <x:String x:Key="Text.Bookmarks.AddFolderTitle" xml:space="preserve">Add folder</x:String>
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">Drag a folder here to add it to your bookmarks</x:String>
-  <x:String x:Key="Text.Bookmarks.Hide" xml:space="preserve">Hide bookmarks bar</x:String>
   <x:String x:Key="Text.Bookmarks.NewFolderName" xml:space="preserve">New folder</x:String>
   <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">Rename...</x:String>
   <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">Rename bookmark</x:String>
@@ -168,7 +169,6 @@
   <x:String x:Key="Text.License.Status.TrialExpired" xml:space="preserve">Trial ended (a license is required)</x:String>
   <x:String x:Key="Text.Menu.About" xml:space="preserve">About Kiriha</x:String>
   <x:String x:Key="Text.Menu.AccessDenied" xml:space="preserve">(Access denied)</x:String>
-  <x:String x:Key="Text.Menu.BookmarksBar" xml:space="preserve">Bookmarks bar</x:String>
   <x:String x:Key="Text.Menu.CheckUpdate" xml:space="preserve">Check for updates</x:String>
   <x:String x:Key="Text.Menu.Empty" xml:space="preserve">(Empty)</x:String>
   <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">New window</x:String>
@@ -290,7 +290,6 @@
   <x:String x:Key="Text.Settings.Shortcuts.Subtitle" xml:space="preserve">Keyboard shortcuts for working faster</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.Tabs" xml:space="preserve">Tabs</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.TabsBody" xml:space="preserve">Ctrl+T　New tab&#10;Ctrl+W　Close tab&#10;Ctrl+Shift+T　Reopen closed tab&#10;Ctrl+Tab　Switch tabs&#10;Ctrl+1..9　Select a specific tab</x:String>
-  <x:String x:Key="Text.Settings.ShowBookmarksBar" xml:space="preserve">Show the bookmarks bar (Ctrl+Shift+B)</x:String>
   <x:String x:Key="Text.Settings.ShowCheckBoxes" xml:space="preserve">Show item check boxes</x:String>
   <x:String x:Key="Text.Settings.ShowExtensions" xml:space="preserve">Show file name extensions</x:String>
   <x:String x:Key="Text.Settings.ShowHidden" xml:space="preserve">Show hidden files</x:String>
@@ -324,12 +323,12 @@
   <x:String x:Key="Text.Share.OpenFailed" xml:space="preserve">Could not open the share sheet</x:String>
   <x:String x:Key="Text.Share.PrepareFailed" xml:space="preserve">Could not prepare the data to share</x:String>
   <x:String x:Key="Text.Share.SelectFiles" xml:space="preserve">Select the files you want to share</x:String>
+  <x:String x:Key="Text.Sidebar.Bookmarks" xml:space="preserve">Bookmarks</x:String>
   <x:String x:Key="Text.Sidebar.Drives" xml:space="preserve">Drives</x:String>
   <x:String x:Key="Text.Sidebar.QuickAccess" xml:space="preserve">Quick access</x:String>
   <x:String x:Key="Text.Sidebar.RecentFiles" xml:space="preserve">Recent files</x:String>
   <x:String x:Key="Text.Sidebar.RecycleBin" xml:space="preserve">Recycle Bin</x:String>
   <x:String x:Key="Text.Sidebar.RecycleBinTip" xml:space="preserve">Open the Recycle Bin in File Explorer</x:String>
-  <x:String x:Key="Text.Sidebar.ToggleTip" xml:space="preserve">Switch between Quick access and the folder tree</x:String>
   <x:String x:Key="Text.Sidebar.TreeView" xml:space="preserve">Tree view</x:String>
   <x:String x:Key="Text.Sort.Ascending" xml:space="preserve">Ascending</x:String>
   <x:String x:Key="Text.Sort.Descending" xml:space="preserve">Descending</x:String>

@@ -1,7 +1,9 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:String x:Key="StringTextFlyoutCopyText" xml:space="preserve">Kopyahin</x:String>
+  <x:String x:Key="StringTextFlyoutCutText" xml:space="preserve">I-cut</x:String>
+  <x:String x:Key="StringTextFlyoutPasteText" xml:space="preserve">I-paste</x:String>
   <x:String x:Key="Text.A11y.OpenSubfolders" xml:space="preserve">Ipakita ang mga subfolder</x:String>
   <x:String x:Key="Text.A11y.ResizeVerticalTabs" xml:space="preserve">Baguhin ang lapad ng patayong tab bar</x:String>
-  <x:String x:Key="Text.A11y.SwitchToTree" xml:space="preserve">Lumipat sa tree view</x:String>
   <x:String x:Key="Text.A11y.ToggleSidebar" xml:space="preserve">Ipakita o itago ang sidebar</x:String>
   <x:String x:Key="Text.A11y.VerticalTabs" xml:space="preserve">Mga patayong tab</x:String>
   <x:String x:Key="Text.Address.Copy" xml:space="preserve">Kopyahin ang address</x:String>
@@ -10,7 +12,6 @@
   <x:String x:Key="Text.Bookmarks.AddFolderMenu" xml:space="preserve">Magdagdag ng folder...</x:String>
   <x:String x:Key="Text.Bookmarks.AddFolderTitle" xml:space="preserve">Magdagdag ng folder</x:String>
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">I-drag dito ang isang folder para idagdag sa mga bookmark</x:String>
-  <x:String x:Key="Text.Bookmarks.Hide" xml:space="preserve">Itago ang bookmarks bar</x:String>
   <x:String x:Key="Text.Bookmarks.NewFolderName" xml:space="preserve">Bagong folder</x:String>
   <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">Palitan ang pangalan...</x:String>
   <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">Palitan ang pangalan ng bookmark</x:String>
@@ -168,7 +169,6 @@
   <x:String x:Key="Text.License.Status.TrialExpired" xml:space="preserve">Tapos na ang pagsubok (kailangan ng lisensya)</x:String>
   <x:String x:Key="Text.Menu.About" xml:space="preserve">Tungkol sa Kiriha</x:String>
   <x:String x:Key="Text.Menu.AccessDenied" xml:space="preserve">(Tinanggihan ang pag-access)</x:String>
-  <x:String x:Key="Text.Menu.BookmarksBar" xml:space="preserve">Bookmarks bar</x:String>
   <x:String x:Key="Text.Menu.CheckUpdate" xml:space="preserve">Maghanap ng update</x:String>
   <x:String x:Key="Text.Menu.Empty" xml:space="preserve">(Walang laman)</x:String>
   <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">Bagong window</x:String>
@@ -290,7 +290,6 @@
   <x:String x:Key="Text.Settings.Shortcuts.Subtitle" xml:space="preserve">Mga keyboard shortcut para mas mabilis magtrabaho</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.Tabs" xml:space="preserve">Mga tab</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.TabsBody" xml:space="preserve">Ctrl+T　Bagong tab&#10;Ctrl+W　Isara ang tab&#10;Ctrl+Shift+T　Buksan ulit ang naisarang tab&#10;Ctrl+Tab　Lumipat ng tab&#10;Ctrl+1..9　Pumili ng partikular na tab</x:String>
-  <x:String x:Key="Text.Settings.ShowBookmarksBar" xml:space="preserve">Ipakita ang bookmarks bar (Ctrl+Shift+B)</x:String>
   <x:String x:Key="Text.Settings.ShowCheckBoxes" xml:space="preserve">Ipakita ang mga check box ng item</x:String>
   <x:String x:Key="Text.Settings.ShowExtensions" xml:space="preserve">Ipakita ang mga extension ng file</x:String>
   <x:String x:Key="Text.Settings.ShowHidden" xml:space="preserve">Ipakita ang mga nakatagong file</x:String>
@@ -324,12 +323,12 @@
   <x:String x:Key="Text.Share.OpenFailed" xml:space="preserve">Hindi mabuksan ang share sheet</x:String>
   <x:String x:Key="Text.Share.PrepareFailed" xml:space="preserve">Hindi maihanda ang datos na ibabahagi</x:String>
   <x:String x:Key="Text.Share.SelectFiles" xml:space="preserve">Piliin ang mga file na nais mong ibahagi</x:String>
+  <x:String x:Key="Text.Sidebar.Bookmarks" xml:space="preserve">Mga Bookmark</x:String>
   <x:String x:Key="Text.Sidebar.Drives" xml:space="preserve">Mga drive</x:String>
   <x:String x:Key="Text.Sidebar.QuickAccess" xml:space="preserve">Quick access</x:String>
   <x:String x:Key="Text.Sidebar.RecentFiles" xml:space="preserve">Kamakailang mga file</x:String>
   <x:String x:Key="Text.Sidebar.RecycleBin" xml:space="preserve">Recycle Bin</x:String>
   <x:String x:Key="Text.Sidebar.RecycleBinTip" xml:space="preserve">Buksan ang Recycle Bin sa File Explorer</x:String>
-  <x:String x:Key="Text.Sidebar.ToggleTip" xml:space="preserve">Lumipat sa pagitan ng Quick access at tree ng folder</x:String>
   <x:String x:Key="Text.Sidebar.TreeView" xml:space="preserve">Tree view</x:String>
   <x:String x:Key="Text.Sort.Ascending" xml:space="preserve">Pataas</x:String>
   <x:String x:Key="Text.Sort.Descending" xml:space="preserve">Pababa</x:String>

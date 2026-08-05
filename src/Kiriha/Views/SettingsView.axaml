@@ -62,8 +62,6 @@
                                                           IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptShowExtensions}" />
                                                 <CheckBox Content="{DynamicResource Text.Settings.ShowCheckBoxes}"
                                                           IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptShowCheckBoxes}" />
-                                                <CheckBox Content="{DynamicResource Text.Settings.ShowBookmarksBar}"
-                                                          IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ShowBookmarksBar}" />
                                             </StackPanel>
                                         </HeaderedContentControl>
 

@@ -433,20 +433,6 @@
             <Setter Property="BorderThickness" Value="3,0,0,0" />
         </Style>
 
-        <!-- お気に入りバーのボタン -->
-        <Style Selector="Button.bookmark">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="CornerRadius" Value="10" />
-            <Setter Property="Padding" Value="8,3" />
-            <Setter Property="FontSize" Value="12.5" />
-            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-        </Style>
-        <Style Selector="Button.bookmark:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource HoverBg}" />
-        </Style>
-
         <!-- 左ペイン（クイックアクセス / PC） -->
         <Style Selector="ListBox.sidebar">
             <Setter Property="Background" Value="Transparent" />
@@ -572,7 +558,9 @@
             <Setter Property="BorderThickness" Value="2" />
             <Setter Property="CornerRadius" Value="6" />
         </Style>
-        <Style Selector="Border.bookmarkbar.filedroptarget">
+        <!-- お気に入りペインへのドロップ。枠の太さは既定でも 0,0,0,3 を透明で確保してあるので、
+             ハイライトが出てもツリーの位置がずれない。 -->
+        <Style Selector="Border.bookmarkpane.filedroptarget">
             <Setter Property="Background" Value="{DynamicResource AccentSelectionBrush}" />
             <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
             <Setter Property="BorderThickness" Value="0,0,0,3" />

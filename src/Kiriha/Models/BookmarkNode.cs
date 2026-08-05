@@ -1,7 +1,10 @@
+using System.Text.Json.Serialization;
+using CommunityToolkit.Mvvm.ComponentModel;
+
 namespace Kiriha.Models;
 
-/// <summary>お気に入りバーの 1 要素（Children が非 null ならフォルダー）。settings.json に永続化する。</summary>
-public sealed class BookmarkNode
+/// <summary>お気に入りの 1 要素（Children が非 null ならフォルダー）。settings.json に永続化する。</summary>
+public sealed partial class BookmarkNode : ObservableObject
 {
     public string Name { get; set; } = "";
 
@@ -12,4 +15,49 @@ public sealed class BookmarkNode
     public List<BookmarkNode>? Children { get; set; }
 
     public bool IsFolder => Children is not null;
+
+    // 以下は表示用で settings.json には出さない（[property: JsonIgnore]）。
+    // アイコンの解決は Directory.Exists やシェル呼び出しを伴いバックグラウンドで行うため、
+    // 後から届いた結果をツリーへ反映できるよう変更通知付きにしてある
+    // （コレクションを作り直す方式にすると、フォルダーノードの開閉状態が毎回失われる）。
+
+    /// <summary>絵文字アイコンセットでの表示文字。画像アイコンが無いときの表示でもある。</summary>
+    [ObservableProperty]
+    [property: JsonIgnore]
+    private string _icon = "📁";
+
+    /// <summary>アイコンセット設定に応じた画像アイコン（Material / Windows Shell）。null なら絵文字で描画する。</summary>
+    [ObservableProperty]
+    [property: JsonIgnore]
+    [NotifyPropertyChangedFor(nameof(HasIconImage))]
+    private Avalonia.Media.IImage? _iconImage;
+
+    /// <summary>IconImage をこの項目が所有するか（Windows Shell アイコンは所有、Material はキャッシュ共有で解放禁止）。</summary>
+    [ObservableProperty]
+    [property: JsonIgnore]
+    private bool _ownsIconImage;
+
+    /// <summary>リンク先の実体がフォルダーか（お気に入りにはファイルも置ける）。
+    /// 判定はアイコン解決と同じバックグラウンド処理で行う。既定は true で、
+    /// 未解決のうちに選ばれてもフォルダーとして扱う（大半がフォルダーのため）。</summary>
+    [ObservableProperty]
+    [property: JsonIgnore]
+    private bool _isDirectoryTarget = true;
+
+    [JsonIgnore]
+    public bool HasIconImage => IconImage is not null;
+
+    /// <summary>表示アイコンと実体種別を差し替える。所有していた Shell アイコンはここで解放する。</summary>
+    public void SetIcon(string icon, Avalonia.Media.IImage? image, bool ownsImage, bool isDirectory)
+    {
+        IsDirectoryTarget = isDirectory;
+        if (OwnsIconImage && IconImage is Avalonia.Media.Imaging.Bitmap bitmap && !ReferenceEquals(bitmap, image))
+        {
+            bitmap.Dispose();
+        }
+
+        Icon = icon;
+        IconImage = image;
+        OwnsIconImage = ownsImage && image is not null;
+    }
 }

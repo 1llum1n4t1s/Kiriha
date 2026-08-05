@@ -112,6 +112,12 @@ public partial class MainWindow : Window
         // 同一パス再読み込み（F5・シェル verb 後の保険リフレッシュ等）後の複数選択復元
         TabViewModel.SelectionRestoreRequested += OnTabSelectionRestoreRequested;
 
+        // 上の階層へ戻ったとき・先頭一致ジャンプのスクロール（スクロールは ListBox 側の機能）
+        TabViewModel.RevealEntryRequested += OnTabRevealEntryRequested;
+
+        // 切り取り / コピーの結果トースト
+        TabViewModel.ToastRequested += OnTabToastRequested;
+
         // ギャラリー表示からの Esc 復帰。ListBox が Escape を内部処理（選択解除）で消費するため、
         // トンネル段階で先に拾う。テキスト入力中（検索・パス編集）は各自の Esc 処理を優先する。
         AddHandler(KeyDownEvent, GalleryEscape_KeyDown, RoutingStrategies.Tunnel);
@@ -365,7 +371,7 @@ public partial class MainWindow : Window
         switch (e.Key)
         {
             case Key.B when ctrl && shift:
-                vm.ToggleBookmarksBarCommand.Execute(null);
+                vm.ToggleBookmarksPaneCommand.Execute(null);
                 break;
             case Key.T when ctrl && shift:
                 vm.ReopenClosedTabCommand.Execute(null);
@@ -480,7 +486,7 @@ public partial class MainWindow : Window
                 if (tab is { IsSettingsTab: false } && tab.CurrentPath != FileSystemService.ComputerPath)
                 {
                     vm.AddBookmark(tab.CurrentPath);
-                    vm.ShowBookmarksBar = true;
+                    vm.ShowBookmarksPane();
                 }
 
                 break;
@@ -559,26 +565,6 @@ public partial class MainWindow : Window
 
     protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
     {
-        // お気に入りバー上の縦ホイールは横スクロールに変換する。
-        // 垂直タブは ListBox 標準の縦スクロールをそのまま使う。
-        if (!e.KeyModifiers.HasFlag(KeyModifiers.Control) && e.Source is Visual wheelSource)
-        {
-            var overBookmarks = wheelSource.GetVisualAncestors().OfType<Border>()
-                .Any(b => b.Classes.Contains("bookmarkbar"));
-            if (overBookmarks)
-            {
-                var scroller = wheelSource.GetVisualAncestors().OfType<Border>()
-                    .First(b => b.Classes.Contains("bookmarkbar"))
-                    .GetVisualDescendants().OfType<ScrollViewer>().FirstOrDefault();
-                if (scroller is not null)
-                {
-                    scroller.Offset = scroller.Offset.WithX(scroller.Offset.X - e.Delta.Y * 48);
-                    e.Handled = true;
-                    return;
-                }
-            }
-        }
-
         // ギャラリー表示中の非 Ctrl ホイール:
         //   下部サムネイルストリップ上 → 縦ホイールを横スクロールに変換
         //   メイン画像上             → 前後の画像へ切り替え
@@ -700,11 +686,12 @@ public partial class MainWindow : Window
             return;
         }
 
-        await CopyPathTextAsync(tab, $"\"{tab.CurrentPath}\"");
+        await CopyPathTextAsync(tab, $"\"{tab.CurrentPath}\"", "Text.Command.CopyFolderPath");
     }
 
-    /// <summary>パス文字列をクリップボードへ載せ、結果をステータスバーへ返す。</summary>
-    private async Task CopyPathTextAsync(TabViewModel tab, string text)
+    /// <summary>パス文字列をクリップボードへ載せ、結果をステータスバーとトーストへ返す。
+    /// labelKey は操作名のチップに出すロケールキー（「パスのコピー」「リンクをコピー」）。</summary>
+    private async Task CopyPathTextAsync(TabViewModel tab, string text, string labelKey = "Text.Common.CopyPath")
     {
         if (Clipboard is null)
         {
@@ -716,7 +703,9 @@ public partial class MainWindow : Window
             await Clipboard.SetTextAsync(text);
             // 切り取り / コピーと同じくステータスバーで結果を返す（ツールバーのボタンからだと
             // 見た目が変わらず、コピーできたのか分からないため）。
-            tab.StatusText = LocalizationService.Text("Text.Clipboard.CopiedToClipboard");
+            var message = LocalizationService.Text("Text.Clipboard.CopiedToClipboard");
+            tab.StatusText = message;
+            ShowActionToast(LocalizationService.Text(labelKey), message);
         }
         catch (Exception ex)
         {
@@ -1657,7 +1646,7 @@ public partial class MainWindow : Window
             && tab.CurrentPath != FileSystemService.ComputerPath)
         {
             vm.AddBookmark(tab.CurrentPath);
-            vm.ShowBookmarksBar = true;
+            vm.ShowBookmarksPane();
         }
     }
 
@@ -1890,70 +1879,56 @@ public partial class MainWindow : Window
         e.Handled = true;
     }
 
-    // ===== お気に入りバー =====
+    // ===== 左ペインのお気に入り表示 =====
 
-    private void Bookmark_Click(object? sender, RoutedEventArgs e)
+    /// <summary>お気に入りの項目を選んだときの動作。フォルダーはそのまま移動、ファイルは関連付けアプリで
+    /// 起動する（お気に入りにはファイルも登録できるため）。グループ分けのフォルダーノードは開閉のみ。
+    /// アプリ側からこのツリーの選択を動かすことは無いので、ツリー表示側のような同期ガードは要らない。</summary>
+    private void BookmarkTree_SelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        if (sender is not Button { DataContext: BookmarkNode node } button || ViewModel is not { } vm)
-        {
-            return;
-        }
-
-        if (node.IsFolder)
-        {
-            var flyout = new MenuFlyout { Placement = PlacementMode.BottomEdgeAlignedLeft };
-            PopulateBookmarkMenu(flyout.Items, node.Children!, vm);
-            flyout.ShowAt(button);
-        }
-        else if (node.Path is { } path)
-        {
-            vm.SelectedTab?.NavigateTo(path);
-        }
-    }
-
-    private void PopulateBookmarkMenu(ItemCollection items, List<BookmarkNode> nodes, MainWindowViewModel vm)
-    {
-        if (nodes.Count == 0)
-        {
-            items.Add(new MenuItem { Header = LocalizationService.Text("Text.Menu.Empty"), IsEnabled = false });
-            return;
-        }
-
-        foreach (var node in nodes)
-        {
-            if (node.IsFolder)
-            {
-                var folder = new MenuItem { Header = node.Name, Icon = new TextBlock { Text = "📁" } };
-                PopulateBookmarkMenu(folder.Items, node.Children!, vm);
-                items.Add(folder);
-            }
-            else
-            {
-                var item = new MenuItem { Header = node.Name, Icon = new TextBlock { Text = "⭐" } };
-                var captured = node;
-                item.Click += (_, _) =>
-                {
-                    if (captured.Path is { } path)
-                    {
-                        vm.SelectedTab?.NavigateTo(path);
-                    }
-                };
-                items.Add(item);
-            }
-        }
-    }
-
-    /// <summary>お気に入り項目の右クリック（Chrome 互換: 開き方 / 名前変更 / 削除）。</summary>
-    private async void BookmarkItem_PointerReleased(object? sender, PointerReleasedEventArgs e)
-    {
-        if (sender is not Button { DataContext: BookmarkNode node } button
+        if (sender is not TreeView { SelectedItem: BookmarkNode { IsFolder: false, Path: { } path } node }
             || ViewModel is not { } vm)
         {
             return;
         }
 
-        // 中クリックでバックグラウンドの新しいタブに開く（Chrome 互換）
-        if (e.InitialPressMouseButton == MouseButton.Middle && !node.IsFolder && node.Path is { } midPath)
+        if (node.IsDirectoryTarget)
+        {
+            vm.SelectedTab?.NavigateTo(path);
+            return;
+        }
+
+        OpenBookmarkFile(path);
+    }
+
+    /// <summary>お気に入りに登録されたファイルを関連付けアプリで開く（サイドバーの最近使用したファイルと同じ扱い）。</summary>
+    private static void OpenBookmarkFile(string path)
+    {
+        try
+        {
+            System.Diagnostics.Process.Start(
+                new System.Diagnostics.ProcessStartInfo(path) { UseShellExecute = true })?.Dispose();
+        }
+        catch (Exception ex)
+        {
+            // 起動失敗は UI に出さないが、原因調査（パス消失 / 権限 / 関連付け欠如の切り分け）のためログには残す
+            Logger.LogException($"お気に入りのファイルを開けませんでした: {path}", ex);
+        }
+    }
+
+    /// <summary>お気に入り項目の中クリック / 右クリック（旧お気に入りバーと同じ操作）。</summary>
+    private void BookmarkTree_PointerReleased(object? sender, PointerReleasedEventArgs e)
+    {
+        if (ViewModel is not { } vm
+            || (e.Source as Visual)?.FindAncestorOfType<TreeViewItem>() is not { DataContext: BookmarkNode node } item)
+        {
+            return;
+        }
+
+        // 中クリックでバックグラウンドの新しいタブに開く（Chrome 互換）。
+        // 対象がファイルのお気に入りではタブに開けないので何もしない。
+        if (e.InitialPressMouseButton == MouseButton.Middle
+            && node is { IsFolder: false, IsDirectoryTarget: true, Path: { } midPath })
         {
             vm.OpenInNewTabBackground(midPath);
             e.Handled = true;
@@ -1966,13 +1941,25 @@ public partial class MainWindow : Window
         }
 
         e.Handled = true;
+        ShowBookmarkItemMenu(item, node, vm);
+    }
+
+    /// <summary>お気に入り項目の右クリックメニュー（開き方 / フォルダ追加 / 名前変更 / 削除）。</summary>
+    private void ShowBookmarkItemMenu(Control anchor, BookmarkNode node, MainWindowViewModel vm)
+    {
         var flyout = new MenuFlyout();
 
-        if (!node.IsFolder && node.Path is { } path)
+        if (node is { IsFolder: false, Path: { } path })
         {
-            var openNew = new MenuItem { Header = LocalizationService.Text("Text.Common.OpenInNewTab") };
-            openNew.Click += (_, _) => vm.OpenInNewTab(path);
-            flyout.Items.Add(openNew);
+            // フォルダーはタブで開く。ファイルは関連付けアプリで開く（タブでは開けないため）。
+            var open = node.IsDirectoryTarget
+                ? new MenuItem { Header = LocalizationService.Text("Text.Common.OpenInNewTab") }
+                : new MenuItem { Header = LocalizationService.Text("Text.Common.Open") };
+            open.Click += (_, _) =>
+            {
+                if (node.IsDirectoryTarget) { vm.OpenInNewTab(path); } else { OpenBookmarkFile(path); }
+            };
+            flyout.Items.Add(open);
             flyout.Items.Add(new Separator());
         }
 
@@ -2006,12 +1993,11 @@ public partial class MainWindow : Window
         remove.Click += (_, _) => vm.RemoveBookmark(node);
         flyout.Items.Add(remove);
 
-        flyout.ShowAt(button, showAtPointer: true);
-        await Task.CompletedTask;
+        flyout.ShowAt(anchor, showAtPointer: true);
     }
 
-    /// <summary>お気に入りバー背景の右クリック（Chrome 互換: フォルダ追加 / ソート / 表示切替）。</summary>
-    private void BookmarkBar_PointerReleased(object? sender, PointerReleasedEventArgs e)
+    /// <summary>お気に入りペイン背景の右クリック（Chrome 互換: フォルダ追加 / ソート）。</summary>
+    private void BookmarkPane_PointerReleased(object? sender, PointerReleasedEventArgs e)
     {
         if (e.InitialPressMouseButton != MouseButton.Right
             || sender is not Border bar
@@ -2020,8 +2006,8 @@ public partial class MainWindow : Window
             return;
         }
 
-        // 項目ボタン上は BookmarkItem_PointerReleased が処理済み
-        if ((e.Source as Visual)?.FindAncestorOfType<Button>() is not null)
+        // 項目行の上は BookmarkTree_PointerReleased が処理済み
+        if ((e.Source as Visual)?.FindAncestorOfType<TreeViewItem>() is not null)
         {
             return;
         }
@@ -2059,12 +2045,6 @@ public partial class MainWindow : Window
         var sortPath = new MenuItem { Header = LocalizationService.Text("Text.Bookmarks.SortByPath") };
         sortPath.Click += (_, _) => vm.SortBookmarks(byPath: true);
         flyout.Items.Add(sortPath);
-
-        flyout.Items.Add(new Separator());
-
-        var hide = new MenuItem { Header = LocalizationService.Text("Text.Bookmarks.Hide") };
-        hide.Click += (_, _) => vm.ShowBookmarksBar = false;
-        flyout.Items.Add(hide);
 
         flyout.ShowAt(bar, showAtPointer: true);
     }
@@ -2665,7 +2645,9 @@ public partial class MainWindow : Window
                 if (tab.CutCommand.CanExecute(null)) tab.CutCommand.Execute(null);
                 e.Handled = true;
                 break;
-            case Key.C when ctrl:
+            // Ctrl+Shift+C は「パスのコピー」。ここで消費すると Window.OnKeyDown のフォールバックまで
+            // 届かず、一覧にフォーカスがある間だけ通常のコピーになってしまうため Shift 付きは通す。
+            case Key.C when ctrl && !e.KeyModifiers.HasFlag(KeyModifiers.Shift):
                 if (tab.CopyCommand.CanExecute(null)) tab.CopyCommand.Execute(null);
                 e.Handled = true;
                 break;
@@ -2740,6 +2722,28 @@ public partial class MainWindow : Window
                 tab.GoUpCommand.Execute(null);
                 e.Handled = true;
                 break;
+        }
+    }
+
+    /// <summary>
+    /// 一覧で文字を打ったときの先頭一致ジャンプ（エクスプローラーと同じ。「S」「O」と続けて打つと
+    /// SoftwareDistribution へ移る）。KeyDown ではなく TextInput で受けるのは、キーボード配列や
+    /// IME を通した「実際に入力された文字」がここへ来るため。
+    /// </summary>
+    private void FileList_TextInput(object? sender, TextInputEventArgs e)
+    {
+        // ギャラリーのフィルムストリップは 1 枚ずつ見る場所なので、名前での飛び先変更はしない。
+        if (sender is not ListBox { DataContext: TabViewModel tab } listBox
+            || listBox.Classes.Contains("gallerystrip")
+            || e.Text is not { Length: > 0 } text)
+        {
+            return;
+        }
+
+        if (tab.TypeAheadSelect(text))
+        {
+            // ListBox 既定の Space（選択トグル）などに二重処理させない。
+            e.Handled = true;
         }
     }
 
@@ -2999,33 +3003,39 @@ public partial class MainWindow : Window
         {
             var text = tab.CurrentPath == FileSystemService.ComputerPath ? "PC" : tab.CurrentPath;
             await Clipboard.SetTextAsync(text);
-            ShowPathCopyToast(LocalizationService.Text("Text.Toast.PathCopied", text));
+            ShowActionToast(
+                LocalizationService.Text("Text.Common.CopyPath"),
+                LocalizationService.Text("Text.Toast.PathCopied", text));
         }
     }
 
     /// <summary>連続表示時に古い非表示タイマーが新しいトーストを消さないための世代番号。</summary>
-    private int _pathCopyToastRevision;
+    private int _actionToastRevision;
 
-    /// <summary>アドレスバー直下に一時通知トーストを表示する（約1.8秒でフェードアウト）。</summary>
-    private void ShowPathCopyToast(string message)
+    /// <summary>
+    /// アドレスバー直下に一時通知トーストを表示する（約1.8秒でフェードアウト）。
+    /// label は操作名のチップ（「コピー」「切り取り」など）、message は結果の説明。
+    /// </summary>
+    private void ShowActionToast(string label, string message)
     {
-        var revision = ++_pathCopyToastRevision;
-        PathCopyToastText.Text = message;
-        PathCopyToast.IsVisible = true;
-        PathCopyToast.Opacity = 1;
+        var revision = ++_actionToastRevision;
+        ActionToastLabel.Text = label;
+        ActionToastText.Text = message;
+        ActionToast.IsVisible = true;
+        ActionToast.Opacity = 1;
         DispatcherTimer.RunOnce(() =>
         {
-            if (revision != _pathCopyToastRevision)
+            if (revision != _actionToastRevision)
             {
                 return;
             }
 
-            PathCopyToast.Opacity = 0;
+            ActionToast.Opacity = 0;
             DispatcherTimer.RunOnce(() =>
             {
-                if (revision == _pathCopyToastRevision)
+                if (revision == _actionToastRevision)
                 {
-                    PathCopyToast.IsVisible = false;
+                    ActionToast.IsVisible = false;
                 }
             }, TimeSpan.FromMilliseconds(200));
         }, TimeSpan.FromMilliseconds(1800));
@@ -3364,13 +3374,14 @@ public partial class MainWindow : Window
 
     // ===== DnD（ドロップ受け入れ） =====
 
-    private static bool IsOnBookmarkBar(RoutedEventArgs e)
+    /// <summary>左ペインの「お気に入り」表示の上のドラッグかどうか（落とすとお気に入りに登録される）。</summary>
+    private static bool IsOnBookmarkPane(RoutedEventArgs e)
     {
         var source = e.Source as Visual;
-        return source is Border border && border.Classes.Contains("bookmarkbar")
+        return source is Border border && border.Classes.Contains("bookmarkpane")
                || source?.GetVisualAncestors()
                    .OfType<Border>()
-                   .Any(ancestor => ancestor.Classes.Contains("bookmarkbar")) == true;
+                   .Any(ancestor => ancestor.Classes.Contains("bookmarkpane")) == true;
     }
 
     /// <summary>垂直タブバー（タブ行・背景・新しいタブボタンを含む領域）上のドラッグかどうか。</summary>
@@ -3568,7 +3579,7 @@ public partial class MainWindow : Window
         // タブに重ね続けたらそのタブへ切り替える。別のタブの中のフォルダーへ落とすための導線。
         UpdateTabHoverSwitch(IsOnVerticalTabStrip(e) ? ResolveHoveredTab(e) : null);
 
-        if (IsOnBookmarkBar(e))
+        if (IsOnBookmarkPane(e))
         {
             e.DragEffects = DragDropEffects.Copy;
             UpdateFileDropVisual(e, DragDropEffects.Copy, isBookmark: true);
@@ -3668,8 +3679,8 @@ public partial class MainWindow : Window
 
         // ドロップ先の領域判定は ClearFileDropVisual より先に確定させる。プレビュータブの上で
         // 離した場合、ClearFileDropVisual がそのタブを取り除くと e.Source が視覚ツリーから外れ、
-        // 祖先をたどる IsOnVerticalTabStrip / IsOnBookmarkBar が後から false に変わってしまう。
-        var isOnBookmarkBar = IsOnBookmarkBar(e);
+        // 祖先をたどる IsOnVerticalTabStrip / IsOnBookmarkPane が後から false に変わってしまう。
+        var isOnBookmarkPane = IsOnBookmarkPane(e);
         var isOnTabStrip = IsOnVerticalTabStrip(e);
         var tabStripDropZone = isOnTabStrip ? ResolveTabStripDropZone(e) : 0;
 
@@ -3682,8 +3693,8 @@ public partial class MainWindow : Window
             return;
         }
 
-        // お気に入りバーへのドロップは登録（アプリ内 / アプリ外どちらの DnD も可）
-        if (isOnBookmarkBar)
+        // お気に入りペインへのドロップは登録（アプリ内 / アプリ外どちらの DnD も可）
+        if (isOnBookmarkPane)
         {
             e.Handled = true;
             foreach (var file in files)
@@ -3785,10 +3796,10 @@ public partial class MainWindow : Window
         var source = e.Source as Visual;
         if (isBookmark)
         {
-            return source as Border is { } sourceBorder && sourceBorder.Classes.Contains("bookmarkbar")
+            return source as Border is { } sourceBorder && sourceBorder.Classes.Contains("bookmarkpane")
                 ? sourceBorder
                 : source?.GetVisualAncestors().OfType<Border>()
-                    .FirstOrDefault(border => border.Classes.Contains("bookmarkbar"));
+                    .FirstOrDefault(border => border.Classes.Contains("bookmarkpane"));
         }
 
         var item = source as ListBoxItem ?? source?.FindAncestorOfType<ListBoxItem>();
@@ -4021,6 +4032,100 @@ public partial class MainWindow : Window
         if (FindActiveFileList() is { } listBox)
         {
             ApplyBulkSelection(listBox, entries);
+        }
+    }
+
+    /// <summary>切り取り / コピーの結果トースト（表示中のタブの操作だけ出す）。</summary>
+    private void OnTabToastRequested(TabViewModel tab, TabViewModel.ToastRequest request)
+    {
+        if (ReferenceEquals(ViewModel?.SelectedTab, tab))
+        {
+            ShowActionToast(request.Label, request.Message);
+        }
+    }
+
+    /// <summary>指定行までスクロールする要求（上の階層へ戻ったとき・先頭一致ジャンプ）。</summary>
+    private void OnTabRevealEntryRequested(TabViewModel tab, TabViewModel.RevealRequest request)
+    {
+        if (!ReferenceEquals(ViewModel?.SelectedTab, tab))
+        {
+            return;
+        }
+
+        // 一覧の差し替え直後は行がまだ実体化しておらず ScrollIntoView が効かないため、
+        // レイアウトが一巡してから実行する。
+        Dispatcher.UIThread.Post(() => RevealEntryInList(tab, request), DispatcherPriority.Background);
+    }
+
+    private void RevealEntryInList(TabViewModel tab, TabViewModel.RevealRequest request)
+    {
+        if (!ReferenceEquals(ViewModel?.SelectedTab, tab)
+            || !ReferenceEquals(tab.SelectedEntry, request.Entry)
+            || FindActiveFileList() is not { } listBox)
+        {
+            return;
+        }
+
+        listBox.ScrollIntoView(request.Entry);
+
+        // スクロールで行のコンテナが作り直されるとフォーカスがウィンドウへ落ち、続けて打った文字が
+        // 一覧へ届かなくなる（先頭一致ジャンプが 1 文字目しか効かない）。移動先の行へ必ず戻す。
+        // 中央寄せはさらにスクロールするため、寄せ終えてからフォーカスを当てる。
+        Dispatcher.UIThread.Post(
+            () =>
+            {
+                if (request.Center)
+                {
+                    CenterListItem(listBox, request.Entry);
+                }
+
+                FocusListItem(listBox, request.Entry);
+            },
+            DispatcherPriority.Background);
+    }
+
+    /// <summary>一覧の指定行へキーボードフォーカスを移す（行が未実体化ならリスト自体へ）。</summary>
+    private static void FocusListItem(ListBox listBox, FileSystemEntry entry)
+    {
+        if (listBox.ContainerFromItem(entry) is { } container)
+        {
+            container.Focus();
+        }
+        else
+        {
+            listBox.Focus();
+        }
+    }
+
+    /// <summary>
+    /// 行を一覧の中央へ寄せる。動かすのは項目が並んでいる 1 軸だけにする。
+    /// 詳細表示は列の合計幅が横にあふれるので、両軸を寄せると名前列が画面外へ流れてしまう
+    /// （実測: 上の階層へ戻ると選択行は中央に来るが名前が見えなくなる）。縦にあふれる表示は
+    /// 縦だけ、あふれない表示（一覧表示は列を埋めて右へ伸びる）は横だけを動かす。
+    /// </summary>
+    private static void CenterListItem(ListBox listBox, FileSystemEntry entry)
+    {
+        if (listBox.ContainerFromItem(entry) is not { } container
+            || listBox.FindDescendantOfType<ScrollViewer>() is not { } scroll
+            || container.TranslatePoint(default, scroll) is not { } position)
+        {
+            return;
+        }
+
+        var offset = scroll.Offset;
+        if (scroll.Extent.Height > scroll.Viewport.Height)
+        {
+            var y = Math.Clamp(
+                offset.Y + position.Y - ((scroll.Viewport.Height - container.Bounds.Height) / 2),
+                0, scroll.Extent.Height - scroll.Viewport.Height);
+            scroll.Offset = new Vector(offset.X, y);
+        }
+        else if (scroll.Extent.Width > scroll.Viewport.Width)
+        {
+            var x = Math.Clamp(
+                offset.X + position.X - ((scroll.Viewport.Width - container.Bounds.Width) / 2),
+                0, scroll.Extent.Width - scroll.Viewport.Width);
+            scroll.Offset = new Vector(x, offset.Y);
         }
     }
 

@@ -25,10 +25,7 @@ public sealed class AppSettings
     /// <summary>エクスプローラーの「項目チェックボックス」相当。</summary>
     public bool ShowCheckBoxes { get; set; }
 
-    /// <summary>お気に入りバーの表示状態（Ctrl+Shift+B で切替）。</summary>
-    public bool ShowBookmarksBar { get; set; }
-
-    /// <summary>お気に入りバーの内容。</summary>
+    /// <summary>お気に入りの内容（左ペインの「お気に入り」表示で使う）。</summary>
     public List<Kiriha.Models.BookmarkNode> Bookmarks { get; set; } = new();
 
     /// <summary>最後に使った表示モード（新規タブの既定）。</summary>
@@ -72,7 +69,12 @@ public sealed class AppSettings
     /// <summary>左ペインの表示状態。</summary>
     public bool ShowSidebar { get; set; } = true;
 
-    /// <summary>左ペインにクイックアクセスの代わりに XP 風フォルダーツリーを表示する。</summary>
+    /// <summary>左ペインの表示内容（<see cref="Kiriha.Models.SidebarMode"/> の名前）。
+    /// 空文字は未設定で、旧 <see cref="SidebarShowTree"/> から移行する。</summary>
+    public string SidebarMode { get; set; } = "";
+
+    /// <summary>旧バージョンの「ツリー表示」フラグ。<see cref="SidebarMode"/> へ移行済みだが、
+    /// 既存の settings.json がまだ持っているため読み取り用に残す（移行後は false に固定する）。</summary>
     public bool SidebarShowTree { get; set; }
 
     /// <summary>ツリー表示を現在のフォルダーへ自動追従させる

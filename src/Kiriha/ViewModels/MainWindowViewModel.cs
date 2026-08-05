@@ -28,7 +28,7 @@ public partial class MainWindowViewModel : ObservableObject
     /// <summary>全タブ共通の表示オプション（隠しファイル / 拡張子 / チェックボックス）。</summary>
     public ShellOptions Options { get; }
 
-    /// <summary>お気に入りバーの内容（settings.json に永続化）。</summary>
+    /// <summary>お気に入りの内容（settings.json に永続化。左ペインの「お気に入り」表示のツリーが束縛する）。</summary>
     public ObservableCollection<BookmarkNode> BookmarkItems { get; } = new();
 
     [ObservableProperty]
@@ -141,10 +141,6 @@ public partial class MainWindowViewModel : ObservableObject
         OnPropertyChanged(nameof(GalleryImageMargin));
     }
 
-    /// <summary>お気に入りバーの表示状態（Ctrl+Shift+B で切替、永続化）。</summary>
-    [ObservableProperty]
-    private bool _showBookmarksBar;
-
     /// <summary>閉じたタブのパス履歴（Ctrl+Shift+T で開き直す）。</summary>
     private readonly Stack<string> _closedTabPaths = new();
 
@@ -168,12 +164,6 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private bool _showPreviewPane;
 
-    partial void OnShowBookmarksBarChanged(bool value)
-    {
-        _settings.ShowBookmarksBar = value;
-        SettingsService.Save(_settings);
-    }
-
     partial void OnShowSidebarChanged(bool value)
     {
         _settings.ShowSidebar = value;
@@ -186,9 +176,33 @@ public partial class MainWindowViewModel : ObservableObject
         SettingsService.Save(_settings);
     }
 
-    /// <summary>サイドバーにクイックアクセスの代わりに XP 風フォルダーツリーを表示する。</summary>
+    /// <summary>左ペインの表示内容（クイックアクセス / ツリー / お気に入りの 3 択、永続化）。
+    /// bool を並べると「ツリーかつお気に入り」という不正状態を作れてしまうため単一の列挙で持つ。</summary>
     [ObservableProperty]
-    private bool _showSidebarTree;
+    [NotifyPropertyChangedFor(nameof(IsSidebarQuickAccess))]
+    [NotifyPropertyChangedFor(nameof(IsSidebarTree))]
+    [NotifyPropertyChangedFor(nameof(IsSidebarBookmarks))]
+    private Models.SidebarMode _sidebarMode;
+
+    /// <summary>チップ（ToggleButton）用の 1 モード 1 プロパティ。true を書いたときだけモードを移す
+    /// （選択中のチップをもう一度押しても外れない = ラジオボタン相当の振る舞い）。</summary>
+    public bool IsSidebarQuickAccess
+    {
+        get => SidebarMode == Models.SidebarMode.QuickAccess;
+        set { if (value) { SidebarMode = Models.SidebarMode.QuickAccess; } else { OnPropertyChanged(); } }
+    }
+
+    public bool IsSidebarTree
+    {
+        get => SidebarMode == Models.SidebarMode.Tree;
+        set { if (value) { SidebarMode = Models.SidebarMode.Tree; } else { OnPropertyChanged(); } }
+    }
+
+    public bool IsSidebarBookmarks
+    {
+        get => SidebarMode == Models.SidebarMode.Bookmarks;
+        set { if (value) { SidebarMode = Models.SidebarMode.Bookmarks; } else { OnPropertyChanged(); } }
+    }
 
     /// <summary>ツリー表示のルート（デスクトップ 1 ノード。子は展開時に遅延列挙）。</summary>
     public ObservableCollection<Models.FolderTreeNode> SidebarTreeRoots { get; } = [];
@@ -197,11 +211,11 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private Models.FolderTreeNode? _sidebarTreeSelectedItem;
 
-    partial void OnShowSidebarTreeChanged(bool value)
+    partial void OnSidebarModeChanged(Models.SidebarMode value)
     {
-        _settings.SidebarShowTree = value;
+        _settings.SidebarMode = value.ToString();
         SettingsService.Save(_settings);
-        if (value)
+        if (value == Models.SidebarMode.Tree)
         {
             EnsureSidebarTree();
             if (SidebarTreeSyncActive)
@@ -278,7 +292,7 @@ public partial class MainWindowViewModel : ObservableObject
 
     private async Task SyncSidebarTreeToCurrentPathCoreAsync()
     {
-        if (!ShowSidebarTree || SidebarTreeRoots.Count == 0
+        if (!IsSidebarTree || SidebarTreeRoots.Count == 0
             || SelectedTab is not { IsSettingsTab: false } tab)
         {
             return;
@@ -404,7 +418,7 @@ public partial class MainWindowViewModel : ObservableObject
     /// </param>
     public async Task BeginNewTreeItemAsync(bool isFile, Models.FolderTreeNode? node = null)
     {
-        if (!ShowSidebarTree || SidebarTreeRoots.Count == 0)
+        if (!IsSidebarTree || SidebarTreeRoots.Count == 0)
         {
             return;
         }
@@ -1111,9 +1125,8 @@ public partial class MainWindowViewModel : ObservableObject
         OptDefaultFolderApp = false;
         OptMinimizeToTray = false;
         OptStartMinimizedToTray = false;
-        ShowBookmarksBar = false;
         ShowSidebar = true;
-        ShowSidebarTree = false;
+        SidebarMode = Models.SidebarMode.QuickAccess;
         OptSidebarTreeDragDisabled = false;
         OptSidebarTreeDropDisabled = false;
         OptTabDoubleClickAction = "None";
@@ -1371,8 +1384,21 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
+    /// <summary>Ctrl+Shift+B。左ペインの「お気に入り」表示と、その前に見ていた表示を行き来する
+    /// （旧「お気に入りバーの表示切替」の置き換え。ペイン自体が隠れているときは開く）。</summary>
     [RelayCommand]
-    private void ToggleBookmarksBar() => ShowBookmarksBar = !ShowBookmarksBar;
+    private void ToggleBookmarksPane()
+    {
+        ShowSidebar = true;
+        SidebarMode = IsSidebarBookmarks ? Models.SidebarMode.QuickAccess : Models.SidebarMode.Bookmarks;
+    }
+
+    /// <summary>お気に入りへ追加したことが分かるように、左ペインをお気に入り表示にして見せる。</summary>
+    public void ShowBookmarksPane()
+    {
+        ShowSidebar = true;
+        SidebarMode = Models.SidebarMode.Bookmarks;
+    }
 
     public MainWindowViewModel()
     {
@@ -1404,11 +1430,14 @@ public partial class MainWindowViewModel : ObservableObject
             _settings.IconSet = Options.IconSet.ToString();
             _settings.UseMaterialIcons = false;
             SettingsService.Save(_settings);
-            // サイドバー（クイックアクセス等）のアイコンもセット設定に追従させる
-            if (e.Kind == ShellOptionKind.IconSet) RefreshSidebar();
+            // サイドバー（クイックアクセス等）とお気に入りのアイコンもセット設定に追従させる
+            if (e.Kind == ShellOptionKind.IconSet)
+            {
+                RefreshSidebar();
+                _ = RefreshBookmarkIconsAsync();
+            }
         };
 
-        _showBookmarksBar = _settings.ShowBookmarksBar;
         _showSidebar = _settings.ShowSidebar;
         _sidebarWidth = _settings.SidebarWidth is > 120 and < 600 ? Math.Round(_settings.SidebarWidth) : 230;
         _verticalTabWidth = _settings.VerticalTabWidth is >= MinVerticalTabWidth and <= MaxVerticalTabWidth
@@ -1438,9 +1467,13 @@ public partial class MainWindowViewModel : ObservableObject
             SettingsService.Save(_settings);
         };
         _showStatusBar = _settings.ShowStatusBar;
-        _showSidebarTree = _settings.SidebarShowTree;
+        // 左ペインの表示内容。旧バージョンは bool の SidebarShowTree だけを持っていたので、
+        // 未設定（空文字）なら旧フラグから引き継ぐ。IconSet と同じく移行後は旧フィールドを寝かせる。
+        _sidebarMode = Models.SidebarModes.Resolve(_settings.SidebarMode, _settings.SidebarShowTree);
+        _settings.SidebarMode = _sidebarMode.ToString();
+        _settings.SidebarShowTree = false;
         _sidebarTreeSyncActive = _settings.SidebarTreeSyncActive;
-        if (_showSidebarTree)
+        if (_sidebarMode == Models.SidebarMode.Tree)
         {
             EnsureSidebarTree();
         }
@@ -1998,7 +2031,7 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
-    // ===== お気に入りバー =====
+    // ===== お気に入り =====
 
     public bool HasNoBookmarks => BookmarkItems.Count == 0;
 
@@ -2012,6 +2045,106 @@ public partial class MainWindowViewModel : ObservableObject
         }
 
         OnPropertyChanged(nameof(HasNoBookmarks));
+        _ = RefreshBookmarkIconsAsync();
+    }
+
+    /// <summary>お気に入りの表示アイコンを、いまのアイコンセット設定で付け直す。
+    /// 実体がフォルダーかファイルかの判定（切断中のネットワークパスでブロックしうる）と
+    /// シェルアイコンの取得はバックグラウンドで行い、結果だけを各ノードへ書き戻す。</summary>
+    public async Task RefreshBookmarkIconsAsync()
+    {
+        var generation = ++_bookmarkIconGeneration;
+        var nodes = new List<BookmarkNode>();
+        CollectBookmarkLinks(_settings.Bookmarks, nodes);
+        if (nodes.Count == 0)
+        {
+            return;
+        }
+
+        var iconSet = Options.IconSet;
+        var preferLight = iconSet == FileIconSet.Material && MaterialIconService.IsLightTheme();
+        var paths = nodes.Select(n => n.Path!).ToList();
+        var resolved = await Task.Run(() => ResolveBookmarkIcons(paths, iconSet, preferLight));
+
+        // 並走した新しい呼び出しがある場合、こちらの（古い）結果は適用せず破棄する
+        if (generation != _bookmarkIconGeneration)
+        {
+            if (iconSet == FileIconSet.Windows)
+            {
+                foreach (var entry in resolved)
+                {
+                    if (entry.Image is Avalonia.Media.Imaging.Bitmap stale) stale.Dispose();
+                }
+            }
+
+            return;
+        }
+
+        for (var i = 0; i < nodes.Count; i++)
+        {
+            var (icon, image, isDirectory) = resolved[i];
+            nodes[i].SetIcon(icon, image, ownsImage: iconSet == FileIconSet.Windows, isDirectory);
+        }
+    }
+
+    /// <summary>連続呼び出し時に古い結果が新しい結果を上書きしないための世代番号。</summary>
+    private int _bookmarkIconGeneration;
+
+    /// <summary>お気に入りのうちリンク（パスを持つ項目）だけを、ツリー順に集める。</summary>
+    private static void CollectBookmarkLinks(List<BookmarkNode> nodes, List<BookmarkNode> into)
+    {
+        foreach (var node in nodes)
+        {
+            if (node.Children is { } children)
+            {
+                CollectBookmarkLinks(children, into);
+            }
+            else if (node.Path is { Length: > 0 })
+            {
+                into.Add(node);
+            }
+        }
+    }
+
+    /// <summary>UI スレッド外で実行する部分。パスごとに（絵文字, 画像アイコン, フォルダーか）を返す。</summary>
+    private static List<(string Icon, Avalonia.Media.IImage? Image, bool IsDirectory)> ResolveBookmarkIcons(
+        List<string> paths,
+        FileIconSet iconSet,
+        bool preferLight)
+    {
+        var result = new List<(string, Avalonia.Media.IImage?, bool)>(paths.Count);
+        foreach (var path in paths)
+        {
+            var name = Path.GetFileName(path.TrimEnd(Path.DirectorySeparatorChar)) is { Length: > 0 } n ? n : path;
+            // 実体が消えていても列挙は続ける（お気に入りは実体より長生きしうる）。
+            // その場合はファイル扱いの既定アイコンになる。
+            var isDirectory = SafeIsDirectory(path);
+            var icon = FileSystemEntry.ResolveEmojiIcon(name, isDirectory);
+            Avalonia.Media.IImage? image = iconSet switch
+            {
+                FileIconSet.Windows => ShellThumbnailService.TryGetIcon(path, 32),
+                FileIconSet.Material => MaterialIconService.ResolveIconKey(name, isDirectory, preferLight) is { Length: > 0 } key
+                    ? MaterialIconService.GetImage(key)
+                    : null,
+                _ => null,
+            };
+            result.Add((icon, image, isDirectory));
+        }
+
+        return result;
+    }
+
+    private static bool SafeIsDirectory(string path)
+    {
+        try
+        {
+            return Directory.Exists(path);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException($"お気に入りの実体を判定できませんでした: {path}", ex);
+            return false;
+        }
     }
 
     public void SaveBookmarks()
@@ -2020,7 +2153,7 @@ public partial class MainWindowViewModel : ObservableObject
         RefreshBookmarks();
     }
 
-    /// <summary>お気に入りバーへ追加（parent が null ならルート）。</summary>
+    /// <summary>お気に入りへ追加（parent が null ならルート）。</summary>
     public void AddBookmark(string path, BookmarkNode? parent = null)
     {
         var name = path == FileSystemService.ComputerPath

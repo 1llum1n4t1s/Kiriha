@@ -1,7 +1,9 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:String x:Key="StringTextFlyoutCopyText" xml:space="preserve">Copiar</x:String>
+  <x:String x:Key="StringTextFlyoutCutText" xml:space="preserve">Recortar</x:String>
+  <x:String x:Key="StringTextFlyoutPasteText" xml:space="preserve">Colar</x:String>
   <x:String x:Key="Text.A11y.OpenSubfolders" xml:space="preserve">Mostrar subpastas</x:String>
   <x:String x:Key="Text.A11y.ResizeVerticalTabs" xml:space="preserve">Redimensionar a barra de guias vertical</x:String>
-  <x:String x:Key="Text.A11y.SwitchToTree" xml:space="preserve">Mudar para a visualização em árvore</x:String>
   <x:String x:Key="Text.A11y.ToggleSidebar" xml:space="preserve">Mostrar ou ocultar a barra lateral</x:String>
   <x:String x:Key="Text.A11y.VerticalTabs" xml:space="preserve">Guias verticais</x:String>
   <x:String x:Key="Text.Address.Copy" xml:space="preserve">Copiar endereço</x:String>
@@ -10,7 +12,6 @@
   <x:String x:Key="Text.Bookmarks.AddFolderMenu" xml:space="preserve">Adicionar pasta...</x:String>
   <x:String x:Key="Text.Bookmarks.AddFolderTitle" xml:space="preserve">Adicionar pasta</x:String>
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">Arraste uma pasta até aqui para adicioná-la aos favoritos</x:String>
-  <x:String x:Key="Text.Bookmarks.Hide" xml:space="preserve">Ocultar a barra de favoritos</x:String>
   <x:String x:Key="Text.Bookmarks.NewFolderName" xml:space="preserve">Nova pasta</x:String>
   <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">Renomear...</x:String>
   <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">Renomear favorito</x:String>
@@ -168,7 +169,6 @@
   <x:String x:Key="Text.License.Status.TrialExpired" xml:space="preserve">Avaliação encerrada (é necessária uma licença)</x:String>
   <x:String x:Key="Text.Menu.About" xml:space="preserve">Sobre o Kiriha</x:String>
   <x:String x:Key="Text.Menu.AccessDenied" xml:space="preserve">(Acesso negado)</x:String>
-  <x:String x:Key="Text.Menu.BookmarksBar" xml:space="preserve">Barra de favoritos</x:String>
   <x:String x:Key="Text.Menu.CheckUpdate" xml:space="preserve">Verificar atualizações</x:String>
   <x:String x:Key="Text.Menu.Empty" xml:space="preserve">(Vazio)</x:String>
   <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">Nova janela</x:String>
@@ -290,7 +290,6 @@
   <x:String x:Key="Text.Settings.Shortcuts.Subtitle" xml:space="preserve">Atalhos de teclado para trabalhar mais rápido</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.Tabs" xml:space="preserve">Guias</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.TabsBody" xml:space="preserve">Ctrl+T　Nova guia&#10;Ctrl+W　Fechar a guia&#10;Ctrl+Shift+T　Reabrir a guia fechada&#10;Ctrl+Tab　Alternar entre guias&#10;Ctrl+1..9　Selecionar uma guia específica</x:String>
-  <x:String x:Key="Text.Settings.ShowBookmarksBar" xml:space="preserve">Mostrar a barra de favoritos (Ctrl+Shift+B)</x:String>
   <x:String x:Key="Text.Settings.ShowCheckBoxes" xml:space="preserve">Mostrar caixas de seleção nos itens</x:String>
   <x:String x:Key="Text.Settings.ShowExtensions" xml:space="preserve">Mostrar as extensões de arquivo</x:String>
   <x:String x:Key="Text.Settings.ShowHidden" xml:space="preserve">Mostrar os arquivos ocultos</x:String>
@@ -324,12 +323,12 @@
   <x:String x:Key="Text.Share.OpenFailed" xml:space="preserve">Não foi possível abrir o painel de compartilhamento</x:String>
   <x:String x:Key="Text.Share.PrepareFailed" xml:space="preserve">Não foi possível preparar os dados para compartilhar</x:String>
   <x:String x:Key="Text.Share.SelectFiles" xml:space="preserve">Selecione os arquivos que deseja compartilhar</x:String>
+  <x:String x:Key="Text.Sidebar.Bookmarks" xml:space="preserve">Favoritos</x:String>
   <x:String x:Key="Text.Sidebar.Drives" xml:space="preserve">Unidades</x:String>
   <x:String x:Key="Text.Sidebar.QuickAccess" xml:space="preserve">Acesso rápido</x:String>
   <x:String x:Key="Text.Sidebar.RecentFiles" xml:space="preserve">Arquivos recentes</x:String>
   <x:String x:Key="Text.Sidebar.RecycleBin" xml:space="preserve">Lixeira</x:String>
   <x:String x:Key="Text.Sidebar.RecycleBinTip" xml:space="preserve">Abrir a Lixeira no Explorador de Arquivos</x:String>
-  <x:String x:Key="Text.Sidebar.ToggleTip" xml:space="preserve">Alternar entre o Acesso rápido e a árvore de pastas</x:String>
   <x:String x:Key="Text.Sidebar.TreeView" xml:space="preserve">Visualização em árvore</x:String>
   <x:String x:Key="Text.Sort.Ascending" xml:space="preserve">Crescente</x:String>
   <x:String x:Key="Text.Sort.Descending" xml:space="preserve">Decrescente</x:String>

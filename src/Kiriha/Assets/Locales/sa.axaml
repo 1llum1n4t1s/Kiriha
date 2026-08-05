@@ -1,7 +1,9 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:String x:Key="StringTextFlyoutCopyText" xml:space="preserve">प्रतिलिख</x:String>
+  <x:String x:Key="StringTextFlyoutCutText" xml:space="preserve">छिन्धि</x:String>
+  <x:String x:Key="StringTextFlyoutPasteText" xml:space="preserve">लेपय</x:String>
   <x:String x:Key="Text.A11y.OpenSubfolders" xml:space="preserve">उपसञ्चिकाकोष्ठान् दर्शय</x:String>
   <x:String x:Key="Text.A11y.ResizeVerticalTabs" xml:space="preserve">ऊर्ध्वपत्रपट्टिकायाः विस्तारं परिवर्तय</x:String>
-  <x:String x:Key="Text.A11y.SwitchToTree" xml:space="preserve">वृक्षदृश्यं प्रति गच्छ</x:String>
   <x:String x:Key="Text.A11y.ToggleSidebar" xml:space="preserve">पार्श्वपट्टिकां दर्शय वा गोपय</x:String>
   <x:String x:Key="Text.A11y.VerticalTabs" xml:space="preserve">ऊर्ध्वपत्राणि</x:String>
   <x:String x:Key="Text.Address.Copy" xml:space="preserve">पदवीं प्रतिलिख</x:String>
@@ -10,7 +12,6 @@
   <x:String x:Key="Text.Bookmarks.AddFolderMenu" xml:space="preserve">सञ्चिकाकोष्ठं योजय...</x:String>
   <x:String x:Key="Text.Bookmarks.AddFolderTitle" xml:space="preserve">सञ्चिकाकोष्ठं योजय</x:String>
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">चिह्नेषु योजयितुम् अत्र सञ्चिकाकोष्ठम् आकर्षय</x:String>
-  <x:String x:Key="Text.Bookmarks.Hide" xml:space="preserve">चिह्नपट्टिकां गोपय</x:String>
   <x:String x:Key="Text.Bookmarks.NewFolderName" xml:space="preserve">नवीनं सञ्चिकाकोष्ठम्</x:String>
   <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">नाम परिवर्तय...</x:String>
   <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">चिह्नस्य नाम परिवर्तय</x:String>
@@ -168,7 +169,6 @@
   <x:String x:Key="Text.License.Status.TrialExpired" xml:space="preserve">परीक्षा समाप्ता (अनुज्ञापत्रम् आवश्यकम्)</x:String>
   <x:String x:Key="Text.Menu.About" xml:space="preserve">Kiriha विषये</x:String>
   <x:String x:Key="Text.Menu.AccessDenied" xml:space="preserve">(प्रवेशः न शक्यते)</x:String>
-  <x:String x:Key="Text.Menu.BookmarksBar" xml:space="preserve">चिह्नपट्टिका</x:String>
   <x:String x:Key="Text.Menu.CheckUpdate" xml:space="preserve">नवीकरणं परीक्षय</x:String>
   <x:String x:Key="Text.Menu.Empty" xml:space="preserve">(रिक्तम्)</x:String>
   <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">नवीनं गवाक्षम्</x:String>
@@ -290,7 +290,6 @@
   <x:String x:Key="Text.Settings.Shortcuts.Subtitle" xml:space="preserve">शीघ्रं कार्यं कर्तुं कुञ्चिकासङ्केतानां सूची</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.Tabs" xml:space="preserve">पत्राणि</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.TabsBody" xml:space="preserve">Ctrl+T　नवीनं पत्रम्&#10;Ctrl+W　पत्रं पिधेहि&#10;Ctrl+Shift+T　पिहितं पत्रं पुनः उद्घाटय&#10;Ctrl+Tab　पत्राणि परिवर्तय&#10;Ctrl+1..9　निर्दिष्टं पत्रं चिनु</x:String>
-  <x:String x:Key="Text.Settings.ShowBookmarksBar" xml:space="preserve">चिह्नपट्टिकां दर्शय (Ctrl+Shift+B)</x:String>
   <x:String x:Key="Text.Settings.ShowCheckBoxes" xml:space="preserve">वस्तुचयनपेटिकाः दर्शय</x:String>
   <x:String x:Key="Text.Settings.ShowExtensions" xml:space="preserve">सञ्चिकाविस्तारान् दर्शय</x:String>
   <x:String x:Key="Text.Settings.ShowHidden" xml:space="preserve">गुप्ताः सञ्चिकाः दर्शय</x:String>
@@ -324,12 +323,12 @@
   <x:String x:Key="Text.Share.OpenFailed" xml:space="preserve">विभाजनपटलं न उद्घाटितम्</x:String>
   <x:String x:Key="Text.Share.PrepareFailed" xml:space="preserve">विभाजनदत्तांशः न सज्जीकृतः</x:String>
   <x:String x:Key="Text.Share.SelectFiles" xml:space="preserve">विभाजयितुम् इष्टाः सञ्चिकाः चिनु</x:String>
+  <x:String x:Key="Text.Sidebar.Bookmarks" xml:space="preserve">चिह्नानि</x:String>
   <x:String x:Key="Text.Sidebar.Drives" xml:space="preserve">चालकाः</x:String>
   <x:String x:Key="Text.Sidebar.QuickAccess" xml:space="preserve">शीघ्रप्रवेशः</x:String>
   <x:String x:Key="Text.Sidebar.RecentFiles" xml:space="preserve">सद्यःप्रयुक्ताः सञ्चिकाः</x:String>
   <x:String x:Key="Text.Sidebar.RecycleBin" xml:space="preserve">पुनश्चक्रपेटिका</x:String>
   <x:String x:Key="Text.Sidebar.RecycleBinTip" xml:space="preserve">पुनश्चक्रपेटिकां सञ्चिकादर्शके उद्घाटय</x:String>
-  <x:String x:Key="Text.Sidebar.ToggleTip" xml:space="preserve">शीघ्रप्रवेशस्य कोष्ठवृक्षस्य च मध्ये परिवर्तयति</x:String>
   <x:String x:Key="Text.Sidebar.TreeView" xml:space="preserve">वृक्षदृश्यम्</x:String>
   <x:String x:Key="Text.Sort.Ascending" xml:space="preserve">आरोहक्रमः</x:String>
   <x:String x:Key="Text.Sort.Descending" xml:space="preserve">अवरोहक्रमः</x:String>

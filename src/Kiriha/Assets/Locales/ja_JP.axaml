@@ -1,7 +1,9 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:String x:Key="StringTextFlyoutCopyText" xml:space="preserve">コピー</x:String>
+  <x:String x:Key="StringTextFlyoutCutText" xml:space="preserve">切り取り</x:String>
+  <x:String x:Key="StringTextFlyoutPasteText" xml:space="preserve">貼り付け</x:String>
   <x:String x:Key="Text.A11y.OpenSubfolders" xml:space="preserve">サブフォルダー一覧を開く</x:String>
   <x:String x:Key="Text.A11y.ResizeVerticalTabs" xml:space="preserve">垂直タブバーの幅を変更</x:String>
-  <x:String x:Key="Text.A11y.SwitchToTree" xml:space="preserve">ツリー表示に切り替え</x:String>
   <x:String x:Key="Text.A11y.ToggleSidebar" xml:space="preserve">サイドバーの表示切替</x:String>
   <x:String x:Key="Text.A11y.VerticalTabs" xml:space="preserve">垂直タブ</x:String>
   <x:String x:Key="Text.Address.Copy" xml:space="preserve">アドレスのコピー</x:String>
@@ -10,7 +12,6 @@
   <x:String x:Key="Text.Bookmarks.AddFolderMenu" xml:space="preserve">フォルダを追加...</x:String>
   <x:String x:Key="Text.Bookmarks.AddFolderTitle" xml:space="preserve">フォルダを追加</x:String>
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">ここにフォルダーをドラッグするとお気に入りに追加されます</x:String>
-  <x:String x:Key="Text.Bookmarks.Hide" xml:space="preserve">お気に入りバーを表示しない</x:String>
   <x:String x:Key="Text.Bookmarks.NewFolderName" xml:space="preserve">新しいフォルダ</x:String>
   <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">名前を変更...</x:String>
   <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">お気に入りの名前を変更</x:String>
@@ -168,7 +169,6 @@
   <x:String x:Key="Text.License.Status.TrialExpired" xml:space="preserve">試用期間終了（ライセンス認証が必要です）</x:String>
   <x:String x:Key="Text.Menu.About" xml:space="preserve">Kiriha について</x:String>
   <x:String x:Key="Text.Menu.AccessDenied" xml:space="preserve">(アクセスできません)</x:String>
-  <x:String x:Key="Text.Menu.BookmarksBar" xml:space="preserve">お気に入りバー</x:String>
   <x:String x:Key="Text.Menu.CheckUpdate" xml:space="preserve">更新の確認</x:String>
   <x:String x:Key="Text.Menu.Empty" xml:space="preserve">(空)</x:String>
   <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">新しいウィンドウ</x:String>
@@ -290,7 +290,6 @@
   <x:String x:Key="Text.Settings.Shortcuts.Subtitle" xml:space="preserve">キーボードで素早く操作するための一覧です</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.Tabs" xml:space="preserve">タブ</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.TabsBody" xml:space="preserve">Ctrl+T　新しいタブ&#10;Ctrl+W　タブを閉じる&#10;Ctrl+Shift+T　閉じたタブを開く&#10;Ctrl+Tab　タブを切り替える&#10;Ctrl+1..9　指定タブを選択</x:String>
-  <x:String x:Key="Text.Settings.ShowBookmarksBar" xml:space="preserve">お気に入りバーを表示する (Ctrl+Shift+B)</x:String>
   <x:String x:Key="Text.Settings.ShowCheckBoxes" xml:space="preserve">項目チェックボックスを表示する</x:String>
   <x:String x:Key="Text.Settings.ShowExtensions" xml:space="preserve">ファイル名拡張子を表示する</x:String>
   <x:String x:Key="Text.Settings.ShowHidden" xml:space="preserve">隠しファイルを表示する</x:String>
@@ -324,12 +323,12 @@
   <x:String x:Key="Text.Share.OpenFailed" xml:space="preserve">共有シートを開けませんでした</x:String>
   <x:String x:Key="Text.Share.PrepareFailed" xml:space="preserve">共有データを準備できませんでした</x:String>
   <x:String x:Key="Text.Share.SelectFiles" xml:space="preserve">共有するファイルを選択してください</x:String>
+  <x:String x:Key="Text.Sidebar.Bookmarks" xml:space="preserve">お気に入り</x:String>
   <x:String x:Key="Text.Sidebar.Drives" xml:space="preserve">ドライブ一覧</x:String>
   <x:String x:Key="Text.Sidebar.QuickAccess" xml:space="preserve">クイックアクセス</x:String>
   <x:String x:Key="Text.Sidebar.RecentFiles" xml:space="preserve">最近使用したファイル</x:String>
   <x:String x:Key="Text.Sidebar.RecycleBin" xml:space="preserve">ごみ箱</x:String>
   <x:String x:Key="Text.Sidebar.RecycleBinTip" xml:space="preserve">ごみ箱をエクスプローラーで開く</x:String>
-  <x:String x:Key="Text.Sidebar.ToggleTip" xml:space="preserve">クイックアクセスとフォルダーツリーを切り替えます</x:String>
   <x:String x:Key="Text.Sidebar.TreeView" xml:space="preserve">ツリー表示</x:String>
   <x:String x:Key="Text.Sort.Ascending" xml:space="preserve">昇順</x:String>
   <x:String x:Key="Text.Sort.Descending" xml:space="preserve">降順</x:String>

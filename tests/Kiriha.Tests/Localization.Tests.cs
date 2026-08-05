@@ -292,4 +292,29 @@ public sealed class LocaleResourceTests
             }
         }
     }
+
+    /// <summary>
+    /// Avalonia 標準 TextBox の右クリックメニュー（検索ボックス・アドレスバー・各ダイアログ）は
+    /// Fluent テーマがこのキーで文字列を引くため、ロケール側で同じキーを定義して上書きしている。
+    /// 消すと英語の Cut / Copy / Paste に戻るので、キーの存在をここで固定する。
+    /// </summary>
+    [Fact]
+    public void Avalonia標準テキストメニューのキーを全言語が上書きしている()
+    {
+        var directory = FindLocalesDirectory();
+        Assert.NotNull(directory);
+
+        string[] required =
+        [
+            "StringTextFlyoutCutText", "StringTextFlyoutCopyText", "StringTextFlyoutPasteText",
+        ];
+
+        foreach (var (name, keys) in LoadAllKeys(directory!))
+        {
+            foreach (var key in required)
+            {
+                Assert.True(keys.Contains(key, StringComparer.Ordinal), $"{name}: {key} がありません");
+            }
+        }
+    }
 }

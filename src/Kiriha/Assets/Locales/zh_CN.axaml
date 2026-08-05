@@ -1,7 +1,9 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:String x:Key="StringTextFlyoutCopyText" xml:space="preserve">复制</x:String>
+  <x:String x:Key="StringTextFlyoutCutText" xml:space="preserve">剪切</x:String>
+  <x:String x:Key="StringTextFlyoutPasteText" xml:space="preserve">粘贴</x:String>
   <x:String x:Key="Text.A11y.OpenSubfolders" xml:space="preserve">显示子文件夹</x:String>
   <x:String x:Key="Text.A11y.ResizeVerticalTabs" xml:space="preserve">调整垂直标签栏宽度</x:String>
-  <x:String x:Key="Text.A11y.SwitchToTree" xml:space="preserve">切换到树状视图</x:String>
   <x:String x:Key="Text.A11y.ToggleSidebar" xml:space="preserve">显示或隐藏侧边栏</x:String>
   <x:String x:Key="Text.A11y.VerticalTabs" xml:space="preserve">垂直标签页</x:String>
   <x:String x:Key="Text.Address.Copy" xml:space="preserve">复制地址</x:String>
@@ -10,7 +12,6 @@
   <x:String x:Key="Text.Bookmarks.AddFolderMenu" xml:space="preserve">添加文件夹...</x:String>
   <x:String x:Key="Text.Bookmarks.AddFolderTitle" xml:space="preserve">添加文件夹</x:String>
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">将文件夹拖到这里即可添加到书签</x:String>
-  <x:String x:Key="Text.Bookmarks.Hide" xml:space="preserve">隐藏书签栏</x:String>
   <x:String x:Key="Text.Bookmarks.NewFolderName" xml:space="preserve">新建文件夹</x:String>
   <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">重命名...</x:String>
   <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">重命名书签</x:String>
@@ -168,7 +169,6 @@
   <x:String x:Key="Text.License.Status.TrialExpired" xml:space="preserve">试用期结束（需要许可证）</x:String>
   <x:String x:Key="Text.Menu.About" xml:space="preserve">关于 Kiriha</x:String>
   <x:String x:Key="Text.Menu.AccessDenied" xml:space="preserve">(无法访问)</x:String>
-  <x:String x:Key="Text.Menu.BookmarksBar" xml:space="preserve">书签栏</x:String>
   <x:String x:Key="Text.Menu.CheckUpdate" xml:space="preserve">检查更新</x:String>
   <x:String x:Key="Text.Menu.Empty" xml:space="preserve">(空)</x:String>
   <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">新建窗口</x:String>
@@ -290,7 +290,6 @@
   <x:String x:Key="Text.Settings.Shortcuts.Subtitle" xml:space="preserve">帮助你更快操作的键盘快捷键一览</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.Tabs" xml:space="preserve">标签页</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.TabsBody" xml:space="preserve">Ctrl+T　新建标签页&#10;Ctrl+W　关闭标签页&#10;Ctrl+Shift+T　重新打开已关闭的标签页&#10;Ctrl+Tab　切换标签页&#10;Ctrl+1..9　选择指定标签页</x:String>
-  <x:String x:Key="Text.Settings.ShowBookmarksBar" xml:space="preserve">显示书签栏 (Ctrl+Shift+B)</x:String>
   <x:String x:Key="Text.Settings.ShowCheckBoxes" xml:space="preserve">显示项目复选框</x:String>
   <x:String x:Key="Text.Settings.ShowExtensions" xml:space="preserve">显示文件扩展名</x:String>
   <x:String x:Key="Text.Settings.ShowHidden" xml:space="preserve">显示隐藏文件</x:String>
@@ -324,12 +323,12 @@
   <x:String x:Key="Text.Share.OpenFailed" xml:space="preserve">无法打开共享面板</x:String>
   <x:String x:Key="Text.Share.PrepareFailed" xml:space="preserve">无法准备要共享的数据</x:String>
   <x:String x:Key="Text.Share.SelectFiles" xml:space="preserve">请选择要共享的文件</x:String>
+  <x:String x:Key="Text.Sidebar.Bookmarks" xml:space="preserve">书签</x:String>
   <x:String x:Key="Text.Sidebar.Drives" xml:space="preserve">驱动器</x:String>
   <x:String x:Key="Text.Sidebar.QuickAccess" xml:space="preserve">快速访问</x:String>
   <x:String x:Key="Text.Sidebar.RecentFiles" xml:space="preserve">最近使用的文件</x:String>
   <x:String x:Key="Text.Sidebar.RecycleBin" xml:space="preserve">回收站</x:String>
   <x:String x:Key="Text.Sidebar.RecycleBinTip" xml:space="preserve">在文件资源管理器中打开回收站</x:String>
-  <x:String x:Key="Text.Sidebar.ToggleTip" xml:space="preserve">在快速访问和文件夹树之间切换</x:String>
   <x:String x:Key="Text.Sidebar.TreeView" xml:space="preserve">树状视图</x:String>
   <x:String x:Key="Text.Sort.Ascending" xml:space="preserve">升序</x:String>
   <x:String x:Key="Text.Sort.Descending" xml:space="preserve">降序</x:String>

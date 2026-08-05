@@ -94,6 +94,23 @@ public partial class TabViewModel : ObservableObject
     /// （ClipboardFileService.CutStateChanged と同じ方式。購読者は MainWindow 1 つ）。</summary>
     public static event Action<TabViewModel, IReadOnlyList<FileSystemEntry>>? SelectionRestoreRequested;
 
+    /// <summary>一覧の特定行までスクロールする要求。スクロールは ListBox が持つ機能なので View へ委ねる
+    /// （SelectionRestoreRequested と同じ理由で static イベント）。</summary>
+    public static event Action<TabViewModel, RevealRequest>? RevealEntryRequested;
+
+    /// <summary>クリップボード操作の結果をウィンドウ上のトーストで知らせる要求（購読者は MainWindow 1 つ）。</summary>
+    public static event Action<TabViewModel, ToastRequest>? ToastRequested;
+
+    /// <summary>一覧の行を見せる要求。Center が true なら画面中央へ、false なら最小移動で収める。</summary>
+    /// <param name="Entry">見せたい行。</param>
+    /// <param name="Center">一覧の中央へスクロールするか。</param>
+    public readonly record struct RevealRequest(FileSystemEntry Entry, bool Center);
+
+    /// <summary>トーストの表示内容。Label は操作名のチップ、Message は本文。</summary>
+    /// <param name="Label">操作名（「コピー」など）。</param>
+    /// <param name="Message">結果の説明文。</param>
+    public readonly record struct ToastRequest(string Label, string Message);
+
     private List<FileSystemEntry> _selection = new();
     private readonly HashSet<string> _pendingNewFolderPaths = new(StringComparer.OrdinalIgnoreCase);
 
@@ -2520,6 +2537,10 @@ public partial class TabViewModel : ObservableObject
             return;
         }
 
+        // 同一フォルダーの読み直し（フォルダー監視による自動更新・F5・オプション変更）かどうか。
+        // 移動と違って表示は基本そのままなので、一覧・パンくず・選択・サムネイルを作り直さない。
+        var isReload = WindowsPathIdentity.Instance.Equals(path, CurrentPath);
+
         if (record && !WindowsPathIdentity.Instance.Equals(CurrentPath, path))
         {
             _back.Push(CurrentPath);
@@ -2536,7 +2557,15 @@ public partial class TabViewModel : ObservableObject
                 ? name
                 : path;
 
-        DisposeEntryImages(_allEntries);
+        if (isReload)
+        {
+            MergeReloadedEntries(entries);
+        }
+        else
+        {
+            DisposeEntryImages(_allEntries);
+        }
+
         SetAllEntries(ApplySort(entries).ToList());
         // 移動で検索をリセット（エクスプローラーと同じ）。プロパティ経由だと OnSearchTextChanged
         // → ApplyFilter が二重に走るだけで害はないため素直にプロパティへ代入する。
@@ -2545,8 +2574,18 @@ public partial class TabViewModel : ObservableObject
         _suppressSearchFilter = false;
         ApplyFilter();
 
-        BuildBreadcrumbs(path);
-        SelectionText = "";
+        // 読み直しではパンくずも選択の内訳も変わらない。作り直すとパンくずが毎回組み直されて
+        // ちらつき、選択が残っているのに「n 個の項目を選択」だけ消える。
+        if (!isReload || Breadcrumbs.Count == 0)
+        {
+            BuildBreadcrumbs(path);
+        }
+
+        if (!isReload)
+        {
+            SelectionText = "";
+        }
+
         UpdateFreeSpace(path);
         SetupWatcher(path);
         _searchCts?.Cancel();
@@ -2564,9 +2603,14 @@ public partial class TabViewModel : ObservableObject
         // 移動したら前フォルダーのサムネイル読み込みはその場で打ち切る。クラウド同期フォルダー
         // （Google ドライブ等）は1件に数秒かかることがあり、打ち切らないと移動先のサムネイルが
         // 旧フォルダーの待ち行列の後ろに並んでいつまでも表示されない。
+        // 逆に同一フォルダーの読み直しでは打ち切らない。一覧を作り直さなくなったぶん
+        // ビューからの再要求も起きないため、打ち切ると読み込み中だった項目が空欄のまま残る。
         if (UsesThumbnails)
         {
-            ResetThumbnailScope();
+            if (!isReload || _thumbnailScope is null)
+            {
+                ResetThumbnailScope();
+            }
         }
         else
         {
@@ -2753,6 +2797,54 @@ public partial class TabViewModel : ObservableObject
         }
     }
 
+    /// <summary>同一フォルダーの読み直し結果を、表示中の項目へ合流させる（entries を直接書き換える）。
+    ///
+    /// 毎回すべて作り直すと、読み込み済みのサムネイル / シェルアイコンを捨てたうえで一覧を
+    /// 丸ごと差し替えることになり、フォルダー監視が発火するたびに全ファイルのアイコンが
+    /// 一斉に消えて読み直される（＝一覧が点滅する）。同じファイルを指す行は既存インスタンスを
+    /// 使い回して値だけその場で更新し、増減した行だけを実際の差し替えにする。
+    ///
+    /// 使い回さなかった（消えた・作り直した）旧項目の画像だけをここで解放する。</summary>
+    private void MergeReloadedEntries(List<FileSystemEntry> entries)
+    {
+        var previousByPath = _entryByPath;
+        if (previousByPath.Count == 0)
+        {
+            return;
+        }
+
+        var reused = new HashSet<string>(previousByPath.Count, WindowsPathIdentity.Instance);
+        for (var i = 0; i < entries.Count; i++)
+        {
+            var fresh = entries[i];
+            if (!previousByPath.TryGetValue(fresh.FullPath, out var previous) || !previous.IsSameRowAs(fresh))
+            {
+                continue;
+            }
+
+            reused.Add(previous.FullPath);
+            entries[i] = previous;
+            if (!previous.UpdateFrom(fresh) || !UsesThumbnails || !previous.HasThumbnail)
+            {
+                continue;
+            }
+
+            // 中身が変わったので読み直す。行は作り直さないためビューからの再要求が起きず、
+            // ここから明示的に走らせる。いま出ている画像は差し替わるまで残る。
+            previous.InvalidateThumbnail();
+            _ = EnsureThumbnailAsync(previous);
+        }
+
+        foreach (var previous in _allEntries)
+        {
+            if (!reused.Contains(previous.FullPath))
+            {
+                previous.DisposeThumbnail();
+                previous.DisposeWindowsIcon();
+            }
+        }
+    }
+
     /// <summary>検索テキストで現在のフォルダー内容を絞り込む。</summary>
     private void ApplyFilter()
     {
@@ -2777,6 +2869,17 @@ public partial class TabViewModel : ObservableObject
     /// パスが一致しないため自然に復元なしとなる。</summary>
     private void ReplaceEntries(IEnumerable<FileSystemEntry> entries)
     {
+        var next = entries as List<FileSystemEntry> ?? entries.ToList();
+
+        // 並びも項目も 1 つも変わっていないなら差し替えない。差し替えると ListBox が
+        // 全行のコンテナを作り直し、選択とスクロール位置も一度失われるため、フォルダー監視に
+        // よる自動更新のたびに一覧が点滅して見える。MergeReloadedEntries が変化のない行を
+        // 使い回すので、実際に何も変わっていない読み直しはここで止まる。
+        if (IsSameEntrySequence(_entries, next))
+        {
+            return;
+        }
+
         var previousSelection = _selection.Count > 0
             ? new HashSet<string>(_selection.Select(e => e.FullPath), WindowsPathIdentity.Instance)
             : null;
@@ -2787,7 +2890,7 @@ public partial class TabViewModel : ObservableObject
             SetSelection([]);
         }
 
-        _entries = entries as List<FileSystemEntry> ?? entries.ToList();
+        _entries = next;
         OnPropertyChanged(nameof(Entries));
         OnPropertyChanged(nameof(HasNoEntries));
 
@@ -2815,6 +2918,21 @@ public partial class TabViewModel : ObservableObject
                 }
             });
         }
+    }
+
+    /// <summary>2 つの一覧が「同じ項目が同じ順に並んでいる」か。行の同一性はインスタンス参照で見る。
+    /// MergeReloadedEntries が同じファイルの行を使い回すので、参照が違うのは増減・並べ替え・
+    /// 作り直しが実際に起きたときだけになる。</summary>
+    private static bool IsSameEntrySequence(List<FileSystemEntry> current, List<FileSystemEntry> next)
+    {
+        if (ReferenceEquals(current, next)) return true;
+        if (current.Count != next.Count) return false;
+        for (var i = 0; i < current.Count; i++)
+        {
+            if (!ReferenceEquals(current[i], next[i])) return false;
+        }
+
+        return true;
     }
 
     private void UpdateFreeSpace(string path)
@@ -3210,8 +3328,12 @@ public partial class TabViewModel : ObservableObject
 
         if (ClipboardFileService.SetFiles(targets.Select(e => e.FullPath).ToList(), cut))
         {
-            StatusText = LocalizationService.Text(
+            var message = LocalizationService.Text(
                 cut ? "Text.Clipboard.Cut" : "Text.Clipboard.Copied", targets.Count);
+            StatusText = message;
+            // ステータスバーは非表示にもできるうえ視線から遠いので、結果はトーストでも返す。
+            ToastRequested?.Invoke(this, new ToastRequest(
+                LocalizationService.Text(cut ? "Text.Command.Cut" : "Text.Common.Copy"), message));
             PasteCommand.NotifyCanExecuteChanged();
         }
         else
@@ -3691,16 +3813,109 @@ public partial class TabViewModel : ObservableObject
         NavigateTo(_forward.Pop(), record: false);
     }
 
+    /// <summary>
+    /// 一つ上の階層へ移動する。移動後は「いま出てきたフォルダー」を選択し、一覧の中央へスクロールする
+    /// （エクスプローラーと同じで、どこから上がってきたのかを見失わないため）。
+    /// </summary>
     [RelayCommand]
-    private void GoUp()
+    private async Task GoUpAsync()
     {
         if (CurrentPath == FileSystemService.ComputerPath)
         {
             return;
         }
 
+        var from = CurrentPath;
         var parent = Directory.GetParent(CurrentPath);
-        NavigateTo(parent?.FullName ?? FileSystemService.ComputerPath);
+        await NavigateToAsync(parent?.FullName ?? FileSystemService.ComputerPath);
+        RevealEntry(from, center: true);
+    }
+
+    /// <summary>指定パスの行を選択し、View へスクロール（表示）を依頼する。
+    /// 固定タブが移動を別タブへ委譲した場合など、一覧に無いパスは何もしない。</summary>
+    private void RevealEntry(string path, bool center)
+    {
+        if (_isDetached || _entryByPath.GetValueOrDefault(path) is not { } entry || !_entries.Contains(entry))
+        {
+            return;
+        }
+
+        SelectedEntry = entry;
+        RevealEntryRequested?.Invoke(this, new RevealRequest(entry, center));
+    }
+
+    // ===== 先頭一致ジャンプ（一覧で文字を打つと該当ファイルへ移動する。エクスプローラーと同じ） =====
+
+    /// <summary>打ち込み途中の文字列。最後の入力から一定時間が空くと捨てる。</summary>
+    private string _typeAheadPrefix = "";
+    private DateTime _typeAheadAtUtc;
+
+    /// <summary>この間隔が空いたら打ち直しとみなす（エクスプローラーの体感に合わせた 1 秒）。</summary>
+    private static readonly TimeSpan TypeAheadResetDelay = TimeSpan.FromSeconds(1);
+
+    /// <summary>
+    /// 一覧へ文字が入力されたときの移動先を決めて選択する。移動したら true。
+    /// 「S → O」と続けて打てば SoftwareDistribution のように、打った文字列の先頭一致で移動する。
+    /// </summary>
+    public bool TypeAheadSelect(string text)
+    {
+        if (IsSettingsTab || text.Length == 0 || char.IsControl(text[0]))
+        {
+            return false;
+        }
+
+        var now = DateTime.UtcNow;
+        var expired = now - _typeAheadAtUtc > TypeAheadResetDelay;
+        // 先頭の空白は打ち始めとして意味を持たない（一覧では選択トグルのキーでもある）。
+        if (text[0] == ' ' && (expired || _typeAheadPrefix.Length == 0))
+        {
+            return false;
+        }
+
+        _typeAheadPrefix = expired ? text : _typeAheadPrefix + text;
+        _typeAheadAtUtc = now;
+
+        var index = FindTypeAheadIndex(_entries, _typeAheadPrefix, _entries.IndexOf(SelectedEntry!));
+        if (index < 0)
+        {
+            return false;
+        }
+
+        var entry = _entries[index];
+        SelectedEntry = entry;
+        // 中央寄せはしない。エクスプローラーと同じく、見えていれば動かさず最小限だけスクロールする。
+        RevealEntryRequested?.Invoke(this, new RevealRequest(entry, Center: false));
+        return true;
+    }
+
+    /// <summary>
+    /// 先頭一致ジャンプの移動先を求める（該当なしは -1）。エクスプローラーと同じ 2 つの規則に従う。
+    /// 1 文字だけのとき、および同じ文字を続けて打ったときは「次の候補へ送る」ので現在位置の次から探す。
+    /// 2 文字以上の打ち込みは現在位置を含めて探す（打ち足して絞り込む操作なので、今の行が該当なら留まる）。
+    /// どちらも末尾まで行ったら先頭へ回り込む。
+    /// </summary>
+    internal static int FindTypeAheadIndex(IReadOnlyList<FileSystemEntry> entries, string prefix, int currentIndex)
+    {
+        if (entries.Count == 0 || prefix.Length == 0)
+        {
+            return -1;
+        }
+
+        var repeating = prefix.Length > 1 && prefix.All(c => c == prefix[0]);
+        var needle = repeating ? prefix[..1] : prefix;
+        var advance = repeating || prefix.Length == 1;
+        var start = Math.Max(0, (advance ? currentIndex + 1 : currentIndex) % entries.Count);
+
+        for (var i = 0; i < entries.Count; i++)
+        {
+            var index = (start + i) % entries.Count;
+            if (entries[index].DisplayName.StartsWith(needle, StringComparison.CurrentCultureIgnoreCase))
+            {
+                return index;
+            }
+        }
+
+        return -1;
     }
 
     [RelayCommand]

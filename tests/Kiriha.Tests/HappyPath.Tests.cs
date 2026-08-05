@@ -174,6 +174,69 @@ public class FileSystemEntryHappyTests
     }
 
     [Fact]
+    public void 読み直しでサイズや日時が変わっても同じ行として扱われること()
+    {
+        // 行を作り直すと一覧ごと差し替わって点滅するため、値の変化は作り直す理由にしない
+        var previous = File("memo.txt", size: 2048, modified: new DateTime(2026, 7, 25, 9, 5, 0));
+        var changed = File("memo.txt", size: 4096, modified: new DateTime(2026, 7, 25, 9, 6, 0));
+
+        Assert.True(previous.IsSameRowAs(changed));
+    }
+
+    [Fact]
+    public void 種別や表示名が変わったときは同じ行として扱わないこと()
+    {
+        var previous = File("memo.txt", size: 2048);
+        var asFolder = new FileSystemEntry
+        {
+            Name = "memo.txt", DisplayName = "memo", FullPath = @"C:\Temp\memo.txt", IsDirectory = true,
+        };
+        // 拡張子表示の切り替えで表示名が変わったときは作り直す
+        var withExtension = new FileSystemEntry
+        {
+            Name = "memo.txt", DisplayName = "memo.txt", FullPath = @"C:\Temp\memo.txt", IsDirectory = false,
+        };
+
+        Assert.False(previous.IsSameRowAs(asFolder));
+        Assert.False(previous.IsSameRowAs(withExtension));
+    }
+
+    [Fact]
+    public void 読み直した内容を写すと表示が更新され中身の変化が返ること()
+    {
+        var entry = File("memo.txt", size: 2048, modified: new DateTime(2026, 7, 25, 9, 5, 0));
+        var fresh = File("memo.txt", size: 4096, modified: new DateTime(2026, 7, 25, 9, 6, 0));
+        fresh.IsCut = true;
+
+        var contentChanged = entry.UpdateFrom(fresh);
+
+        Assert.True(contentChanged);
+        Assert.Equal(4096, entry.Size);
+        Assert.Equal(new DateTime(2026, 7, 25, 9, 6, 0), entry.Modified);
+        Assert.True(entry.IsCut);
+    }
+
+    [Fact]
+    public void 中身が変わっていない読み直しでは変化なしと返ること()
+    {
+        var entry = File("memo.txt", size: 2048, modified: new DateTime(2026, 7, 25, 9, 5, 0));
+        var fresh = File("memo.txt", size: 2048, modified: new DateTime(2026, 7, 25, 9, 5, 0));
+
+        Assert.False(entry.UpdateFrom(fresh));
+    }
+
+    [Fact]
+    public void サムネイルを無効化すると読み直し対象に戻ること()
+    {
+        var entry = File("a.jpg");
+        entry.MarkThumbnailFinal();
+
+        entry.InvalidateThumbnail();
+
+        Assert.False(entry.IsThumbnailFinal);
+    }
+
+    [Fact]
     public void 切り取りと隠し属性のとき行の不透明度が下がること()
     {
         var normal = File("a");
@@ -186,6 +249,75 @@ public class FileSystemEntryHappyTests
         Assert.Equal(1.0, normal.RowOpacity);
         Assert.Equal(0.6, hidden.RowOpacity);
         Assert.Equal(0.45, cut.RowOpacity);
+    }
+}
+
+/// <summary>一覧で文字を打ったときの先頭一致ジャンプ（エクスプローラー互換）の移動先。</summary>
+public class TypeAheadHappyTests
+{
+    // C:\Windows の並びを模した一覧（表示名の先頭一致で移動する）
+    private static readonly IReadOnlyList<FileSystemEntry> Entries =
+    [
+        Folder("Fonts"), Folder("security"), Folder("ServiceProfiles"), Folder("servicing"),
+        Folder("Setup"), Folder("SoftwareDistribution"), Folder("System32"), Folder("Web"),
+    ];
+
+    private static FileSystemEntry Folder(string name) => new()
+    {
+        Name = name,
+        DisplayName = name,
+        FullPath = @"C:\Windows\" + name,
+        IsDirectory = true,
+    };
+
+    private static int Find(string prefix, int currentIndex)
+        => Kiriha.ViewModels.TabViewModel.FindTypeAheadIndex(Entries, prefix, currentIndex);
+
+    [Fact]
+    public void SからOと打つと先頭一致でSoftwareDistributionへ移ること()
+    {
+        // S → 最初の s 始まり（security）へ移り、続けて O を打つと "so" の一致先へ進む
+        var afterS = Find("s", -1);
+        Assert.Equal("security", Entries[afterS].DisplayName);
+
+        var afterSo = Find("so", afterS);
+        Assert.Equal("SoftwareDistribution", Entries[afterSo].DisplayName);
+    }
+
+    [Fact]
+    public void 打ち足した文字列が今の行にも一致するならその場に留まること()
+    {
+        // SoftwareDistribution を選んだ状態で "sof" まで打っても動かない（絞り込みの継続）
+        var index = Array.FindIndex(Entries.ToArray(), e => e.DisplayName == "SoftwareDistribution");
+        Assert.Equal(index, Find("sof", index));
+    }
+
+    [Fact]
+    public void 同じ文字を続けて打つと次の候補へ送られること()
+    {
+        Assert.Equal("security", Entries[Find("s", -1)].DisplayName);
+        Assert.Equal("ServiceProfiles", Entries[Find("ss", 1)].DisplayName);
+        Assert.Equal("servicing", Entries[Find("sss", 2)].DisplayName);
+    }
+
+    [Fact]
+    public void 一文字は常に次の候補へ進み末尾まで行くと先頭へ回り込むこと()
+    {
+        // System32（最後の s 始まり）から "s" を打つと security へ戻る
+        var last = Array.FindIndex(Entries.ToArray(), e => e.DisplayName == "System32");
+        Assert.Equal("security", Entries[Find("s", last)].DisplayName);
+    }
+
+    [Fact]
+    public void 大文字小文字を区別せずに一致すること()
+        => Assert.Equal("SoftwareDistribution", Entries[Find("SOFT", -1)].DisplayName);
+
+    [Fact]
+    public void 該当がないときは移動しないこと()
+    {
+        Assert.Equal(-1, Find("zz", -1));
+        Assert.Equal(-1, Find("", 0));
+        Assert.Equal(-1, Kiriha.ViewModels.TabViewModel.FindTypeAheadIndex([], "s", -1));
     }
 }
 
@@ -338,4 +470,63 @@ public class FileSystemServiceHappyTests
                 entries,
                 x => string.Equals(x.FullPath, Path.GetPathRoot(Environment.SystemDirectory), StringComparison.OrdinalIgnoreCase));
         });
+}
+
+/// <summary>左ペインの表示モードの保存値解決（旧 bool フラグからの移行を含む）。</summary>
+public class SidebarModeHappyTests
+{
+    [Theory]
+    [InlineData("QuickAccess", SidebarMode.QuickAccess)]
+    [InlineData("Tree", SidebarMode.Tree)]
+    [InlineData("Bookmarks", SidebarMode.Bookmarks)]
+    public void 保存済みのモード名はそのまま解決される(string saved, SidebarMode expected)
+    {
+        Assert.Equal(expected, SidebarModes.Resolve(saved, legacyShowTree: false));
+        // 保存値がある限り旧フラグは見ない
+        Assert.Equal(expected, SidebarModes.Resolve(saved, legacyShowTree: true));
+    }
+
+    [Theory]
+    [InlineData(true, SidebarMode.Tree)]
+    [InlineData(false, SidebarMode.QuickAccess)]
+    public void 未設定なら旧ツリー表示フラグから移行する(bool legacyShowTree, SidebarMode expected)
+    {
+        Assert.Equal(expected, SidebarModes.Resolve("", legacyShowTree));
+        Assert.Equal(expected, SidebarModes.Resolve(null, legacyShowTree));
+    }
+
+    [Theory]
+    [InlineData("5")]        // Enum.TryParse は数値文字列も通してしまう
+    [InlineData("Favorites")]
+    public void 壊れた保存値は未設定と同じ扱いになる(string saved)
+    {
+        Assert.Equal(SidebarMode.QuickAccess, SidebarModes.Resolve(saved, legacyShowTree: false));
+        Assert.Equal(SidebarMode.Tree, SidebarModes.Resolve(saved, legacyShowTree: true));
+    }
+}
+
+/// <summary>絵文字アイコンセットの表示文字。お気に入りとファイル一覧が同じ解決を共有する。</summary>
+public class EmojiIconHappyTests
+{
+    [Theory]
+    [InlineData("C:\\", true, true, "💾")]
+    [InlineData("dev", true, false, "📁")]
+    [InlineData("photo.PNG", false, false, "🖼")]
+    [InlineData("clip.mp4", false, false, "🎬")]
+    [InlineData("setup.exe", false, false, "⚙")]
+    [InlineData("CHANGELOG.md", false, false, "📄")]
+    [InlineData("Program.cs", false, false, "📜")]
+    [InlineData("なにか.unknown", false, false, "📄")]
+    public void 種別と拡張子から絵文字を決める(string name, bool isDirectory, bool isDrive, string expected)
+    {
+        Assert.Equal(expected, FileSystemEntry.ResolveEmojiIcon(name, isDirectory, isDrive));
+    }
+
+    [Fact]
+    public void ドライブとフォルダーは拡張子より優先される()
+    {
+        // 名前に拡張子があってもフォルダーならフォルダーのアイコンになる
+        Assert.Equal("📁", FileSystemEntry.ResolveEmojiIcon("bundle.app", isDirectory: true));
+        Assert.Equal("💾", FileSystemEntry.ResolveEmojiIcon("D:\\", isDirectory: true, isDrive: true));
+    }
 }

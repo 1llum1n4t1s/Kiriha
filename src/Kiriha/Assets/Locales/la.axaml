@@ -1,7 +1,9 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:String x:Key="StringTextFlyoutCopyText" xml:space="preserve">Exscribere</x:String>
+  <x:String x:Key="StringTextFlyoutCutText" xml:space="preserve">Exsecare</x:String>
+  <x:String x:Key="StringTextFlyoutPasteText" xml:space="preserve">Agglutinare</x:String>
   <x:String x:Key="Text.A11y.OpenSubfolders" xml:space="preserve">Subplicas monstrare</x:String>
   <x:String x:Key="Text.A11y.ResizeVerticalTabs" xml:space="preserve">Latitudinem tabulae verticalis mutare</x:String>
-  <x:String x:Key="Text.A11y.SwitchToTree" xml:space="preserve">Ad arborem transire</x:String>
   <x:String x:Key="Text.A11y.ToggleSidebar" xml:space="preserve">Latus monstrare vel celare</x:String>
   <x:String x:Key="Text.A11y.VerticalTabs" xml:space="preserve">Schedae verticales</x:String>
   <x:String x:Key="Text.Address.Copy" xml:space="preserve">Inscriptionem exscribere</x:String>
@@ -10,7 +12,6 @@
   <x:String x:Key="Text.Bookmarks.AddFolderMenu" xml:space="preserve">Plicam addere...</x:String>
   <x:String x:Key="Text.Bookmarks.AddFolderTitle" xml:space="preserve">Plicam addere</x:String>
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">Plicam huc trahe ut inter notas addatur</x:String>
-  <x:String x:Key="Text.Bookmarks.Hide" xml:space="preserve">Tabulam notarum celare</x:String>
   <x:String x:Key="Text.Bookmarks.NewFolderName" xml:space="preserve">Plica nova</x:String>
   <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">Nomen mutare...</x:String>
   <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">Nomen notae mutare</x:String>
@@ -168,7 +169,6 @@
   <x:String x:Key="Text.License.Status.TrialExpired" xml:space="preserve">Probatio finita (licentia requiritur)</x:String>
   <x:String x:Key="Text.Menu.About" xml:space="preserve">De Kiriha</x:String>
   <x:String x:Key="Text.Menu.AccessDenied" xml:space="preserve">(Aditus negatus)</x:String>
-  <x:String x:Key="Text.Menu.BookmarksBar" xml:space="preserve">Tabula notarum</x:String>
   <x:String x:Key="Text.Menu.CheckUpdate" xml:space="preserve">Renovationes quaerere</x:String>
   <x:String x:Key="Text.Menu.Empty" xml:space="preserve">(Vacuum)</x:String>
   <x:String x:Key="Text.Menu.NewWindow" xml:space="preserve">Fenestra nova</x:String>
@@ -290,7 +290,6 @@
   <x:String x:Key="Text.Settings.Shortcuts.Subtitle" xml:space="preserve">Compendia claviaturae ad celerius operandum</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.Tabs" xml:space="preserve">Schedae</x:String>
   <x:String x:Key="Text.Settings.Shortcuts.TabsBody" xml:space="preserve">Ctrl+T　Scheda nova&#10;Ctrl+W　Schedam claudere&#10;Ctrl+Shift+T　Schedam clausam iterum aperire&#10;Ctrl+Tab　Schedas permutare&#10;Ctrl+1..9　Schedam certam eligere</x:String>
-  <x:String x:Key="Text.Settings.ShowBookmarksBar" xml:space="preserve">Tabulam notarum monstrare (Ctrl+Shift+B)</x:String>
   <x:String x:Key="Text.Settings.ShowCheckBoxes" xml:space="preserve">Quadrata electionis rerum monstrare</x:String>
   <x:String x:Key="Text.Settings.ShowExtensions" xml:space="preserve">Extensiones nominum monstrare</x:String>
   <x:String x:Key="Text.Settings.ShowHidden" xml:space="preserve">Fasciculos occultos monstrare</x:String>
@@ -324,12 +323,12 @@
   <x:String x:Key="Text.Share.OpenFailed" xml:space="preserve">Tabula communicationis aperiri non potuit</x:String>
   <x:String x:Key="Text.Share.PrepareFailed" xml:space="preserve">Data communicanda parari non potuerunt</x:String>
   <x:String x:Key="Text.Share.SelectFiles" xml:space="preserve">Fasciculos communicandos elige</x:String>
+  <x:String x:Key="Text.Sidebar.Bookmarks" xml:space="preserve">Notae</x:String>
   <x:String x:Key="Text.Sidebar.Drives" xml:space="preserve">Disci</x:String>
   <x:String x:Key="Text.Sidebar.QuickAccess" xml:space="preserve">Aditus celer</x:String>
   <x:String x:Key="Text.Sidebar.RecentFiles" xml:space="preserve">Fasciculi recentes</x:String>
   <x:String x:Key="Text.Sidebar.RecycleBin" xml:space="preserve">Scrinium</x:String>
   <x:String x:Key="Text.Sidebar.RecycleBinTip" xml:space="preserve">Scrinium in Explorer aperire</x:String>
-  <x:String x:Key="Text.Sidebar.ToggleTip" xml:space="preserve">Inter aditum celerem et arborem plicarum permutat</x:String>
   <x:String x:Key="Text.Sidebar.TreeView" xml:space="preserve">Aspectus arboris</x:String>
   <x:String x:Key="Text.Sort.Ascending" xml:space="preserve">Ascendens</x:String>
   <x:String x:Key="Text.Sort.Descending" xml:space="preserve">Descendens</x:String>
