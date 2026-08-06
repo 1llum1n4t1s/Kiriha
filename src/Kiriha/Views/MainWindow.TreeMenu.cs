@@ -218,7 +218,9 @@ public partial class MainWindow
             return;
         }
 
-        var result = FileOperationService.Rename(target.Path, newPath);
+        // ツリー側の名前変更も一覧側と同じく背景スレッドで実行する
+        // （IFileOperation は同期ブロッキングで、UI スレッドから呼ぶと固まる）
+        var result = await Task.Run(() => FileOperationService.Rename(target.Path, newPath));
         if (!result.IsSuccess)
         {
             if (!result.IsCancelled)

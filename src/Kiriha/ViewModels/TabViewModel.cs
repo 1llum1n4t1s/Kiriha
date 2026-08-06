@@ -1767,6 +1767,37 @@ public partial class TabViewModel : ObservableObject
     /// </summary>
     private async Task ApplyDirectoryChangesAsync(DirectoryChangeBatch batch)
     {
+        _pendingChangeBatches.Enqueue(batch);
+        if (_isApplyingChangeBatches)
+        {
+            return;
+        }
+
+        _isApplyingChangeBatches = true;
+        try
+        {
+            while (_pendingChangeBatches.Count > 0)
+            {
+                await ApplyDirectoryChangeBatchAsync(_pendingChangeBatches.Dequeue());
+            }
+        }
+        finally
+        {
+            _isApplyingChangeBatches = false;
+        }
+    }
+
+    /// <summary>適用待ちの監視バッチ。enqueue も dequeue も UI スレッドからしか起きない
+    /// （<see cref="OnObservedDirectoryChanged"/> の Post 内で開始し、await の再開も UI スレッド）ため、
+    /// ロックは要らない。</summary>
+    private readonly Queue<DirectoryChangeBatch> _pendingChangeBatches = new();
+
+    private bool _isApplyingChangeBatches;
+
+    /// <summary>1 バッチぶんの変更を適用する。呼び出しは
+    /// <see cref="ApplyDirectoryChangesAsync"/> が到着順に直列化する。</summary>
+    private async Task ApplyDirectoryChangeBatchAsync(DirectoryChangeBatch batch)
+    {
         var path = CurrentPath;
         if (path == FileSystemService.ComputerPath)
         {
@@ -1788,14 +1819,15 @@ public partial class TabViewModel : ObservableObject
         List<(DirectoryChange Change, FileSystemEntry? Fresh)> resolved;
         try
         {
-            // 属性・サイズの取得は同期 I/O（切断中のネットワークパスではブロックする）なので背景で行う
+            // 属性・サイズの取得は同期 I/O（切断中のネットワークパスではブロックする）なので背景で行う。
+            //
+            // 削除通知でも Kind を信じずに実状を見る。イベントが届いてからここへ来るまでに
+            // 同名で作り直されていることがあり（上書き保存・ビルド出力）、Kind を信じて
+            // 無条件に「消えた」とすると、ディスク上に在る行を一覧から落としてしまう。
+            // 存在しなければ TryCreateEntry が null を返すので、結果は従来と同じ。
             resolved = await Task.Run(
                 () => targets
-                    .Select(change => (
-                        change,
-                        change.Kind == DirectoryChangeKind.Deleted
-                            ? null
-                            : FileSystemService.TryCreateEntry(change.FullPath, options)))
+                    .Select(change => (change, FileSystemService.TryCreateEntry(change.FullPath, options)))
                     .ToList(),
                 _lifetimeCts.Token);
         }
@@ -2614,6 +2646,7 @@ public partial class TabViewModel : ObservableObject
         LocalizationService.Changed -= OnLocalizationChanged;
         _watcherSubscription?.Dispose();
         _watcherSubscription = null;
+        _pendingChangeBatches.Clear();
         _filterDebounceCts?.Cancel();
         _filterDebounceCts?.Dispose();
         _searchCts?.Cancel();
@@ -3987,7 +4020,10 @@ public partial class TabViewModel : ObservableObject
         {
             // Windows の大文字・小文字だけの変更は同一パス扱いになるため、一時名を経由する。
             var temporary = Path.Combine(dir, $".kiriha-rename-{Guid.NewGuid():N}");
-            var first = FileOperationService.Rename(entry.FullPath, temporary);
+            // コピー・削除と同じ理由で背景スレッドへ出す。IFileOperation は同期ブロッキングで、
+            // FileOperationService.Execute は専用 STA スレッドを Join するため、UI スレッドから
+            // 直接呼ぶと確認ダイアログや低速パスの間ウィンドウ全体が固まる。
+            var first = await Task.Run(() => FileOperationService.Rename(entry.FullPath, temporary));
             if (!first.IsSuccess)
             {
                 if (!first.IsCancelled) StatusText = LocalizationService.Text("Text.Op.RenameFailed", FormatOpError(first.NativeErrorCode));
@@ -3995,10 +4031,10 @@ public partial class TabViewModel : ObservableObject
             }
 
             // 一時名への改名は既に成功しているため、ここで失敗したら一時名のまま残ってしまう。必ず元へ戻す。
-            var second = FileOperationService.Rename(temporary, newPath);
+            var second = await Task.Run(() => FileOperationService.Rename(temporary, newPath));
             if (!second.IsSuccess)
             {
-                var rollback = FileOperationService.Rename(temporary, entry.FullPath);
+                var rollback = await Task.Run(() => FileOperationService.Rename(temporary, entry.FullPath));
                 StatusText = rollback.IsSuccess
                     ? LocalizationService.Text("Text.Rename.RevertedToOriginal")
                     : LocalizationService.Text("Text.Rename.StuckAsTemporary", Path.GetFileName(temporary));
@@ -4008,7 +4044,7 @@ public partial class TabViewModel : ObservableObject
         }
         else
         {
-            var result = FileOperationService.Rename(entry.FullPath, newPath);
+            var result = await Task.Run(() => FileOperationService.Rename(entry.FullPath, newPath));
             if (!result.IsSuccess)
             {
                 if (!result.IsCancelled) StatusText = LocalizationService.Text("Text.Op.RenameFailed", FormatOpError(result.NativeErrorCode));
