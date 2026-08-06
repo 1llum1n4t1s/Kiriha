@@ -1848,6 +1848,30 @@ public partial class TabViewModel : ObservableObject
 
         SetAllEntries(ApplySort(all).ToList());
         ApplyFilter();
+        ReconcileSelectionWithEntries();
+    }
+
+    /// <summary>
+    /// 監視差分で消えた行を、選択の側からも取り除く。
+    ///
+    /// 選択の実体は ListBox が持ち、通常は行が消えた時点で SelectionChanged →
+    /// <see cref="SetSelection"/> と伝わる。ところが選択中でないタブには ListBox 自体が無く
+    /// （タブの中身は SelectedTab の DataTemplate で作られるため）、裏で監視だけが進む。
+    /// その間に選択中のファイルが外部から消されると、タブへ戻ってきたときに一覧からは消えているのに
+    /// 「1 個の項目を選択」だけが残り、切り取り / 削除 / 名前変更が存在しないパスへ向く（実測で再現）。
+    /// </summary>
+    private void ReconcileSelectionWithEntries()
+    {
+        var alive = new HashSet<FileSystemEntry>(_allEntries);
+        if (SelectedEntry is { } anchor && !alive.Contains(anchor))
+        {
+            SelectedEntry = null;
+        }
+
+        if (_selection.Count > 0 && _selection.Exists(e => !alive.Contains(e)))
+        {
+            SetSelection(_selection.Where(alive.Contains).ToList());
+        }
     }
 
     /// <summary>path が parent の直下の項目か（監視は非再帰なので通常は真だが、念のため確かめる）。</summary>
