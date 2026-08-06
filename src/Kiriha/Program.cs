@@ -17,7 +17,16 @@ internal static partial class Program
     // クリティカルセクションに入れ、起動直後の競合で通知が消失する（lost-wakeup）のを防ぐ。
     private static readonly Lock ActivationGate = new();
     private static Action<string[]>? _activationHandler;
-    private static string[]? _pendingActivationArgs;
+    /// <summary>
+    /// UI がハンドラを登録する前に届いた起動要求。単一のフィールドへ上書きしていたときは、
+    /// 登録前に 2 つ目以降の起動が来ると先着の引数が捨てられ、そのフォルダーが開かなかった。
+    /// 到着順に貯めて、登録時にまとめて配送する。
+    /// </summary>
+    private static readonly List<string[]> PendingActivationArgs = [];
+
+    /// <summary>ハンドラが登録されないまま貯まり続けないよう上限を設ける（受信側の引数上限と同じ考え方）。</summary>
+    private const int MaxPendingActivations = 8;
+
     /// <summary>起動引数（フォルダーパスを渡すとそのフォルダーをタブで開く）。</summary>
     public static string[] StartupArgs { get; private set; } = [];
 
@@ -89,18 +98,18 @@ internal static partial class Program
 
     public static void RegisterActivationHandler(Action<string[]> handler)
     {
-        string[]? pending;
+        string[][] pending;
         lock (ActivationGate)
         {
             _activationHandler = handler;
-            pending = _pendingActivationArgs;
-            _pendingActivationArgs = null;
+            pending = [.. PendingActivationArgs];
+            PendingActivationArgs.Clear();
         }
 
         // 保留中の起動要求があればロック外で処理する（ハンドラは UI へ Post するだけなので短時間）。
-        if (pending is not null)
+        foreach (var args in pending)
         {
-            handler(pending);
+            handler(args);
         }
     }
 
@@ -132,9 +141,9 @@ internal static partial class Program
                 {
                     handler = _activationHandler;
                     // ハンドラ未登録なら保留に積む（登録側が同じロック下で拾う）。
-                    if (handler is null)
+                    if (handler is null && PendingActivationArgs.Count < MaxPendingActivations)
                     {
-                        _pendingActivationArgs = args;
+                        PendingActivationArgs.Add(args);
                     }
                 }
 
@@ -156,13 +165,38 @@ internal static partial class Program
                 ".", ActivationPipeName, PipeDirection.Out, PipeOptions.CurrentUserOnly);
             client.Connect(1500);
             using var writer = new StreamWriter(client) { AutoFlush = true };
-            var safeArgs = args.Take(32).Where(arg => !arg.Contains('\n') && !arg.Contains('\r')).ToArray();
+            var safeArgs = args.Take(32)
+                .Where(arg => !arg.Contains('\n') && !arg.Contains('\r'))
+                .Select(ToAbsoluteDirectoryArgument)
+                .ToArray();
             writer.WriteLine(safeArgs.Length);
             foreach (var arg in safeArgs) writer.WriteLine(arg);
         }
         catch (Exception ex)
         {
             Logger.LogException("既存のKirihaへ起動通知を送信できませんでした", ex);
+        }
+    }
+
+    /// <summary>
+    /// 相対パスの引数を、送信側の作業ディレクトリを基準に絶対パスへ直す。
+    ///
+    /// 受け取った側は自分の作業ディレクトリで <c>Directory.Exists</c> / <c>Path.GetFullPath</c> を
+    /// 掛けるため、そのまま送ると「<c>kiriha .</c>」のような相対指定が既存インスタンスの
+    /// 作業ディレクトリ（通常はインストール先）として解決され、別のフォルダーが開くか何も開かない。
+    /// 引数がパスとは限らないので、送信側でディレクトリとして解決できたものだけを変換する。
+    /// </summary>
+    private static string ToAbsoluteDirectoryArgument(string arg)
+    {
+        try
+        {
+            var full = Path.GetFullPath(arg);
+            return Directory.Exists(full) ? full : arg;
+        }
+        catch
+        {
+            // パスとして不正な引数（将来のオプション等）はそのまま渡す
+            return arg;
         }
     }
 

@@ -71,25 +71,50 @@ internal static partial class ClipboardFileService
 
         try
         {
-            EmptyClipboard();
+            // 確保は EmptyClipboard より先に済ませる。先に空にしてしまうと、確保に失敗して
+            // false を返したときには利用者が前に入れていた内容まで消えている。
             var hDrop = CreateHDrop(paths);
             if (hDrop == 0)
             {
                 return false;
             }
 
-            if (SetClipboardData(CfHdrop, hDrop) == 0)
+            var effectFormat = RegisterClipboardFormatW("Preferred DropEffect");
+            var hEffect = effectFormat == 0 ? 0 : CreateDword(cut ? DropEffectMove : DropEffectCopy);
+            if (hEffect == 0 && cut)
             {
-                // 設定に失敗したときは所有権がクリップボードへ移らないので、こちらで解放する
+                // 切り取りは "Preferred DropEffect" が無いとエクスプローラーにコピーとして
+                // 解釈される。半透明表示だけ切り取りになって実際はコピー、という食い違いは
+                // 「貼り付けたので元を消す」を誘発するため、操作ごと失敗させる。
                 _ = GlobalFree(hDrop);
                 return false;
             }
 
-            var effectFormat = RegisterClipboardFormatW("Preferred DropEffect");
-            var hEffect = CreateDword(cut ? DropEffectMove : DropEffectCopy);
+            EmptyClipboard();
+            if (SetClipboardData(CfHdrop, hDrop) == 0)
+            {
+                // 設定に失敗したときは所有権がクリップボードへ移らないので、こちらで解放する
+                _ = GlobalFree(hDrop);
+                if (hEffect != 0)
+                {
+                    _ = GlobalFree(hEffect);
+                }
+
+                return false;
+            }
+
             if (hEffect != 0 && SetClipboardData(effectFormat, hEffect) == 0)
             {
                 _ = GlobalFree(hEffect);
+                if (cut)
+                {
+                    // 上と同じ理由。パス一覧だけが載った中途半端な状態を残さない。
+                    EmptyClipboard();
+                    return false;
+                }
+
+                // コピーは効果指定が無くても既定でコピー扱いになるので、記録だけ残して続行する。
+                Logger.Log("クリップボードへ Preferred DropEffect を設定できませんでした（コピーとして続行）", LogLevel.Warning);
             }
 
             _cutPaths = cut

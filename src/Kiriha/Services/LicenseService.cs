@@ -207,8 +207,9 @@ public static class LicenseService
         var iso = start.ToString("O");
         try
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(trialFile)!);
-            File.WriteAllText(trialFile, iso);
+            // 直書きだと書き込み途中の異常終了で空の trial.dat が残る。レジストリ側も読めない
+            // 環境では、そこから試用期間が丸ごと再起算されてしまうので原子的に置き換える。
+            AtomicFile.WriteAllText(trialFile, iso);
         }
         catch { /* 片方だけでも記録できていればよい */ }
 
@@ -486,9 +487,10 @@ public static class LicenseService
         {
             using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
             var check = await QueryRevocationAsync(http, purchaseId, ct);
-            if (check is null)
+            if (check is not { Valid: not null })
             {
-                // サーバー側の一時異常は失効と区別が付かないため猶予を消費するだけに留める
+                // サーバー側の一時異常（到達不能・valid を含まない応答）は失効と区別が付かないため、
+                // 猶予を消費するだけに留める。ここで失効扱いにすると購入済みのキーを消すことになる。
                 return true;
             }
             if (check is { Valid: false })
@@ -629,7 +631,14 @@ public static class LicenseService
         public string? IssuedAt { get; set; }
     }
 
-    internal sealed record LicenseCheckResponse([property: JsonPropertyName("valid")] bool Valid);
+    /// <summary>
+    /// 失効照会の応答。<c>valid</c> は意図的に null 許容にしてある。
+    /// 非 null の bool にすると、hub のスキーマ変更や中継の事故で <c>valid</c> を含まない
+    /// 200 応答（例: <c>{}</c>）が返ったとき、System.Text.Json が既定値 false を入れてしまい、
+    /// 「失効した」と誤解して購入済みユーザーのキーを消してしまう。
+    /// null は「判定できなかった」として一時異常と同じ猶予継続へ倒す。
+    /// </summary>
+    internal sealed record LicenseCheckResponse([property: JsonPropertyName("valid")] bool? Valid);
 
     /// <summary>確認コードの送信・照合に送る本文（code は送信依頼時は null）。</summary>
     internal sealed class RecoveryRequest

@@ -687,6 +687,10 @@ public partial class TabViewModel : ObservableObject
     /// PNG は画素の並べ替えと再圧縮を挟むため、大きな画像でも間に合う長さにしてある。</summary>
     private static readonly TimeSpan RotateTimeout = TimeSpan.FromSeconds(60);
 
+    /// <summary>いま回転の書き込みが走っているファイル。同じ画像が複数のタブで開かれていても
+    /// 二重に回さないよう、タブ単位ではなくアプリ全体で 1 本持つ（<see cref="FileUndoService"/> と同じ考え方）。</summary>
+    private static readonly ConcurrentDictionary<string, byte> RotatingPaths = new(StringComparer.OrdinalIgnoreCase);
+
     [RelayCommand]
     private Task RotateSelectedLeft() => RotateSelectedAsync(clockwise: false);
 
@@ -711,14 +715,32 @@ public partial class TabViewModel : ObservableObject
         }
 
         var path = entry.FullPath;
+
+        // タイムアウトで待つのをやめても、書き込み自体は止められない（待たされているのは
+        // キャンセルできないファイル open なので、CancellationToken を渡しても抜けられない）。
+        // 打ち切った後にもう一度回すと、遅れて完了した 90 度の上にさらに 90 度が乗って
+        // 180 度回ってしまうため、同じファイルへの回転が走っている間は次を受け付けない。
+        if (!RotatingPaths.TryAdd(path, 0))
+        {
+            StatusText = LocalizationService.Text("Text.Gallery.RotateFailed");
+            return;
+        }
+
         bool rotated;
+        var work = Task.Run(() => ImageRotationService.TryRotate(path, clockwise));
+        // 打ち切った場合も含め、書き込みが実際に終わった時点で受付を再開する。
+        _ = work.ContinueWith(
+            completed => RotatingPaths.TryRemove(path, out _),
+            CancellationToken.None,
+            TaskContinuationOptions.None,
+            TaskScheduler.Default);
+
         try
         {
             // 他プロセス（ウイルス対策等）が oplock を握っていると、書き込み用の open は
             // 例外も出さずに待ち続けることがある。待ちきりにするとコマンドが完了扱いにならず
             // ボタンが二度と押せなくなるため、上限を切って失敗として扱う。
-            rotated = await Task.Run(() => ImageRotationService.TryRotate(path, clockwise))
-                .WaitAsync(RotateTimeout);
+            rotated = await work.WaitAsync(RotateTimeout);
         }
         catch (TimeoutException)
         {
@@ -3463,7 +3485,13 @@ public partial class TabViewModel : ObservableObject
             await NavigateToAsync(CurrentPath, record: false);
             StatusText = LocalizationService.Text("Text.Op.Undone", recycled.Count);
         }
-        else if (!result.IsCancelled)
+        else if (result.IsCancelled)
+        {
+            // 利用者が確認ダイアログで「キャンセル」を選んだだけなので、項目はごみ箱に残っている。
+            // 履歴を消してしまうと、もう一度 Ctrl+Z を押しても二度と戻せなくなる。
+            FileUndoService.PushDelete(recycled);
+        }
+        else
         {
             // 戻せなかった分は履歴へ戻さない（ごみ箱を空にした後などは何度試しても失敗するため）
             StatusText = LocalizationService.Text("Text.Op.UndoFailed", FormatOpError(result.NativeErrorCode));
