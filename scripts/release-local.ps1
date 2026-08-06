@@ -151,7 +151,7 @@ foreach ($runtime in $Runtimes) {
             --packId Kiriha `
             --packVersion $version `
             --packTitle 'Kiriha' `
-            --packAuthors '1llum1n4t1s' `
+            --packAuthors 'Kagayoi' `
             --mainExe Kiriha.exe `
             --icon (Join-Path 'src' 'Kiriha' 'icon' 'app.ico') `
             --packDir $publishDir `

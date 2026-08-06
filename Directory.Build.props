@@ -17,10 +17,12 @@
     <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
     <AssemblyTitle>Kiriha</AssemblyTitle>
     <AssemblyDescription>Chrome ライクなタブ型ファイラー</AssemblyDescription>
-    <AssemblyCompany>1llum1n4t1s</AssemblyCompany>
+    <Company>Kagayoi</Company>
     <AssemblyProduct>Kiriha</AssemblyProduct>
-    <AssemblyCopyright>Copyright © 2026 ゆろち</AssemblyCopyright>
+    <Copyright>Copyright © 2026 Kagayoi</Copyright>
     <Title>Kiriha</Title>
-    <Authors>ゆろち</Authors>
+    <Authors>Kagayoi</Authors>
+    <!-- IDE コードスタイル分析をビルド時にも強制する。IDE0005 はドキュメント生成が必須なため対象外。 -->
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
 </Project>
