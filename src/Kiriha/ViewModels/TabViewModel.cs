@@ -565,9 +565,36 @@ public partial class TabViewModel : ObservableObject
     /// → 鮮鋭化」の順に通し、描画時の再サンプリングが要らない状態で返す
     /// （呼び出し側は <see cref="PreviewStretch"/> を Stretch.None にする）。
     /// </summary>
+    /// <summary>
+    /// ギャラリーへ出す 1 枚の元画像を作る。RAW と新世代フォーマットはシェルのコーデックに
+    /// 現像してもらい、それ以外は Skia でデコードする。どちらの経路も同じ幅を要求するので、
+    /// 後段の鮮鋭化・ガンマ・表示サイズ調整は形式を問わず共通に掛かる。
+    ///
+    /// シェルは要求サイズを外接矩形として扱い、埋め込みプレビューの実寸を超えて拡大はしない。
+    /// 実測（30MB の CR2）では要求 1024 と 2560 で所要時間が変わらない（どちらも現像 1 回で
+    /// 620〜740ms）ため、ギャラリーでは常に GalleryDecodeWidth を要求してよい。
+    /// </summary>
+    private static Bitmap? DecodeGallerySource(string path, CancellationToken token)
+    {
+        if (!IsShellDecodedImage(Path.GetExtension(path).ToLowerInvariant()))
+        {
+            return ImageDecodeService.TryDecodeToWidth(path, GalleryDecodeWidth, token);
+        }
+
+        // シェル呼び出しはキャンセルを受け付けないので、戻ってから世代を確認して捨てる。
+        var shell = ShellThumbnailService.TryGetThumbnail(path, GalleryDecodeWidth);
+        if (token.IsCancellationRequested)
+        {
+            shell?.Dispose();
+            return null;
+        }
+
+        return shell;
+    }
+
     private GalleryImage? DecodeGalleryBitmap(string path, CancellationToken token)
     {
-        var bitmap = ImageDecodeService.TryDecodeToWidth(path, GalleryDecodeWidth, token);
+        var bitmap = DecodeGallerySource(path, token);
         if (bitmap is null)
         {
             return null;
@@ -802,8 +829,30 @@ public partial class TabViewModel : ObservableObject
     /// 小さい画像が無駄に大きなビットマップになることはない。</summary>
     private const int GalleryDecodeWidth = 2560;
 
+    /// <summary>プレビューペインのデコード幅（ギャラリーと違い、脇に小さく出すだけ）。</summary>
+    private const int PreviewPaneDecodeWidth = 480;
+
     /// <summary>プレビューでデコードを試みるファイルサイズの上限。</summary>
     private const long PreviewSizeLimit = 64 * 1024 * 1024;
+
+    /// <summary>Skia が扱えないため、シェルのコーデックに現像してもらう拡張子か（RAW・新世代フォーマット）。</summary>
+    private static bool IsShellDecodedImage(string ext)
+        => ShellImageThumbnailExtensions.Contains(ext) || RawThumbnailExtensions.Contains(ext);
+
+    /// <summary>プレビュー・ギャラリーで画像としてデコードを試みる対象か。
+    /// サイズ上限を掛けるのは Skia でデコードするものだけ。シェル経由はファイル全体を
+    /// managed メモリへ読み込まないので、30MB 級の RAW でも上限を気にする必要がない。</summary>
+    private static bool IsPreviewableImage(FileSystemEntry entry)
+    {
+        if (entry.IsDirectory)
+        {
+            return false;
+        }
+
+        var ext = Path.GetExtension(entry.Name).ToLowerInvariant();
+        return IsShellDecodedImage(ext)
+               || (ImageExtensions.Contains(ext) && entry.Size is < PreviewSizeLimit);
+    }
 
     /// <summary>先読み済みのビットマップ（キーは絶対パス）。取り出した時点で所有権も渡す。
     /// 「表示サイズで作ったものか」も一緒に持つ（作った当時の状態でしか判断できないため）。</summary>
@@ -921,10 +970,11 @@ public partial class TabViewModel : ObservableObject
         }
     }
 
-    /// <summary>この項目をギャラリーの先読み対象にできるか（動画・巨大ファイル・フォルダーは除く）。</summary>
+    /// <summary>この項目をギャラリーの先読み対象にできるか（動画・巨大ファイル・フォルダーは除く）。
+    /// RAW と新世代フォーマットも対象に含める。シェルの現像は 1 枚あたり 0.6 秒ほどかかるので、
+    /// Skia でデコードする通常の画像よりむしろ先読みの効果が大きい。</summary>
     private static bool IsPrefetchable(FileSystemEntry entry)
-        => entry is { IsDirectory: false, Size: < PreviewSizeLimit }
-           && ImageExtensions.Contains(Path.GetExtension(entry.Name).ToLowerInvariant());
+        => IsPreviewableImage(entry);
 
     private async Task PrefetchAsync(string path, CancellationTokenSource scope, CancellationToken token)
     {
@@ -1527,9 +1577,11 @@ public partial class TabViewModel : ObservableObject
 
         try
         {
-            // ギャラリー表示中は画面いっぱいに出すため高解像度でデコードする
-            var decodeWidth = IsGalleryView ? GalleryDecodeWidth : 480;
-            if (ImageExtensions.Contains(ext) && entry.Size is < PreviewSizeLimit)
+            // RAW も新世代フォーマットも「ギャラリーの静止画」としては通常の画像と同じ扱いにする。
+            // 経路が違うのはデコード元（Skia かシェルのコーデックか）だけで、解像度・鮮鋭化・
+            // ガンマ・先読みは共通に効かせる。
+            var isShellImage = IsShellDecodedImage(ext);
+            if (isShellImage || (ImageExtensions.Contains(ext) && entry.Size is < PreviewSizeLimit))
             {
                 // 先読み済みならデコードを待たずにそのまま出す（ホイール送りの待ち時間が消える）。
                 var image = TakePrefetched(entry.FullPath);
@@ -1539,7 +1591,9 @@ public partial class TabViewModel : ObservableObject
                     image = IsGalleryView
                         ? await Task.Run(() => DecodeGalleryBitmap(entry.FullPath, cts.Token), cts.Token)
                         : await Task.Run(
-                            () => ImageDecodeService.TryDecodeToWidth(entry.FullPath, decodeWidth, cts.Token),
+                            () => isShellImage
+                                ? ShellThumbnailService.TryGetThumbnail(entry.FullPath, PreviewPaneDecodeWidth)
+                                : ImageDecodeService.TryDecodeToWidth(entry.FullPath, PreviewPaneDecodeWidth, cts.Token),
                             cts.Token) is { } plain
                             ? new GalleryImage(plain, DisplaySized: false)
                             : null;
@@ -1564,31 +1618,8 @@ public partial class TabViewModel : ObservableObject
                     return;
                 }
 
-                // 読み取り自体に失敗した場合（クラウドドライブの瞬断など）は情報表示のみへフォールスルー
-            }
-
-            // RAW も「画像」として扱うので、シェル（各社の RAW コーデック）に現像してもらう。
-            if (ShellImageThumbnailExtensions.Contains(ext) || RawThumbnailExtensions.Contains(ext))
-            {
-                var bmp = await Task.Run(
-                    () => ShellThumbnailService.TryGetThumbnail(entry.FullPath, IsGalleryView ? 1024 : 480), cts.Token);
-                if (!cts.IsCancellationRequested && bmp is not null)
-                {
-                    PreviewBitmap?.Dispose();
-                    // シェル任せのサムネイルは表示サイズちょうどではないので、従来どおり収める。
-                    ApplyPreviewDisplaySize(null);
-                    PreviewBitmap = bmp;
-                    PreviewText = "";
-                    PreviewInfo = $"{entry.Name}\n{entry.TypeText}  {entry.SizeText}  {bmp.PixelSize.Width}×{bmp.PixelSize.Height}\n" + LocalizationService.Text("Text.Tooltip.Modified", entry.ModifiedText);
-                    return;
-                }
-
-                bmp?.Dispose();
-                if (cts.IsCancellationRequested)
-                {
-                    return;
-                }
-                // コーデック未導入で取得できなければ情報表示のみへフォールスルー
+                // 読み取り自体に失敗した場合（コーデック未導入、クラウドドライブの瞬断など）は
+                // 情報表示のみへフォールスルー
             }
 
             if (TextExtensions.Contains(ext) && entry.Size is < 512 * 1024)
@@ -3339,9 +3370,7 @@ public partial class TabViewModel : ObservableObject
     public static bool IsGalleryImage(string path)
     {
         var ext = Path.GetExtension(path).ToLowerInvariant();
-        return ImageExtensions.Contains(ext)
-               || ShellImageThumbnailExtensions.Contains(ext)
-               || RawThumbnailExtensions.Contains(ext);
+        return ImageExtensions.Contains(ext) || IsShellDecodedImage(ext);
     }
 
     /// <summary>ギャラリーで再生できる動画か。</summary>

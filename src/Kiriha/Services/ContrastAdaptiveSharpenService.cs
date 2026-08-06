@@ -129,9 +129,7 @@ internal static class ContrastAdaptiveSharpenService
         Bitmap scaled;
         try
         {
-            scaled = source.PixelSize == target
-                ? source
-                : source.CreateScaledBitmap(target, BitmapInterpolationMode.HighQuality);
+            scaled = source.PixelSize == target ? source : ScaleTo(source, target);
         }
         catch (Exception ex)
         {
@@ -145,6 +143,37 @@ internal static class ContrastAdaptiveSharpenService
         }
 
         return Apply(scaled);
+    }
+
+    /// <summary>
+    /// 表示サイズへ縮小拡大する。<c>CreateScaledBitmap</c> は Skia が持つ不変ビットマップしか
+    /// 受け付けず、<see cref="WriteableBitmap"/> を渡すと "Invalid source bitmap type." で失敗する
+    /// （実測: シェルのコーデックで現像した RAW と、Exif 回転を掛けた JPEG がこれに当たり、
+    /// 元の解像度のまま描画側へ渡ってしまうため鮮鋭化がほぼ打ち消されていた）。
+    /// その場合は画素を写し取って不変ビットマップへ作り直してから縮小拡大する。
+    /// </summary>
+    private static unsafe Bitmap ScaleTo(Bitmap source, PixelSize target)
+    {
+        if (source is not WriteableBitmap)
+        {
+            return source.CreateScaledBitmap(target, BitmapInterpolationMode.HighQuality);
+        }
+
+        var size = source.PixelSize;
+        var stride = checked(size.Width * 4);
+        var pixels = new byte[checked(stride * size.Height)];
+        fixed (byte* buffer = pixels)
+        {
+            source.CopyPixels(new PixelRect(size), (nint)buffer, pixels.Length, stride);
+            using var immutable = new Bitmap(
+                source.Format ?? PixelFormat.Bgra8888,
+                source.AlphaFormat ?? AlphaFormat.Premul,
+                (nint)buffer,
+                size,
+                source.Dpi,
+                stride);
+            return immutable.CreateScaledBitmap(target, BitmapInterpolationMode.HighQuality);
+        }
     }
 
     public static unsafe Bitmap Apply(Bitmap source, bool disposeSource = true, Vector? dpi = null)
