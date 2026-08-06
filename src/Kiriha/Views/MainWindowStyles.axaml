@@ -559,11 +559,28 @@
             <Setter Property="CornerRadius" Value="6" />
         </Style>
         <!-- お気に入りペインへのドロップ。枠の太さは既定でも 0,0,0,3 を透明で確保してあるので、
-             ハイライトが出てもツリーの位置がずれない。 -->
+             ハイライトが出てもツリーの位置がずれない。
+             ペイン全体を塗り潰さないのは、行ごとの挿入位置インジケーター（dropline）が
+             同じアクセント色で描かれるため、背景を塗ると線が見えなくなるから。 -->
         <Style Selector="Border.bookmarkpane.filedroptarget">
-            <Setter Property="Background" Value="{DynamicResource AccentSelectionBrush}" />
             <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
             <Setter Property="BorderThickness" Value="0,0,0,3" />
+        </Style>
+
+        <!-- お気に入りの行。ドラッグ中の「どこへ入るか」をここで見せる:
+             行の上下に出る 2px の線が「その前 / その後ろ」、行全体の強調が「このフォルダーの中へ」。
+             線は行の内側に重ねて描く（Panel の子）ので、表示が出てもツリーの行位置はずれない。 -->
+        <Style Selector="Border.bookmarkrow.dropinto">
+            <Setter Property="Background" Value="{DynamicResource AccentSelectionBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="4" />
+        </Style>
+        <Style Selector="Border.dropline">
+            <Setter Property="Height" Value="2" />
+            <Setter Property="CornerRadius" Value="1" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="Background" Value="{DynamicResource SystemAccentColor}" />
         </Style>
 
         <!-- ===== 設定タブ（Lhamiel / Shisui / RealTimeTranslator の実装を調査し数値を合わせた共通デザイン言語） =====

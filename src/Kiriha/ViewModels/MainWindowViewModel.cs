@@ -2169,6 +2169,127 @@ public partial class MainWindowViewModel : ObservableObject
         SaveBookmarks();
     }
 
+    /// <summary>
+    /// ドラッグ＆ドロップで示された位置へお気に入りを挿入する。
+    /// reference が null（項目の無い余白へのドロップ）なら末尾へ足す。
+    /// 既に同じパスが登録されているときは、その項目を指定位置へ移動する
+    /// （追加できずに何も起きないと、ユーザーからは並べ替えに失敗したように見えるため）。
+    /// </summary>
+    public void InsertBookmark(string path, BookmarkNode? reference, BookmarkDropMark mark)
+    {
+        var (target, index) = ResolveBookmarkInsertion(reference, mark);
+        var name = path == FileSystemService.ComputerPath
+            ? "PC"
+            : Path.GetFileName(path.TrimEnd(Path.DirectorySeparatorChar)) is { Length: > 0 } n ? n : path;
+
+        if (FindBookmarkByPath(_settings.Bookmarks, path) is { } existing)
+        {
+            // 元の位置を抜く前に挿入位置を求めてあるので、同じリスト内で前を抜いた分だけ詰める
+            var sourceIndex = target.IndexOf(existing);
+            if (sourceIndex >= 0 && sourceIndex < index)
+            {
+                index--;
+            }
+
+            RemoveBookmarkRecursive(_settings.Bookmarks, existing);
+            target.Insert(Math.Clamp(index, 0, target.Count), existing);
+            SaveBookmarks();
+            return;
+        }
+
+        target.Insert(Math.Clamp(index, 0, target.Count), new BookmarkNode { Name = name, Path = path });
+        SaveBookmarks();
+    }
+
+    /// <summary>目印の付いた項目から「どのリストの何番目か」を求める。</summary>
+    private (List<BookmarkNode> Target, int Index) ResolveBookmarkInsertion(BookmarkNode? reference, BookmarkDropMark mark)
+    {
+        if (reference is null || mark == BookmarkDropMark.None)
+        {
+            return (_settings.Bookmarks, _settings.Bookmarks.Count);
+        }
+
+        if (mark == BookmarkDropMark.Into && reference.Children is { } children)
+        {
+            return (children, children.Count);
+        }
+
+        var parent = FindBookmarkParent(_settings.Bookmarks, reference) ?? _settings.Bookmarks;
+        var index = parent.IndexOf(reference);
+        if (index < 0)
+        {
+            return (_settings.Bookmarks, _settings.Bookmarks.Count);
+        }
+
+        return (parent, mark == BookmarkDropMark.After ? index + 1 : index);
+    }
+
+    private static List<BookmarkNode>? FindBookmarkParent(List<BookmarkNode> list, BookmarkNode node)
+    {
+        if (list.Contains(node))
+        {
+            return list;
+        }
+
+        foreach (var child in list)
+        {
+            if (child.Children is { } children && FindBookmarkParent(children, node) is { } found)
+            {
+                return found;
+            }
+        }
+
+        return null;
+    }
+
+    private static BookmarkNode? FindBookmarkByPath(List<BookmarkNode> list, string path)
+    {
+        foreach (var node in list)
+        {
+            if (node.Children is { } children)
+            {
+                if (FindBookmarkByPath(children, path) is { } found)
+                {
+                    return found;
+                }
+            }
+            else if (node.Path is { Length: > 0 } target && WindowsPathIdentity.Instance.Equals(target, path))
+            {
+                return node;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>登録済みのお気に入りから、そのパスの項目を探す（連続ドロップの基準点に使う）。</summary>
+    public BookmarkNode? FindBookmark(string path) => FindBookmarkByPath(_settings.Bookmarks, path);
+
+    /// <summary>ドラッグ終了時に、全項目の挿入位置の目印を消す。</summary>
+    public void ClearBookmarkDropMarks() => ClearBookmarkDropMarks(_settings.Bookmarks);
+
+    private static void ClearBookmarkDropMarks(List<BookmarkNode> list)
+    {
+        foreach (var node in list)
+        {
+            node.DropMark = BookmarkDropMark.None;
+            if (node.Children is { } children)
+            {
+                ClearBookmarkDropMarks(children);
+            }
+        }
+    }
+
+    /// <summary>指定の項目だけに目印を付け、他は消す。</summary>
+    public void SetBookmarkDropMark(BookmarkNode? node, BookmarkDropMark mark)
+    {
+        ClearBookmarkDropMarks();
+        if (node is not null)
+        {
+            node.DropMark = mark;
+        }
+    }
+
     public void AddBookmarkFolder(string name, BookmarkNode? parent = null)
     {
         var target = parent?.Children ?? _settings.Bookmarks;

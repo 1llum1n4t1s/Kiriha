@@ -44,6 +44,23 @@ public sealed partial class BookmarkNode : ObservableObject
     [property: JsonIgnore]
     private bool _isDirectoryTarget = true;
 
+    /// <summary>ドラッグ中に、この項目のどこへ落とそうとしているかの目印。</summary>
+    [ObservableProperty]
+    [property: JsonIgnore]
+    [NotifyPropertyChangedFor(nameof(IsDropBefore))]
+    [NotifyPropertyChangedFor(nameof(IsDropAfter))]
+    [NotifyPropertyChangedFor(nameof(IsDropInto))]
+    private BookmarkDropMark _dropMark;
+
+    [JsonIgnore]
+    public bool IsDropBefore => DropMark == BookmarkDropMark.Before;
+
+    [JsonIgnore]
+    public bool IsDropAfter => DropMark == BookmarkDropMark.After;
+
+    [JsonIgnore]
+    public bool IsDropInto => DropMark == BookmarkDropMark.Into;
+
     [JsonIgnore]
     public bool HasIconImage => IconImage is not null;
 

@@ -3418,6 +3418,62 @@ public partial class MainWindow : Window
                    .Any(ancestor => ancestor.Classes.Contains("bookmarkpane")) == true;
     }
 
+    /// <summary>ドラッグ中に狙っているお気に入りの挿入位置（ドロップ時にそのまま使う）。</summary>
+    private BookmarkNode? _bookmarkDropNode;
+    private BookmarkDropMark _bookmarkDropMark;
+
+    /// <summary>
+    /// お気に入りペイン上のポインター位置から挿入位置を決め、その目印を出す。
+    /// 行の上端 / 下端寄りなら「その前 / その後ろ」、フォルダー項目の中央なら「その中へ」。
+    /// 項目の無い余白なら末尾（最後の項目の下に線を出す）。
+    /// </summary>
+    private void UpdateBookmarkDropMark(DragEventArgs e)
+    {
+        if (ViewModel is not { } vm)
+        {
+            return;
+        }
+
+        var row = (e.Source as Visual)?
+            .GetSelfAndVisualAncestors()
+            .OfType<Border>()
+            .FirstOrDefault(border => border.Classes.Contains("bookmarkrow"));
+
+        if (row?.DataContext is not BookmarkNode node || row.Bounds.Height <= 0)
+        {
+            // 余白へのドロップは末尾へ。最後の項目の下に線を出して「ここに入る」ことを見せる。
+            var last = vm.BookmarkItems.LastOrDefault();
+            _bookmarkDropNode = last;
+            _bookmarkDropMark = last is null ? BookmarkDropMark.None : BookmarkDropMark.After;
+            vm.SetBookmarkDropMark(_bookmarkDropNode, _bookmarkDropMark);
+            return;
+        }
+
+        var ratio = e.GetPosition(row).Y / row.Bounds.Height;
+        _bookmarkDropNode = node;
+        _bookmarkDropMark = node.IsFolder
+            ? ratio switch
+            {
+                < 0.3 => BookmarkDropMark.Before,
+                > 0.7 => BookmarkDropMark.After,
+                _ => BookmarkDropMark.Into,
+            }
+            : ratio < 0.5 ? BookmarkDropMark.Before : BookmarkDropMark.After;
+        vm.SetBookmarkDropMark(node, _bookmarkDropMark);
+    }
+
+    private void ClearBookmarkDropMark()
+    {
+        if (_bookmarkDropNode is null && _bookmarkDropMark == BookmarkDropMark.None)
+        {
+            return;
+        }
+
+        _bookmarkDropNode = null;
+        _bookmarkDropMark = BookmarkDropMark.None;
+        ViewModel?.ClearBookmarkDropMarks();
+    }
+
     /// <summary>垂直タブバー（タブ行・背景・新しいタブボタンを含む領域）上のドラッグかどうか。</summary>
     private bool IsOnVerticalTabStrip(RoutedEventArgs e)
         => e.Source is Visual source
@@ -3615,11 +3671,18 @@ public partial class MainWindow : Window
 
         if (IsOnBookmarkPane(e))
         {
+            // お気に入りを狙っている間はタブバーへ一切反応させない。タブバーはお気に入りペインの
+            // すぐ左隣にあり、そこを通ってきたドラッグのプレビュータブが残ったままになると
+            // 「お気に入りに入れようとしただけでタブが増える」ように見える。
+            RemoveTabDropPreview();
+            UpdateBookmarkDropMark(e);
             e.DragEffects = DragDropEffects.Copy;
             UpdateFileDropVisual(e, DragDropEffects.Copy, isBookmark: true);
             e.Handled = true;
             return;
         }
+
+        ClearBookmarkDropMark();
 
         // タブバー全域は「新しいタブで開く」（タブ行の上下どちら寄りかで挿入位置を決める）
         if (IsOnVerticalTabStrip(e))
@@ -3721,6 +3784,8 @@ public partial class MainWindow : Window
         // プレビュータブが仮配置済みなら、ユーザーが見ているその位置をそのまま挿入位置にする
         // （ClearFileDropVisual でプレビューが取り除かれる前に確定させる）
         var previewIndex = _tabDropPreviewTab is { } preview ? ViewModel?.Tabs.IndexOf(preview) : null;
+        var bookmarkDropNode = _bookmarkDropNode;
+        var bookmarkDropMark = _bookmarkDropMark;
         ClearFileDropVisual();
         if (files.Count == 0)
         {
@@ -3731,9 +3796,15 @@ public partial class MainWindow : Window
         if (isOnBookmarkPane)
         {
             e.Handled = true;
+            // ドラッグ中に見せていた挿入位置へそのまま入れる。複数まとめて落としたときは
+            // 掴んだ順を保つため、2 件目以降は 1 件前の後ろへ続ける。
+            var node = bookmarkDropNode;
+            var mark = bookmarkDropMark;
             foreach (var file in files)
             {
-                ViewModel?.AddBookmark(file);
+                ViewModel?.InsertBookmark(file, node, mark);
+                node = ViewModel?.FindBookmark(file) ?? node;
+                mark = node is null ? BookmarkDropMark.None : BookmarkDropMark.After;
             }
 
             return;
@@ -3856,6 +3927,7 @@ public partial class MainWindow : Window
     private void ClearFileDropVisual()
     {
         _fileDropVisualRevision++;
+        ClearBookmarkDropMark();
         RemoveTabDropPreview();
         _fileDropTargetControl?.Classes.Remove("filedroptarget");
         _fileDropTargetControl = null;

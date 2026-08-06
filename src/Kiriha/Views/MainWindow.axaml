@@ -824,18 +824,31 @@
                                                      ファイル）のアイコンを出し、お気に入り内のグループ分けフォルダーだけが
                                                      📁 のまま（実体を持たないノードのため）。 -->
                                                 <TreeDataTemplate DataType="m:BookmarkNode" ItemsSource="{Binding Children}">
-                                                    <StackPanel Orientation="Horizontal" Spacing="8" Background="Transparent"
-                                                                ToolTip.Tip="{Binding Path}">
-                                                        <Image Source="{Binding IconImage}" Width="16" Height="16"
-                                                               IsVisible="{Binding HasIconImage}"
-                                                               VerticalAlignment="Center" />
-                                                        <TextBlock Text="{Binding Icon}" FontSize="13"
-                                                                   IsVisible="{Binding !HasIconImage}"
-                                                                   VerticalAlignment="Center" />
-                                                        <TextBlock Text="{Binding Name}" FontSize="13"
-                                                                   Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center"
-                                                                   TextTrimming="CharacterEllipsis" />
-                                                    </StackPanel>
+                                                    <!-- bookmarkrow クラスは、ドラッグ中に行の高さと位置を測るための目印でもある
+                                                         （MainWindow.axaml.cs の UpdateBookmarkDropMark）。行の余白まで当たり判定に
+                                                         入れたいので Background="Transparent" ＋ 横いっぱいに広げる。 -->
+                                                    <Border Classes="bookmarkrow" Background="Transparent"
+                                                            HorizontalAlignment="Stretch"
+                                                            Classes.dropinto="{Binding IsDropInto}"
+                                                            ToolTip.Tip="{Binding Path}">
+                                                        <Panel>
+                                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                                <Image Source="{Binding IconImage}" Width="16" Height="16"
+                                                                       IsVisible="{Binding HasIconImage}"
+                                                                       VerticalAlignment="Center" />
+                                                                <TextBlock Text="{Binding Icon}" FontSize="13"
+                                                                           IsVisible="{Binding !HasIconImage}"
+                                                                           VerticalAlignment="Center" />
+                                                                <TextBlock Text="{Binding Name}" FontSize="13"
+                                                                           Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center"
+                                                                           TextTrimming="CharacterEllipsis" />
+                                                            </StackPanel>
+                                                            <Border Classes="dropline" VerticalAlignment="Top"
+                                                                    IsVisible="{Binding IsDropBefore}" />
+                                                            <Border Classes="dropline" VerticalAlignment="Bottom"
+                                                                    IsVisible="{Binding IsDropAfter}" />
+                                                        </Panel>
+                                                    </Border>
                                                 </TreeDataTemplate>
                                             </TreeView.ItemTemplate>
                                         </TreeView>
@@ -992,6 +1005,7 @@
                                              SelectionMode="Multiple"
                                              Background="Transparent"
                                              Padding="12,8,0,0"
+                                             ScrollViewer.ScrollChanged="FileListScroll_ScrollChanged"
                                              DragDrop.AllowDrop="True"
                                              DoubleTapped="FileList_DoubleTapped"
                                              SelectionChanged="FileList_SelectionChanged"
