@@ -227,7 +227,7 @@ public static class LicenseService
     public static bool ActivateKey(string key)
     {
         var trimmed = key.Trim();
-        if (!TryParseAndVerify(trimmed, out var payload))
+        if (!TryParseAndVerify(trimmed, out _))
         {
             return false;
         }
@@ -247,7 +247,10 @@ public static class LicenseService
             Save();
         }
 
-        Email = payload.Email;
+        // Email はここで代入しない。RecomputeState が同じ検証済みキーから Gate 内で
+        // 導出するので冗長なうえ、State / TrialDaysLeft と組で意味を持つ値を Gate の外で
+        // 書くと、並走する失効確認との間で「Licensed なのに Email 空」のような
+        // 中途半端な組み合わせを観測させうる（RecomputeState の注記を参照）。
         RecomputeState();
         NotifyStateChanged();
 
