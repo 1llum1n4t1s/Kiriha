@@ -3401,6 +3401,8 @@ public partial class TabViewModel : ObservableObject
                 input.TrimStart('~', '\\', '/'));
         }
 
+        input = ResolveTypedPath(input, CurrentPath);
+
         if (File.Exists(input))
         {
             try
@@ -3417,6 +3419,51 @@ public partial class TabViewModel : ObservableObject
         }
 
         NavigateTo(input);
+    }
+
+    /// <summary>
+    /// アドレスバーに打ち込まれた文字列を、実際に開くパスへ直す。
+    ///
+    /// <c>C:</c> のようなドライブ相対表記は、Windows では「ドライブ直下」ではなく
+    /// 「そのプロセスにおける C: のカレントディレクトリ」を指す（実測: <c>Directory.Exists("C:")</c> は true、
+    /// <c>new DirectoryInfo("C:").FullName</c> はカレントディレクトリ）。そのまま開くと、エクスプローラーが
+    /// <c>C:\</c> を開くのに対して Kiriha は実行ファイルの場所を開いてしまい、しかも <c>CurrentPath</c> ・
+    /// 監視キー・フォルダー別設定のキーに <c>C:</c> という相対表記が残る。
+    ///
+    /// 相対パスの基準はプロセスのカレントディレクトリ（＝インストール先）ではなく、
+    /// いま表示しているフォルダーにする。エクスプローラーのアドレスバーと同じ解釈で、
+    /// 利用者にとって意味のある基準はこちらしかないため。
+    ///
+    /// 解決できない文字列はそのまま返し、呼び出し側の「開けませんでした」に任せる。
+    /// </summary>
+    internal static string ResolveTypedPath(string input, string currentPath)
+    {
+        if (input.Length == 0)
+        {
+            return input;
+        }
+
+        // "C:" → "C:\"（ドライブ直下）
+        if (input.Length == 2 && input[1] == ':' && char.IsAsciiLetter(input[0]))
+        {
+            return input + Path.DirectorySeparatorChar;
+        }
+
+        try
+        {
+            var full = Path.IsPathFullyQualified(currentPath)
+                ? Path.GetFullPath(input, currentPath)
+                : Path.GetFullPath(input);
+            // 末尾の区切りは落とす（ルートは TrimEndingDirectorySeparator が保つ）。
+            // 列挙が返す FullName と同じ形にしておかないと、同じフォルダーがタブ・監視・
+            // フォルダー別設定で別物として扱われる余地が残る。
+            return Path.TrimEndingDirectorySeparator(full);
+        }
+        catch (Exception ex)
+        {
+            Logger.Log($"アドレスバーの入力を解決できませんでした: {input}: {ex.GetType().Name}", LogLevel.Warning);
+            return input;
+        }
     }
 
     /// <summary>
