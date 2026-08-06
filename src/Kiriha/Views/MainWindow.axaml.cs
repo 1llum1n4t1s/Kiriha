@@ -1892,13 +1892,123 @@ public partial class MainWindow : Window
             return;
         }
 
-        if (node.IsDirectoryTarget)
+        _ = ActivateBookmarkAsync(node, path, vm);
+    }
+
+    /// <summary>
+    /// お気に入りの項目を開く。実体の有無はここで取り直す（<see cref="BookmarkNode.IsDirectoryTarget"/> は
+    /// アイコン解決時の値で、開いたまま実体が消えた場合は古いため）。実体が無ければ、リンク切れの
+    /// ショートカットを実行したときの Windows と同じく、削除するかを確認する。
+    /// 存在確認はネットワークやクラウドのパスで数秒ブロックしうるのでスレッドプールで行う。
+    /// </summary>
+    private async Task ActivateBookmarkAsync(BookmarkNode node, string path, MainWindowViewModel vm)
+    {
+        // 「PC」（ドライブ一覧）は実体を持たない特別なパスなので存在確認をしない
+        if (path == FileSystemService.ComputerPath)
         {
             vm.SelectedTab?.NavigateTo(path);
             return;
         }
 
-        OpenBookmarkFile(path);
+        switch (await ResolveBookmarkTargetKindAsync(path))
+        {
+            case BookmarkTargetKind.Directory:
+                vm.SelectedTab?.NavigateTo(path);
+                break;
+            case BookmarkTargetKind.File:
+                OpenBookmarkFile(path);
+                break;
+            default:
+                await ConfirmRemoveMissingBookmarkAsync(node, path, vm);
+                break;
+        }
+    }
+
+    private enum BookmarkTargetKind
+    {
+        Directory,
+        File,
+        Missing,
+    }
+
+    /// <summary>お気に入りのリンク先が今どうなっているかを調べる（存在確認はスレッドプールで行う）。</summary>
+    private static Task<BookmarkTargetKind> ResolveBookmarkTargetKindAsync(string path) => Task.Run(() =>
+    {
+        try
+        {
+            if (Directory.Exists(path)) { return BookmarkTargetKind.Directory; }
+            return File.Exists(path) ? BookmarkTargetKind.File : BookmarkTargetKind.Missing;
+        }
+        catch (Exception ex)
+        {
+            // 判定できない場合（権限等）はこれまでどおり開こうとして、失敗は開く側の経路で報告する
+            Logger.LogException($"お気に入りの実体を判定できませんでした: {path}", ex);
+            return BookmarkTargetKind.Directory;
+        }
+    });
+
+    /// <summary>リンク切れのお気に入りを削除するか確認し、OK なら削除する。</summary>
+    private async Task ConfirmRemoveMissingBookmarkAsync(BookmarkNode node, string path, MainWindowViewModel vm)
+    {
+        var remove = await ConfirmAsync(
+            LocalizationService.Text("Text.Bookmarks.MissingTitle"),
+            LocalizationService.Text("Text.Bookmarks.MissingMessage", path));
+        if (remove)
+        {
+            vm.RemoveBookmark(node);
+        }
+    }
+
+    /// <summary>OK / キャンセルの確認ダイアログ。OK を押したときだけ true。</summary>
+    private async Task<bool> ConfirmAsync(string title, string message)
+    {
+        var confirmed = false;
+        var ok = new Button
+        {
+            Content = "OK",
+            IsDefault = true,
+            MinWidth = 100,
+            Padding = new Thickness(16, 8),
+            CornerRadius = new CornerRadius(10),
+            HorizontalContentAlignment = HorizontalAlignment.Center,
+        };
+        var cancel = new Button
+        {
+            Content = LocalizationService.Text("Text.Common.Cancel"),
+            IsCancel = true,
+            MinWidth = 100,
+            Padding = new Thickness(16, 8),
+            CornerRadius = new CornerRadius(10),
+            HorizontalContentAlignment = HorizontalAlignment.Center,
+        };
+        var dialog = new ThemedDialogWindow(ViewModel?.OptUseAcrylicBackground ?? false)
+        {
+            Title = title,
+            SizeToContent = SizeToContent.WidthAndHeight,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            CanResize = false,
+            DialogContent = new StackPanel
+            {
+                Margin = new Thickness(20),
+                Spacing = 16,
+                MaxWidth = 420,
+                Children =
+                {
+                    new TextBlock { Text = message, TextWrapping = Avalonia.Media.TextWrapping.Wrap },
+                    new StackPanel
+                    {
+                        Orientation = Avalonia.Layout.Orientation.Horizontal,
+                        HorizontalAlignment = HorizontalAlignment.Right,
+                        Spacing = 10,
+                        Children = { ok, cancel },
+                    },
+                },
+            },
+        };
+        ok.Click += (_, _) => { confirmed = true; dialog.Close(); };
+        cancel.Click += (_, _) => dialog.Close();
+        await dialog.ShowDialog(this);
+        return confirmed;
     }
 
     /// <summary>お気に入りに登録されたファイルを関連付けアプリで開く（サイドバーの最近使用したファイルと同じ扱い）。</summary>
@@ -1944,7 +2054,7 @@ public partial class MainWindow : Window
         ShowBookmarkItemMenu(item, node, vm);
     }
 
-    /// <summary>お気に入り項目の右クリックメニュー（開き方 / フォルダ追加 / 名前変更 / 削除）。</summary>
+    /// <summary>お気に入り項目の右クリックメニュー（開き方 / 名前変更 / 削除）。</summary>
     private void ShowBookmarkItemMenu(Control anchor, BookmarkNode node, MainWindowViewModel vm)
     {
         var flyout = new MenuFlyout();
@@ -1955,26 +2065,23 @@ public partial class MainWindow : Window
             var open = node.IsDirectoryTarget
                 ? new MenuItem { Header = LocalizationService.Text("Text.Common.OpenInNewTab") }
                 : new MenuItem { Header = LocalizationService.Text("Text.Common.Open") };
-            open.Click += (_, _) =>
+            open.Click += async (_, _) =>
             {
-                if (node.IsDirectoryTarget) { vm.OpenInNewTab(path); } else { OpenBookmarkFile(path); }
-            };
-            flyout.Items.Add(open);
-            flyout.Items.Add(new Separator());
-        }
-
-        if (node.IsFolder)
-        {
-            var addChild = new MenuItem { Header = LocalizationService.Text("Text.Bookmarks.AddFolderMenu") };
-            addChild.Click += async (_, _) =>
-            {
-                var name = await PromptTextAsync(LocalizationService.Text("Text.Bookmarks.AddFolderTitle"), LocalizationService.Text("Text.Bookmarks.NewFolderName"));
-                if (name is not null)
+                // 実体が無ければ削除確認まで一本化する（選択で開いたときと同じ扱い）
+                switch (await ResolveBookmarkTargetKindAsync(path))
                 {
-                    vm.AddBookmarkFolder(name, node);
+                    case BookmarkTargetKind.Directory:
+                        vm.OpenInNewTab(path);
+                        break;
+                    case BookmarkTargetKind.File:
+                        OpenBookmarkFile(path);
+                        break;
+                    default:
+                        await ConfirmRemoveMissingBookmarkAsync(node, path, vm);
+                        break;
                 }
             };
-            flyout.Items.Add(addChild);
+            flyout.Items.Add(open);
             flyout.Items.Add(new Separator());
         }
 
@@ -2016,25 +2123,8 @@ public partial class MainWindow : Window
         var flyout = new MenuFlyout();
 
         var addCurrent = new MenuItem { Header = LocalizationService.Text("Text.Bookmarks.AddCurrent") };
-        addCurrent.Click += (_, _) =>
-        {
-            if (vm.SelectedTab is { } tab && tab.CurrentPath != FileSystemService.ComputerPath)
-            {
-                vm.AddBookmark(tab.CurrentPath);
-            }
-        };
+        addCurrent.Click += (_, _) => AddCurrentBookmark();
         flyout.Items.Add(addCurrent);
-
-        var addFolder = new MenuItem { Header = LocalizationService.Text("Text.Bookmarks.AddFolderMenu") };
-        addFolder.Click += async (_, _) =>
-        {
-            var name = await PromptTextAsync(LocalizationService.Text("Text.Bookmarks.AddFolderTitle"), LocalizationService.Text("Text.Bookmarks.NewFolderName"));
-            if (name is not null)
-            {
-                vm.AddBookmarkFolder(name);
-            }
-        };
-        flyout.Items.Add(addFolder);
 
         flyout.Items.Add(new Separator());
 
@@ -2048,6 +2138,23 @@ public partial class MainWindow : Window
 
         flyout.ShowAt(bar, showAtPointer: true);
     }
+
+    /// <summary>現在のタブのフォルダーをお気に入りへ追加する（背景メニューとヘッダーボタンで共用）。</summary>
+    private void AddCurrentBookmark()
+    {
+        if (ViewModel is { } vm
+            && vm.SelectedTab is { } tab
+            && tab.CurrentPath != FileSystemService.ComputerPath)
+        {
+            vm.AddBookmark(tab.CurrentPath);
+        }
+    }
+
+    private void BookmarkAddCurrent_Click(object? sender, RoutedEventArgs e) => AddCurrentBookmark();
+
+    private void BookmarkSortByName_Click(object? sender, RoutedEventArgs e) => ViewModel?.SortBookmarks(byPath: false);
+
+    private void BookmarkSortByPath_Click(object? sender, RoutedEventArgs e) => ViewModel?.SortBookmarks(byPath: true);
 
     // ===== 詳細表示のカラム幅変更 =====
 

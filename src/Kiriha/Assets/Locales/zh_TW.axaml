@@ -9,10 +9,9 @@
   <x:String x:Key="Text.Address.Copy" xml:space="preserve">複製位址</x:String>
   <x:String x:Key="Text.Address.Edit" xml:space="preserve">編輯位址</x:String>
   <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">加入目前的資料夾</x:String>
-  <x:String x:Key="Text.Bookmarks.AddFolderMenu" xml:space="preserve">新增資料夾...</x:String>
-  <x:String x:Key="Text.Bookmarks.AddFolderTitle" xml:space="preserve">新增資料夾</x:String>
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">將資料夾拖曳到這裡即可加入書籤</x:String>
-  <x:String x:Key="Text.Bookmarks.NewFolderName" xml:space="preserve">新增資料夾</x:String>
+  <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">找不到連結目標</x:String>
+  <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">此我的最愛的目標「{0}」已變更、移動或刪除。要刪除此我的最愛嗎？</x:String>
   <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">重新命名...</x:String>
   <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">重新命名書籤</x:String>
   <x:String x:Key="Text.Bookmarks.SortByName" xml:space="preserve">依名稱排序</x:String>
@@ -335,7 +334,7 @@
   <x:String x:Key="Text.Status.Breakdown" xml:space="preserve">（資料夾 {0} 個，檔案 {1} 個）</x:String>
   <x:String x:Key="Text.Status.ClearSelectionTip" xml:space="preserve">按一下以取消選取</x:String>
   <x:String x:Key="Text.Status.DetailsViewTip" xml:space="preserve">詳細資料檢視</x:String>
-  <x:String x:Key="Text.Status.FreeSpace" xml:space="preserve">可用空間: {0}</x:String>
+  <x:String x:Key="Text.Status.Modified" xml:space="preserve">修改日期: {0}</x:String>
   <x:String x:Key="Text.Status.IconSizeTip" xml:space="preserve">圖示大小</x:String>
   <x:String x:Key="Text.Status.ItemCount" xml:space="preserve">{0} 個項目</x:String>
   <x:String x:Key="Text.Status.ItemCountFiltered" xml:space="preserve">{0} 個項目（搜尋: {1}）</x:String>

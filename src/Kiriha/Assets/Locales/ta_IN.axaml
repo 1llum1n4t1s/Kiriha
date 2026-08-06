@@ -9,10 +9,9 @@
   <x:String x:Key="Text.Address.Copy" xml:space="preserve">முகவரியை நகலெடு</x:String>
   <x:String x:Key="Text.Address.Edit" xml:space="preserve">முகவரியைத் திருத்து</x:String>
   <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">தற்போதைய கோப்புறையைச் சேர்</x:String>
-  <x:String x:Key="Text.Bookmarks.AddFolderMenu" xml:space="preserve">கோப்புறையைச் சேர்...</x:String>
-  <x:String x:Key="Text.Bookmarks.AddFolderTitle" xml:space="preserve">கோப்புறையைச் சேர்</x:String>
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">புத்தகக்குறிகளில் சேர்க்க இங்கே ஒரு கோப்புறையை இழுத்து விடுங்கள்</x:String>
-  <x:String x:Key="Text.Bookmarks.NewFolderName" xml:space="preserve">புதிய கோப்புறை</x:String>
+  <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">இணைப்பு இலக்கு கிடைக்கவில்லை</x:String>
+  <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">இந்த புத்தகக்குறியின் இலக்கு &quot;{0}&quot; மாற்றப்பட்டது, நகர்த்தப்பட்டது அல்லது நீக்கப்பட்டது. இந்த புத்தகக்குறியை நீக்கவா?</x:String>
   <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">பெயர் மாற்று...</x:String>
   <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">புத்தகக்குறியின் பெயரை மாற்று</x:String>
   <x:String x:Key="Text.Bookmarks.SortByName" xml:space="preserve">பெயர் வரிசையில் அடுக்கு</x:String>
@@ -335,7 +334,7 @@
   <x:String x:Key="Text.Status.Breakdown" xml:space="preserve">({0} கோப்புறைகள், {1} கோப்புகள்)</x:String>
   <x:String x:Key="Text.Status.ClearSelectionTip" xml:space="preserve">தேர்வை நீக்க கிளிக் செய்யவும்</x:String>
   <x:String x:Key="Text.Status.DetailsViewTip" xml:space="preserve">விவரக் காட்சி</x:String>
-  <x:String x:Key="Text.Status.FreeSpace" xml:space="preserve">காலி இடம்: {0}</x:String>
+  <x:String x:Key="Text.Status.Modified" xml:space="preserve">மாற்றப்பட்டது: {0}</x:String>
   <x:String x:Key="Text.Status.IconSizeTip" xml:space="preserve">சின்ன அளவு</x:String>
   <x:String x:Key="Text.Status.ItemCount" xml:space="preserve">{0} உருப்படிகள்</x:String>
   <x:String x:Key="Text.Status.ItemCountFiltered" xml:space="preserve">{0} உருப்படிகள் (தேடல்: {1})</x:String>

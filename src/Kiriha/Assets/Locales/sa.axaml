@@ -9,10 +9,9 @@
   <x:String x:Key="Text.Address.Copy" xml:space="preserve">पदवीं प्रतिलिख</x:String>
   <x:String x:Key="Text.Address.Edit" xml:space="preserve">पदवीं सम्पादय</x:String>
   <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">वर्तमानं सञ्चिकाकोष्ठं योजय</x:String>
-  <x:String x:Key="Text.Bookmarks.AddFolderMenu" xml:space="preserve">सञ्चिकाकोष्ठं योजय...</x:String>
-  <x:String x:Key="Text.Bookmarks.AddFolderTitle" xml:space="preserve">सञ्चिकाकोष्ठं योजय</x:String>
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">चिह्नेषु योजयितुम् अत्र सञ्चिकाकोष्ठम् आकर्षय</x:String>
-  <x:String x:Key="Text.Bookmarks.NewFolderName" xml:space="preserve">नवीनं सञ्चिकाकोष्ठम्</x:String>
+  <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">लक्ष्यं न प्राप्तम्</x:String>
+  <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">अस्य रुचिचिह्नस्य लक्ष्यं &quot;{0}&quot; परिवर्तितं चालितं वा लोपितम् अस्ति। इदं रुचिचिह्नं लोपयितुम् इच्छसि वा?</x:String>
   <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">नाम परिवर्तय...</x:String>
   <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">चिह्नस्य नाम परिवर्तय</x:String>
   <x:String x:Key="Text.Bookmarks.SortByName" xml:space="preserve">नाम्ना क्रमय</x:String>
@@ -335,7 +334,7 @@
   <x:String x:Key="Text.Status.Breakdown" xml:space="preserve">({0} कोष्ठानि, {1} सञ्चिकाः)</x:String>
   <x:String x:Key="Text.Status.ClearSelectionTip" xml:space="preserve">चयनं मोक्तुं नुद</x:String>
   <x:String x:Key="Text.Status.DetailsViewTip" xml:space="preserve">विस्तृतदृश्यम्</x:String>
-  <x:String x:Key="Text.Status.FreeSpace" xml:space="preserve">रिक्तम् अवकाशः: {0}</x:String>
+  <x:String x:Key="Text.Status.Modified" xml:space="preserve">परिवर्तितम्: {0}</x:String>
   <x:String x:Key="Text.Status.IconSizeTip" xml:space="preserve">प्रतीकपरिमाणम्</x:String>
   <x:String x:Key="Text.Status.ItemCount" xml:space="preserve">{0} वस्तूनि</x:String>
   <x:String x:Key="Text.Status.ItemCountFiltered" xml:space="preserve">{0} वस्तूनि (अन्वेषणम्: {1})</x:String>

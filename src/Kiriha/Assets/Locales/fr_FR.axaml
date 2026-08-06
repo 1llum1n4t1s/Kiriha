@@ -9,10 +9,9 @@
   <x:String x:Key="Text.Address.Copy" xml:space="preserve">Copier l'adresse</x:String>
   <x:String x:Key="Text.Address.Edit" xml:space="preserve">Modifier l'adresse</x:String>
   <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">Ajouter le dossier actuel</x:String>
-  <x:String x:Key="Text.Bookmarks.AddFolderMenu" xml:space="preserve">Ajouter un dossier...</x:String>
-  <x:String x:Key="Text.Bookmarks.AddFolderTitle" xml:space="preserve">Ajouter un dossier</x:String>
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">Faites glisser un dossier ici pour l'ajouter aux favoris</x:String>
-  <x:String x:Key="Text.Bookmarks.NewFolderName" xml:space="preserve">Nouveau dossier</x:String>
+  <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">Cible du lien introuvable</x:String>
+  <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">La cible de ce favori, « {0} », a été modifiée, déplacée ou supprimée. Voulez-vous supprimer ce favori ?</x:String>
   <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">Renommer...</x:String>
   <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">Renommer le favori</x:String>
   <x:String x:Key="Text.Bookmarks.SortByName" xml:space="preserve">Trier par nom</x:String>
@@ -335,7 +334,7 @@
   <x:String x:Key="Text.Status.Breakdown" xml:space="preserve">({0} dossier(s), {1} fichier(s))</x:String>
   <x:String x:Key="Text.Status.ClearSelectionTip" xml:space="preserve">Cliquez pour annuler la sélection</x:String>
   <x:String x:Key="Text.Status.DetailsViewTip" xml:space="preserve">Affichage Détails</x:String>
-  <x:String x:Key="Text.Status.FreeSpace" xml:space="preserve">Espace libre : {0}</x:String>
+  <x:String x:Key="Text.Status.Modified" xml:space="preserve">Modifié : {0}</x:String>
   <x:String x:Key="Text.Status.IconSizeTip" xml:space="preserve">Taille des icônes</x:String>
   <x:String x:Key="Text.Status.ItemCount" xml:space="preserve">{0} élément(s)</x:String>
   <x:String x:Key="Text.Status.ItemCountFiltered" xml:space="preserve">{0} élément(s) (recherche : {1})</x:String>

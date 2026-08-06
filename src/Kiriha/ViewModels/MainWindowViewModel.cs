@@ -2290,13 +2290,6 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
-    public void AddBookmarkFolder(string name, BookmarkNode? parent = null)
-    {
-        var target = parent?.Children ?? _settings.Bookmarks;
-        target.Add(new BookmarkNode { Name = name, Children = new List<BookmarkNode>() });
-        SaveBookmarks();
-    }
-
     public void RemoveBookmark(BookmarkNode node)
     {
         RemoveBookmarkRecursive(_settings.Bookmarks, node);

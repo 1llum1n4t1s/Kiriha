@@ -9,10 +9,9 @@
   <x:String x:Key="Text.Address.Copy" xml:space="preserve">Copy address</x:String>
   <x:String x:Key="Text.Address.Edit" xml:space="preserve">Edit address</x:String>
   <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">Add current folder</x:String>
-  <x:String x:Key="Text.Bookmarks.AddFolderMenu" xml:space="preserve">Add folder...</x:String>
-  <x:String x:Key="Text.Bookmarks.AddFolderTitle" xml:space="preserve">Add folder</x:String>
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">Drag a folder here to add it to your bookmarks</x:String>
-  <x:String x:Key="Text.Bookmarks.NewFolderName" xml:space="preserve">New folder</x:String>
+  <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">Link target not found</x:String>
+  <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">The target of this bookmark, &quot;{0}&quot;, has been changed, moved, or removed. Do you want to delete this bookmark?</x:String>
   <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">Rename...</x:String>
   <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">Rename bookmark</x:String>
   <x:String x:Key="Text.Bookmarks.SortByName" xml:space="preserve">Sort by name</x:String>
@@ -335,7 +334,7 @@
   <x:String x:Key="Text.Status.Breakdown" xml:space="preserve">({0} folder(s), {1} file(s))</x:String>
   <x:String x:Key="Text.Status.ClearSelectionTip" xml:space="preserve">Click to clear the selection</x:String>
   <x:String x:Key="Text.Status.DetailsViewTip" xml:space="preserve">Details view</x:String>
-  <x:String x:Key="Text.Status.FreeSpace" xml:space="preserve">Free space: {0}</x:String>
+  <x:String x:Key="Text.Status.Modified" xml:space="preserve">Modified: {0}</x:String>
   <x:String x:Key="Text.Status.IconSizeTip" xml:space="preserve">Icon size</x:String>
   <x:String x:Key="Text.Status.ItemCount" xml:space="preserve">{0} item(s)</x:String>
   <x:String x:Key="Text.Status.ItemCountFiltered" xml:space="preserve">{0} item(s) (search: {1})</x:String>

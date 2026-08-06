@@ -9,10 +9,9 @@
   <x:String x:Key="Text.Address.Copy" xml:space="preserve">アドレスのコピー</x:String>
   <x:String x:Key="Text.Address.Edit" xml:space="preserve">アドレスの編集</x:String>
   <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">現在のフォルダーを追加</x:String>
-  <x:String x:Key="Text.Bookmarks.AddFolderMenu" xml:space="preserve">フォルダを追加...</x:String>
-  <x:String x:Key="Text.Bookmarks.AddFolderTitle" xml:space="preserve">フォルダを追加</x:String>
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">ここにフォルダーをドラッグするとお気に入りに追加されます</x:String>
-  <x:String x:Key="Text.Bookmarks.NewFolderName" xml:space="preserve">新しいフォルダ</x:String>
+  <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">リンク先が見つかりません</x:String>
+  <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">このお気に入りのリンク先「{0}」は、変更されたか、移動または削除されています。このお気に入りを削除しますか？</x:String>
   <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">名前を変更...</x:String>
   <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">お気に入りの名前を変更</x:String>
   <x:String x:Key="Text.Bookmarks.SortByName" xml:space="preserve">名前順で並べ替え</x:String>
@@ -335,7 +334,7 @@
   <x:String x:Key="Text.Status.Breakdown" xml:space="preserve">(フォルダー {0}、ファイル {1})</x:String>
   <x:String x:Key="Text.Status.ClearSelectionTip" xml:space="preserve">クリックして選択を解除</x:String>
   <x:String x:Key="Text.Status.DetailsViewTip" xml:space="preserve">詳細表示</x:String>
-  <x:String x:Key="Text.Status.FreeSpace" xml:space="preserve">空き領域: {0}</x:String>
+  <x:String x:Key="Text.Status.Modified" xml:space="preserve">更新日時: {0}</x:String>
   <x:String x:Key="Text.Status.IconSizeTip" xml:space="preserve">アイコンのサイズ</x:String>
   <x:String x:Key="Text.Status.ItemCount" xml:space="preserve">{0} 個の項目</x:String>
   <x:String x:Key="Text.Status.ItemCountFiltered" xml:space="preserve">{0} 個の項目 (検索: {1})</x:String>

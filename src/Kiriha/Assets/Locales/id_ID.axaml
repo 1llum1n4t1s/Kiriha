@@ -9,10 +9,9 @@
   <x:String x:Key="Text.Address.Copy" xml:space="preserve">Salin alamat</x:String>
   <x:String x:Key="Text.Address.Edit" xml:space="preserve">Edit alamat</x:String>
   <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">Tambahkan folder saat ini</x:String>
-  <x:String x:Key="Text.Bookmarks.AddFolderMenu" xml:space="preserve">Tambah folder...</x:String>
-  <x:String x:Key="Text.Bookmarks.AddFolderTitle" xml:space="preserve">Tambah folder</x:String>
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">Seret folder ke sini untuk menambahkannya ke markah</x:String>
-  <x:String x:Key="Text.Bookmarks.NewFolderName" xml:space="preserve">Folder baru</x:String>
+  <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">Target tautan tidak ditemukan</x:String>
+  <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">Target markah ini, &quot;{0}&quot;, telah diubah, dipindahkan, atau dihapus. Apakah Anda ingin menghapus markah ini?</x:String>
   <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">Ganti nama...</x:String>
   <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">Ganti nama markah</x:String>
   <x:String x:Key="Text.Bookmarks.SortByName" xml:space="preserve">Urutkan menurut nama</x:String>
@@ -335,7 +334,7 @@
   <x:String x:Key="Text.Status.Breakdown" xml:space="preserve">({0} folder, {1} berkas)</x:String>
   <x:String x:Key="Text.Status.ClearSelectionTip" xml:space="preserve">Klik untuk membatalkan pilihan</x:String>
   <x:String x:Key="Text.Status.DetailsViewTip" xml:space="preserve">Tampilan detail</x:String>
-  <x:String x:Key="Text.Status.FreeSpace" xml:space="preserve">Ruang kosong: {0}</x:String>
+  <x:String x:Key="Text.Status.Modified" xml:space="preserve">Diubah: {0}</x:String>
   <x:String x:Key="Text.Status.IconSizeTip" xml:space="preserve">Ukuran ikon</x:String>
   <x:String x:Key="Text.Status.ItemCount" xml:space="preserve">{0} item</x:String>
   <x:String x:Key="Text.Status.ItemCountFiltered" xml:space="preserve">{0} item (pencarian: {1})</x:String>

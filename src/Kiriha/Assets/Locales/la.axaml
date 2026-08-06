@@ -9,10 +9,9 @@
   <x:String x:Key="Text.Address.Copy" xml:space="preserve">Inscriptionem exscribere</x:String>
   <x:String x:Key="Text.Address.Edit" xml:space="preserve">Inscriptionem recensere</x:String>
   <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">Plicam praesentem addere</x:String>
-  <x:String x:Key="Text.Bookmarks.AddFolderMenu" xml:space="preserve">Plicam addere...</x:String>
-  <x:String x:Key="Text.Bookmarks.AddFolderTitle" xml:space="preserve">Plicam addere</x:String>
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">Plicam huc trahe ut inter notas addatur</x:String>
-  <x:String x:Key="Text.Bookmarks.NewFolderName" xml:space="preserve">Plica nova</x:String>
+  <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">Meta nexus non inventa</x:String>
+  <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">Meta huius delicii, &quot;{0}&quot;, mutata, mota aut deleta est. Visne hoc delicium delere?</x:String>
   <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">Nomen mutare...</x:String>
   <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">Nomen notae mutare</x:String>
   <x:String x:Key="Text.Bookmarks.SortByName" xml:space="preserve">Secundum nomen ordinare</x:String>
@@ -335,7 +334,7 @@
   <x:String x:Key="Text.Status.Breakdown" xml:space="preserve">(plicae {0}, fasciculi {1})</x:String>
   <x:String x:Key="Text.Status.ClearSelectionTip" xml:space="preserve">Preme ut electionem tollas</x:String>
   <x:String x:Key="Text.Status.DetailsViewTip" xml:space="preserve">Aspectus singulorum</x:String>
-  <x:String x:Key="Text.Status.FreeSpace" xml:space="preserve">Spatium vacuum: {0}</x:String>
+  <x:String x:Key="Text.Status.Modified" xml:space="preserve">Mutatum: {0}</x:String>
   <x:String x:Key="Text.Status.IconSizeTip" xml:space="preserve">Magnitudo imagunculae</x:String>
   <x:String x:Key="Text.Status.ItemCount" xml:space="preserve">Res {0}</x:String>
   <x:String x:Key="Text.Status.ItemCountFiltered" xml:space="preserve">Res {0} (quaesitio: {1})</x:String>

@@ -9,10 +9,9 @@
   <x:String x:Key="Text.Address.Copy" xml:space="preserve">Копіювати адресу</x:String>
   <x:String x:Key="Text.Address.Edit" xml:space="preserve">Редагувати адресу</x:String>
   <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">Додати поточну папку</x:String>
-  <x:String x:Key="Text.Bookmarks.AddFolderMenu" xml:space="preserve">Додати папку...</x:String>
-  <x:String x:Key="Text.Bookmarks.AddFolderTitle" xml:space="preserve">Додати папку</x:String>
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">Перетягніть сюди папку, щоб додати її до закладок</x:String>
-  <x:String x:Key="Text.Bookmarks.NewFolderName" xml:space="preserve">Нова папка</x:String>
+  <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">Ціль посилання не знайдено</x:String>
+  <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">Ціль цієї закладки «{0}» була змінена, переміщена або видалена. Видалити цю закладку?</x:String>
   <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">Перейменувати...</x:String>
   <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">Перейменувати закладку</x:String>
   <x:String x:Key="Text.Bookmarks.SortByName" xml:space="preserve">Сортувати за назвою</x:String>
@@ -335,7 +334,7 @@
   <x:String x:Key="Text.Status.Breakdown" xml:space="preserve">(папок: {0}, файлів: {1})</x:String>
   <x:String x:Key="Text.Status.ClearSelectionTip" xml:space="preserve">Клацніть, щоб зняти виділення</x:String>
   <x:String x:Key="Text.Status.DetailsViewTip" xml:space="preserve">Таблиця</x:String>
-  <x:String x:Key="Text.Status.FreeSpace" xml:space="preserve">Вільне місце: {0}</x:String>
+  <x:String x:Key="Text.Status.Modified" xml:space="preserve">Змінено: {0}</x:String>
   <x:String x:Key="Text.Status.IconSizeTip" xml:space="preserve">Розмір значків</x:String>
   <x:String x:Key="Text.Status.ItemCount" xml:space="preserve">об'єктів: {0}</x:String>
   <x:String x:Key="Text.Status.ItemCountFiltered" xml:space="preserve">об'єктів: {0} (пошук: {1})</x:String>

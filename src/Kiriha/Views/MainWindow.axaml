@@ -708,6 +708,38 @@
                                     </ToggleButton>
                                 </StackPanel>
 
+                                <!-- お気に入りのヘッダー操作。ペイン背景の右クリックメニューと同じ操作を
+                                     アイコンから出せるようにしたもの（項目で埋まると背景を右クリックできなくなるため）。
+                                     並べ替えはコマンドバーのソートボタンと同じ「アイコン＋ドロップダウン」形にする。 -->
+                                <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="2" Margin="8,2,8,0"
+                                            HorizontalAlignment="Right"
+                                            IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).IsSidebarBookmarks}">
+                                    <Button Classes="treehdr" Click="BookmarkAddCurrent_Click"
+                                            ToolTip.Tip="{DynamicResource Text.Bookmarks.AddCurrent}"
+                                            AutomationProperties.Name="{DynamicResource Text.Bookmarks.AddCurrent}">
+                                        <TextBlock Classes="fico" Text="&#xE710;" FontSize="14"
+                                                   Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" />
+                                    </Button>
+                                    <Button Classes="treehdr" Width="34"
+                                            ToolTip.Tip="{DynamicResource Text.Command.Sort}"
+                                            AutomationProperties.Name="{DynamicResource Text.Command.Sort}">
+                                        <StackPanel Orientation="Horizontal" Spacing="2">
+                                            <TextBlock Classes="fico" Text="&#xE8CB;" FontSize="14"
+                                                       Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" />
+                                            <TextBlock Classes="fico" Text="&#xE70D;" FontSize="9"
+                                                       Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                        <Button.Flyout>
+                                            <MenuFlyout Placement="BottomEdgeAlignedRight">
+                                                <MenuItem Header="{DynamicResource Text.Bookmarks.SortByName}"
+                                                          Click="BookmarkSortByName_Click" />
+                                                <MenuItem Header="{DynamicResource Text.Bookmarks.SortByPath}"
+                                                          Click="BookmarkSortByPath_Click" />
+                                            </MenuFlyout>
+                                        </Button.Flyout>
+                                    </Button>
+                                </StackPanel>
+
                                 <!-- XP 風フォルダーツリー（デスクトップ > マイ ドキュメント / マイ コンピュータ） -->
                                 <TreeView Grid.Row="2" Margin="4,2,0,0"
                                           DragDrop.AllowDrop="True"
@@ -807,7 +839,12 @@
                                                    FontSize="11.5" Foreground="{DynamicResource TextSecondary}"
                                                    TextWrapping="Wrap" Margin="8,10" VerticalAlignment="Top"
                                                    IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).HasNoBookmarks}" />
-                                        <TreeView ItemsSource="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).BookmarkItems}"
+                                        <!-- 下端に余白を開けて、項目でペインが埋まっても背景の右クリック
+                                             （現在のフォルダーを追加 / 並べ替え）に届く場所を必ず残す。
+                                             横スクロールバーは出さない（幅が足りない名前は末尾を省略する）。 -->
+                                        <TreeView Margin="0,0,0,28" Padding="0"
+                                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                                  ItemsSource="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).BookmarkItems}"
                                                   SelectionChanged="BookmarkTree_SelectionChanged"
                                                   PointerReleased="BookmarkTree_PointerReleased">
                                             <TreeView.Resources>
@@ -817,6 +854,19 @@
                                             <TreeView.Styles>
                                                 <Style Selector="TreeViewItem">
                                                     <Setter Property="MinHeight" Value="26" />
+                                                    <!-- クイックアクセスの行と同じ位置から文字が始まるようにする（実測合わせ） -->
+                                                    <Setter Property="Padding" Value="12,0,0,0" />
+                                                </Style>
+                                                <!-- Fluent の TreeViewItem は開閉シェブロンの領域として
+                                                     12px + 左右 12px マージン = 36dip を常に確保する（実測でも
+                                                     クイックアクセスより 37dip 右にずれていた）。お気に入りは
+                                                     ほぼすべてが子を持たない行なので、その場合は領域ごと畳んで
+                                                     クイックアクセスと同じ位置から並べる。 -->
+                                                <Style Selector="TreeViewItem:empty /template/ Panel#PART_ExpandCollapseChevronContainer">
+                                                    <Setter Property="IsVisible" Value="False" />
+                                                </Style>
+                                                <Style Selector="TreeViewItem /template/ Panel#PART_ExpandCollapseChevronContainer">
+                                                    <Setter Property="Margin" Value="0,0,6,0" />
                                                 </Style>
                                             </TreeView.Styles>
                                             <TreeView.ItemTemplate>
@@ -832,17 +882,19 @@
                                                             Classes.dropinto="{Binding IsDropInto}"
                                                             ToolTip.Tip="{Binding Path}">
                                                         <Panel>
-                                                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                                                <Image Source="{Binding IconImage}" Width="16" Height="16"
+                                                            <!-- 横スクロールバーを出さない代わりに、名前は残り幅で末尾を省略する。
+                                                                 横並びの StackPanel では子が無限幅で測られて省略が効かないため Grid。 -->
+                                                            <Grid ColumnDefinitions="Auto,*">
+                                                                <Image Grid.Column="0" Source="{Binding IconImage}" Width="16" Height="16"
                                                                        IsVisible="{Binding HasIconImage}"
                                                                        VerticalAlignment="Center" />
-                                                                <TextBlock Text="{Binding Icon}" FontSize="13"
+                                                                <TextBlock Grid.Column="0" Text="{Binding Icon}" FontSize="13"
                                                                            IsVisible="{Binding !HasIconImage}"
                                                                            VerticalAlignment="Center" />
-                                                                <TextBlock Text="{Binding Name}" FontSize="13"
+                                                                <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="13" Margin="8,0,0,0"
                                                                            Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center"
                                                                            TextTrimming="CharacterEllipsis" />
-                                                            </StackPanel>
+                                                            </Grid>
                                                             <Border Classes="dropline" VerticalAlignment="Top"
                                                                     IsVisible="{Binding IsDropBefore}" />
                                                             <Border Classes="dropline" VerticalAlignment="Bottom"
@@ -1609,9 +1661,10 @@
                                             IsVisible="{Binding SelectionText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
                                     <TextBlock Text="{Binding SelectionText}" FontSize="11.5" Foreground="{DynamicResource TextSecondary}"
                                                VerticalAlignment="Center" />
+                                    <!-- 選択が 1 件のときだけ更新日時（サイズは選択情報に含まれる） -->
                                     <Border Width="1" Height="14" Background="{DynamicResource StatusDivider}" VerticalAlignment="Center"
-                                            IsVisible="{Binding FreeSpaceText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
-                                    <TextBlock Text="{Binding FreeSpaceText}" FontSize="11.5"
+                                            IsVisible="{Binding SelectionModifiedText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                                    <TextBlock Text="{Binding SelectionModifiedText}" FontSize="11.5"
                                                Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" />
                                     <!-- Finder 風のアイコンサイズスライダー（アイコン表示時のみ） -->
                                     <!-- Focusable=False: フォーカスが入ると左右キーが IconSize を動かし、

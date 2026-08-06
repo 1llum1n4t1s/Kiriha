@@ -9,10 +9,9 @@
   <x:String x:Key="Text.Address.Copy" xml:space="preserve">Copiar endereço</x:String>
   <x:String x:Key="Text.Address.Edit" xml:space="preserve">Editar endereço</x:String>
   <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">Adicionar a pasta atual</x:String>
-  <x:String x:Key="Text.Bookmarks.AddFolderMenu" xml:space="preserve">Adicionar pasta...</x:String>
-  <x:String x:Key="Text.Bookmarks.AddFolderTitle" xml:space="preserve">Adicionar pasta</x:String>
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">Arraste uma pasta até aqui para adicioná-la aos favoritos</x:String>
-  <x:String x:Key="Text.Bookmarks.NewFolderName" xml:space="preserve">Nova pasta</x:String>
+  <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">Destino do link não encontrado</x:String>
+  <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">O destino deste favorito, &quot;{0}&quot;, foi alterado, movido ou excluído. Deseja excluir este favorito?</x:String>
   <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">Renomear...</x:String>
   <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">Renomear favorito</x:String>
   <x:String x:Key="Text.Bookmarks.SortByName" xml:space="preserve">Classificar por nome</x:String>
@@ -335,7 +334,7 @@
   <x:String x:Key="Text.Status.Breakdown" xml:space="preserve">({0} pasta(s), {1} arquivo(s))</x:String>
   <x:String x:Key="Text.Status.ClearSelectionTip" xml:space="preserve">Clique para limpar a seleção</x:String>
   <x:String x:Key="Text.Status.DetailsViewTip" xml:space="preserve">Modo de exibição Detalhes</x:String>
-  <x:String x:Key="Text.Status.FreeSpace" xml:space="preserve">Espaço livre: {0}</x:String>
+  <x:String x:Key="Text.Status.Modified" xml:space="preserve">Modificado: {0}</x:String>
   <x:String x:Key="Text.Status.IconSizeTip" xml:space="preserve">Tamanho dos ícones</x:String>
   <x:String x:Key="Text.Status.ItemCount" xml:space="preserve">{0} item(ns)</x:String>
   <x:String x:Key="Text.Status.ItemCountFiltered" xml:space="preserve">{0} item(ns) (pesquisa: {1})</x:String>

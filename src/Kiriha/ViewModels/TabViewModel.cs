@@ -10,6 +10,10 @@ using CommunityToolkit.Mvvm.Input;
 using Kiriha.Models;
 using Kiriha.Services;
 
+// 走査 API 側の FileSystemEntry（ref struct）は、このプロジェクトの Models.FileSystemEntry と名前が
+// ぶつかるので別名で使う。
+using SysEntry = System.IO.Enumeration.FileSystemEntry;
+
 namespace Kiriha.ViewModels;
 
 /// <summary>並べ替え・列を識別するキーの単一情報源。settings.json にこの名前のまま永続化されるため変更しないこと。
@@ -185,9 +189,10 @@ public partial class TabViewModel : ObservableObject
 
     partial void OnTitleChanged(string value) => OnPropertyChanged(nameof(SearchPlaceholder));
 
-    /// <summary>ステータスバー右側（空き領域）。</summary>
+    /// <summary>ステータスバー右側（選択が 1 件のときだけ出す更新日時）。
+    /// 複数選択では日時が一意に決まらないので空にする。</summary>
     [ObservableProperty]
-    private string _freeSpaceText = "";
+    private string _selectionModifiedText = "";
 
     /// <summary>コンパクトビュー（行の高さを詰める）。</summary>
     [ObservableProperty]
@@ -1843,7 +1848,6 @@ public partial class TabViewModel : ObservableObject
 
         SetAllEntries(ApplySort(all).ToList());
         ApplyFilter();
-        UpdateFreeSpace(CurrentPath);
     }
 
     /// <summary>path が parent の直下の項目か（監視は非再帰なので通常は真だが、念のため確かめる）。</summary>
@@ -2552,6 +2556,9 @@ public partial class TabViewModel : ObservableObject
         _filterDebounceCts?.Dispose();
         _searchCts?.Cancel();
         _searchCts?.Dispose();
+        _selectionSizeCts?.Cancel();
+        _selectionSizeCts?.Dispose();
+        _selectionSizeCts = null;
         CancelThumbnailScope();
         foreach (var column in DetailColumns) column.Detach();
         DisposeEntryImages(_allEntries);
@@ -2763,10 +2770,14 @@ public partial class TabViewModel : ObservableObject
 
         if (!isReload)
         {
+            // 集計中のフォルダーサイズが後から届いて、消したはずの選択情報を書き戻さないようにする
+            _selectionSizeCts?.Cancel();
+            _selectionSizeCts?.Dispose();
+            _selectionSizeCts = null;
             SelectionText = "";
+            SelectionModifiedText = "";
         }
 
-        UpdateFreeSpace(path);
         SetupWatcher(path);
         _searchCts?.Cancel();
         GoBackCommand.NotifyCanExecuteChanged();
@@ -3181,40 +3192,6 @@ public partial class TabViewModel : ObservableObject
         return true;
     }
 
-    private void UpdateFreeSpace(string path)
-    {
-        // DriveInfo.AvailableFreeSpace は同期 P/Invoke で、切断中のネットワークドライブでは
-        // OS のタイムアウトまで UI スレッドをブロックするため、取得は背景スレッドで行う。
-        FreeSpaceText = "";
-        if (path == FileSystemService.ComputerPath || Path.GetPathRoot(path) is not { Length: > 0 } root)
-        {
-            return;
-        }
-
-        var generation = _navigationGeneration;
-        _ = Task.Run(() =>
-        {
-            string text;
-            try
-            {
-                text = LocalizationService.Text("Text.Status.FreeSpace", FileSystemEntry.FormatSize(new DriveInfo(root).AvailableFreeSpace));
-            }
-            catch
-            {
-                // ネットワークドライブ切断などは表示なしで続行
-                return;
-            }
-
-            Dispatcher.UIThread.Post(() =>
-            {
-                if (!_isDetached && generation == _navigationGeneration)
-                {
-                    FreeSpaceText = text;
-                }
-            });
-        });
-    }
-
     /// <summary>詳細表示のカラムヘッダークリック（同じ列なら昇順 / 降順をトグル、エクスプローラーと同じ）。</summary>
     [RelayCommand]
     private void SortByColumn(string key)
@@ -3513,18 +3490,35 @@ public partial class TabViewModel : ObservableObject
         OnPropertyChanged(nameof(CanCopyPath));
         OnPropertyChanged(nameof(CanCopySelectedPath));
 
+        _selectionSizeCts?.Cancel();
+        _selectionSizeCts?.Dispose();
+        _selectionSizeCts = null;
+
         if (selection.Count == 0)
         {
             SelectionText = "";
+            SelectionModifiedText = "";
             return;
         }
 
-        var totalSize = selection.Where(e => e.Size is not null).Sum(e => e.Size!.Value);
-        var sizeText = selection.Any(e => e.Size is not null) ? $" {FileSystemEntry.FormatSize(totalSize)}" : "";
+        // 更新日時は 1 件だけ選んでいるときの情報なので、複数選択では出さない（サイズは合計を出す）
+        SelectionModifiedText = selection.Count == 1 && selection[0].ModifiedText is { Length: > 0 } modified
+            ? LocalizationService.Text("Text.Status.Modified", modified)
+            : "";
+
+        var fileSize = selection.Where(e => e.Size is not null).Sum(e => e.Size!.Value);
+        var hasSize = selection.Any(e => e.Size is not null);
         var folders = selection.Count(e => e.IsDirectory);
         var files = selection.Count - folders;
         var breakdown = folders > 0 && files > 0 ? " " + LocalizationService.Text("Text.Status.Breakdown", folders, files) : "";
-        SelectionText = LocalizationService.Text("Text.Status.ItemsSelected", selection.Count) + sizeText + breakdown;
+
+        // フォルダーは自身のサイズを持たないので、選択に含まれていれば中身を数えて合計に足す。
+        // ドライブ一覧（PC）は 1 台まるごとの走査になってしまうので対象外。
+        var folderPaths = CurrentPath == FileSystemService.ComputerPath
+            ? []
+            : selection.Where(e => e.IsDirectory).Select(e => e.FullPath).ToList();
+
+        SelectionText = BuildSelectionText(selection.Count, fileSize, hasSize || folderPaths.Count > 0, breakdown, computing: folderPaths.Count > 0);
 
         if (_previewEnabled && selection.Count > 1)
         {
@@ -3533,7 +3527,101 @@ public partial class TabViewModel : ObservableObject
             PreviewText = "";
             PreviewInfo = SelectionText;
         }
+
+        if (folderPaths.Count > 0)
+        {
+            var cts = new CancellationTokenSource();
+            _selectionSizeCts = cts;
+            _ = SumFolderSizesAsync(folderPaths, selection.Count, fileSize, breakdown, selection.Count > 1, cts.Token);
+        }
     }
+
+    /// <summary>選択中フォルダーの中身を数え終えるまで、途中経過を書き換えるための解除トークン。</summary>
+    private CancellationTokenSource? _selectionSizeCts;
+
+    /// <summary>ステータスバーの「n 個の項目を選択 …」を組み立てる。集計中はサイズの後ろに … を付ける。</summary>
+    private static string BuildSelectionText(int count, long size, bool hasSize, string breakdown, bool computing)
+    {
+        var sizeText = hasSize ? $" {FileSystemEntry.FormatSize(size)}{(computing ? "…" : "")}" : "";
+        return LocalizationService.Text("Text.Status.ItemsSelected", count) + sizeText + breakdown;
+    }
+
+    /// <summary>
+    /// 選択されたフォルダーの中身を再帰的に足し合わせ、途中経過をステータスバーへ流す。
+    ///
+    /// 走査は当然ながら重い（数万ファイルのフォルダーなら秒単位）ので、UI スレッドでは絶対に行わず、
+    /// 選択が変わったら即座に解除する。再解析ポイント（ジャンクション / シンボリックリンク）は
+    /// たどらない ― 循環すると終わらなくなるうえ、エクスプローラーも実体の中身だけを数えるため。
+    /// </summary>
+    private async Task SumFolderSizesAsync(List<string> folders, int count, long fileSize, string breakdown, bool isMultiple, CancellationToken token)
+    {
+        await Task.Run(() =>
+        {
+            // AttributesToSkip はフォルダーだけでなくファイルにも効くため、ここで ReparsePoint を
+            // 弾くと OneDrive のプレースホルダー（未ダウンロードのクラウドファイルは再解析ポイント）
+            // まで合計から丸ごと落ちる。除きたいのは「リンク先へ潜ること」だけなので、
+            // ファイルは数え、再帰の可否だけを ShouldRecursePredicate で止める。
+            var options = new EnumerationOptions
+            {
+                RecurseSubdirectories = true,
+                IgnoreInaccessible = true,
+                AttributesToSkip = 0,
+            };
+
+            var total = 0L;
+            var nextReport = Environment.TickCount64 + SelectionSizeReportIntervalMs;
+            foreach (var folder in folders)
+            {
+                try
+                {
+                    var sizes = new System.IO.Enumeration.FileSystemEnumerable<long>(
+                        folder,
+                        (ref SysEntry entry) => entry.Length,
+                        options)
+                    {
+                        ShouldIncludePredicate = (ref SysEntry entry) => !entry.IsDirectory,
+                        // ジャンクション / シンボリックリンクの先へは潜らない（循環すると終わらないため）
+                        ShouldRecursePredicate = (ref SysEntry entry) => (entry.Attributes & FileAttributes.ReparsePoint) == 0,
+                    };
+
+                    foreach (var size in sizes)
+                    {
+                        if (token.IsCancellationRequested) { return; }
+                        total += size;
+                        if (Environment.TickCount64 >= nextReport)
+                        {
+                            nextReport = Environment.TickCount64 + SelectionSizeReportIntervalMs;
+                            Post(total, computing: true);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // 権限不足や途中で消えたフォルダーは、そこまでの合計で続ける
+                    Logger.LogException($"フォルダーのサイズを集計できませんでした: {folder}", ex);
+                }
+            }
+
+            Post(total, computing: false);
+
+            void Post(long folderTotal, bool computing)
+            {
+                var text = BuildSelectionText(count, fileSize + folderTotal, hasSize: true, breakdown, computing);
+                Dispatcher.UIThread.Post(() =>
+                {
+                    if (_isDetached || token.IsCancellationRequested) { return; }
+                    SelectionText = text;
+                    if (_previewEnabled && isMultiple)
+                    {
+                        PreviewInfo = text;
+                    }
+                });
+            }
+        }, CancellationToken.None);
+    }
+
+    /// <summary>フォルダー集計の途中経過をステータスバーへ出す間隔（ミリ秒）。</summary>
+    private const int SelectionSizeReportIntervalMs = 300;
 
     /// <summary>詳細表示の列の表示 / 非表示を切り替える（ヘッダー右クリック）。</summary>
     [RelayCommand]
