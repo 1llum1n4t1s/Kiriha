@@ -145,74 +145,120 @@ public static class FileSystemService
         // 「開けませんでした」を出させるのが正しい（true にすると空フォルダーに見えてしまう）。
         foreach (var dir in info.EnumerateDirectories())
         {
-            var attributes = dir.Attributes;
-            var hidden = (attributes & FileAttributes.Hidden) != 0;
-            if (!options.ShowHidden && hidden)
+            if (CreateEntry(dir, options, useMaterialIcons, preferLight) is { } entry)
             {
-                continue;
+                entries.Add(entry);
             }
-
-            // Explorer パリティ: Hidden+System 両方付き（保護された OS 項目。Documents 配下の
-            // My Music 等の互換ジャンクションなど）は「隠しファイルを表示」ON でも表示しない。
-            if (hidden && (attributes & FileAttributes.System) != 0)
-            {
-                continue;
-            }
-
-            entries.Add(new FileSystemEntry
-            {
-                Name = dir.Name,
-                DisplayName = dir.Name,
-                FullPath = dir.FullName,
-                IsDirectory = true,
-                Modified = dir.LastWriteTime,
-                Created = dir.CreationTime,
-                IsHidden = hidden,
-                IsReadOnly = (attributes & FileAttributes.ReadOnly) != 0,
-                IsCut = ClipboardFileService.IsCutPath(dir.FullName),
-                MaterialIconKey = useMaterialIcons
-                    ? MaterialIconService.ResolveIconKey(dir.Name, isDirectory: true, preferLight)
-                    : "",
-            });
         }
 
         foreach (var file in info.EnumerateFiles())
         {
-            var attributes = file.Attributes;
-            var hidden = (attributes & FileAttributes.Hidden) != 0;
-            if (!options.ShowHidden && hidden)
+            if (CreateEntry(file, options, useMaterialIcons, preferLight) is { } entry)
             {
-                continue;
+                entries.Add(entry);
             }
-
-            // Explorer パリティ: Hidden+System 両方付き（desktop.ini 等）は常に非表示。
-            if (hidden && (attributes & FileAttributes.System) != 0)
-            {
-                continue;
-            }
-
-            var display = !options.ShowExtensions && Path.GetFileNameWithoutExtension(file.Name) is { Length: > 0 } stem
-                ? stem
-                : file.Name;
-
-            entries.Add(new FileSystemEntry
-            {
-                Name = file.Name,
-                DisplayName = display,
-                FullPath = file.FullName,
-                IsDirectory = false,
-                Size = file.Length,
-                Modified = file.LastWriteTime,
-                Created = file.CreationTime,
-                IsHidden = hidden,
-                IsReadOnly = (attributes & FileAttributes.ReadOnly) != 0,
-                IsCut = ClipboardFileService.IsCutPath(file.FullName),
-                MaterialIconKey = useMaterialIcons
-                    ? MaterialIconService.ResolveIconKey(file.Name, isDirectory: false, preferLight)
-                    : "",
-            });
         }
 
         return entries;
+    }
+
+    /// <summary>
+    /// 変更通知で届いた 1 パスぶんの行を作る（フォルダー監視からのピンポイント更新用）。
+    /// 実体が無い・アクセスできない・表示対象外（隠し / 保護された OS 項目）なら null を返す。
+    /// 返す内容は <see cref="GetEntries"/> の 1 行と同じでなければならないため、生成は共通化してある。
+    /// </summary>
+    public static FileSystemEntry? TryCreateEntry(string fullPath, ShellOptions options)
+    {
+        var useMaterialIcons = options.IconSet == FileIconSet.Material;
+        var preferLight = useMaterialIcons && MaterialIconService.IsLightTheme();
+        try
+        {
+            var directory = new DirectoryInfo(fullPath);
+            if (directory.Exists)
+            {
+                return CreateEntry(directory, options, useMaterialIcons, preferLight);
+            }
+
+            var file = new FileInfo(fullPath);
+            return file.Exists ? CreateEntry(file, options, useMaterialIcons, preferLight) : null;
+        }
+        catch (Exception ex)
+        {
+            // 変更直後に消える一時ファイルなど、この経路では珍しくない。行を作らないだけで続行する。
+            Logger.Log($"変更のあった項目を取得できませんでした: {fullPath}: {ex.GetType().Name}", LogLevel.Warning);
+            return null;
+        }
+    }
+
+    /// <summary>フォルダー 1 件ぶんの行。表示対象外なら null。</summary>
+    private static FileSystemEntry? CreateEntry(DirectoryInfo dir, ShellOptions options, bool useMaterialIcons, bool preferLight)
+    {
+        var attributes = dir.Attributes;
+        var hidden = (attributes & FileAttributes.Hidden) != 0;
+        if (!options.ShowHidden && hidden)
+        {
+            return null;
+        }
+
+        // Explorer パリティ: Hidden+System 両方付き（保護された OS 項目。Documents 配下の
+        // My Music 等の互換ジャンクションなど）は「隠しファイルを表示」ON でも表示しない。
+        if (hidden && (attributes & FileAttributes.System) != 0)
+        {
+            return null;
+        }
+
+        return new FileSystemEntry
+        {
+            Name = dir.Name,
+            DisplayName = dir.Name,
+            FullPath = dir.FullName,
+            IsDirectory = true,
+            Modified = dir.LastWriteTime,
+            Created = dir.CreationTime,
+            IsHidden = hidden,
+            IsReadOnly = (attributes & FileAttributes.ReadOnly) != 0,
+            IsCut = ClipboardFileService.IsCutPath(dir.FullName),
+            MaterialIconKey = useMaterialIcons
+                ? MaterialIconService.ResolveIconKey(dir.Name, isDirectory: true, preferLight)
+                : "",
+        };
+    }
+
+    /// <summary>ファイル 1 件ぶんの行。表示対象外なら null。</summary>
+    private static FileSystemEntry? CreateEntry(FileInfo file, ShellOptions options, bool useMaterialIcons, bool preferLight)
+    {
+        var attributes = file.Attributes;
+        var hidden = (attributes & FileAttributes.Hidden) != 0;
+        if (!options.ShowHidden && hidden)
+        {
+            return null;
+        }
+
+        // Explorer パリティ: Hidden+System 両方付き（desktop.ini 等）は常に非表示。
+        if (hidden && (attributes & FileAttributes.System) != 0)
+        {
+            return null;
+        }
+
+        var display = !options.ShowExtensions && Path.GetFileNameWithoutExtension(file.Name) is { Length: > 0 } stem
+            ? stem
+            : file.Name;
+
+        return new FileSystemEntry
+        {
+            Name = file.Name,
+            DisplayName = display,
+            FullPath = file.FullName,
+            IsDirectory = false,
+            Size = file.Length,
+            Modified = file.LastWriteTime,
+            Created = file.CreationTime,
+            IsHidden = hidden,
+            IsReadOnly = (attributes & FileAttributes.ReadOnly) != 0,
+            IsCut = ClipboardFileService.IsCutPath(file.FullName),
+            MaterialIconKey = useMaterialIcons
+                ? MaterialIconService.ResolveIconKey(file.Name, isDirectory: false, preferLight)
+                : "",
+        };
     }
 }

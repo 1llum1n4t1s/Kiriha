@@ -1694,17 +1694,170 @@ public partial class TabViewModel : ObservableObject
     internal bool NeedsShellRefreshBackup
         => _watcherSubscription is null && SearchText.Length == 0;
 
-    private void OnObservedDirectoryChanged(DateTime lastEventUtc)
+    private void OnObservedDirectoryChanged(DirectoryChangeBatch batch)
     {
         Dispatcher.UIThread.Post(() =>
         {
-            // 最後のファイルシステムイベントより後に列挙を開始済みなら、その読み込みが
-            // 変更を反映済みなので再読み込みしない（操作直後の明示 Refresh との二重走行防止）。
-            if (!_isDetached && SearchText.Length == 0 && LastListLoadStartUtc <= lastEventUtc)
+            if (_isDetached || SearchText.Length > 0)
             {
-                NavigateTo(CurrentPath, record: false);
+                return;
             }
+
+            // 差分で追随できない通知（監視の復帰・大量変更）だけ、従来どおり全体を読み直す。
+            // 最後のファイルシステムイベントより後に列挙を開始済みなら、その読み込みが
+            // 変更を反映済みなので読み直さない（操作直後の明示 Refresh との二重走行防止）。
+            if (batch.NeedsFullReload)
+            {
+                if (LastListLoadStartUtc <= batch.LastEventUtc)
+                {
+                    NavigateTo(CurrentPath, record: false);
+                }
+
+                return;
+            }
+
+            _ = ApplyDirectoryChangesAsync(batch);
         });
+    }
+
+    /// <summary>
+    /// フォルダー監視が知らせてきた変更を、変わった項目だけに適用する。
+    ///
+    /// 以前はどんな変更でもフォルダー全体を読み直していたため、1 ファイル消えただけでも
+    /// 全行の再構築（ItemsSource の差し替え）が起きて、進行中のクリック・ダブルクリックが
+    /// 巻き添えで落ちていた。ここでは変化した項目の情報だけを取り直し、増減した行だけを
+    /// 一覧へ足し引きするので、他の行のコンテナには一切触れない。
+    /// </summary>
+    private async Task ApplyDirectoryChangesAsync(DirectoryChangeBatch batch)
+    {
+        var path = CurrentPath;
+        if (path == FileSystemService.ComputerPath)
+        {
+            // ドライブ一覧はファイル単位の変更と対応しないため、従来どおり読み直す
+            NavigateTo(path, record: false);
+            return;
+        }
+
+        var generation = _navigationGeneration;
+        var options = _options;
+        var targets = batch.Changes
+            .Where(change => IsDirectChild(path, change.FullPath))
+            .ToList();
+        if (targets.Count == 0)
+        {
+            return;
+        }
+
+        List<(DirectoryChange Change, FileSystemEntry? Fresh)> resolved;
+        try
+        {
+            // 属性・サイズの取得は同期 I/O（切断中のネットワークパスではブロックする）なので背景で行う
+            resolved = await Task.Run(
+                () => targets
+                    .Select(change => (
+                        change,
+                        change.Kind == DirectoryChangeKind.Deleted
+                            ? null
+                            : FileSystemService.TryCreateEntry(change.FullPath, options)))
+                    .ToList(),
+                _lifetimeCts.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        if (_isDetached || generation != _navigationGeneration || !WindowsPathIdentity.Instance.Equals(path, CurrentPath))
+        {
+            return;
+        }
+
+        ApplyResolvedChanges(resolved);
+    }
+
+    /// <summary>取得し直した内容を母集合へ反映し、変化があれば並べ替え・絞り込みを通して一覧へ出す。</summary>
+    private void ApplyResolvedChanges(List<(DirectoryChange Change, FileSystemEntry? Fresh)> resolved)
+    {
+        var all = new List<FileSystemEntry>(_allEntries);
+        var changed = false;
+
+        foreach (var (change, fresh) in resolved)
+        {
+            var existing = _entryByPath.GetValueOrDefault(change.FullPath);
+            if (fresh is null)
+            {
+                // 消えた、あるいは隠し属性が付いて表示対象外になった
+                if (existing is null || !all.Remove(existing))
+                {
+                    continue;
+                }
+
+                existing.DisposeThumbnail();
+                existing.DisposeWindowsIcon();
+                changed = true;
+                continue;
+            }
+
+            if (existing is null)
+            {
+                all.Add(fresh);
+                changed = true;
+                continue;
+            }
+
+            if (!existing.IsSameRowAs(fresh))
+            {
+                // 表示名や種別が変わった行は作り直す（同名で上書きされた場合など）
+                var index = all.IndexOf(existing);
+                if (index < 0)
+                {
+                    continue;
+                }
+
+                all[index] = fresh;
+                existing.DisposeThumbnail();
+                existing.DisposeWindowsIcon();
+                changed = true;
+                continue;
+            }
+
+            if (!existing.UpdateFrom(fresh))
+            {
+                continue;
+            }
+
+            // 中身が変わったのでサムネイルを読み直す。行は作り直さないためビューからの
+            // 再要求が起きず、ここから明示的に走らせる（いま出ている画像は差し替わるまで残る）。
+            changed = true;
+            if (UsesThumbnails && existing.HasThumbnail)
+            {
+                existing.InvalidateThumbnail();
+                _ = EnsureThumbnailAsync(existing);
+            }
+        }
+
+        if (!changed)
+        {
+            return;
+        }
+
+        SetAllEntries(ApplySort(all).ToList());
+        ApplyFilter();
+        UpdateFreeSpace(CurrentPath);
+    }
+
+    /// <summary>path が parent の直下の項目か（監視は非再帰なので通常は真だが、念のため確かめる）。</summary>
+    private static bool IsDirectChild(string parent, string path)
+    {
+        try
+        {
+            return Path.GetDirectoryName(path) is { Length: > 0 } directory
+                   && WindowsPathIdentity.Instance.Equals(directory, parent);
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     // ===== 再帰検索（検索ボックスで Enter） =====
@@ -2153,9 +2306,14 @@ public partial class TabViewModel : ObservableObject
     /// </summary>
     public bool CanChangeViewMode => !IsComputerRoot && !IsSettingsTab;
 
-    private List<FileSystemEntry> _entries = [];
+    private readonly FileEntryCollection _entries = new();
 
-    public IReadOnlyList<FileSystemEntry> Entries => _entries;
+    /// <summary>表示中の一覧。増減は差分で通知されるので、1 件の変化で全行が作り直されることはない
+    /// （<see cref="ReplaceEntries"/> と <see cref="FileEntryCollection"/> を参照）。</summary>
+    public FileEntryCollection Entries => _entries;
+
+    /// <summary>Entries を差し替えた回数。非同期処理が「自分が見ていた一覧のままか」を確かめるのに使う。</summary>
+    private int _entriesRevision;
 
     public ObservableCollection<BreadcrumbSegment> Breadcrumbs { get; } = new();
 
@@ -2893,12 +3051,20 @@ public partial class TabViewModel : ObservableObject
     {
         var next = entries as List<FileSystemEntry> ?? entries.ToList();
 
-        // 並びも項目も 1 つも変わっていないなら差し替えない。差し替えると ListBox が
+        // 並びも項目も 1 つも変わっていないなら何もしない。差し替えると ListBox が
         // 全行のコンテナを作り直し、選択とスクロール位置も一度失われるため、フォルダー監視に
         // よる自動更新のたびに一覧が点滅して見える。MergeReloadedEntries が変化のない行を
         // 使い回すので、実際に何も変わっていない読み直しはここで止まる。
         if (IsSameEntrySequence(_entries, next))
         {
+            return;
+        }
+
+        // 増減だけで済むなら、その行だけを Add / Remove で通知する。ListBox は残りの行の
+        // コンテナを作り直さないので、スクロール位置・選択・進行中のクリックが保たれる。
+        if (TryPatchEntries(next))
+        {
+            OnPropertyChanged(nameof(HasNoEntries));
             return;
         }
 
@@ -2912,8 +3078,8 @@ public partial class TabViewModel : ObservableObject
             SetSelection([]);
         }
 
-        _entries = next;
-        OnPropertyChanged(nameof(Entries));
+        _entries.Reset(next);
+        _entriesRevision++;
         OnPropertyChanged(nameof(HasNoEntries));
 
         if (previousSelection is null)
@@ -2931,10 +3097,10 @@ public partial class TabViewModel : ObservableObject
             // 複数選択の適用は ListBox（View 側）が持つためイベントで依頼する。
             // ItemsSource バインディングの再構築が選択適用を上書きしないよう、
             // 反映後（次のディスパッチャフレーム）に実行する。
-            var replacedEntries = _entries;
+            var revision = _entriesRevision;
             Dispatcher.UIThread.Post(() =>
             {
-                if (!_isDetached && ReferenceEquals(_entries, replacedEntries))
+                if (!_isDetached && revision == _entriesRevision)
                 {
                     SelectionRestoreRequested?.Invoke(this, restored);
                 }
@@ -2942,10 +3108,68 @@ public partial class TabViewModel : ObservableObject
         }
     }
 
+    /// <summary>増減だけで現在の一覧を目的の並びへ持っていけるなら、その差分を適用して true を返す。
+    /// 並べ替え（共通する行の前後関係が変わる）や差分が大きすぎる場合は、何も変更せず false を返して
+    /// 呼び出し側の一括置換に任せる。</summary>
+    private bool TryPatchEntries(List<FileSystemEntry> next)
+    {
+        // 初回表示（空 → 全件）は一括置換の方が安い
+        if (_entries.Count == 0 || next.Count == 0)
+        {
+            return false;
+        }
+
+        var currentSet = new HashSet<FileSystemEntry>(_entries);
+        var nextSet = new HashSet<FileSystemEntry>(next);
+        var removed = _entries.Count(entry => !nextSet.Contains(entry));
+        var added = next.Count(entry => !currentSet.Contains(entry));
+        if (removed + added == 0 || removed + added > MaxPatchedEntryChanges)
+        {
+            return false;
+        }
+
+        // 両方に残る行の並び順が一致していなければ「増減」では表せない（＝並べ替え）
+        var keptCurrent = _entries.Where(nextSet.Contains).ToList();
+        var keptNext = next.Where(currentSet.Contains).ToList();
+        if (keptCurrent.Count != keptNext.Count)
+        {
+            return false;
+        }
+
+        for (var i = 0; i < keptCurrent.Count; i++)
+        {
+            if (!ReferenceEquals(keptCurrent[i], keptNext[i]))
+            {
+                return false;
+            }
+        }
+
+        for (var i = _entries.Count - 1; i >= 0; i--)
+        {
+            if (!nextSet.Contains(_entries[i]))
+            {
+                _entries.RemoveAt(i);
+            }
+        }
+
+        for (var i = 0; i < next.Count; i++)
+        {
+            if (i >= _entries.Count || !ReferenceEquals(_entries[i], next[i]))
+            {
+                _entries.Insert(i, next[i]);
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>増減で反映する上限。これを超えるなら一括置換（Reset 1 回）の方が速い。</summary>
+    private const int MaxPatchedEntryChanges = 128;
+
     /// <summary>2 つの一覧が「同じ項目が同じ順に並んでいる」か。行の同一性はインスタンス参照で見る。
     /// MergeReloadedEntries が同じファイルの行を使い回すので、参照が違うのは増減・並べ替え・
     /// 作り直しが実際に起きたときだけになる。</summary>
-    private static bool IsSameEntrySequence(List<FileSystemEntry> current, List<FileSystemEntry> next)
+    private static bool IsSameEntrySequence(IReadOnlyList<FileSystemEntry> current, IReadOnlyList<FileSystemEntry> next)
     {
         if (ReferenceEquals(current, next)) return true;
         if (current.Count != next.Count) return false;

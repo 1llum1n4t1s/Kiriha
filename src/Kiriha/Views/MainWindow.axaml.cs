@@ -2067,6 +2067,40 @@ public partial class MainWindow : Window
             && list.FindDescendantOfType<ScrollViewer>() is { } scroll)
         {
             tab.SetDetailHeaderOffset(scroll.Offset.X);
+            ReserveHorizontalScrollBarSpace(list, scroll);
+        }
+    }
+
+    /// <summary>水平スクロールバーの高さ（Fluent の ScrollBar 太さ + 余白）。</summary>
+    private const double HorizontalScrollBarReserve = 14;
+
+    /// <summary>
+    /// 水平スクロールバーが出ている間だけ、一覧の下端に同じ高さの余白を確保する。
+    /// Avalonia のスクロールバーは内容の上に重なって描かれる（レイアウト上の場所を取らない）ため、
+    /// 最下部までスクロールしても最後の 1 行がスクロールバーに隠れたままになる（実測: 詳細表示で
+    /// 最終行の下半分が欠ける）。余白は ScrollViewer の内側に入るのでスクロール量に加算され、
+    /// 最終行を最後まで送り出せるようになる。
+    /// </summary>
+    private static void ReserveHorizontalScrollBarSpace(Control list, ScrollViewer scroll)
+    {
+        if (list is not TemplatedControl target)
+        {
+            return;
+        }
+
+        var needed = scroll.Extent.Width - scroll.Viewport.Width > 0.5 ? HorizontalScrollBarReserve : 0;
+        var padding = target.Padding;
+        if (Math.Abs(padding.Bottom - needed) > 0.1)
+        {
+            target.Padding = new Thickness(padding.Left, padding.Top, padding.Right, needed);
+        }
+    }
+
+    private void FileListScroll_ScrollChanged(object? sender, ScrollChangedEventArgs e)
+    {
+        if (sender is Control list && list.FindDescendantOfType<ScrollViewer>() is { } scroll)
+        {
+            ReserveHorizontalScrollBarSpace(list, scroll);
         }
     }
 
