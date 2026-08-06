@@ -335,6 +335,7 @@
   <x:String x:Key="Text.Status.ClearSelectionTip" xml:space="preserve">चयनं मोक्तुं नुद</x:String>
   <x:String x:Key="Text.Status.DetailsViewTip" xml:space="preserve">विस्तृतदृश्यम्</x:String>
   <x:String x:Key="Text.Status.Modified" xml:space="preserve">परिवर्तितम्: {0}</x:String>
+  <x:String x:Key="Text.Status.GalleryViewTip" xml:space="preserve">चित्रवीथिकादृश्यम्</x:String>
   <x:String x:Key="Text.Status.IconSizeTip" xml:space="preserve">प्रतीकपरिमाणम्</x:String>
   <x:String x:Key="Text.Status.ItemCount" xml:space="preserve">{0} वस्तूनि</x:String>
   <x:String x:Key="Text.Status.ItemCountFiltered" xml:space="preserve">{0} वस्तूनि (अन्वेषणम्: {1})</x:String>
@@ -418,6 +419,7 @@
   <x:String x:Key="Text.View.Details" xml:space="preserve">विस्तारः</x:String>
   <x:String x:Key="Text.View.ExtraLarge" xml:space="preserve">अतिबृहत्प्रतीकानि</x:String>
   <x:String x:Key="Text.View.FileExtensions" xml:space="preserve">सञ्चिकाविस्ताराः</x:String>
+  <x:String x:Key="Text.View.Gallery" xml:space="preserve">चित्रवीथिका</x:String>
   <x:String x:Key="Text.View.HiddenFiles" xml:space="preserve">गुप्तानि वस्तूनि</x:String>
   <x:String x:Key="Text.View.ItemCheckBoxes" xml:space="preserve">वस्तुचयनपेटिकाः</x:String>
   <x:String x:Key="Text.View.Large" xml:space="preserve">बृहत्प्रतीकानि</x:String>

@@ -335,6 +335,7 @@
   <x:String x:Key="Text.Status.ClearSelectionTip" xml:space="preserve">Click to clear the selection</x:String>
   <x:String x:Key="Text.Status.DetailsViewTip" xml:space="preserve">Details view</x:String>
   <x:String x:Key="Text.Status.Modified" xml:space="preserve">Modified: {0}</x:String>
+  <x:String x:Key="Text.Status.GalleryViewTip" xml:space="preserve">Gallery view</x:String>
   <x:String x:Key="Text.Status.IconSizeTip" xml:space="preserve">Icon size</x:String>
   <x:String x:Key="Text.Status.ItemCount" xml:space="preserve">{0} item(s)</x:String>
   <x:String x:Key="Text.Status.ItemCountFiltered" xml:space="preserve">{0} item(s) (search: {1})</x:String>
@@ -418,6 +419,7 @@
   <x:String x:Key="Text.View.Details" xml:space="preserve">Details</x:String>
   <x:String x:Key="Text.View.ExtraLarge" xml:space="preserve">Extra large icons</x:String>
   <x:String x:Key="Text.View.FileExtensions" xml:space="preserve">File name extensions</x:String>
+  <x:String x:Key="Text.View.Gallery" xml:space="preserve">Gallery</x:String>
   <x:String x:Key="Text.View.HiddenFiles" xml:space="preserve">Hidden items</x:String>
   <x:String x:Key="Text.View.ItemCheckBoxes" xml:space="preserve">Item check boxes</x:String>
   <x:String x:Key="Text.View.Large" xml:space="preserve">Large icons</x:String>

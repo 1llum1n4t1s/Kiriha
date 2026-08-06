@@ -78,10 +78,11 @@ public partial class TabViewModel : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(
         nameof(IsDetailsView), nameof(IsListView), nameof(IsIconsView), nameof(IsTilesView),
-        nameof(IconFontSize),
+        nameof(IconFontSize), nameof(UsesThumbnails),
         nameof(ListOrientation), nameof(IsGalleryView),
         nameof(IsViewExtraLarge), nameof(IsViewLarge), nameof(IsViewMedium),
-        nameof(IsViewSmall), nameof(IsViewList), nameof(IsViewDetails), nameof(IsViewTiles))]
+        nameof(IsViewSmall), nameof(IsViewList), nameof(IsViewDetails), nameof(IsViewTiles),
+        nameof(IsViewGallery))]
     private ViewMode _viewMode = ViewMode.Details;
 
     /// <summary>タブ自身（✕ ボタン / コンテキストメニュー）からの閉じる要求。</summary>
@@ -2118,7 +2119,7 @@ public partial class TabViewModel : ObservableObject
 
     partial void OnIconSizeChanged(double value)
     {
-        HandleGalleryTransition();
+        // サイズスライダーはギャラリーの出入りに関与しない（2026-08-06 以降は ViewMode が唯一の切り替え）。
         SaveFolderViewSettings();
     }
 
@@ -2385,8 +2386,9 @@ public partial class TabViewModel : ObservableObject
     /// <summary>エクスプローラーの「並べて表示」。サイズはスライダーに追従せず固定（本家と同じ）。</summary>
     public bool IsTilesView => ViewMode == ViewMode.Tiles;
 
-    /// <summary>サムネイルを読み込む表示か。並べて表示も 48px のサムネイルを出す（エクスプローラーと同じ）。</summary>
-    public bool UsesThumbnails => IsIconsView || IsTilesView;
+    /// <summary>サムネイルを読み込む表示か。並べて表示も 48px のサムネイルを出す（エクスプローラーと同じ）。
+    /// ギャラリーは下部フィルムストリップがサムネイルそのものなので、当然ここに含める。</summary>
+    public bool UsesThumbnails => IsIconsView || IsTilesView || IsGalleryView;
 
     /// <summary>小アイコンは横方向へ折り返し、一覧は縦方向を埋めてから次の列へ進む。</summary>
     public Avalonia.Layout.Orientation ListOrientation
@@ -2400,15 +2402,19 @@ public partial class TabViewModel : ObservableObject
     /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(
-        nameof(IconFontSize), nameof(IconItemWidth), nameof(IconCellWidth), nameof(IconCellHeight),
-        nameof(IsGalleryView))]
+        nameof(IconFontSize), nameof(IconItemWidth), nameof(IconCellWidth), nameof(IconCellHeight))]
     private double _iconSize = 28;
 
     public double IconFontSize => IconSize;
 
-    /// <summary>アイコンサイズスライダーを最大（160）まで上げると入る特別モード。
-    /// ナビゲーション / プレビューを隠し、1 枚を大きく表示 + 下部フィルムストリップで送る。</summary>
-    public bool IsGalleryView => IsIconsView && IconSize >= 159.5;
+    /// <summary>ギャラリー表示か。ナビゲーション / プレビューを隠し、1 枚を大きく表示して
+    /// 下部フィルムストリップで送る。
+    ///
+    /// 以前は「アイコン表示 かつ サイズスライダーが最大」という派生状態だったが、
+    /// スライダーを一番右まで動かしただけで意図せず入ってしまうため、
+    /// ステータスバー / 表示メニューから選ぶ独立した <see cref="ViewMode"/> にした（2026-08-06）。
+    /// スライダーは <see cref="IsIconsView"/> のときだけ出るので、ギャラリー中は表示されない。</summary>
+    public bool IsGalleryView => ViewMode == ViewMode.Gallery;
 
     /// <summary>アイコンビューのセル幅（アイコンサイズに追従）。</summary>
     public double IconItemWidth => Math.Max(96, IconSize * 1.7);
@@ -2426,6 +2432,7 @@ public partial class TabViewModel : ObservableObject
     public bool IsViewList => ViewMode == ViewMode.List;
     public bool IsViewDetails => ViewMode == ViewMode.Details;
     public bool IsViewTiles => ViewMode == ViewMode.Tiles;
+    public bool IsViewGallery => ViewMode == ViewMode.Gallery;
 
     public bool ShowHidden => _options.ShowHidden;
 
@@ -3360,8 +3367,36 @@ public partial class TabViewModel : ObservableObject
         });
     }
 
-    /// <summary>ギャラリー表示に切り替わるアイコンサイズ（サイズスライダーの上限と同じ値）。</summary>
-    private const double GalleryIconSize = 160;
+    /// <summary>ギャラリーへ入る直前の表示モード。閉じたときはここへ戻す
+    /// （利用者が選んでいた表示を、ギャラリーを覗いただけで失わせないため）。</summary>
+    private ViewMode _viewModeBeforeGallery = ViewMode.LargeIcons;
+
+    /// <summary>ギャラリー表示へ入る。抜ける先を覚えるため、ここが唯一の入口。</summary>
+    public void EnterGallery()
+    {
+        if (!CanChangeViewMode || IsGalleryView)
+        {
+            return;
+        }
+
+        _viewModeBeforeGallery = ViewMode;
+        ViewMode = ViewMode.Gallery;
+    }
+
+    /// <summary>ギャラリー表示を終える（Esc / ✕ / フィルムストリップ上の Ctrl+ホイール）。
+    /// 入る前の表示モードへ戻す。フォルダー別記憶からギャラリーで復元された場合は
+    /// 覚えている直前値が無いので、大アイコンへ戻す。</summary>
+    public void LeaveGallery()
+    {
+        if (!IsGalleryView)
+        {
+            return;
+        }
+
+        ViewMode = _viewModeBeforeGallery == ViewMode.Gallery
+            ? ViewMode.LargeIcons
+            : _viewModeBeforeGallery;
+    }
 
     /// <summary>
     /// ギャラリーで画像として扱う拡張子か。通常の画像に加えて、シェルのコーデック任せで
@@ -3381,13 +3416,9 @@ public partial class TabViewModel : ObservableObject
     public void OpenInGallery(FileSystemEntry entry)
     {
         SelectedEntry = entry;
-        if (!IsIconsView)
-        {
-            // ViewMode の変更はプリセットのサイズ（96）を書くので、先に済ませてから広げる。
-            ViewMode = ViewMode.ExtraLargeIcons;
-        }
-
-        IconSize = GalleryIconSize;
+        EnterGallery();
+        // ViewMode の切り替えで選択が動くことはないが、フィルムストリップ側の初期選択を
+        // 確実にこの 1 枚へ合わせるため、入ったあとにもう一度指定する。
         SelectedEntry = entry;
     }
 
@@ -4374,10 +4405,19 @@ public partial class TabViewModel : ObservableObject
     [RelayCommand]
     private void SetViewMode(string mode)
     {
-        if (CanChangeViewMode && Enum.TryParse<ViewMode>(mode, out var value))
+        if (!CanChangeViewMode || !Enum.TryParse<ViewMode>(mode, out var value))
         {
-            ViewMode = value;
+            return;
         }
+
+        // ギャラリーへ入るときだけは、抜ける先を覚えるため専用の入口を通す。
+        if (value == ViewMode.Gallery)
+        {
+            EnterGallery();
+            return;
+        }
+
+        ViewMode = value;
     }
 
     [RelayCommand]

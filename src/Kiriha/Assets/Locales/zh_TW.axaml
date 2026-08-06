@@ -335,6 +335,7 @@
   <x:String x:Key="Text.Status.ClearSelectionTip" xml:space="preserve">按一下以取消選取</x:String>
   <x:String x:Key="Text.Status.DetailsViewTip" xml:space="preserve">詳細資料檢視</x:String>
   <x:String x:Key="Text.Status.Modified" xml:space="preserve">修改日期: {0}</x:String>
+  <x:String x:Key="Text.Status.GalleryViewTip" xml:space="preserve">圖庫檢視</x:String>
   <x:String x:Key="Text.Status.IconSizeTip" xml:space="preserve">圖示大小</x:String>
   <x:String x:Key="Text.Status.ItemCount" xml:space="preserve">{0} 個項目</x:String>
   <x:String x:Key="Text.Status.ItemCountFiltered" xml:space="preserve">{0} 個項目（搜尋: {1}）</x:String>
@@ -418,6 +419,7 @@
   <x:String x:Key="Text.View.Details" xml:space="preserve">詳細資料</x:String>
   <x:String x:Key="Text.View.ExtraLarge" xml:space="preserve">超大圖示</x:String>
   <x:String x:Key="Text.View.FileExtensions" xml:space="preserve">副檔名</x:String>
+  <x:String x:Key="Text.View.Gallery" xml:space="preserve">圖庫</x:String>
   <x:String x:Key="Text.View.HiddenFiles" xml:space="preserve">隱藏的項目</x:String>
   <x:String x:Key="Text.View.ItemCheckBoxes" xml:space="preserve">項目核取方塊</x:String>
   <x:String x:Key="Text.View.Large" xml:space="preserve">大圖示</x:String>

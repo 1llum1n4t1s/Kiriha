@@ -335,6 +335,7 @@
   <x:String x:Key="Text.Status.ClearSelectionTip" xml:space="preserve">Fai clic per annullare la selezione</x:String>
   <x:String x:Key="Text.Status.DetailsViewTip" xml:space="preserve">Vista Dettagli</x:String>
   <x:String x:Key="Text.Status.Modified" xml:space="preserve">Modificato: {0}</x:String>
+  <x:String x:Key="Text.Status.GalleryViewTip" xml:space="preserve">Vista Galleria</x:String>
   <x:String x:Key="Text.Status.IconSizeTip" xml:space="preserve">Dimensione delle icone</x:String>
   <x:String x:Key="Text.Status.ItemCount" xml:space="preserve">{0} elemento/i</x:String>
   <x:String x:Key="Text.Status.ItemCountFiltered" xml:space="preserve">{0} elemento/i (ricerca: {1})</x:String>
@@ -418,6 +419,7 @@
   <x:String x:Key="Text.View.Details" xml:space="preserve">Dettagli</x:String>
   <x:String x:Key="Text.View.ExtraLarge" xml:space="preserve">Icone molto grandi</x:String>
   <x:String x:Key="Text.View.FileExtensions" xml:space="preserve">Estensioni dei file</x:String>
+  <x:String x:Key="Text.View.Gallery" xml:space="preserve">Galleria</x:String>
   <x:String x:Key="Text.View.HiddenFiles" xml:space="preserve">Elementi nascosti</x:String>
   <x:String x:Key="Text.View.ItemCheckBoxes" xml:space="preserve">Caselle di controllo degli elementi</x:String>
   <x:String x:Key="Text.View.Large" xml:space="preserve">Icone grandi</x:String>

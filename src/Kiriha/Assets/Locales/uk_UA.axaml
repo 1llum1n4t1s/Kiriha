@@ -335,6 +335,7 @@
   <x:String x:Key="Text.Status.ClearSelectionTip" xml:space="preserve">Клацніть, щоб зняти виділення</x:String>
   <x:String x:Key="Text.Status.DetailsViewTip" xml:space="preserve">Таблиця</x:String>
   <x:String x:Key="Text.Status.Modified" xml:space="preserve">Змінено: {0}</x:String>
+  <x:String x:Key="Text.Status.GalleryViewTip" xml:space="preserve">Режим галереї</x:String>
   <x:String x:Key="Text.Status.IconSizeTip" xml:space="preserve">Розмір значків</x:String>
   <x:String x:Key="Text.Status.ItemCount" xml:space="preserve">об'єктів: {0}</x:String>
   <x:String x:Key="Text.Status.ItemCountFiltered" xml:space="preserve">об'єктів: {0} (пошук: {1})</x:String>
@@ -418,6 +419,7 @@
   <x:String x:Key="Text.View.Details" xml:space="preserve">Таблиця</x:String>
   <x:String x:Key="Text.View.ExtraLarge" xml:space="preserve">Величезні значки</x:String>
   <x:String x:Key="Text.View.FileExtensions" xml:space="preserve">Розширення файлів</x:String>
+  <x:String x:Key="Text.View.Gallery" xml:space="preserve">Галерея</x:String>
   <x:String x:Key="Text.View.HiddenFiles" xml:space="preserve">Приховані елементи</x:String>
   <x:String x:Key="Text.View.ItemCheckBoxes" xml:space="preserve">Прапорці елементів</x:String>
   <x:String x:Key="Text.View.Large" xml:space="preserve">Великі значки</x:String>

@@ -622,7 +622,16 @@ public partial class MainWindow : Window
                 return;
             }
 
-            if (tab.IsIconsView)
+            if (tab.IsGalleryView)
+            {
+                // ギャラリー中にここへ来るのはフィルムストリップ上だけ（画像領域は上の分岐で拡大縮小）。
+                // 縮小方向はギャラリーを抜ける操作に割り当て、拡大方向は行き先が無いので何もしない。
+                if (e.Delta.Y < 0)
+                {
+                    tab.LeaveGallery();
+                }
+            }
+            else if (tab.IsIconsView)
             {
                 tab.IconSize = Math.Clamp(tab.IconSize + e.Delta.Y * 8, 24, 160);
             }
@@ -2382,7 +2391,7 @@ public partial class MainWindow : Window
         }
         else
         {
-            tab.IconSize = 96;
+            tab.LeaveGallery();
         }
 
         e.Handled = true;
@@ -2487,7 +2496,7 @@ public partial class MainWindow : Window
     {
         if ((sender as Control)?.DataContext is TabViewModel tab)
         {
-            tab.IconSize = 96;
+            tab.LeaveGallery();
         }
     }
 
@@ -2825,8 +2834,8 @@ public partial class MainWindow : Window
             case Key.Escape:
                 if (listBox.Classes.Contains("gallerystrip"))
                 {
-                    // ギャラリー表示からの復帰（スライダーを特大アイコン相当まで戻す）
-                    tab.IconSize = 96;
+                    // ギャラリー表示からの復帰（入る前の表示モードへ戻す）
+                    tab.LeaveGallery();
                 }
                 else
                 {

@@ -335,6 +335,7 @@
   <x:String x:Key="Text.Status.ClearSelectionTip" xml:space="preserve">Klicken, um die Auswahl aufzuheben</x:String>
   <x:String x:Key="Text.Status.DetailsViewTip" xml:space="preserve">Detailansicht</x:String>
   <x:String x:Key="Text.Status.Modified" xml:space="preserve">Geändert: {0}</x:String>
+  <x:String x:Key="Text.Status.GalleryViewTip" xml:space="preserve">Galerieansicht</x:String>
   <x:String x:Key="Text.Status.IconSizeTip" xml:space="preserve">Symbolgröße</x:String>
   <x:String x:Key="Text.Status.ItemCount" xml:space="preserve">{0} Element(e)</x:String>
   <x:String x:Key="Text.Status.ItemCountFiltered" xml:space="preserve">{0} Element(e) (Suche: {1})</x:String>
@@ -418,6 +419,7 @@
   <x:String x:Key="Text.View.Details" xml:space="preserve">Details</x:String>
   <x:String x:Key="Text.View.ExtraLarge" xml:space="preserve">Extra große Symbole</x:String>
   <x:String x:Key="Text.View.FileExtensions" xml:space="preserve">Dateinamenerweiterungen</x:String>
+  <x:String x:Key="Text.View.Gallery" xml:space="preserve">Galerie</x:String>
   <x:String x:Key="Text.View.HiddenFiles" xml:space="preserve">Ausgeblendete Elemente</x:String>
   <x:String x:Key="Text.View.ItemCheckBoxes" xml:space="preserve">Kontrollkästchen für Elemente</x:String>
   <x:String x:Key="Text.View.Large" xml:space="preserve">Große Symbole</x:String>

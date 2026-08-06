@@ -335,6 +335,7 @@
   <x:String x:Key="Text.Status.ClearSelectionTip" xml:space="preserve">Cliquez pour annuler la sélection</x:String>
   <x:String x:Key="Text.Status.DetailsViewTip" xml:space="preserve">Affichage Détails</x:String>
   <x:String x:Key="Text.Status.Modified" xml:space="preserve">Modifié : {0}</x:String>
+  <x:String x:Key="Text.Status.GalleryViewTip" xml:space="preserve">Affichage Galerie</x:String>
   <x:String x:Key="Text.Status.IconSizeTip" xml:space="preserve">Taille des icônes</x:String>
   <x:String x:Key="Text.Status.ItemCount" xml:space="preserve">{0} élément(s)</x:String>
   <x:String x:Key="Text.Status.ItemCountFiltered" xml:space="preserve">{0} élément(s) (recherche : {1})</x:String>
@@ -418,6 +419,7 @@
   <x:String x:Key="Text.View.Details" xml:space="preserve">Détails</x:String>
   <x:String x:Key="Text.View.ExtraLarge" xml:space="preserve">Très grandes icônes</x:String>
   <x:String x:Key="Text.View.FileExtensions" xml:space="preserve">Extensions de fichier</x:String>
+  <x:String x:Key="Text.View.Gallery" xml:space="preserve">Galerie</x:String>
   <x:String x:Key="Text.View.HiddenFiles" xml:space="preserve">Éléments masqués</x:String>
   <x:String x:Key="Text.View.ItemCheckBoxes" xml:space="preserve">Cases à cocher des éléments</x:String>
   <x:String x:Key="Text.View.Large" xml:space="preserve">Grandes icônes</x:String>

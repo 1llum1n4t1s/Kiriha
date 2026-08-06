@@ -335,6 +335,7 @@
   <x:String x:Key="Text.Status.ClearSelectionTip" xml:space="preserve">தேர்வை நீக்க கிளிக் செய்யவும்</x:String>
   <x:String x:Key="Text.Status.DetailsViewTip" xml:space="preserve">விவரக் காட்சி</x:String>
   <x:String x:Key="Text.Status.Modified" xml:space="preserve">மாற்றப்பட்டது: {0}</x:String>
+  <x:String x:Key="Text.Status.GalleryViewTip" xml:space="preserve">கேலரி காட்சி</x:String>
   <x:String x:Key="Text.Status.IconSizeTip" xml:space="preserve">சின்ன அளவு</x:String>
   <x:String x:Key="Text.Status.ItemCount" xml:space="preserve">{0} உருப்படிகள்</x:String>
   <x:String x:Key="Text.Status.ItemCountFiltered" xml:space="preserve">{0} உருப்படிகள் (தேடல்: {1})</x:String>
@@ -418,6 +419,7 @@
   <x:String x:Key="Text.View.Details" xml:space="preserve">விவரங்கள்</x:String>
   <x:String x:Key="Text.View.ExtraLarge" xml:space="preserve">மிகப் பெரிய சின்னங்கள்</x:String>
   <x:String x:Key="Text.View.FileExtensions" xml:space="preserve">கோப்பு நீட்டிப்புகள்</x:String>
+  <x:String x:Key="Text.View.Gallery" xml:space="preserve">கேலரி</x:String>
   <x:String x:Key="Text.View.HiddenFiles" xml:space="preserve">மறைந்த உருப்படிகள்</x:String>
   <x:String x:Key="Text.View.ItemCheckBoxes" xml:space="preserve">உருப்படித் தேர்வுப்பெட்டிகள்</x:String>
   <x:String x:Key="Text.View.Large" xml:space="preserve">பெரிய சின்னங்கள்</x:String>

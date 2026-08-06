@@ -335,6 +335,7 @@
   <x:String x:Key="Text.Status.ClearSelectionTip" xml:space="preserve">클릭하여 선택 해제</x:String>
   <x:String x:Key="Text.Status.DetailsViewTip" xml:space="preserve">자세히 보기</x:String>
   <x:String x:Key="Text.Status.Modified" xml:space="preserve">수정한 날짜: {0}</x:String>
+  <x:String x:Key="Text.Status.GalleryViewTip" xml:space="preserve">갤러리 보기</x:String>
   <x:String x:Key="Text.Status.IconSizeTip" xml:space="preserve">아이콘 크기</x:String>
   <x:String x:Key="Text.Status.ItemCount" xml:space="preserve">{0}개 항목</x:String>
   <x:String x:Key="Text.Status.ItemCountFiltered" xml:space="preserve">{0}개 항목(검색: {1})</x:String>
@@ -418,6 +419,7 @@
   <x:String x:Key="Text.View.Details" xml:space="preserve">자세히</x:String>
   <x:String x:Key="Text.View.ExtraLarge" xml:space="preserve">아주 큰 아이콘</x:String>
   <x:String x:Key="Text.View.FileExtensions" xml:space="preserve">파일 확장명</x:String>
+  <x:String x:Key="Text.View.Gallery" xml:space="preserve">갤러리</x:String>
   <x:String x:Key="Text.View.HiddenFiles" xml:space="preserve">숨긴 항목</x:String>
   <x:String x:Key="Text.View.ItemCheckBoxes" xml:space="preserve">항목 확인란</x:String>
   <x:String x:Key="Text.View.Large" xml:space="preserve">큰 아이콘</x:String>

@@ -335,6 +335,7 @@
   <x:String x:Key="Text.Status.ClearSelectionTip" xml:space="preserve">クリックして選択を解除</x:String>
   <x:String x:Key="Text.Status.DetailsViewTip" xml:space="preserve">詳細表示</x:String>
   <x:String x:Key="Text.Status.Modified" xml:space="preserve">更新日時: {0}</x:String>
+  <x:String x:Key="Text.Status.GalleryViewTip" xml:space="preserve">ギャラリー表示</x:String>
   <x:String x:Key="Text.Status.IconSizeTip" xml:space="preserve">アイコンのサイズ</x:String>
   <x:String x:Key="Text.Status.ItemCount" xml:space="preserve">{0} 個の項目</x:String>
   <x:String x:Key="Text.Status.ItemCountFiltered" xml:space="preserve">{0} 個の項目 (検索: {1})</x:String>
@@ -418,6 +419,7 @@
   <x:String x:Key="Text.View.Details" xml:space="preserve">詳細</x:String>
   <x:String x:Key="Text.View.ExtraLarge" xml:space="preserve">特大アイコン</x:String>
   <x:String x:Key="Text.View.FileExtensions" xml:space="preserve">ファイル名拡張子</x:String>
+  <x:String x:Key="Text.View.Gallery" xml:space="preserve">ギャラリー表示</x:String>
   <x:String x:Key="Text.View.HiddenFiles" xml:space="preserve">隠しファイル</x:String>
   <x:String x:Key="Text.View.ItemCheckBoxes" xml:space="preserve">項目チェックボックス</x:String>
   <x:String x:Key="Text.View.Large" xml:space="preserve">大アイコン</x:String>
