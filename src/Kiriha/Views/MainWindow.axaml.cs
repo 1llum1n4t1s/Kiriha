@@ -109,6 +109,11 @@ public partial class MainWindow : Window
             RoutingStrategies.Tunnel, handledEventsToo: true);
         AddHandler(PointerCaptureLostEvent, MarqueeSelection_PointerCaptureLost, handledEventsToo: true);
 
+        // ファイル一覧のダブルクリック（FileListOpen_PointerPressed の説明を参照。
+        // DoubleTapped ジェスチャは行内要素の差し替えで不発になるため使わない）
+        AddHandler(PointerPressedEvent, FileListOpen_PointerPressed,
+            RoutingStrategies.Bubble, handledEventsToo: true);
+
         // 同一パス再読み込み（F5・シェル verb 後の保険リフレッシュ等）後の複数選択復元
         TabViewModel.SelectionRestoreRequested += OnTabSelectionRestoreRequested;
 
@@ -2339,16 +2344,56 @@ public partial class MainWindow : Window
 
     // ===== ファイル一覧 =====
 
-    private void FileList_DoubleTapped(object? sender, TappedEventArgs e)
+    /// <summary>
+    /// ファイル一覧のダブルクリックは DoubleTapped ジェスチャではなく ClickCount で判定して開く。
+    ///
+    /// Avalonia の Gestures は「1 回目と 2 回目のプレスの e.Source が同一インスタンス」のときだけ
+    /// DoubleTapped を発火する（Gestures.cs の target == source 比較。12.1.1 で確認）。ファイル一覧の
+    /// 行では、絵文字 → サムネイル / シェルアイコンの非同期差し替えと、移動直後の行の実体化が
+    /// クリックの合間に挟まるため、ヒット要素が入れ替わって本物のダブルクリックが不発になっていた。
+    /// 実測（フォルダーを開いた直後の連打 7 回）: 7 回全てが ScrollContentPresenter / StackPanel →
+    /// Image の不一致で DoubleTapped 不発、一方 ClickCount は全て正しく 2 を数えていた。
+    /// ClickCount は MouseDevice が時間とダブルクリック矩形だけで数える（エクスプローラーの
+    /// WM_LBUTTONDBLCLK と同じ原理）ので、要素の入れ替わりに影響されない。
+    ///
+    /// ListBoxItem は選択処理でプレスを Handled にするため、Window の handledEventsToo で受ける
+    /// （DragSource_PointerPressed と同じ理由）。偶数プレスで発火させるのも Win32 の
+    /// DOWN → DBLCLK → DOWN → DBLCLK の交互パターンに合わせたもの。
+    /// </summary>
+    private void FileListOpen_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        if (sender is not ListBox { DataContext: TabViewModel tab })
+        if (e.ClickCount % 2 != 0 || e.Source is not Visual source)
         {
             return;
         }
 
-        if (sender is ListBox senderList
-            && !IsDetailsBackgroundColumnHit(senderList, e.Source)
-            && (e.Source as Visual)?.FindAncestorOfType<ListBoxItem>()?.DataContext is FileSystemEntry entry)
+        // 対象はファイル一覧の 5 つの ListBox（details/list/tiles は files、アイコン表示は icons、
+        // フィルムストリップは files gallerystrip）。同じタブテンプレート内のサイドバー（sidebar）や
+        // タブ一覧（verticaltabs）はクラスで外れる。
+        var list = source.FindAncestorOfType<ListBox>(includeSelf: true);
+        if (list is null
+            || !(list.Classes.Contains("files") || list.Classes.Contains("icons"))
+            || list.DataContext is not TabViewModel tab)
+        {
+            return;
+        }
+
+        if (!e.GetCurrentPoint(list).Properties.IsLeftButtonPressed)
+        {
+            return;
+        }
+
+        // 行内・背景の操作コントロールの連打では開かない（チェックボックス、スクロールバー等）
+        for (var v = source; v is not null && !ReferenceEquals(v, list); v = v.GetVisualParent() as Visual)
+        {
+            if (v is CheckBox or ScrollBar or Button or TextBox or Thumb)
+            {
+                return;
+            }
+        }
+
+        if (!IsDetailsBackgroundColumnHit(list, e.Source)
+            && source.FindAncestorOfType<ListBoxItem>(includeSelf: true)?.DataContext is FileSystemEntry entry)
         {
             if (!TryOpenInGallery(tab, entry))
             {
@@ -2358,11 +2403,8 @@ public partial class MainWindow : Window
             return;
         }
 
-        // 背景のダブルクリック（設定で動作を選択）。スクロールバー連打では発火させない。
-        if ((e.Source as Visual)?.FindAncestorOfType<ScrollBar>() is null)
-        {
-            ExecuteBackgroundClickAction(tab, ViewModel?.OptBackgroundDoubleClickAction);
-        }
+        // 背景のダブルクリック（設定で動作を選択）
+        ExecuteBackgroundClickAction(tab, ViewModel?.OptBackgroundDoubleClickAction);
     }
 
     /// <summary>
