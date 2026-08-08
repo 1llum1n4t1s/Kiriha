@@ -179,6 +179,7 @@
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">戻る</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">戻る (右クリックで履歴)</x:String>
   <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">表示しきれないフォルダー（クリックで一覧）</x:String>
+  <x:String x:Key="Text.Nav.DragFolderTip" xml:space="preserve">このフォルダーをドラッグ</x:String>
   <x:String x:Key="Text.Nav.EditPathTip" xml:space="preserve">クリックしてパスを編集</x:String>
   <x:String x:Key="Text.Nav.Forward" xml:space="preserve">進む</x:String>
   <x:String x:Key="Text.Nav.ForwardTip" xml:space="preserve">進む (右クリックで履歴)</x:String>

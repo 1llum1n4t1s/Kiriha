@@ -1283,6 +1283,22 @@ public partial class MainWindow : Window
 
         MoveTabDragGhost(position);
 
+        // お気に入りペインの上へ持っていったら、そこが行き先になる（登録 / リンク先へのコピー・移動）。
+        // タブのドラッグは OLE ではないので、ペインの目印は座標のヒットテストから出す。
+        var hit = this.InputHitTest(position) as Visual;
+        if (IsOnBookmarkPane(hit))
+        {
+            _tabDragOverBookmark = true;
+            UpdateBookmarkDropMark(hit, position);
+            return;
+        }
+
+        if (_tabDragOverBookmark)
+        {
+            _tabDragOverBookmark = false;
+            ClearBookmarkDropMark();
+        }
+
         // フォルダードロップの仮配置と同じ表現: 掴んだタブ自体を半透明のままライブで並べ替え、
         // ドロップ後の並びをそのまま見せる（挿入ラインは使わない）。
         if (TabUnderPoint(position) is { } target && target != _tabDragTab && ViewModel is { } vm)
@@ -1306,6 +1322,15 @@ public partial class MainWindow : Window
 
     private void Tabs_PointerReleased(object? sender, PointerReleasedEventArgs e)
     {
+        // お気に入りペインの上で離したら、並べ替えではなくそちらへのドロップとして扱う
+        if (_tabDragActive && _tabDragOverBookmark && _tabDragTab is { } droppedTab)
+        {
+            DropTabOnBookmarkPane(droppedTab, e.KeyModifiers);
+            e.Handled = true;
+            EndTabDrag();
+            return;
+        }
+
         if (e.InitialPressMouseButton == MouseButton.Middle)
         {
             if (TabUnderPointer(e) is { } tab)
@@ -1339,12 +1364,52 @@ public partial class MainWindow : Window
         EndTabDrag();
     }
 
+    /// <summary>ドラッグ中のタブが今お気に入りペインの上にあるか（離した場所の判定に使う）。</summary>
+    private bool _tabDragOverBookmark;
+
+    /// <summary>
+    /// タブをお気に入りペインへ落としたときの処理。ファイルのドロップと同じ規則にそろえてある:
+    /// 実フォルダーを指すリンク行の中央なら、そのフォルダーへのコピー / 移動。
+    /// それ以外（行の上下端・グループフォルダーの中・余白）はお気に入りへの登録。
+    /// </summary>
+    private void DropTabOnBookmarkPane(TabViewModel tab, KeyModifiers modifiers)
+    {
+        var node = _bookmarkDropNode;
+        var mark = _bookmarkDropMark;
+        ClearBookmarkDropMark();
+
+        // 設定タブと「PC」は実体のあるフォルダーを持たないので落とせない
+        if (tab.IsSettingsTab || tab.CurrentPath is not { Length: > 0 } path
+            || path == FileSystemService.ComputerPath)
+        {
+            return;
+        }
+
+        List<string> files = [path];
+        if (mark == BookmarkDropMark.Into && node is { } into && IsFileDropTargetBookmark(into)
+            && !IsSelfDrop(files, into.Path!)
+            && ViewModel?.SelectedTab is { } dropTab)
+        {
+            var move = ResolveDropEffect(modifiers, files, into.Path!) == DragDropEffects.Move;
+            _ = dropTab.DropFilesAsync(files, into.Path!, move);
+            return;
+        }
+
+        ViewModel?.InsertBookmarks(files, node, mark);
+    }
+
     private ListBoxItem? TabContainer(TabViewModel tab)
         => (_tabDragListBox ?? VerticalTabsListBox).GetVisualDescendants().OfType<ListBoxItem>()
             .FirstOrDefault(item => ReferenceEquals(item.DataContext, tab));
 
     private void EndTabDrag()
     {
+        if (_tabDragOverBookmark)
+        {
+            _tabDragOverBookmark = false;
+            ClearBookmarkDropMark();
+        }
+
         _tabDragContainer?.Classes.Remove("dragging");
         TabDragGhost.IsVisible = false;
         _tabDragContainer = null;
@@ -1678,7 +1743,10 @@ public partial class MainWindow : Window
     /// </summary>
     private void BreadcrumbBar_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        if (e.Source is Visual visual && visual.FindAncestorOfType<Button>() is not null)
+        // 左端の取っ手はフォルダーを掴むための場所なので、押しても直接入力へは切り替えない
+        // （ドラッグを始めるたびに編集モードへ落ちてしまうため）。
+        if (e.Source is Visual visual
+            && (visual.FindAncestorOfType<Button>() is not null || FindAddressDragHandle(visual) is not null))
         {
             return;
         }
@@ -2212,15 +2280,24 @@ public partial class MainWindow : Window
 
         flyout.Items.Add(new Separator());
 
-        var sortName = new MenuItem { Header = LocalizationService.Text("Text.Bookmarks.SortByName") };
-        sortName.Click += (_, _) => vm.SortBookmarks(byPath: false);
-        flyout.Items.Add(sortName);
-
-        var sortPath = new MenuItem { Header = LocalizationService.Text("Text.Bookmarks.SortByPath") };
-        sortPath.Click += (_, _) => vm.SortBookmarks(byPath: true);
-        flyout.Items.Add(sortPath);
+        // 昇順 / 降順はヘッダーの並べ替えボタンと同じ入れ子構成にそろえる
+        flyout.Items.Add(BuildBookmarkSortMenu(vm, "Text.Bookmarks.SortByName", byPath: false));
+        flyout.Items.Add(BuildBookmarkSortMenu(vm, "Text.Bookmarks.SortByPath", byPath: true));
 
         flyout.ShowAt(bar, showAtPointer: true);
+    }
+
+    /// <summary>「名前順で並べ替え ▸ 昇順 / 降順」1 基準ぶんのメニューを作る。</summary>
+    private static MenuItem BuildBookmarkSortMenu(MainWindowViewModel vm, string headerKey, bool byPath)
+    {
+        var parent = new MenuItem { Header = LocalizationService.Text(headerKey) };
+        var ascending = new MenuItem { Header = LocalizationService.Text("Text.Sort.Ascending") };
+        ascending.Click += (_, _) => vm.SortBookmarks(byPath, ascending: true);
+        var descending = new MenuItem { Header = LocalizationService.Text("Text.Sort.Descending") };
+        descending.Click += (_, _) => vm.SortBookmarks(byPath, ascending: false);
+        parent.Items.Add(ascending);
+        parent.Items.Add(descending);
+        return parent;
     }
 
     /// <summary>現在のタブのフォルダーをお気に入りへ追加する（背景メニューとヘッダーボタンで共用）。</summary>
@@ -2236,9 +2313,17 @@ public partial class MainWindow : Window
 
     private void BookmarkAddCurrent_Click(object? sender, RoutedEventArgs e) => AddCurrentBookmark();
 
-    private void BookmarkSortByName_Click(object? sender, RoutedEventArgs e) => ViewModel?.SortBookmarks(byPath: false);
+    private void BookmarkSortByName_Click(object? sender, RoutedEventArgs e)
+        => ViewModel?.SortBookmarks(byPath: false, ascending: true);
 
-    private void BookmarkSortByPath_Click(object? sender, RoutedEventArgs e) => ViewModel?.SortBookmarks(byPath: true);
+    private void BookmarkSortByNameDesc_Click(object? sender, RoutedEventArgs e)
+        => ViewModel?.SortBookmarks(byPath: false, ascending: false);
+
+    private void BookmarkSortByPath_Click(object? sender, RoutedEventArgs e)
+        => ViewModel?.SortBookmarks(byPath: true, ascending: true);
+
+    private void BookmarkSortByPathDesc_Click(object? sender, RoutedEventArgs e)
+        => ViewModel?.SortBookmarks(byPath: true, ascending: false);
 
     // ===== 詳細表示のカラム幅変更 =====
 
@@ -3125,7 +3210,22 @@ public partial class MainWindow : Window
             _dragListBox = null;
             _dragSidebarLink = null;
             _dragButton = isRightPress ? MouseButton.Right : MouseButton.Left;
-            _dragTreeNodePath = treeNode.Path;
+            _dragFolderPath = treeNode.Path;
+            _dragSelectionSnapshot = null;
+            _dragStartPoint = e.GetPosition(this);
+            _dragInProgress = false;
+            return;
+        }
+
+        // アドレスバー左端の取っ手。今開いているフォルダーそのものを掴む（エクスプローラーと同じ）。
+        if (FindAddressDragHandle(source) is { DataContext: TabViewModel { CurrentPath.Length: > 0 } addressTab }
+            && addressTab.CurrentPath != FileSystemService.ComputerPath)
+        {
+            _dragPressArgs = e;
+            _dragListBox = null;
+            _dragSidebarLink = null;
+            _dragButton = isRightPress ? MouseButton.Right : MouseButton.Left;
+            _dragFolderPath = addressTab.CurrentPath;
             _dragSelectionSnapshot = null;
             _dragStartPoint = e.GetPosition(this);
             _dragInProgress = false;
@@ -3135,8 +3235,16 @@ public partial class MainWindow : Window
         ResetDragSource();
     }
 
-    /// <summary>フォルダーツリーからドラッグ開始する対象パス（押下時に記録、閾値超過で発火）。</summary>
-    private string? _dragTreeNodePath;
+    /// <summary>アドレスバー左端のドラッグ取っ手（<c>addressdrag</c> クラス）を祖先からたどる。
+    /// タブごとの DataTemplate の中にあるため x:Name では届かず、クラスで拾う。</summary>
+    private static Control? FindAddressDragHandle(Visual? source)
+        => source?.GetSelfAndVisualAncestors()
+            .OfType<Control>()
+            .FirstOrDefault(control => control.Classes.Contains("addressdrag"));
+
+    /// <summary>フォルダー 1 つを掴むドラッグの対象パス（押下時に記録、閾値超過で発火）。
+    /// フォルダーツリーのノードと、アドレスバー左端の取っ手が使う。</summary>
+    private string? _dragFolderPath;
 
     private void DragSource_PointerMoved(object? sender, PointerEventArgs e)
     {
@@ -3146,7 +3254,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        if (_dragPressArgs is null || _dragInProgress || (_dragListBox is null && _dragTreeNodePath is null))
+        if (_dragPressArgs is null || _dragInProgress || (_dragListBox is null && _dragFolderPath is null))
         {
             return;
         }
@@ -3180,10 +3288,10 @@ public partial class MainWindow : Window
             return;
         }
 
-        if (_dragTreeNodePath is { } treePath)
+        if (_dragFolderPath is { } folderPath)
         {
             _dragInProgress = true;
-            _ = StartDragAsync(refreshTab: null, [(treePath, true)], _dragPressArgs, rightDrag);
+            _ = StartDragAsync(refreshTab: null, [(folderPath, true)], _dragPressArgs, rightDrag);
             return;
         }
 
@@ -3423,7 +3531,7 @@ public partial class MainWindow : Window
         _dragPressArgs = null;
         _dragListBox = null;
         _dragSidebarLink = null;
-        _dragTreeNodePath = null;
+        _dragFolderPath = null;
         _dragSelectionSnapshot = null;
         _dragPressCollapseEntry = null;
         _dragInProgress = false;
@@ -3637,14 +3745,15 @@ public partial class MainWindow : Window
     // ===== DnD（ドロップ受け入れ） =====
 
     /// <summary>左ペインの「お気に入り」表示の上のドラッグかどうか（落とすとお気に入りに登録される）。</summary>
-    private static bool IsOnBookmarkPane(RoutedEventArgs e)
-    {
-        var source = e.Source as Visual;
-        return source is Border border && border.Classes.Contains("bookmarkpane")
-               || source?.GetVisualAncestors()
-                   .OfType<Border>()
-                   .Any(ancestor => ancestor.Classes.Contains("bookmarkpane")) == true;
-    }
+    private static bool IsOnBookmarkPane(RoutedEventArgs e) => IsOnBookmarkPane(e.Source as Visual);
+
+    /// <summary>この要素がお気に入りペインの中にあるか。タブのドラッグは OLE ではなくポインター追跡で
+    /// 動くため、イベント引数ではなくヒットテストで得た要素から判定できる形も要る。</summary>
+    private static bool IsOnBookmarkPane(Visual? source)
+        => source is Border border && border.Classes.Contains("bookmarkpane")
+           || source?.GetVisualAncestors()
+               .OfType<Border>()
+               .Any(ancestor => ancestor.Classes.Contains("bookmarkpane")) == true;
 
     /// <summary>ドラッグ中に狙っているお気に入りの挿入位置（ドロップ時にそのまま使う）。</summary>
     private BookmarkNode? _bookmarkDropNode;
@@ -3732,13 +3841,18 @@ public partial class MainWindow : Window
     /// 項目の無い余白なら末尾（最後の項目の下に線を出す）。
     /// </summary>
     private void UpdateBookmarkDropMark(DragEventArgs e)
+        => UpdateBookmarkDropMark(e.Source as Visual, e.GetPosition(this));
+
+    /// <summary><see cref="UpdateBookmarkDropMark(DragEventArgs)"/> の本体。
+    /// タブのドラッグはポインター追跡で動くため、ヒットテストした要素とウィンドウ座標でも呼べるようにしてある。</summary>
+    private void UpdateBookmarkDropMark(Visual? source, Point windowPoint)
     {
         if (ViewModel is not { } vm)
         {
             return;
         }
 
-        var row = (e.Source as Visual)?
+        var row = source?
             .GetSelfAndVisualAncestors()
             .OfType<Border>()
             .FirstOrDefault(border => border.Classes.Contains("bookmarkrow"));
@@ -3753,7 +3867,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        var ratio = e.GetPosition(row).Y / row.Bounds.Height;
+        var ratio = (this.TranslatePoint(windowPoint, row)?.Y ?? 0) / row.Bounds.Height;
         _bookmarkDropNode = node;
         _bookmarkDropMark = node.IsFolder || IsFileDropTargetBookmark(node)
             ? ratio switch
@@ -4152,17 +4266,9 @@ public partial class MainWindow : Window
                 return;
             }
 
-            // ドラッグ中に見せていた挿入位置へそのまま入れる。複数まとめて落としたときは
-            // 掴んだ順を保つため、2 件目以降は 1 件前の後ろへ続ける。
-            var node = bookmarkDropNode;
-            var mark = bookmarkDropMark;
-            foreach (var file in files)
-            {
-                ViewModel?.InsertBookmark(file, node, mark);
-                node = ViewModel?.FindBookmark(file) ?? node;
-                mark = node is null ? BookmarkDropMark.None : BookmarkDropMark.After;
-            }
-
+            // ドラッグ中に見せていた挿入位置へそのまま入れる
+            // （複数まとめて落としたときは登録済みを飛ばして不足分だけ足す。順序も含めて VM 側の規則）。
+            ViewModel?.InsertBookmarks(files, bookmarkDropNode, bookmarkDropMark);
             return;
         }
 
@@ -4310,13 +4416,18 @@ public partial class MainWindow : Window
 
     /// <summary>エクスプローラーと同じ既定則: 同一ドライブ = 移動 / 別ドライブ = コピー。Ctrl でコピー、Shift で移動を強制。</summary>
     private static DragDropEffects ResolveDropEffect(DragEventArgs e, List<string> files, string destDir)
+        => ResolveDropEffect(e.KeyModifiers, files, destDir);
+
+    /// <summary><see cref="ResolveDropEffect(DragEventArgs, List{string}, string)"/> の本体。
+    /// タブのドラッグは OLE ではないので、修飾キーだけを渡せる形も要る。</summary>
+    private static DragDropEffects ResolveDropEffect(KeyModifiers modifiers, List<string> files, string destDir)
     {
-        if (e.KeyModifiers.HasFlag(KeyModifiers.Control))
+        if (modifiers.HasFlag(KeyModifiers.Control))
         {
             return DragDropEffects.Copy;
         }
 
-        if (e.KeyModifiers.HasFlag(KeyModifiers.Shift))
+        if (modifiers.HasFlag(KeyModifiers.Shift))
         {
             return DragDropEffects.Move;
         }

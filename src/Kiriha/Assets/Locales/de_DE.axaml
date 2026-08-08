@@ -179,6 +179,7 @@
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">Zurück</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">Zurück (Rechtsklick für Verlauf)</x:String>
   <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">Ordner, die nicht mehr passen (zum Auflisten klicken)</x:String>
+  <x:String x:Key="Text.Nav.DragFolderTip" xml:space="preserve">Diesen Ordner ziehen</x:String>
   <x:String x:Key="Text.Nav.EditPathTip" xml:space="preserve">Klicken, um den Pfad zu bearbeiten</x:String>
   <x:String x:Key="Text.Nav.Forward" xml:space="preserve">Vorwärts</x:String>
   <x:String x:Key="Text.Nav.ForwardTip" xml:space="preserve">Vorwärts (Rechtsklick für Verlauf)</x:String>

@@ -179,6 +179,7 @@
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">पश्चात्</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">पश्चात् (इतिहासाय दक्षिणनुदनम्)</x:String>
   <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">ये सञ्चिकाकोशाः न दृश्यन्ते (नुदतु सूचीदर्शनाय)</x:String>
+  <x:String x:Key="Text.Nav.DragFolderTip" xml:space="preserve">एतत् संचिकाकोशं कर्षतु</x:String>
   <x:String x:Key="Text.Nav.EditPathTip" xml:space="preserve">मार्गं सम्पादयितुं नुद</x:String>
   <x:String x:Key="Text.Nav.Forward" xml:space="preserve">अग्रे</x:String>
   <x:String x:Key="Text.Nav.ForwardTip" xml:space="preserve">अग्रे (इतिहासाय दक्षिणनुदनम्)</x:String>

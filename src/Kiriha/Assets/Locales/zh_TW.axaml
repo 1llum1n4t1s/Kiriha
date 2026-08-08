@@ -179,6 +179,7 @@
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">上一頁</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">上一頁（按右鍵可看歷程記錄）</x:String>
   <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">放不下的資料夾（點擊查看清單）</x:String>
+  <x:String x:Key="Text.Nav.DragFolderTip" xml:space="preserve">拖曳此資料夾</x:String>
   <x:String x:Key="Text.Nav.EditPathTip" xml:space="preserve">按一下以編輯路徑</x:String>
   <x:String x:Key="Text.Nav.Forward" xml:space="preserve">下一頁</x:String>
   <x:String x:Key="Text.Nav.ForwardTip" xml:space="preserve">下一頁（按右鍵可看歷程記錄）</x:String>

@@ -41,6 +41,15 @@ public partial class MainWindow
     private const string GlyphProperties = "\uE946";
     private const string GlyphMore = "\uE712";
     private const string GlyphRefresh = "\uE72C";
+    private const string GlyphPaste = "\uE77F";
+    // 「すべて選択」は MultiSelect (E9D5)。SelectAll (E8B3) は四隅の括弧と点の集合なので、
+    // メニューの実寸（13px）で描くと QR コードにしか見えない。
+    // E9D5 は Segoe Fluent Icons と Segoe MDL2 Assets の両方にあるため、
+    // Fluent を持たない Windows 10 でも豆腐にならない（両フォントで描画を確認済み）。
+    private const string GlyphSelectAll = "\uE9D5";
+    private const string GlyphNewFolder = "\uE8F4";
+    private const string GlyphSort = "\uE8CB";
+    private const string GlyphView = "\uE890";
 
     /// <summary>
     /// Windows 自身がシェルメニューへ足す項目の正規 verb。Modern モードでは
@@ -144,6 +153,10 @@ public partial class MainWindow
         {
             BuildHeaderRow(tab, session, paths, header, excludedVerbs);
         }
+        else
+        {
+            BuildBackgroundHeaderRow(tab, session, paths, header, excludedVerbs);
+        }
 
         if (usesSelection && tab.Selection.Count == 1)
         {
@@ -159,34 +172,22 @@ public partial class MainWindow
             });
         }
 
-        // 背景の右クリックにはエクスプローラーと同じ「最新の情報に更新」を先頭側へ置く
-        // （項目への右クリックでは意味が薄いので背景だけ。System モードのシェル既定メニューには
-        // シェル自身の更新項目が無いため、Modern のここで補う）。
+        // 背景の右クリックは「今のフォルダーの見せ方」を変える場所でもあるので、
+        // コマンドバーと同じ 並べ替え / 表示 をサブメニューとして出す（エクスプローラーの背景メニューと同じ並び）。
         if (!usesSelection)
         {
-            items.Add(new ExplorerMenuEntry
-            {
-                Text = LocalizationService.Text("Text.Command.Refresh"),
-                Glyph = GlyphRefresh,
-                Invoke = () => tab.RefreshCommand.Execute(null),
-            });
+            items.Add(BuildSortSubMenu(tab));
+            items.Add(BuildViewSubMenu(tab));
+            items.Add(ExplorerMenuEntry.Separator);
         }
 
         items.AddRange(BuildKirihaFolderEntries(tab, paths, excludedVerbs));
 
-        // 選択に対する パスのコピー / プロパティ は上部のアイコン行が持つ（BuildHeaderRow）。
-        // 背景の右クリックにはアイコン行が無いので、そのときだけ従来どおり本文へ並べる。
-        if (!usesSelection)
-        {
-            excludedVerbs.Add("properties");
-            items.Add(new ExplorerMenuEntry
-            {
-                Text = LocalizationService.Text("Text.Common.Properties"),
-                Shortcut = "Alt+Enter",
-                Glyph = GlyphProperties,
-                Invoke = () => ShowPropertiesFor(session, paths),
-            });
-        }
+        // 「タスクバーにピン留めする」はここには置けない。Windows 11 のそれは Explorer 内部の実装で、
+        // 公開シェル API（IContextMenu / IExplorerCommand）には出てこない —— 実測でも、フォルダーにも
+        // exe にも taskbarpin verb は現れず、出るのは「スタート にピン留めする」(pintostartscreen) と
+        // 「クイック アクセスにピン留めする」(pintohome) だけだった。どちらもシェル項目として
+        // そのまま生き残る（KeptWindowsVerbs）ので、自前項目を足す必要はない。
 
         // シェル側からは「サードパーティ拡張の、直接実行できる項目」だけを取り込む。
         // Windows 自身の項目（ショートカットの作成・以前のバージョンの復元 等）と、
@@ -279,6 +280,129 @@ public partial class MainWindow
         excludedVerbs.Add("properties");
         excludedVerbs.Add("Windows.Share");
         excludedVerbs.Add("Windows.ModernShare");
+    }
+
+    /// <summary>
+    /// 背景（何も無いところ）を右クリックしたときの、上部の横並びアイコン行
+    /// （貼り付け / すべて選択 / 新規フォルダー / 最新の情報に更新 / プロパティ）。
+    /// </summary>
+    /// <remarks>
+    /// 選択時のアイコン行がエクスプローラーの並びをなぞっているのに対し、こちらは Kiriha 独自。
+    /// Windows 11 の背景メニューにアイコン行は無いので手本が無く、
+    /// <b>「選択が要らない・引数も要らない・すぐ効く」操作だけ</b>を入れる方針で選んである。
+    /// 並べ替え / 表示は子メニューを開かないと決まらないのでアイコンにできず、本文側に残る。
+    /// ここへ入れた操作は本文から取り除く（同じ機能が 2 行に並ぶのを避ける。選択時と同じ扱い）。
+    /// </remarks>
+    private void BuildBackgroundHeaderRow(
+        TabViewModel tab,
+        ShellMenuSession session,
+        IReadOnlyList<string> paths,
+        List<ExplorerMenuEntry> header,
+        HashSet<string> excludedVerbs)
+    {
+        header.Add(new ExplorerMenuEntry
+        {
+            Text = LocalizationService.Text("Text.Command.Paste"),
+            Glyph = GlyphPaste,
+            IsEnabled = tab.PasteCommand.CanExecute(null),
+            Invoke = () => tab.PasteCommand.Execute(null),
+        });
+        header.Add(new ExplorerMenuEntry
+        {
+            Text = LocalizationService.Text("Text.Select.All"),
+            Glyph = GlyphSelectAll,
+            Invoke = () => FindActiveFileList()?.SelectAll(),
+        });
+        header.Add(new ExplorerMenuEntry
+        {
+            Text = LocalizationService.Text("Text.Command.NewFolder"),
+            Glyph = GlyphNewFolder,
+            IsEnabled = tab.CanCreateNew,
+            Invoke = tab.CreateNewFolder,
+        });
+        header.Add(new ExplorerMenuEntry
+        {
+            Text = LocalizationService.Text("Text.Command.Refresh"),
+            Glyph = GlyphRefresh,
+            Invoke = () => tab.RefreshCommand.Execute(null),
+        });
+        header.Add(new ExplorerMenuEntry
+        {
+            Text = LocalizationService.Text("Text.Common.Properties"),
+            Glyph = GlyphProperties,
+            Invoke = () => ShowPropertiesFor(session, paths),
+        });
+
+        excludedVerbs.Add("paste");
+        excludedVerbs.Add("properties");
+    }
+
+    /// <summary>背景メニューの「並べ替え」。コマンドバーの並べ替えボタンと同じ中身。</summary>
+    private static ExplorerMenuEntry BuildSortSubMenu(TabViewModel tab)
+    {
+        ExplorerMenuEntry SortKeyEntry(string textKey, string sortKey, bool isChecked) => new()
+        {
+            Text = LocalizationService.Text(textKey),
+            IsChecked = isChecked,
+            Invoke = () => tab.SetSortKeyCommand.Execute(sortKey),
+        };
+
+        return new ExplorerMenuEntry
+        {
+            Text = LocalizationService.Text("Text.Command.Sort"),
+            Glyph = GlyphSort,
+            Children =
+            [
+                SortKeyEntry("Text.Column.Name", SortKeys.Name, tab.IsSortByName),
+                SortKeyEntry("Text.Column.Modified", SortKeys.Modified, tab.IsSortByModified),
+                SortKeyEntry("Text.Column.Created", SortKeys.Created, tab.IsSortByCreated),
+                SortKeyEntry("Text.Column.Type", SortKeys.Type, tab.IsSortByType),
+                SortKeyEntry("Text.Column.Size", SortKeys.Size, tab.IsSortBySize),
+                ExplorerMenuEntry.Separator,
+                new ExplorerMenuEntry
+                {
+                    Text = LocalizationService.Text("Text.Sort.Ascending"),
+                    IsChecked = tab.IsSortAscending,
+                    Invoke = () => tab.SetSortAscendingCommand.Execute("True"),
+                },
+                new ExplorerMenuEntry
+                {
+                    Text = LocalizationService.Text("Text.Sort.Descending"),
+                    IsChecked = tab.IsSortDescending,
+                    Invoke = () => tab.SetSortAscendingCommand.Execute("False"),
+                },
+            ],
+        };
+    }
+
+    /// <summary>背景メニューの「表示」。表示方法の選択だけ（「PC」は並べて表示に固定なので無効化する）。</summary>
+    private static ExplorerMenuEntry BuildViewSubMenu(TabViewModel tab)
+    {
+        var canChange = tab.CanChangeViewMode;
+        ExplorerMenuEntry ViewEntry(string textKey, ViewMode mode, bool isChecked) => new()
+        {
+            Text = LocalizationService.Text(textKey),
+            IsChecked = isChecked,
+            IsEnabled = canChange,
+            Invoke = () => tab.SetViewModeCommand.Execute(mode.ToString()),
+        };
+
+        return new ExplorerMenuEntry
+        {
+            Text = LocalizationService.Text("Text.Command.View"),
+            Glyph = GlyphView,
+            Children =
+            [
+                ViewEntry("Text.View.ExtraLarge", ViewMode.ExtraLargeIcons, tab.IsViewExtraLarge),
+                ViewEntry("Text.View.Large", ViewMode.LargeIcons, tab.IsViewLarge),
+                ViewEntry("Text.View.Medium", ViewMode.MediumIcons, tab.IsViewMedium),
+                ViewEntry("Text.View.Small", ViewMode.SmallIcons, tab.IsViewSmall),
+                ViewEntry("Text.View.List", ViewMode.List, tab.IsViewList),
+                ViewEntry("Text.View.Details", ViewMode.Details, tab.IsViewDetails),
+                ViewEntry("Text.View.Tiles", ViewMode.Tiles, tab.IsViewTiles),
+                ViewEntry("Text.View.Gallery", ViewMode.Gallery, tab.IsViewGallery),
+            ],
+        };
     }
 
     /// <summary>

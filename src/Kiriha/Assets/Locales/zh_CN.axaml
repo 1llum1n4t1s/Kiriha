@@ -179,6 +179,7 @@
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">后退</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">后退（右键查看历史记录）</x:String>
   <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">放不下的文件夹（点击查看列表）</x:String>
+  <x:String x:Key="Text.Nav.DragFolderTip" xml:space="preserve">拖动此文件夹</x:String>
   <x:String x:Key="Text.Nav.EditPathTip" xml:space="preserve">点击以编辑路径</x:String>
   <x:String x:Key="Text.Nav.Forward" xml:space="preserve">前进</x:String>
   <x:String x:Key="Text.Nav.ForwardTip" xml:space="preserve">前进（右键查看历史记录）</x:String>

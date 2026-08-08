@@ -179,6 +179,7 @@
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">Bumalik</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">Bumalik (i-right click para sa history)</x:String>
   <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">Mga folder na hindi kasya (i-click para makita)</x:String>
+  <x:String x:Key="Text.Nav.DragFolderTip" xml:space="preserve">I-drag ang folder na ito</x:String>
   <x:String x:Key="Text.Nav.EditPathTip" xml:space="preserve">I-click para i-edit ang path</x:String>
   <x:String x:Key="Text.Nav.Forward" xml:space="preserve">Sumulong</x:String>
   <x:String x:Key="Text.Nav.ForwardTip" xml:space="preserve">Sumulong (i-right click para sa history)</x:String>

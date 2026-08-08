@@ -179,6 +179,7 @@
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">பின்</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">பின் (வரலாற்றுக்கு வலது கிளிக்)</x:String>
   <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">இடம் போதாத கோப்புறைகள் (சொடுக்கினால் பட்டியல்)</x:String>
+  <x:String x:Key="Text.Nav.DragFolderTip" xml:space="preserve">இந்தக் கோப்புறையை இழுக்கவும்</x:String>
   <x:String x:Key="Text.Nav.EditPathTip" xml:space="preserve">பாதையைத் திருத்த கிளிக் செய்யவும்</x:String>
   <x:String x:Key="Text.Nav.Forward" xml:space="preserve">முன்</x:String>
   <x:String x:Key="Text.Nav.ForwardTip" xml:space="preserve">முன் (வரலாற்றுக்கு வலது கிளிக்)</x:String>

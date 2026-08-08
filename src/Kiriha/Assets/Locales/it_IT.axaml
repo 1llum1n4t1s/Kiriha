@@ -179,6 +179,7 @@
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">Indietro</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">Indietro (clic destro per la cronologia)</x:String>
   <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">Cartelle che non entrano (fai clic per elencarle)</x:String>
+  <x:String x:Key="Text.Nav.DragFolderTip" xml:space="preserve">Trascina questa cartella</x:String>
   <x:String x:Key="Text.Nav.EditPathTip" xml:space="preserve">Fai clic per modificare il percorso</x:String>
   <x:String x:Key="Text.Nav.Forward" xml:space="preserve">Avanti</x:String>
   <x:String x:Key="Text.Nav.ForwardTip" xml:space="preserve">Avanti (clic destro per la cronologia)</x:String>

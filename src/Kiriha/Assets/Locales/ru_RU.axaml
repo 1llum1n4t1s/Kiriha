@@ -179,6 +179,7 @@
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">Назад</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">Назад (правый клик — журнал)</x:String>
   <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">Папки, которые не поместились (нажмите, чтобы показать)</x:String>
+  <x:String x:Key="Text.Nav.DragFolderTip" xml:space="preserve">Перетащить эту папку</x:String>
   <x:String x:Key="Text.Nav.EditPathTip" xml:space="preserve">Щёлкните, чтобы изменить путь</x:String>
   <x:String x:Key="Text.Nav.Forward" xml:space="preserve">Вперёд</x:String>
   <x:String x:Key="Text.Nav.ForwardTip" xml:space="preserve">Вперёд (правый клик — журнал)</x:String>

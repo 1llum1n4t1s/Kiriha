@@ -360,7 +360,20 @@
                                     PointerPressed="BreadcrumbBar_PointerPressed"
                                     PointerReleased="BreadcrumbBar_PointerReleased">
 
-                                <Panel>
+                                <Grid ColumnDefinitions="Auto,*">
+                                    <!-- エクスプローラーのアドレスバー左端と同じ、今のフォルダーを掴むための取っ手。
+                                         ここからのドラッグは通常の OLE ドラッグとして始まるので、お気に入り・タブバー・
+                                         ファイル一覧のどのドロップ先も既存の経路がそのまま受け取る
+                                         （コード側は addressdrag クラスで拾う。DataTemplate 内は x:Name が届かないため）。
+                                         Border ではなく Button なのは、Border だとオートメーションピアが作られず
+                                         UI Automation から名前で辿れない（＝画面越しの検証ができない）ため。
+                                         押しても何も起きず、ホバーの丸い強調だけが「掴める場所」の合図になる。 -->
+                                    <Button Grid.Column="0" Classes="nav addressdrag"
+                                            Content="&#xE8B7;" Margin="1,0,0,0" VerticalAlignment="Center"
+                                            ToolTip.Tip="{DynamicResource Text.Nav.DragFolderTip}"
+                                            AutomationProperties.Name="{DynamicResource Text.Nav.DragFolderTip}" />
+
+                                    <Panel Grid.Column="1">
                                     <!-- 通常表示は Web ブラウザと同じプレーンテキスト（パンくずはステータスバー側）。
                                          クリックで直接入力モードへ切り替わる。 -->
                                     <Border Background="Transparent"
@@ -370,7 +383,7 @@
                                                    FontSize="13.5"
                                                    Foreground="{DynamicResource TextPrimary}"
                                                    TextTrimming="CharacterEllipsis"
-                                                   VerticalAlignment="Center" Margin="14,0" />
+                                                   VerticalAlignment="Center" Margin="4,0" />
                                     </Border>
 
                                     <!-- 直接入力モード -->
@@ -383,7 +396,7 @@
                                              FontSize="13.5"
                                              Foreground="{DynamicResource TextPrimary}"
                                              VerticalContentAlignment="Center"
-                                             Margin="10,0">
+                                             Margin="0,0,10,0">
                                         <TextBox.Styles>
                                             <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
                                                 <Setter Property="Background" Value="Transparent" />
@@ -395,7 +408,8 @@
                                             </Style>
                                         </TextBox.Styles>
                                     </TextBox>
-                                </Panel>
+                                    </Panel>
+                                </Grid>
                             </Border>
 
                             <!-- 今開いているフォルダーのパスをコピー。アドレスバーのクリックはクリップボードへ
@@ -500,6 +514,11 @@
                                 <Border Width="1" Height="20" Background="{DynamicResource Divider}"
                                         VerticalAlignment="Center" Margin="4,0" />
 
+                                <!-- 最新の情報に更新（アドレスバーの更新ボタンと同じコマンド）。
+                                     並べ替え・表示と同じグループの先頭に置く。 -->
+                                <Button Classes="cmd cmdicon" Content="&#xE72C;" ToolTip.Tip="{DynamicResource Text.Command.Refresh}" AutomationProperties.Name="{DynamicResource Text.Command.Refresh}"
+                                        VerticalAlignment="Center" Command="{Binding RefreshCommand}" />
+
                                 <Button Classes="cmd" VerticalAlignment="Center">
                                     <StackPanel Orientation="Horizontal" Spacing="6">
                                         <TextBlock Classes="fico" Text="&#xE8CB;" FontSize="14" VerticalAlignment="Center" />
@@ -596,11 +615,6 @@
                                         </MenuFlyout>
                                     </Button.Flyout>
                                 </Button>
-
-                                <!-- 最新の情報に更新（アドレスバーの更新ボタンと同じコマンド。
-                                     設定ボタンがあった場所に置き、設定は「もっと見る」メニューへ移した） -->
-                                <Button Classes="cmd cmdicon" Content="&#xE72C;" ToolTip.Tip="{DynamicResource Text.Command.Refresh}" AutomationProperties.Name="{DynamicResource Text.Command.Refresh}"
-                                        VerticalAlignment="Center" Command="{Binding RefreshCommand}" />
 
                                 <Button Classes="cmd cmdicon" Content="&#xE712;" ToolTip.Tip="{DynamicResource Text.Command.More}" AutomationProperties.Name="{DynamicResource Text.Command.More}"
                                         VerticalAlignment="Center">
@@ -737,11 +751,21 @@
                                                        Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" />
                                         </StackPanel>
                                         <Button.Flyout>
+                                            <!-- 昇順 / 降順は基準ごとの子メニューにする。平らに 4 項目並べるより短く、
+                                                 既存の Text.Sort.* をそのまま使えるので言語ファイルの追加も要らない。 -->
                                             <MenuFlyout Placement="BottomEdgeAlignedRight">
-                                                <MenuItem Header="{DynamicResource Text.Bookmarks.SortByName}"
-                                                          Click="BookmarkSortByName_Click" />
-                                                <MenuItem Header="{DynamicResource Text.Bookmarks.SortByPath}"
-                                                          Click="BookmarkSortByPath_Click" />
+                                                <MenuItem Header="{DynamicResource Text.Bookmarks.SortByName}">
+                                                    <MenuItem Header="{DynamicResource Text.Sort.Ascending}"
+                                                              Click="BookmarkSortByName_Click" />
+                                                    <MenuItem Header="{DynamicResource Text.Sort.Descending}"
+                                                              Click="BookmarkSortByNameDesc_Click" />
+                                                </MenuItem>
+                                                <MenuItem Header="{DynamicResource Text.Bookmarks.SortByPath}">
+                                                    <MenuItem Header="{DynamicResource Text.Sort.Ascending}"
+                                                              Click="BookmarkSortByPath_Click" />
+                                                    <MenuItem Header="{DynamicResource Text.Sort.Descending}"
+                                                              Click="BookmarkSortByPathDesc_Click" />
+                                                </MenuItem>
                                             </MenuFlyout>
                                         </Button.Flyout>
                                     </Button>

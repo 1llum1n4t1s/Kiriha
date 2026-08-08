@@ -596,3 +596,67 @@ public class BookmarkBulkRemoveHappyTests
         Assert.Equal([a], list);
     }
 }
+
+/// <summary>お気に入りの並べ替え（名前順 / パス名順 × 昇順 / 降順）。</summary>
+public class BookmarkSortHappyTests
+{
+    private static BookmarkNode Link(string name, string? path = null)
+        => new() { Name = name, Path = path ?? $@"C:\{name}" };
+
+    private static BookmarkNode Folder(string name, params BookmarkNode[] children)
+        => new() { Name = name, Children = [.. children] };
+
+    private static string[] Names(List<BookmarkNode> list) => [.. list.Select(n => n.Name)];
+
+    [Fact]
+    public void 名前の昇順と降順が逆順になる()
+    {
+        List<BookmarkNode> list = [Link("c"), Link("a"), Link("b")];
+
+        Assert.Equal(
+            ["a", "b", "c"],
+            Names(MainWindowViewModel.SortBookmarkList(list, byPath: false, ascending: true)));
+        Assert.Equal(
+            ["c", "b", "a"],
+            Names(MainWindowViewModel.SortBookmarkList(list, byPath: false, ascending: false)));
+    }
+
+    [Fact]
+    public void パス名順は名前ではなくパスで並ぶ()
+    {
+        // 名前順なら a → b だが、パス名順では z\a より m\b が先に来る
+        List<BookmarkNode> list = [Link("a", @"C:\z\a"), Link("b", @"C:\m\b")];
+
+        Assert.Equal(
+            ["b", "a"],
+            Names(MainWindowViewModel.SortBookmarkList(list, byPath: true, ascending: true)));
+        Assert.Equal(
+            ["a", "b"],
+            Names(MainWindowViewModel.SortBookmarkList(list, byPath: true, ascending: false)));
+    }
+
+    [Fact]
+    public void グループフォルダーは降順でも先頭に集まる()
+    {
+        // 降順で反転させるとフォルダーが下に落ちてツリーの見え方が変わってしまうため、
+        // フォルダー優先の規則だけは昇順・降順で共通にしてある
+        List<BookmarkNode> list = [Link("b"), Folder("g1"), Link("a"), Folder("g2")];
+
+        Assert.Equal(
+            ["g1", "g2", "a", "b"],
+            Names(MainWindowViewModel.SortBookmarkList(list, byPath: false, ascending: true)));
+        Assert.Equal(
+            ["g2", "g1", "b", "a"],
+            Names(MainWindowViewModel.SortBookmarkList(list, byPath: false, ascending: false)));
+    }
+
+    [Fact]
+    public void グループフォルダーの中も同じ向きで並ぶ()
+    {
+        var group = Folder("g", Link("y"), Link("x"));
+        List<BookmarkNode> list = [group];
+
+        MainWindowViewModel.SortBookmarkList(list, byPath: false, ascending: false);
+        Assert.Equal(["y", "x"], Names(group.Children!));
+    }
+}

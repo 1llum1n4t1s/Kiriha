@@ -179,6 +179,7 @@
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">Retro</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">Retro (dextro clicu pro historia)</x:String>
   <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">Scrinia quae non capiuntur (preme ut enumerentur)</x:String>
+  <x:String x:Key="Text.Nav.DragFolderTip" xml:space="preserve">Hanc plicam trahere</x:String>
   <x:String x:Key="Text.Nav.EditPathTip" xml:space="preserve">Preme ut semitam recenseas</x:String>
   <x:String x:Key="Text.Nav.Forward" xml:space="preserve">Prorsum</x:String>
   <x:String x:Key="Text.Nav.ForwardTip" xml:space="preserve">Prorsum (dextro clicu pro historia)</x:String>

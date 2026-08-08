@@ -2201,6 +2201,43 @@ public partial class MainWindowViewModel : ObservableObject
         SaveBookmarks();
     }
 
+    /// <summary>
+    /// ドラッグ＆ドロップで示された位置へ複数のお気に入りをまとめて挿入する。
+    /// <para>
+    /// 2 件以上のときは<b>登録済みのパスを飛ばし、不足分だけを足す</b>。A/B/C が登録済みの状態で
+    /// A/B/C/D を落としたら D だけが増える、という動き。まとめて落とすのは「この一式を入れておきたい」
+    /// という操作なので、既にあるものを移動させると並びが崩れるだけで得がない。
+    /// </para>
+    /// <para>
+    /// 1 件だけのときは <see cref="InsertBookmark"/> にそのまま任せる。こちらは登録済みなら
+    /// 指定位置へ移動する（お気に入りペインを並べ替えの受け皿にしている経路なので変えない）。
+    /// </para>
+    /// </summary>
+    public void InsertBookmarks(IReadOnlyList<string> paths, BookmarkNode? reference, BookmarkDropMark mark)
+    {
+        if (paths.Count == 1)
+        {
+            InsertBookmark(paths[0], reference, mark);
+            return;
+        }
+
+        var node = reference;
+        var current = mark;
+        foreach (var path in paths)
+        {
+            if (FindBookmarkByPath(_settings.Bookmarks, path) is not null)
+            {
+                continue;
+            }
+
+            InsertBookmark(path, node, current);
+
+            // 掴んだ順を保つため、2 件目以降は 1 件前の後ろへ続ける
+            node = FindBookmarkByPath(_settings.Bookmarks, path) ?? node;
+            current = node is null ? BookmarkDropMark.None : BookmarkDropMark.After;
+        }
+    }
+
     /// <summary>目印の付いた項目から「どのリストの何番目か」を求める。</summary>
     private (List<BookmarkNode> Target, int Index) ResolveBookmarkInsertion(BookmarkNode? reference, BookmarkDropMark mark)
     {
@@ -2338,24 +2375,30 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
-    /// <summary>Chrome の「名前順で並べ替え / パス名順で並べ替え」（フォルダー優先、ネスト内も再帰的に）。</summary>
-    public void SortBookmarks(bool byPath)
+    /// <summary>Chrome の「名前順で並べ替え / パス名順で並べ替え」（フォルダー優先、ネスト内も再帰的に）。
+    /// <paramref name="ascending"/> が false なら同じ基準の降順。</summary>
+    public void SortBookmarks(bool byPath, bool ascending = true)
     {
-        _settings.Bookmarks = SortBookmarkList(_settings.Bookmarks, byPath);
+        _settings.Bookmarks = SortBookmarkList(_settings.Bookmarks, byPath, ascending);
         SaveBookmarks();
     }
 
-    private static List<BookmarkNode> SortBookmarkList(List<BookmarkNode> list, bool byPath)
+    /// <summary>並べ替えの本体。グループフォルダーを先頭に集める規則は昇順・降順で変えない
+    /// （降順で反転させるとフォルダーが下に落ち、ツリーの見え方が別物になるため）。</summary>
+    internal static List<BookmarkNode> SortBookmarkList(List<BookmarkNode> list, bool byPath, bool ascending)
     {
         foreach (var folder in list.Where(b => b.Children is not null))
         {
-            folder.Children = SortBookmarkList(folder.Children!, byPath);
+            folder.Children = SortBookmarkList(folder.Children!, byPath, ascending);
         }
 
-        return list
-            .OrderByDescending(b => b.IsFolder)
-            .ThenBy(b => byPath ? b.Path ?? "" : b.Name, StringComparer.CurrentCultureIgnoreCase)
+        var ordered = list.OrderByDescending(b => b.IsFolder);
+        return (ascending
+                ? ordered.ThenBy(Key, StringComparer.CurrentCultureIgnoreCase)
+                : ordered.ThenByDescending(Key, StringComparer.CurrentCultureIgnoreCase))
             .ToList();
+
+        string Key(BookmarkNode node) => byPath ? node.Path ?? "" : node.Name;
     }
 
     /// <summary>ウィンドウの位置・サイズ・最大化状態・開いていたタブの保存（終了時に呼ばれる）。</summary>

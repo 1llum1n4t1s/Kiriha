@@ -179,6 +179,7 @@
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">Voltar</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">Voltar (clique com o botão direito para o histórico)</x:String>
   <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">Pastas que não cabem (clique para listá-las)</x:String>
+  <x:String x:Key="Text.Nav.DragFolderTip" xml:space="preserve">Arrastar esta pasta</x:String>
   <x:String x:Key="Text.Nav.EditPathTip" xml:space="preserve">Clique para editar o caminho</x:String>
   <x:String x:Key="Text.Nav.Forward" xml:space="preserve">Avançar</x:String>
   <x:String x:Key="Text.Nav.ForwardTip" xml:space="preserve">Avançar (clique com o botão direito para o histórico)</x:String>

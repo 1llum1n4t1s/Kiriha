@@ -179,6 +179,7 @@
   <x:String x:Key="Text.Nav.Back" xml:space="preserve">Précédent</x:String>
   <x:String x:Key="Text.Nav.BackTip" xml:space="preserve">Précédent (clic droit pour l'historique)</x:String>
   <x:String x:Key="Text.Nav.CrumbOverflow" xml:space="preserve">Dossiers qui ne tiennent pas (cliquez pour les afficher)</x:String>
+  <x:String x:Key="Text.Nav.DragFolderTip" xml:space="preserve">Faire glisser ce dossier</x:String>
   <x:String x:Key="Text.Nav.EditPathTip" xml:space="preserve">Cliquez pour modifier le chemin</x:String>
   <x:String x:Key="Text.Nav.Forward" xml:space="preserve">Suivant</x:String>
   <x:String x:Key="Text.Nav.ForwardTip" xml:space="preserve">Suivant (clic droit pour l'historique)</x:String>
