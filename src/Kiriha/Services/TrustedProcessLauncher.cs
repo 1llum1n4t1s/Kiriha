@@ -9,7 +9,14 @@ internal static class TrustedProcessLauncher
     // Windows は内部で cmd.exe を介するため、ArgumentList はこれらをエスケープできない（BatBadBut クラス）。
     private static readonly char[] CmdShellMetaChars = ['&', '|', '<', '>', '\n', '\r'];
 
-    public static void Start(string fileName, IEnumerable<string> arguments, string workingDirectory)
+    /// <param name="runAsAdmin">
+    /// 管理者として起動する（ShellExecuteEx の "runas" verb）。昇格するのは<b>起動される側だけ</b>で、
+    /// Kiriha 自身は通常権限のまま。エクスプローラーが非管理者のまま「管理者として実行」を出せるのと同じ仕組み。
+    /// ユーザーが UAC を拒否すると <see cref="System.ComponentModel.Win32Exception"/>
+    /// （<c>NativeErrorCode</c> = 1223 / ERROR_CANCELLED）が飛ぶので、呼び出し側はそれを失敗と区別する。
+    /// </param>
+    public static void Start(
+        string fileName, IEnumerable<string> arguments, string workingDirectory, bool runAsAdmin = false)
     {
         var executable = ResolveExecutable(fileName);
         var args = arguments.ToArray();
@@ -28,6 +35,8 @@ internal static class TrustedProcessLauncher
         {
             UseShellExecute = true,
             WorkingDirectory = workingDirectory,
+            // Verb は UseShellExecute = true が前提。空文字は「既定の verb」で従来どおりの起動になる。
+            Verb = runAsAdmin ? "runas" : string.Empty,
         };
         foreach (var argument in args)
         {

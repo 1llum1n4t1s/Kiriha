@@ -206,6 +206,10 @@ public sealed class AppSettings
     /// <summary>Kiriha 内で動画をダブルクリックしたとき、ギャラリーの全画面表示で開く（既定 ON）。</summary>
     public bool OpenVideosInGallery { get; set; } = true;
 
+    /// <summary>ターミナルを管理者として起動する（既定 OFF）。Kiriha 自身は昇格しない
+    /// （詳細は <see cref="TerminalLauncher.RunAsAdmin"/>）。</summary>
+    public bool RunTerminalAsAdmin { get; set; }
+
     /// <summary>最小化時にタスクバーではなくタスクトレイに格納する（Discord と同等の挙動、既定 OFF）。</summary>
     public bool MinimizeToTray { get; set; }
 
