@@ -67,4 +67,34 @@ internal sealed class WindowsPathIdentity : IEqualityComparer<string>
 
         return builder.ToString();
     }
+
+    /// <summary>
+    /// ドライブ直下（<c>C:\</c>）やネットワーク共有のルート（<c>\\server\share</c>）か。
+    /// エクスプローラー同様、これらを移動・コピー・削除・名前の変更の対象にしないための判定。
+    /// </summary>
+    /// <remarks>
+    /// <see cref="Path.GetPathRoot(string?)"/> の戻り値と素の <see cref="string.Equals(string?, string?, StringComparison)"/>
+    /// で比べると、同じルートでも表記が違うだけで false になる。実測（.NET 10 / Windows 11）:
+    /// <c>C:/</c> と <c>C:\\</c> は root が <c>C:\</c>、<c>\\server\share\</c> と <c>\\server/share</c> は
+    /// root が <c>\\server\share</c> を返し、いずれも素の比較では一致しない。
+    /// <para>
+    /// これは机上の話ではない。<c>MainWindowViewModel.OpenShellPaths</c> は起動引数を
+    /// <see cref="Path.GetFullPath(string)"/> だけ通して <c>CurrentPath</c> にするが、GetFullPath は
+    /// UNC ルートの末尾区切りを落とさない（実測）。つまりシェルの「Kiriha で開く」やショートカットが
+    /// <c>\\server\share\</c> を渡すと、共有ルートを開いたタブが「ルートではない」と判定され、
+    /// 統一コンテキストメニューの切り取り / 削除 / 名前の変更が有効になってしまう。
+    /// </para>
+    /// 正規化を挟むこの判定を唯一の実装にすること（以前はドラッグ側とメニュー側に別実装があり、
+    /// ドラッグは弾くのにメニューは通す、という食い違いになっていた）。
+    /// </remarks>
+    internal static bool IsRoot(string? path)
+    {
+        if (string.IsNullOrEmpty(path))
+        {
+            return false;
+        }
+
+        var root = Path.GetPathRoot(path);
+        return !string.IsNullOrEmpty(root) && Instance.Equals(root, path);
+    }
 }
