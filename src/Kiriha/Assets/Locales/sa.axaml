@@ -46,6 +46,7 @@
   <x:String x:Key="Text.Command.Paste" xml:space="preserve">लेपय</x:String>
   <x:String x:Key="Text.Command.PasteTip" xml:space="preserve">लेपय (Ctrl+V)</x:String>
   <x:String x:Key="Text.Command.PropertiesTip" xml:space="preserve">गुणधर्माः (Alt+Enter)</x:String>
+  <x:String x:Key="Text.Command.Refresh" xml:space="preserve">नवीकुरु</x:String>
   <x:String x:Key="Text.Command.Rename" xml:space="preserve">नाम परिवर्तय</x:String>
   <x:String x:Key="Text.Command.RenameTip" xml:space="preserve">नाम परिवर्तय (F2)</x:String>
   <x:String x:Key="Text.Command.Share" xml:space="preserve">विभाजय</x:String>

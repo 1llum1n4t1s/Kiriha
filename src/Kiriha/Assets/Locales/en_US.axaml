@@ -46,6 +46,7 @@
   <x:String x:Key="Text.Command.Paste" xml:space="preserve">Paste</x:String>
   <x:String x:Key="Text.Command.PasteTip" xml:space="preserve">Paste (Ctrl+V)</x:String>
   <x:String x:Key="Text.Command.PropertiesTip" xml:space="preserve">Properties (Alt+Enter)</x:String>
+  <x:String x:Key="Text.Command.Refresh" xml:space="preserve">Refresh</x:String>
   <x:String x:Key="Text.Command.Rename" xml:space="preserve">Rename</x:String>
   <x:String x:Key="Text.Command.RenameTip" xml:space="preserve">Rename (F2)</x:String>
   <x:String x:Key="Text.Command.Share" xml:space="preserve">Share</x:String>

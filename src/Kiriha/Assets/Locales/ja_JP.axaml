@@ -46,6 +46,7 @@
   <x:String x:Key="Text.Command.Paste" xml:space="preserve">貼り付け</x:String>
   <x:String x:Key="Text.Command.PasteTip" xml:space="preserve">貼り付け (Ctrl+V)</x:String>
   <x:String x:Key="Text.Command.PropertiesTip" xml:space="preserve">プロパティ (Alt+Enter)</x:String>
+  <x:String x:Key="Text.Command.Refresh" xml:space="preserve">最新の情報に更新</x:String>
   <x:String x:Key="Text.Command.Rename" xml:space="preserve">名前の変更</x:String>
   <x:String x:Key="Text.Command.RenameTip" xml:space="preserve">名前の変更 (F2)</x:String>
   <x:String x:Key="Text.Command.Share" xml:space="preserve">共有</x:String>

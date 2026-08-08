@@ -46,6 +46,7 @@
   <x:String x:Key="Text.Command.Paste" xml:space="preserve">ஒட்டு</x:String>
   <x:String x:Key="Text.Command.PasteTip" xml:space="preserve">ஒட்டு (Ctrl+V)</x:String>
   <x:String x:Key="Text.Command.PropertiesTip" xml:space="preserve">பண்புகள் (Alt+Enter)</x:String>
+  <x:String x:Key="Text.Command.Refresh" xml:space="preserve">புதுப்பி</x:String>
   <x:String x:Key="Text.Command.Rename" xml:space="preserve">பெயர் மாற்று</x:String>
   <x:String x:Key="Text.Command.RenameTip" xml:space="preserve">பெயர் மாற்று (F2)</x:String>
   <x:String x:Key="Text.Command.Share" xml:space="preserve">பகிர்</x:String>

@@ -40,6 +40,7 @@ public partial class MainWindow
     private const string GlyphCopyPath = "\uE71B";
     private const string GlyphProperties = "\uE946";
     private const string GlyphMore = "\uE712";
+    private const string GlyphRefresh = "\uE72C";
 
     /// <summary>
     /// Windows 自身がシェルメニューへ足す項目の正規 verb。Modern モードでは
@@ -155,6 +156,19 @@ public partial class MainWindow
                 Glyph = GlyphOpen,
                 IsDefault = true,
                 Invoke = () => tab.Open(entry),
+            });
+        }
+
+        // 背景の右クリックにはエクスプローラーと同じ「最新の情報に更新」を先頭側へ置く
+        // （項目への右クリックでは意味が薄いので背景だけ。System モードのシェル既定メニューには
+        // シェル自身の更新項目が無いため、Modern のここで補う）。
+        if (!usesSelection)
+        {
+            items.Add(new ExplorerMenuEntry
+            {
+                Text = LocalizationService.Text("Text.Command.Refresh"),
+                Glyph = GlyphRefresh,
+                Invoke = () => tab.RefreshCommand.Execute(null),
             });
         }
 

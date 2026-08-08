@@ -46,6 +46,7 @@
   <x:String x:Key="Text.Command.Paste" xml:space="preserve">I-paste</x:String>
   <x:String x:Key="Text.Command.PasteTip" xml:space="preserve">I-paste (Ctrl+V)</x:String>
   <x:String x:Key="Text.Command.PropertiesTip" xml:space="preserve">Mga katangian (Alt+Enter)</x:String>
+  <x:String x:Key="Text.Command.Refresh" xml:space="preserve">I-refresh</x:String>
   <x:String x:Key="Text.Command.Rename" xml:space="preserve">Palitan ang pangalan</x:String>
   <x:String x:Key="Text.Command.RenameTip" xml:space="preserve">Palitan ang pangalan (F2)</x:String>
   <x:String x:Key="Text.Command.Share" xml:space="preserve">Ibahagi</x:String>

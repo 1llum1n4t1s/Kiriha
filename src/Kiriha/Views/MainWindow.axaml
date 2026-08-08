@@ -597,9 +597,10 @@
                                     </Button.Flyout>
                                 </Button>
 
-                                <Button Classes="cmd cmdicon" Content="&#xE713;" ToolTip.Tip="{DynamicResource Text.Command.Options}" AutomationProperties.Name="{DynamicResource Text.Command.Options}"
-                                        VerticalAlignment="Center"
-                                        Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OpenSettingsCommand}" />
+                                <!-- 最新の情報に更新（アドレスバーの更新ボタンと同じコマンド。
+                                     設定ボタンがあった場所に置き、設定は「もっと見る」メニューへ移した） -->
+                                <Button Classes="cmd cmdicon" Content="&#xE72C;" ToolTip.Tip="{DynamicResource Text.Command.Refresh}" AutomationProperties.Name="{DynamicResource Text.Command.Refresh}"
+                                        VerticalAlignment="Center" Command="{Binding RefreshCommand}" />
 
                                 <Button Classes="cmd cmdicon" Content="&#xE712;" ToolTip.Tip="{DynamicResource Text.Command.More}" AutomationProperties.Name="{DynamicResource Text.Command.More}"
                                         VerticalAlignment="Center">
@@ -620,6 +621,9 @@
                                             <MenuItem Header="{DynamicResource Text.Common.Properties}" Command="{Binding ShowPropertiesCommand}" />
                                             <Separator />
                                             <MenuItem Header="{DynamicResource Text.Menu.NewWindow}" Click="NewWindow_Click" InputGesture="Ctrl+N" />
+                                            <!-- コマンドバーに並んでいた設定ボタンの移設先（Chrome の「⋮ > 設定」相当） -->
+                                            <MenuItem Header="{DynamicResource Text.Command.Options}"
+                                                      Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OpenSettingsCommand}" />
                                             <MenuItem Header="{DynamicResource Text.Menu.CheckUpdate}" Click="CheckUpdate_Click" />
                                             <MenuItem Header="{DynamicResource Text.Menu.About}"
                                                       Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OpenSettingsCommand}" />

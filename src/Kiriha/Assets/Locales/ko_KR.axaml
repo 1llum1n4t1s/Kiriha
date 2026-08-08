@@ -46,6 +46,7 @@
   <x:String x:Key="Text.Command.Paste" xml:space="preserve">붙여넣기</x:String>
   <x:String x:Key="Text.Command.PasteTip" xml:space="preserve">붙여넣기 (Ctrl+V)</x:String>
   <x:String x:Key="Text.Command.PropertiesTip" xml:space="preserve">속성 (Alt+Enter)</x:String>
+  <x:String x:Key="Text.Command.Refresh" xml:space="preserve">새로 고침</x:String>
   <x:String x:Key="Text.Command.Rename" xml:space="preserve">이름 바꾸기</x:String>
   <x:String x:Key="Text.Command.RenameTip" xml:space="preserve">이름 바꾸기 (F2)</x:String>
   <x:String x:Key="Text.Command.Share" xml:space="preserve">공유</x:String>
