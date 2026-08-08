@@ -3608,9 +3608,85 @@ public partial class MainWindow : Window
     private BookmarkNode? _bookmarkDropNode;
     private BookmarkDropMark _bookmarkDropMark;
 
+    // ===== お気に入りペインのドラッグ自動スクロール =====
+    // 登録数がペインの高さを超えると、ドラッグ中は見えている行にしか落とせない
+    // （OLE ドラッグ中はホイールも効かない）。エクスプローラーと同じく、ペインの
+    // 上下端へ寄せている間だけリストを送る。
+    private const double BookmarkAutoScrollZone = 32;
+    private const double BookmarkAutoScrollStep = 12;
+    private Control? _bookmarkAutoScrollPane;
+    private ScrollViewer? _bookmarkAutoScrollViewer;
+    private int _bookmarkAutoScrollDirection;
+    private DispatcherTimer? _bookmarkAutoScrollTimer;
+
+    /// <summary>ペイン内のポインター位置から自動スクロールの向きを決め、端に居る間だけタイマーで送る。
+    /// ポインターが静止していると DragOver は来なくなるため、送り続ける役はタイマーが持つ。</summary>
+    private void UpdateBookmarkAutoScroll(DragEventArgs e)
+    {
+        var pane = ResolveFileDropVisualControl(e, isBookmark: true);
+        if (pane is null)
+        {
+            StopBookmarkAutoScroll();
+            return;
+        }
+
+        // ScrollViewer の解決はペインが差し替わったときだけ（タブ切り替えでツリーごと作り直される）
+        if (!ReferenceEquals(pane, _bookmarkAutoScrollPane))
+        {
+            _bookmarkAutoScrollPane = pane;
+            _bookmarkAutoScrollViewer = pane.FindDescendantOfType<ScrollViewer>();
+        }
+
+        if (_bookmarkAutoScrollViewer is null)
+        {
+            return;
+        }
+
+        var y = e.GetPosition(pane).Y;
+        _bookmarkAutoScrollDirection = y < BookmarkAutoScrollZone ? -1
+            : y > pane.Bounds.Height - BookmarkAutoScrollZone ? 1
+            : 0;
+
+        if (_bookmarkAutoScrollDirection == 0)
+        {
+            _bookmarkAutoScrollTimer?.Stop();
+            return;
+        }
+
+        if (_bookmarkAutoScrollTimer is null)
+        {
+            _bookmarkAutoScrollTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(50) };
+            _bookmarkAutoScrollTimer.Tick += (_, _) =>
+            {
+                if (_bookmarkAutoScrollViewer is not { } viewer || _bookmarkAutoScrollDirection == 0)
+                {
+                    _bookmarkAutoScrollTimer!.Stop();
+                    return;
+                }
+
+                // Offset は ScrollViewer 側で [0, extent - viewport] に丸められる
+                viewer.Offset = new Vector(
+                    viewer.Offset.X,
+                    viewer.Offset.Y + BookmarkAutoScrollStep * _bookmarkAutoScrollDirection);
+            };
+        }
+
+        _bookmarkAutoScrollTimer.Start();
+    }
+
+    private void StopBookmarkAutoScroll()
+    {
+        _bookmarkAutoScrollDirection = 0;
+        _bookmarkAutoScrollTimer?.Stop();
+        _bookmarkAutoScrollPane = null;
+        _bookmarkAutoScrollViewer = null;
+    }
+
     /// <summary>
     /// お気に入りペイン上のポインター位置から挿入位置を決め、その目印を出す。
     /// 行の上端 / 下端寄りなら「その前 / その後ろ」、フォルダー項目の中央なら「その中へ」。
+    /// 実フォルダーを指すリンク項目の中央も「その中へ」で、こちらは登録ではなく
+    /// リンク先へのファイル移動 / コピーになる（エクスプローラーのサイドバーと同じ）。
     /// 項目の無い余白なら末尾（最後の項目の下に線を出す）。
     /// </summary>
     private void UpdateBookmarkDropMark(DragEventArgs e)
@@ -3637,7 +3713,7 @@ public partial class MainWindow : Window
 
         var ratio = e.GetPosition(row).Y / row.Bounds.Height;
         _bookmarkDropNode = node;
-        _bookmarkDropMark = node.IsFolder
+        _bookmarkDropMark = node.IsFolder || IsFileDropTargetBookmark(node)
             ? ratio switch
             {
                 < 0.3 => BookmarkDropMark.Before,
@@ -3647,6 +3723,15 @@ public partial class MainWindow : Window
             : ratio < 0.5 ? BookmarkDropMark.Before : BookmarkDropMark.After;
         vm.SetBookmarkDropMark(node, _bookmarkDropMark);
     }
+
+    /// <summary>この項目の中央へのドロップが「リンク先フォルダーへのファイル操作」になるか。
+    /// 実フォルダーを指すリンクだけが対象（グループフォルダーは登録先、ファイルへのリンクと
+    /// 「PC」はドロップ先の実体を持たない）。IsDirectoryTarget はアイコン解決時の値だが、
+    /// 古くても実害は薄い: 消えたフォルダーへ落とすとシェルのエラーダイアログが出るだけで、
+    /// ここで同期の Directory.Exists を呼ぶと切断中のネットワークパスでドラッグが固まる。</summary>
+    private static bool IsFileDropTargetBookmark(BookmarkNode node)
+        => node is { IsFolder: false, IsDirectoryTarget: true, Path.Length: > 0 }
+           && node.Path != FileSystemService.ComputerPath;
 
     private void ClearBookmarkDropMark()
     {
@@ -3862,6 +3947,30 @@ public partial class MainWindow : Window
             // 「お気に入りに入れようとしただけでタブが増える」ように見える。
             RemoveTabDropPreview();
             UpdateBookmarkDropMark(e);
+            UpdateBookmarkAutoScroll(e);
+
+            // リンク先フォルダーの中央へ落とすときは登録ではなくファイル操作
+            // （行の強調は DropMark.Into のバインドが出す。バッジは移動 / コピーに切り替える）。
+            if (_bookmarkDropMark == BookmarkDropMark.Into
+                && _bookmarkDropNode is { } intoTarget && IsFileDropTargetBookmark(intoTarget))
+            {
+                if (IsSelfDrop(files, intoTarget.Path!))
+                {
+                    // 自分自身のお気に入り行へは落とせない（エクスプローラーと同じ）
+                    ClearBookmarkDropMark();
+                    e.DragEffects = DragDropEffects.None;
+                    UpdateFileDropVisual(e, DragDropEffects.None, isBookmark: false);
+                }
+                else
+                {
+                    e.DragEffects = ResolveDropEffect(e, files, intoTarget.Path!);
+                    UpdateFileDropVisual(e, e.DragEffects, isBookmark: false);
+                }
+
+                e.Handled = true;
+                return;
+            }
+
             e.DragEffects = DragDropEffects.Copy;
             UpdateFileDropVisual(e, DragDropEffects.Copy, isBookmark: true);
             e.Handled = true;
@@ -3982,6 +4091,25 @@ public partial class MainWindow : Window
         if (isOnBookmarkPane)
         {
             e.Handled = true;
+
+            // リンク先フォルダーの中央へ落としたときは、そのフォルダーへのファイル操作
+            // （エクスプローラーのサイドバーと同じ。右ボタンドラッグなら操作メニューを出す）。
+            if (bookmarkDropMark == BookmarkDropMark.Into
+                && bookmarkDropNode is { } intoTarget && IsFileDropTargetBookmark(intoTarget)
+                && !IsSelfDrop(files, intoTarget.Path!)
+                && ViewModel?.SelectedTab is { } dropTab)
+            {
+                if (rightDrop)
+                {
+                    ShowRightDragDropMenu(dropTab, files, intoTarget.Path!, e.GetPosition(this));
+                    return;
+                }
+
+                var moveIntoBookmark = ResolveDropEffect(e, files, intoTarget.Path!) == DragDropEffects.Move;
+                _ = dropTab.DropFilesAsync(files, intoTarget.Path!, moveIntoBookmark);
+                return;
+            }
+
             // ドラッグ中に見せていた挿入位置へそのまま入れる。複数まとめて落としたときは
             // 掴んだ順を保つため、2 件目以降は 1 件前の後ろへ続ける。
             var node = bookmarkDropNode;
@@ -4114,6 +4242,7 @@ public partial class MainWindow : Window
     {
         _fileDropVisualRevision++;
         ClearBookmarkDropMark();
+        StopBookmarkAutoScroll();
         RemoveTabDropPreview();
         _fileDropTargetControl?.Classes.Remove("filedroptarget");
         _fileDropTargetControl = null;
