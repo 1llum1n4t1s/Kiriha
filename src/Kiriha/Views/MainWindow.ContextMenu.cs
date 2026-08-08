@@ -50,6 +50,29 @@ public partial class MainWindow
     private const string GlyphNewFolder = "\uE8F4";
     private const string GlyphSort = "\uE8CB";
     private const string GlyphView = "\uE890";
+    private const string GlyphTerminal = "\uE756";
+    // \u30BF\u30D6\u306E\u9589\u3058\u308B\u30DC\u30BF\u30F3\uFF08MainWindow.axaml \u306E tabclose\uFF09\u3068\u540C\u3058\u5B57\u306B\u305D\u308D\u3048\u308B
+    private const string GlyphClose = "\uE8BB";
+
+    /// <summary>
+    /// Windows Terminal がシェルへ足す「ターミナルで開く」の正規 verb。Kiriha 側の同名項目を出すときは
+    /// こちらを落とす（同じ表示名が 2 行並ぶうえ、設定「ターミナルを管理者として開く」が効くのは
+    /// Kiriha の項目だけなので、どちらを押したかで挙動が変わってしまう）。
+    /// </summary>
+    /// <remarks>
+    /// Windows Terminal は IExplorerCommand のパッケージ登録型ハンドラーで、レジストリの
+    /// Directory\shell には出てこない。ただし GetCommandString(GCS_VERBW) はハンドラーの CLSID を返す
+    /// —— 実測（このリポジトリのフォルダーを対象に QueryContextMenu を 2 回）で、表示名
+    /// 「ターミナルで開く(&amp;T)」の verb が {9F156763-...} であることを確認した。表示名は Windows の
+    /// UI 言語で変わり、しかも Kiriha のロケール設定とは一致しないので、判定は必ずこの CLSID で行う。
+    /// 2 つ目は Windows Terminal Preview の CLSID（この環境には未インストールで未実測。外れていても
+    /// 「Preview の項目が残る」だけで害は無い）。
+    /// </remarks>
+    private static readonly HashSet<string> WindowsTerminalVerbs = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "{9F156763-7844-4DC4-B2B1-901F640F5155}",
+        "{02DB545A-3E20-46DE-83A5-1329B1E88B6B}",
+    };
 
     /// <summary>
     /// Windows 自身がシェルメニューへ足す項目の正規 verb。Modern モードでは
@@ -98,7 +121,7 @@ public partial class MainWindow
         {
             var header = new List<ExplorerMenuEntry>();
             var items = style == ContextMenuStyle.Shell
-                ? BuildShellStyleMenu(tab, session, paths)
+                ? BuildShellStyleMenu(tab, session, paths, screen)
                 : BuildModernMenu(tab, session, paths, screen, header);
 
             if (items.Count == 0)
@@ -122,10 +145,19 @@ public partial class MainWindow
     private List<ExplorerMenuEntry> BuildShellStyleMenu(
         TabViewModel tab,
         ShellMenuSession session,
-        IReadOnlyList<string> paths)
+        IReadOnlyList<string> paths,
+        PixelPoint screen)
     {
-        var items = ConvertShellItems(session, session.Items, paths, excludedVerbs: null, thirdPartyOnly: false);
-        var extras = BuildKirihaFolderEntries(tab, paths);
+        // このモードはシェルの項目をそのまま並べるのが約束なので、原則 excludedVerbs は使わない。
+        // 「開く」「貼り付け」は先に入れておくことで共通ビルダー側が自前項目を出さず、シェルの項目が残る。
+        // 例外は Windows Terminal だけ —— Kiriha 側の「ターミナルで開く」と同じ表示名が 2 行並び、
+        // どちらを押したかで昇格するかが変わってしまう。表示名の違う重複（お気に入りに追加など）は従来どおり残す。
+        var kirihaVerbs = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "open", "paste" };
+        var extras = BuildCommonPathEntries(
+            CreateFileListTarget(tab, paths, SelectionMatches(tab, paths), screen), kirihaVerbs);
+        kirihaVerbs.IntersectWith(WindowsTerminalVerbs);
+
+        var items = ConvertShellItems(session, session.Items, paths, kirihaVerbs, thirdPartyOnly: false);
         if (extras.Count > 0)
         {
             items.Add(ExplorerMenuEntry.Separator);
@@ -144,32 +176,20 @@ public partial class MainWindow
         List<ExplorerMenuEntry> header)
     {
         // 自前項目が「選択中の項目」を対象にできるのは、右クリック対象が今の選択と一致するときだけ。
-        // 背景クリック（対象は現在のフォルダー自身）では選択が別物なので、シェル項目へ任せる。
+        // 背景クリック（対象は現在のフォルダー自身）はアイコン行の中身が変わる。
         var usesSelection = SelectionMatches(tab, paths);
         var excludedVerbs = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var items = new List<ExplorerMenuEntry>();
+        var target = CreateFileListTarget(tab, paths, usesSelection, screen);
 
         if (usesSelection)
         {
-            BuildHeaderRow(tab, session, paths, header, excludedVerbs);
+            // アイコン行と本文は他の 5 か所と同じ組み立てを通す（MainWindow.UnifiedMenu.cs）
+            BuildCommonHeaderRow(target, session, header, excludedVerbs);
         }
         else
         {
             BuildBackgroundHeaderRow(tab, session, paths, header, excludedVerbs);
-        }
-
-        if (usesSelection && tab.Selection.Count == 1)
-        {
-            var entry = tab.Selection[0];
-            excludedVerbs.Add("open");
-            items.Add(new ExplorerMenuEntry
-            {
-                Text = LocalizationService.Text("Text.Common.Open"),
-                Shortcut = "Enter",
-                Glyph = GlyphOpen,
-                IsDefault = true,
-                Invoke = () => tab.Open(entry),
-            });
         }
 
         // 背景の右クリックは「今のフォルダーの見せ方」を変える場所でもあるので、
@@ -181,7 +201,7 @@ public partial class MainWindow
             items.Add(ExplorerMenuEntry.Separator);
         }
 
-        items.AddRange(BuildKirihaFolderEntries(tab, paths, excludedVerbs));
+        items.AddRange(BuildCommonPathEntries(target, excludedVerbs));
 
         // 「タスクバーにピン留めする」はここには置けない。Windows 11 のそれは Explorer 内部の実装で、
         // 公開シェル API（IContextMenu / IExplorerCommand）には出てこない —— 実測でも、フォルダーにも
@@ -211,76 +231,22 @@ public partial class MainWindow
         return items;
     }
 
-    /// <summary>
-    /// 上部の横並びアイコン行
-    /// （切り取り / コピー / パスのコピー / 名前の変更 / 共有 / 削除 / プロパティ）。
-    /// </summary>
-    private void BuildHeaderRow(
+    /// <summary>ファイル一覧の右クリック対象を、統一メニュー（MainWindow.UnifiedMenu.cs）の形へ包む。</summary>
+    /// <param name="usesSelection">右クリック対象が今の選択と一致するか（背景クリックなら false）。</param>
+    /// <remarks>
+    /// <see cref="ContextMenuTarget.Entry"/> は単一選択のときだけ入れる。「開く」をギャラリー対応の
+    /// <see cref="TabViewModel.Open"/> に通すためで、他の 5 か所には対応する行が無い。
+    /// </remarks>
+    private ContextMenuTarget CreateFileListTarget(
         TabViewModel tab,
-        ShellMenuSession session,
         IReadOnlyList<string> paths,
-        List<ExplorerMenuEntry> header,
-        HashSet<string> excludedVerbs)
-    {
-        header.Add(new ExplorerMenuEntry
+        bool usesSelection,
+        PixelPoint screen)
+        => new(ContextMenuSource.FileList, paths, ViewModel!, screen)
         {
-            Text = LocalizationService.Text("Text.Command.Cut"),
-            Glyph = GlyphCut,
-            IsEnabled = tab.CutCommand.CanExecute(null),
-            Invoke = () => tab.CutCommand.Execute(null),
-        });
-        header.Add(new ExplorerMenuEntry
-        {
-            Text = LocalizationService.Text("Text.Common.Copy"),
-            Glyph = GlyphCopy,
-            IsEnabled = tab.CopyCommand.CanExecute(null),
-            Invoke = () => tab.CopyCommand.Execute(null),
-        });
-        // Windows 11 の「パスのコピー」（copyaspath）と同じ機能。Kiriha 側は Ctrl+Shift+C と
-        // ステータスバー通知が付くので、こちらを出してシェル側は落とす。
-        header.Add(new ExplorerMenuEntry
-        {
-            Text = LocalizationService.Text("Text.Common.CopyPath"),
-            Glyph = GlyphCopyPath,
-            Invoke = () => CopySelectedPaths(tab),
-        });
-        header.Add(new ExplorerMenuEntry
-        {
-            Text = LocalizationService.Text("Text.Command.Rename"),
-            Glyph = GlyphRename,
-            IsEnabled = tab.RenameCommand.CanExecute(null),
-            Invoke = () => tab.RenameCommand.Execute(null),
-        });
-        header.Add(new ExplorerMenuEntry
-        {
-            Text = LocalizationService.Text("Text.Command.Share"),
-            Glyph = GlyphShare,
-            Invoke = () => tab.ShareCommand.Execute(null),
-        });
-        header.Add(new ExplorerMenuEntry
-        {
-            Text = LocalizationService.Text("Text.Common.Delete"),
-            Glyph = GlyphDelete,
-            IsEnabled = tab.DeleteCommand.CanExecute(null),
-            Invoke = () => tab.DeleteCommand.Execute(null),
-        });
-        header.Add(new ExplorerMenuEntry
-        {
-            Text = LocalizationService.Text("Text.Common.Properties"),
-            Glyph = GlyphProperties,
-            Invoke = () => ShowPropertiesFor(session, paths),
-        });
-
-        // 自前で用意した以上、シェル側の同じ機能は重複させない
-        excludedVerbs.Add("cut");
-        excludedVerbs.Add("copy");
-        excludedVerbs.Add("copyaspath");
-        excludedVerbs.Add("rename");
-        excludedVerbs.Add("delete");
-        excludedVerbs.Add("properties");
-        excludedVerbs.Add("Windows.Share");
-        excludedVerbs.Add("Windows.ModernShare");
-    }
+            MatchesSelection = usesSelection,
+            Entry = usesSelection && tab.Selection.Count == 1 ? tab.Selection[0] : null,
+        };
 
     /// <summary>
     /// 背景（何も無いところ）を右クリックしたときの、上部の横並びアイコン行
@@ -403,68 +369,6 @@ public partial class MainWindow
                 ViewEntry("Text.View.Gallery", ViewMode.Gallery, tab.IsViewGallery),
             ],
         };
-    }
-
-    /// <summary>
-    /// フォルダーを右クリックしたときだけ足す Kiriha 独自の項目。
-    /// Win32 メニュー側の <c>BuildOpenInTabsItem</c> 等と同じ条件・同じ動作にそろえてある。
-    /// </summary>
-    /// <param name="excludedVerbs">
-    /// 足した項目と機能が重なるシェル verb をここへ登録する（Modern モードのみ。Shell モードは null）。
-    /// </param>
-    private List<ExplorerMenuEntry> BuildKirihaFolderEntries(
-        TabViewModel tab,
-        IReadOnlyList<string> paths,
-        HashSet<string>? excludedVerbs = null)
-    {
-        var entries = new List<ExplorerMenuEntry>();
-        if (ViewModel is not { } vm || paths.Count == 0 || !paths.All(Directory.Exists))
-        {
-            return entries;
-        }
-
-        // シェルの「お気に入りに追加」(pintohomefile) はエクスプローラーの Home に足すもので、
-        // Kiriha のサイドバーには現れない。同じ表示名が 2 つ並ぶのを避けて、こちらを残す。
-        excludedVerbs?.Add("pintohomefile");
-
-        var targets = paths.ToList();
-        entries.Add(new ExplorerMenuEntry
-        {
-            Text = LocalizationService.Text("Text.Tab.OpenInTabs", targets.Count),
-            Glyph = GlyphNewTab,
-            Invoke = () => vm.OpenFolderTabs(targets),
-        });
-        entries.Add(new ExplorerMenuEntry
-        {
-            Text = LocalizationService.Text("Text.Tab.PinInTabs", targets.Count),
-            Glyph = GlyphPin,
-            Invoke = () => vm.PinFolderTabs(targets),
-        });
-        entries.Add(new ExplorerMenuEntry
-        {
-            Text = LocalizationService.Text("Text.Common.AddToBookmarks"),
-            Glyph = GlyphFavorite,
-            Invoke = () =>
-            {
-                foreach (var path in targets)
-                {
-                    vm.AddBookmark(path);
-                }
-            },
-        });
-        entries.Add(new ExplorerMenuEntry
-        {
-            Text = LocalizationService.Text("Text.Common.OpenInExplorer"),
-            Glyph = GlyphFolderOpen,
-            Invoke = () =>
-            {
-                foreach (var path in targets)
-                {
-                    tab.OpenFolderInExplorer(path);
-                }
-            },
-        });
-        return entries;
     }
 
     /// <summary>吸い出したシェル項目を表示用モデルへ変換する（サブメニューは再帰）。</summary>
