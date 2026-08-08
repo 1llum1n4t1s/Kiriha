@@ -93,6 +93,32 @@ public class WindowsPathIdentityBoundaryTests
         Assert.True(WindowsPathIdentity.Instance.Equals(@"\\server\share\", @"\\SERVER\Share"));
     }
 
+    /// <summary>
+    /// ルート判定は表記ゆれを吸収すること。素の <c>string.Equals(Path.GetPathRoot(p), p)</c> では、
+    /// 実測（.NET 10 / Windows 11）で <c>C:/</c> <c>C:\\</c> <c>\\server\share\</c> <c>\\server/share</c> が
+    /// すべて false になり、ルート相当のパスに対して切り取り / 削除 / 名前の変更が有効化される。
+    /// </summary>
+    /// @severity=high
+    [Theory]
+    [InlineData(@"C:\")]
+    [InlineData("C:/")]
+    [InlineData(@"C:\\")]
+    [InlineData(@"\\server\share")]
+    [InlineData(@"\\server\share\")]
+    [InlineData("//server/share")]
+    public void 表記が違ってもルートはルートと判定されること(string path)
+        => Assert.True(WindowsPathIdentity.IsRoot(path));
+
+    /// @severity=high
+    [Theory]
+    [InlineData(@"C:\Users")]
+    [InlineData(@"C:\Users\")]
+    [InlineData(@"\\server\share\sub")]
+    [InlineData("")]
+    [InlineData(null)]
+    public void ルートでないパスはルートと判定されないこと(string? path)
+        => Assert.False(WindowsPathIdentity.IsRoot(path));
+
     /// @severity=med
     [Fact]
     public void nullと空文字とComputerPathは等しいこと()

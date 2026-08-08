@@ -606,7 +606,8 @@ public class BookmarkSortHappyTests
     private static BookmarkNode Folder(string name, params BookmarkNode[] children)
         => new() { Name = name, Children = [.. children] };
 
-    private static string[] Names(List<BookmarkNode> list) => [.. list.Select(n => n.Name)];
+    // 表示（＝並べ替えの基準）はリンク項目なら実体名。node.Name はグループフォルダーだけが持つ
+    private static string[] Names(List<BookmarkNode> list) => [.. list.Select(n => n.DisplayName)];
 
     [Fact]
     public void 名前の昇順と降順が逆順になる()
@@ -658,5 +659,151 @@ public class BookmarkSortHappyTests
 
         MainWindowViewModel.SortBookmarkList(list, byPath: false, ascending: false);
         Assert.Equal(["y", "x"], Names(group.Children!));
+    }
+
+    [Fact]
+    public void 名前順はリンクに残った独自名ではなく実体名で並ぶ()
+    {
+        // 出荷済みの settings.json には独自に付けた名前が残っているが、表示も並べ替えも実体名で行う
+        List<BookmarkNode> list = [Link("zzz", @"C:\a"), Link("aaa", @"C:\z")];
+
+        Assert.Equal(
+            ["a", "z"],
+            Names(MainWindowViewModel.SortBookmarkList(list, byPath: false, ascending: true)));
+    }
+}
+
+/// <summary>お気に入りの表示名は実体から導く（独自に保持しない）。</summary>
+public class BookmarkDisplayNameHappyTests
+{
+    [Fact]
+    public void リンク項目はパスの末尾を表示名にする()
+    {
+        Assert.Equal("Kiriha", new BookmarkNode { Name = "古い名前", Path = @"C:\dev\Kiriha" }.DisplayName);
+        Assert.Equal("memo.txt", new BookmarkNode { Path = @"C:\dev\memo.txt" }.DisplayName);
+    }
+
+    [Fact]
+    public void 末尾の区切りは無視される()
+    {
+        Assert.Equal("Kiriha", new BookmarkNode { Path = @"C:\dev\Kiriha\" }.DisplayName);
+    }
+
+    [Fact]
+    public void ドライブ直下はパスをそのまま出す()
+    {
+        // ファイル名部分が空になるので、そのままだと名前が消える
+        Assert.Equal(@"C:\", new BookmarkNode { Path = @"C:\" }.DisplayName);
+    }
+
+    [Fact]
+    public void 実体を持たないノードは保持した名前を使う()
+    {
+        // グループ分けフォルダー（Path なし）と「PC」（Path が空文字）
+        Assert.Equal("仕事", new BookmarkNode { Name = "仕事", Children = [] }.DisplayName);
+        Assert.Equal("PC", new BookmarkNode { Name = "PC", Path = "" }.DisplayName);
+    }
+
+    [Fact]
+    public void パスを付け替えると表示名も変わる()
+    {
+        var node = new BookmarkNode { Path = @"C:\dev\old" };
+        var changed = false;
+        node.PropertyChanged += (_, e) => changed |= e.PropertyName == nameof(BookmarkNode.DisplayName);
+
+        node.Path = @"C:\dev\new";
+
+        Assert.Equal("new", node.DisplayName);
+        Assert.True(changed);
+    }
+}
+
+/// <summary>
+/// お気に入りが settings.json を往復しても壊れない。
+/// </summary>
+/// <remarks>
+/// <see cref="BookmarkNode.Path"/> を <c>[ObservableProperty]</c> にした瞬間、MVVM Toolkit が生成した
+/// プロパティを System.Text.Json のジェネレーターが見られず、保存時に Path が丸ごと消えた（2026-08-08、
+/// 開発機の登録済みお気に入りを実際に失った）。ソースジェネレーター同士は互いの出力を見られないので、
+/// 保存対象のプロパティを生成に頼ると同じことが起きる。ここはその番人。
+/// </remarks>
+[Collection(AppStorageCollection.Name)]
+public class BookmarkNodeSerializationTests
+{
+    [Fact]
+    public void 保存して読み直してもリンク先パスが残る()
+    {
+        using var scope = new AppStorageScope();
+        var settings = new AppSettings
+        {
+            Bookmarks =
+            [
+                new BookmarkNode { Path = @"C:\dev\Kiriha" },
+                new BookmarkNode { Name = "PC", Path = "" },
+                new BookmarkNode { Name = "仕事", Children = [new BookmarkNode { Path = @"C:\dev\Komorebi" }] },
+            ],
+        };
+
+        SettingsService.Save(settings);
+        var loaded = SettingsService.Load();
+
+        Assert.Equal(@"C:\dev\Kiriha", loaded.Bookmarks[0].Path);
+        Assert.Equal("Kiriha", loaded.Bookmarks[0].DisplayName);
+        Assert.Equal("", loaded.Bookmarks[1].Path);
+        Assert.Equal("PC", loaded.Bookmarks[1].DisplayName);
+        Assert.Equal(@"C:\dev\Komorebi", loaded.Bookmarks[2].Children![0].Path);
+    }
+}
+
+/// <summary>リネームでお気に入りの登録パスが追従する。</summary>
+public class BookmarkPathFollowHappyTests
+{
+    [Fact]
+    public void 同じパスの登録が新しいパスへ付け替わる()
+    {
+        var node = new BookmarkNode { Path = @"C:\dev\old" };
+        List<BookmarkNode> list = [node];
+
+        Assert.True(MainWindowViewModel.UpdateBookmarkPaths(list, @"C:\dev\old", @"C:\dev\new"));
+        Assert.Equal(@"C:\dev\new", node.Path);
+    }
+
+    [Fact]
+    public void 親フォルダーのリネームで配下の登録も付け替わる()
+    {
+        var child = new BookmarkNode { Path = @"C:\dev\old\sub\deep" };
+        List<BookmarkNode> list = [new BookmarkNode { Name = "g", Children = [child] }];
+
+        Assert.True(MainWindowViewModel.UpdateBookmarkPaths(list, @"C:\dev\old", @"C:\dev\new"));
+        Assert.Equal(@"C:\dev\new\sub\deep", child.Path);
+    }
+
+    [Fact]
+    public void 大文字小文字は同じパスとして扱う()
+    {
+        var node = new BookmarkNode { Path = @"c:\DEV\Old" };
+        List<BookmarkNode> list = [node];
+
+        Assert.True(MainWindowViewModel.UpdateBookmarkPaths(list, @"C:\dev\old", @"C:\dev\new"));
+        Assert.Equal(@"C:\dev\new", node.Path);
+    }
+
+    [Fact]
+    public void 名前が前方一致しただけの別フォルダーは巻き込まない()
+    {
+        // C:\dev\old2 は C:\dev\old の配下ではない
+        var sibling = new BookmarkNode { Path = @"C:\dev\old2" };
+        List<BookmarkNode> list = [sibling];
+
+        Assert.False(MainWindowViewModel.UpdateBookmarkPaths(list, @"C:\dev\old", @"C:\dev\new"));
+        Assert.Equal(@"C:\dev\old2", sibling.Path);
+    }
+
+    [Fact]
+    public void 該当が無ければ変更なしを返す()
+    {
+        List<BookmarkNode> list = [new BookmarkNode { Path = @"C:\other" }, new BookmarkNode { Name = "PC", Path = "" }];
+
+        Assert.False(MainWindowViewModel.UpdateBookmarkPaths(list, @"C:\dev\old", @"C:\dev\new"));
     }
 }
