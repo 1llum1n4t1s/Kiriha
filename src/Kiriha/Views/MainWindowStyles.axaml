@@ -12,7 +12,14 @@
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="Padding" Value="8,6,3,0" />
         </Style>
-        <Style Selector="ListBox.verticaltabs ListBoxItem">
+        <!-- x:DataType は AutomationProperties.Name のバインディング用（このプロジェクトはコンパイル済み
+             バインディングが既定なので、Style の Setter でも開始型の指定が要る）。 -->
+        <Style Selector="ListBox.verticaltabs ListBoxItem" x:DataType="vm:TabViewModel">
+            <!-- タブの読み上げ名。コンテナ（ListBoxItem）に付けないと効かない: その自動化ピアは
+                 AutomationProperties.Name が無いと Content.ToString() へ落ちるので、実測では 11 タブ全部が
+                 "Kiriha.ViewModels.TabViewModel" という名前になっていた。DataTemplate のルート Grid へ
+                 書くのは無駄で、Grid は自動化ピアを持たず UI ツリーに現れない（一度そう書かれていた）。 -->
+            <Setter Property="AutomationProperties.Name" Value="{Binding Title}" />
             <Setter Property="Padding" Value="0" />
             <Setter Property="MinHeight" Value="0" />
             <Setter Property="Margin" Value="0,1" />

@@ -1104,7 +1104,11 @@ public partial class MainWindow : Window
         var newName = await PromptTextAsync(LocalizationService.Text("Text.Command.Rename"), entry.Name, selectionLength);
         if (newName is not null)
         {
-            await tab.CommitRenameAsync(entry, newName);
+            // お気に入りは実体名を表示するので、改名できたら登録側のパスも付け替える
+            if (await tab.CommitRenameAsync(entry, newName) is { } newPath && ViewModel is { } vm)
+            {
+                vm.UpdateBookmarkPaths(entry.FullPath, newPath);
+            }
         }
         else
         {
@@ -1146,49 +1150,114 @@ public partial class MainWindow : Window
         ToggleMaximize();
     }
 
-    /// <summary>タブ右クリックメニューが開いたとき「最近閉じたタブ」サブメニューを構築する。</summary>
-    private void TabMenu_Opened(object? sender, RoutedEventArgs e)
+    /// <summary>タブの右クリックメニュー。他の 5 か所と同じ組み立てを通す（並びだけ「固有 → 共通」）。</summary>
+    /// <remarks>
+    /// タブのメニューは閉じる・固定といったタブ操作が主目的なので、共通部を先頭に置くと
+    /// 日常操作が遠くなる。<c>ownEntriesFirst</c> を使うのはここだけ。
+    /// </remarks>
+    private void ShowTabContextMenu(Control anchor, TabViewModel tab, MainWindowViewModel vm, PixelPoint screen)
     {
-        if (sender is not ContextMenu menu || ViewModel is not { } vm)
-        {
-            return;
-        }
+        // 設定タブと「PC」タブは実体のあるフォルダーを持たないので共通部を出さない
+        var target = tab is { IsSettingsTab: false, CurrentPath.Length: > 0 }
+            ? new ContextMenuTarget(ContextMenuSource.Tab, [tab.CurrentPath], vm, screen)
+            { AllDirectories = true, ContextTab = tab }
+            : null;
 
-        var recent = menu.Items.OfType<MenuItem>().FirstOrDefault(m => (m.Tag as string) == "recent");
-        var tabActions = menu.Items.OfType<MenuItem>().FirstOrDefault(m => (m.Tag as string) == "tabActions");
-        if (tabActions is not null && menu.DataContext is TabViewModel contextTab)
+        ShowUnifiedContextMenu(anchor, target, BuildTabOwnEntries(tab, vm), screen, ownEntriesFirst: true);
+    }
+
+    /// <summary>タブ固有の項目。パスのコピーとエクスプローラーで開くは共通部が持つのでここには無い。</summary>
+    private List<ExplorerMenuEntry> BuildTabOwnEntries(TabViewModel tab, MainWindowViewModel vm)
+    {
+        var entries = new List<ExplorerMenuEntry>
         {
-            tabActions.Items.Clear();
-            foreach (var action in ContextActionCatalog.For(ActionScope.Tab))
+            new()
             {
-                var item = new MenuItem { Header = action.Title };
-                item.Click += async (_, _) => await ExecuteTabContextActionAsync(action, contextTab);
-                tabActions.Items.Add(item);
-            }
-        }
-        if (recent is null)
+                Text = LocalizationService.Text("Text.Tab.NewBelow"),
+                Glyph = GlyphNewTab,
+                Invoke = () => vm.NewTabToRight(tab),
+            },
+        };
+
+        if (tab.IsNormalTab)
         {
-            return;
+            entries.Add(new ExplorerMenuEntry
+            {
+                Text = LocalizationService.Text("Text.Tab.Duplicate"),
+                Glyph = GlyphCopy,
+                Invoke = () => vm.DuplicateTab(tab),
+            });
         }
 
-        recent.Items.Clear();
+        entries.Add(ExplorerMenuEntry.Separator);
+        entries.Add(new ExplorerMenuEntry
+        {
+            Text = LocalizationService.Text(tab.IsPinned ? "Text.Tab.Unpin" : "Text.Tab.Pin"),
+            Glyph = GlyphPin,
+            Invoke = () => tab.TogglePinCommand.Execute(null),
+        });
+
+        entries.Add(ExplorerMenuEntry.Separator);
+        entries.Add(new ExplorerMenuEntry
+        {
+            Text = LocalizationService.Text("Text.Tab.Close"),
+            Glyph = GlyphClose,
+            Invoke = () => tab.CloseSelfCommand.Execute(null),
+        });
+        entries.Add(new ExplorerMenuEntry
+        {
+            Text = LocalizationService.Text("Text.Tab.CloseBelow"),
+            Invoke = () => vm.CloseTabsToRight(tab),
+        });
+        entries.Add(new ExplorerMenuEntry
+        {
+            Text = LocalizationService.Text("Text.Tab.CloseOthers"),
+            Invoke = () => vm.CloseOtherTabs(tab),
+        });
+        entries.Add(new ExplorerMenuEntry
+        {
+            Text = LocalizationService.Text("Text.Tab.MoreActions"),
+            Children = ContextActionCatalog.For(ActionScope.Tab)
+                .Select(action => new ExplorerMenuEntry
+                {
+                    Text = action.Title,
+                    Invoke = () => _ = ExecuteTabContextActionAsync(action, tab),
+                })
+                .ToList(),
+        });
+
+        entries.Add(ExplorerMenuEntry.Separator);
+        entries.Add(new ExplorerMenuEntry
+        {
+            Text = LocalizationService.Text("Text.Tab.Reopen"),
+            Shortcut = "Ctrl+Shift+T",
+            Invoke = () => vm.ReopenClosedTabCommand.Execute(null),
+        });
+        entries.Add(new ExplorerMenuEntry
+        {
+            Text = LocalizationService.Text("Text.Tab.RecentlyClosed"),
+            Children = BuildRecentlyClosedEntries(vm),
+        });
+        return entries;
+    }
+
+    /// <summary>「最近閉じたタブ」サブメニュー。空のときは無効の 1 行を出す（サブメニューごと消すと理由が分からない）。</summary>
+    private static List<ExplorerMenuEntry> BuildRecentlyClosedEntries(MainWindowViewModel vm)
+    {
         var paths = vm.ClosedTabPaths;
         if (paths.Count == 0)
         {
-            recent.Items.Add(new MenuItem { Header = LocalizationService.Text("Text.Menu.NoneItem"), IsEnabled = false });
-            return;
+            return [new ExplorerMenuEntry { Text = LocalizationService.Text("Text.Menu.NoneItem"), IsEnabled = false }];
         }
 
-        foreach (var path in paths)
+        return paths.Select(path => new ExplorerMenuEntry
         {
-            var name = path == FileSystemService.ComputerPath
+            Text = path == FileSystemService.ComputerPath
                 ? "PC"
-                : Path.GetFileName(path.TrimEnd(Path.DirectorySeparatorChar)) is { Length: > 0 } n ? n : path;
-            var captured = path;
-            var item = new MenuItem { Header = name, Icon = new TextBlock { Text = "📁" } };
-            item.Click += (_, _) => vm.ReopenClosedPath(captured);
-            recent.Items.Add(item);
-        }
+                : Path.GetFileName(path.TrimEnd(Path.DirectorySeparatorChar)) is { Length: > 0 } n ? n : path,
+            Glyph = GlyphFolderOpen,
+            Invoke = () => vm.ReopenClosedPath(path),
+        }).ToList();
     }
 
     private async Task ExecuteTabContextActionAsync(ContextAction action, TabViewModel tab)
@@ -1209,14 +1278,6 @@ public partial class MainWindow : Window
             return;
         }
         vm.ExecuteTabManagement(action.Id, tab);
-    }
-
-    private async void TabCopyPath_Click(object? sender, RoutedEventArgs e)
-    {
-        if ((sender as MenuItem)?.DataContext is TabViewModel tab && Clipboard is not null)
-        {
-            await Clipboard.SetTextAsync(tab.CurrentPath == FileSystemService.ComputerPath ? "PC" : tab.CurrentPath);
-        }
     }
 
     private void Minimize_Click(object? sender, RoutedEventArgs e)
@@ -1346,17 +1407,26 @@ public partial class MainWindow : Window
 
             e.Handled = true;
         }
-        else if (e.InitialPressMouseButton == MouseButton.Right && TabUnderPointer(e) is null)
+        else if (e.InitialPressMouseButton == MouseButton.Right && ViewModel is { } vm)
         {
-            // タブバー背景の右クリックメニュー
-            var flyout = new MenuFlyout();
-            var newTab = new MenuItem { Header = LocalizationService.Text("Text.Tab.New"), InputGesture = new KeyGesture(Key.T, KeyModifiers.Control) };
-            newTab.Click += (_, _) => ViewModel?.NewTabCommand.Execute(null);
-            flyout.Items.Add(newTab);
-            var reopen = new MenuItem { Header = LocalizationService.Text("Text.Tab.Reopen"), InputGesture = new KeyGesture(Key.T, KeyModifiers.Control | KeyModifiers.Shift) };
-            reopen.Click += (_, _) => ViewModel?.ReopenClosedTabCommand.Execute(null);
-            flyout.Items.Add(reopen);
-            flyout.ShowAt((Control)sender!, showAtPointer: true);
+            var screen = this.PointToScreen(e.GetPosition(this));
+            if (TabUnderPointer(e) is { } contextTab)
+            {
+                ShowTabContextMenu((Control)sender!, contextTab, vm, screen);
+            }
+            else
+            {
+                // タブバー背景。対象のフォルダーが無いので共通部は出さない
+                var flyout = new MenuFlyout();
+                var newTab = new MenuItem { Header = LocalizationService.Text("Text.Tab.New"), InputGesture = new KeyGesture(Key.T, KeyModifiers.Control) };
+                newTab.Click += (_, _) => vm.NewTabCommand.Execute(null);
+                flyout.Items.Add(newTab);
+                var reopen = new MenuItem { Header = LocalizationService.Text("Text.Tab.Reopen"), InputGesture = new KeyGesture(Key.T, KeyModifiers.Control | KeyModifiers.Shift) };
+                reopen.Click += (_, _) => vm.ReopenClosedTabCommand.Execute(null);
+                flyout.Items.Add(reopen);
+                flyout.ShowAt((Control)sender!, showAtPointer: true);
+            }
+
             e.Handled = true;
         }
 
@@ -1431,38 +1501,6 @@ public partial class MainWindow : Window
     {
         Canvas.SetLeft(TabDragGhost, position.X - 24);
         Canvas.SetTop(TabDragGhost, position.Y - 14);
-    }
-
-    private void TabNewRight_Click(object? sender, RoutedEventArgs e)
-    {
-        if ((sender as MenuItem)?.DataContext is TabViewModel tab)
-        {
-            ViewModel?.NewTabToRight(tab);
-        }
-    }
-
-    private void TabDuplicate_Click(object? sender, RoutedEventArgs e)
-    {
-        if ((sender as MenuItem)?.DataContext is TabViewModel tab)
-        {
-            ViewModel?.DuplicateTab(tab);
-        }
-    }
-
-    private void TabCloseRight_Click(object? sender, RoutedEventArgs e)
-    {
-        if ((sender as MenuItem)?.DataContext is TabViewModel tab)
-        {
-            ViewModel?.CloseTabsToRight(tab);
-        }
-    }
-
-    private void TabCloseOthers_Click(object? sender, RoutedEventArgs e)
-    {
-        if ((sender as MenuItem)?.DataContext is TabViewModel tab)
-        {
-            ViewModel?.CloseOtherTabs(tab);
-        }
     }
 
     // ===== 履歴メニュー（戻る / 進むボタンの右クリック、Chrome 互換） =====
@@ -1613,35 +1651,60 @@ public partial class MainWindow : Window
             return;
         }
 
-        e.Handled = true;
-        var flyout = new MenuFlyout();
-
-        // アドレスバーのクリックでは自動コピーしなくなったため、現在パスのコピーはここが正規の入口。
-        var copy = new MenuItem { Header = LocalizationService.Text("Text.Address.Copy") };
-        copy.Click += async (_, _) =>
+        if (ViewModel is not { } vm)
         {
-            try
-            {
-                await CopyCurrentPathToClipboardAsync(tab);
-            }
-            catch (Exception ex)
-            {
-                // 他プロセスがクリップボードを掴んでいる場合など。async void なので未捕捉のまま落とさない。
-                Logger.LogException("現在パスのクリップボードコピーに失敗しました", ex);
-                tab.StatusText = LocalizationService.Text("Text.Clipboard.CopyFailed");
-            }
-        };
-        flyout.Items.Add(copy);
+            return;
+        }
 
-        var edit = new MenuItem { Header = LocalizationService.Text("Text.Address.Edit"), InputGesture = new KeyGesture(Key.L, KeyModifiers.Control) };
-        edit.Click += (_, _) => FocusPathBox(tab);
-        flyout.Items.Add(edit);
+        e.Handled = true;
+        var screen = this.PointToScreen(e.GetPosition(this));
 
-        flyout.ShowAt(border, showAtPointer: true);
+        // 対象は「今表示しているフォルダー」。「PC」は実体を持たないので共通部を出さない。
+        var target = tab is { IsSettingsTab: false, CurrentPath.Length: > 0 }
+            ? new ContextMenuTarget(ContextMenuSource.AddressBar, [tab.CurrentPath], vm, screen) { AllDirectories = true }
+            : null;
+
+        ShowUnifiedContextMenu(border, target, BuildAddressBarOwnEntries(tab), screen);
     }
 
-    private void TabReopen_Click(object? sender, RoutedEventArgs e)
-        => ViewModel?.ReopenClosedTabCommand.Execute(null);
+    /// <summary>アドレスバー固有の項目（アドレスのコピー / 編集）。</summary>
+    /// <remarks>
+    /// 「アドレスのコピー」は共通部の「パスのコピー」と似ているが同じではない ——
+    /// 共通部は複数選択に備えてエクスプローラー式の引用符付きで書き出すのに対し、
+    /// こちらは現在パスをそのまま入れる（アドレスバーのクリックで自動コピーしなくなって以来、
+    /// ここが「今いる場所を素のまま取る」正規の入口）。
+    /// </remarks>
+    private List<ExplorerMenuEntry> BuildAddressBarOwnEntries(TabViewModel tab)
+        =>
+        [
+            new ExplorerMenuEntry
+            {
+                Text = LocalizationService.Text("Text.Address.Copy"),
+                Glyph = GlyphCopyPath,
+                Invoke = () => _ = CopyCurrentPathSafeAsync(tab),
+            },
+            new ExplorerMenuEntry
+            {
+                Text = LocalizationService.Text("Text.Address.Edit"),
+                Shortcut = "Ctrl+L",
+                Glyph = GlyphRename,
+                Invoke = () => FocusPathBox(tab),
+            },
+        ];
+
+    /// <summary>現在パスのコピー。他プロセスがクリップボードを掴んでいる場合に落とさないよう包んである。</summary>
+    private async Task CopyCurrentPathSafeAsync(TabViewModel tab)
+    {
+        try
+        {
+            await CopyCurrentPathToClipboardAsync(tab);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException("現在パスのクリップボードコピーに失敗しました", ex);
+            tab.StatusText = LocalizationService.Text("Text.Clipboard.CopyFailed");
+        }
+    }
 
     /// <summary>「上へ」ボタンの右クリックで祖先フォルダー一覧を表示する。</summary>
     private static void NavUp_PointerReleased(object? sender, PointerReleasedEventArgs e)
@@ -1906,59 +1969,91 @@ public partial class MainWindow : Window
             return;
         }
 
-        var flyout = new MenuFlyout();
-
-        if (link.IsShellCommand)
+        if (ViewModel is not { } vm)
         {
-            // ごみ箱: 開く / 空にする
-            var openBin = new MenuItem { Header = LocalizationService.Text("Text.Common.Open") };
-            openBin.Click += (_, _) => TrustedProcessLauncher.Start("explorer.exe", [link.Path],
-                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
-            flyout.Items.Add(openBin);
-
-            var empty = new MenuItem { Header = LocalizationService.Text("Text.RecycleBin.Empty") };
-            empty.Click += (_, _) =>
-            {
-                if (TryGetPlatformHandle() is { } h)
-                {
-                    FileOperationService.EmptyRecycleBin(h.Handle);
-                }
-            };
-            flyout.Items.Add(empty);
-
-            flyout.ShowAt(listBox, showAtPointer: true);
-            e.Handled = true;
             return;
         }
 
-        var openNew = new MenuItem { Header = LocalizationService.Text("Text.Common.OpenInNewTab") };
-        openNew.Click += (_, _) => ViewModel?.OpenInNewTab(link.Path);
-        flyout.Items.Add(openNew);
+        e.Handled = true;
+        var screen = this.PointToScreen(e.GetPosition(this));
+
+        // ごみ箱（シェルコマンド）と「PC」は実パスを持たないので共通部を出さない。
+        // それ以外はフォルダーとして、ファイル一覧と同じ共通部を出す。
+        var target = link is { IsShellCommand: false, Path.Length: > 0 }
+            ? new ContextMenuTarget(ContextMenuSource.QuickAccess, [link.Path], vm, screen)
+            {
+                AllDirectories = true,
+                SidebarLink = link,
+                // 既にピン留めされている行にシェルの「クイック アクセスにピン留めする」が並ぶと、
+                // すぐ下の自前の「ピン留めを外す」と噛み合わない（実測で並んだ）
+                ExcludedShellVerbs = link.IsQuickAccess ? ["pintohome"] : [],
+            }
+            : null;
+
+        ShowUnifiedContextMenu(listBox, target, BuildQuickAccessOwnEntries(link, vm), screen);
+    }
+
+    /// <summary>クイックアクセス固有の項目（ごみ箱の操作 / ピン留めの解除）。</summary>
+    private List<ExplorerMenuEntry> BuildQuickAccessOwnEntries(SidebarLink link, MainWindowViewModel vm)
+    {
+        var entries = new List<ExplorerMenuEntry>();
+        if (link.IsShellCommand)
+        {
+            // ごみ箱: 開く / 空にする。実パスではないので共通部は出ておらず、開くもここが唯一の入口。
+            entries.Add(new ExplorerMenuEntry
+            {
+                Text = LocalizationService.Text("Text.Common.Open"),
+                Glyph = GlyphOpen,
+                IsDefault = true,
+                Invoke = () => TrustedProcessLauncher.Start("explorer.exe", [link.Path],
+                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)),
+            });
+            entries.Add(new ExplorerMenuEntry
+            {
+                Text = LocalizationService.Text("Text.RecycleBin.Empty"),
+                Glyph = GlyphDelete,
+                Invoke = () =>
+                {
+                    if (TryGetPlatformHandle() is { } h)
+                    {
+                        FileOperationService.EmptyRecycleBin(h.Handle);
+                    }
+                },
+            });
+            return entries;
+        }
+
+        if (link.Path == FileSystemService.ComputerPath)
+        {
+            // 「PC」はドライブ一覧の仮想パス。開く以外に意味のある操作が無い
+            entries.Add(new ExplorerMenuEntry
+            {
+                Text = LocalizationService.Text("Text.Common.OpenInNewTab"),
+                Glyph = GlyphNewTab,
+                IsDefault = true,
+                Invoke = () => vm.OpenInNewTab(link.Path),
+            });
+            return entries;
+        }
 
         if (link.IsQuickAccess)
         {
-            var unpin = new MenuItem { Header = LocalizationService.Text("Text.Common.UnpinFromQuickAccess") };
-            unpin.Click += (_, _) =>
+            entries.Add(new ExplorerMenuEntry
             {
-                var handle = TryGetPlatformHandle();
-                if (handle is not null && ShellContextMenuService.InvokeVerb(handle.Handle, link.Path, "unpinfromhome"))
+                // グリフ無し。「ピン留めを外す」に当たる字が Segoe MDL2 Assets 側にあるか未確認のため
+                Text = LocalizationService.Text("Text.Common.UnpinFromQuickAccess"),
+                Invoke = () =>
                 {
-                    ViewModel?.RefreshSidebar();
-                }
-            };
-            flyout.Items.Add(unpin);
+                    if (TryGetPlatformHandle() is { } handle
+                        && ShellContextMenuService.InvokeVerb(handle.Handle, link.Path, "unpinfromhome"))
+                    {
+                        vm.RefreshSidebar();
+                    }
+                },
+            });
         }
 
-        if (link.Path != FileSystemService.ComputerPath)
-        {
-            flyout.Items.Add(new Separator());
-            var props = new MenuItem { Header = LocalizationService.Text("Text.Common.Properties") };
-            props.Click += (_, _) => FileOperationService.ShowProperties(link.Path);
-            flyout.Items.Add(props);
-        }
-
-        flyout.ShowAt(listBox, showAtPointer: true);
-        e.Handled = true;
+        return entries;
     }
 
     // ===== 左ペインのお気に入り表示 =====
@@ -2182,78 +2277,42 @@ public partial class MainWindow : Window
         }
 
         e.Handled = true;
+        var screen = this.PointToScreen(e.GetPosition(this));
 
         // 複数選択した中の 1 つを右クリックしたときは、選択全体に効くメニューを出す
         // （選択外の項目を右クリックした場合は、その押下で選択がその項目だけに戻っている）。
         var selection = SelectedBookmarkNodes(tree);
-        if (selection.Count > 1 && selection.Contains(node))
-        {
-            ShowBookmarkSelectionMenu(item, selection, vm);
-            return;
-        }
+        var nodes = selection.Count > 1 && selection.Contains(node) ? selection : [node];
 
-        ShowBookmarkItemMenu(item, node, vm);
-    }
-
-    /// <summary>複数選択したお気に入りの右クリックメニュー。開く / 名前変更は 1 項目にしか
-    /// 意味が無いので、まとめて削除だけを出す。</summary>
-    private void ShowBookmarkSelectionMenu(Control anchor, List<BookmarkNode> nodes, MainWindowViewModel vm)
-    {
-        var flyout = new MenuFlyout();
-        var remove = new MenuItem { Header = LocalizationService.Text("Text.Common.Delete") };
-        remove.Click += (_, _) => _ = DeleteBookmarksAsync(nodes, vm);
-        flyout.Items.Add(remove);
-        flyout.ShowAt(anchor, showAtPointer: true);
-    }
-
-    /// <summary>お気に入り項目の右クリックメニュー（開き方 / 名前変更 / 削除）。</summary>
-    private void ShowBookmarkItemMenu(Control anchor, BookmarkNode node, MainWindowViewModel vm)
-    {
-        var flyout = new MenuFlyout();
-
-        if (node is { IsFolder: false, Path: { } path })
-        {
-            // フォルダーはタブで開く。ファイルは関連付けアプリで開く（タブでは開けないため）。
-            var open = node.IsDirectoryTarget
-                ? new MenuItem { Header = LocalizationService.Text("Text.Common.OpenInNewTab") }
-                : new MenuItem { Header = LocalizationService.Text("Text.Common.Open") };
-            open.Click += async (_, _) =>
+        // 共通部が効くのは実体を指す行だけ。グループ分けフォルダーと「PC」（Path が空文字）は
+        // ファイル操作の対象にならないので、お気に入り固有の項目だけを出す。
+        var paths = nodes.Where(n => n is { IsFolder: false, Path.Length: > 0 }).Select(n => n.Path!).ToList();
+        var target = paths.Count > 0
+            ? new ContextMenuTarget(ContextMenuSource.Bookmarks, paths, vm, screen)
             {
-                // 実体が無ければ削除確認まで一本化する（選択で開いたときと同じ扱い）
-                switch (await ResolveBookmarkTargetKindAsync(path))
-                {
-                    case BookmarkTargetKind.Directory:
-                        vm.OpenInNewTab(path);
-                        break;
-                    case BookmarkTargetKind.File:
-                        OpenBookmarkFile(path);
-                        break;
-                    default:
-                        await ConfirmRemoveMissingBookmarkAsync(node, path, vm);
-                        break;
-                }
-            };
-            flyout.Items.Add(open);
-            flyout.Items.Add(new Separator());
-        }
-
-        var rename = new MenuItem { Header = LocalizationService.Text("Text.Bookmarks.RenameMenu") };
-        rename.Click += async (_, _) =>
-        {
-            var newName = await PromptTextAsync(LocalizationService.Text("Text.Bookmarks.RenameTitle"), node.Name);
-            if (newName is not null)
-            {
-                vm.RenameBookmark(node, newName);
+                // IsDirectoryTarget は最後のアイコン解決時点の値。ここで Directory.Exists を
+                // 呼び直すと切断されたネットワークパスでメニューが固まるので、そのまま信じる
+                // （外れていても「共有」の活性が変わる程度で、実行時はシェル側が正しく弾く）。
+                AllDirectories = nodes.All(n => n.IsDirectoryTarget),
+                BookmarkNodes = nodes,
             }
-        };
-        flyout.Items.Add(rename);
+            : null;
 
-        var remove = new MenuItem { Header = LocalizationService.Text("Text.Common.Delete") };
-        remove.Click += (_, _) => vm.RemoveBookmark(node);
-        flyout.Items.Add(remove);
-
-        flyout.ShowAt(anchor, showAtPointer: true);
+        ShowUnifiedContextMenu(item, target, BuildBookmarkOwnEntries(nodes, vm), screen);
     }
+
+    /// <summary>お気に入り固有の項目（登録の解除）。実体の削除は共通部のアイコン行が持つ。</summary>
+    /// <remarks>
+    /// 共通部の「削除」は実体をごみ箱へ送るので、表示名は「お気に入りから削除」と明確に分ける。
+    /// グリフは付けない —— 「登録解除」に当たる字が Segoe MDL2 Assets 側にあるか未確認で、
+    /// 外すと Windows 10 で豆腐になるため（ツリー固有項目と同じ判断）。
+    /// </remarks>
+    private List<ExplorerMenuEntry> BuildBookmarkOwnEntries(List<BookmarkNode> nodes, MainWindowViewModel vm)
+        => [new ExplorerMenuEntry
+        {
+            Text = LocalizationService.Text("Text.Bookmarks.Remove"),
+            Invoke = () => _ = DeleteBookmarksAsync(nodes, vm),
+        }];
 
     /// <summary>お気に入りペイン背景の右クリック（Chrome 互換: フォルダ追加 / ソート）。</summary>
     private void BookmarkPane_PointerReleased(object? sender, PointerReleasedEventArgs e)
@@ -3431,7 +3490,7 @@ public partial class MainWindow : Window
                 // ドラッグ元は「ファイル一覧 / 左ペイン / ツリー」の 3 経路あるが、
                 // どれもここを通るので塞ぐのはこの 1 か所でよい。
                 // 全部が除外されたら previewEntries が空になり、下でドラッグごと中止される。
-                if (IsDriveRootPath(entry.Path))
+                if (IsDriveRoot(entry.Path))
                 {
                     continue;
                 }
@@ -3477,21 +3536,6 @@ public partial class MainWindow : Window
             ClearFileDropVisual();
             ResetDragSource();
         }
-    }
-
-    /// <summary>
-    /// ドライブ直下（<c>C:\</c>）やネットワーク共有のルート（<c>\\server\share</c>）かどうか。
-    /// エクスプローラー同様、これらは移動・コピーの対象にしないための判定。
-    /// </summary>
-    private static bool IsDriveRootPath(string path)
-    {
-        if (string.IsNullOrEmpty(path))
-        {
-            return false;
-        }
-
-        var root = Path.GetPathRoot(path);
-        return !string.IsNullOrEmpty(root) && WindowsPathIdentity.Instance.Equals(root, path);
     }
 
     /// <summary>同じパスの重複を取り除く（Windows のパスは大文字小文字を区別しない）。</summary>
@@ -4752,6 +4796,7 @@ public partial class MainWindow : Window
         var invoked = ShellContextMenuService.Show(handle.Handle, paths, screen.X, screen.Y,
             BuildOpenInTabsItem(paths),
             BuildPinInTabsItem(paths),
+            BuildOpenInTerminalItem(tab, paths),
             BuildOpenInExplorerItem(tab, paths));
         if (invoked)
         {
@@ -4794,6 +4839,34 @@ public partial class MainWindow : Window
             LocalizationService.Text("Text.Tab.PinInTabs", targets.Count),
             () => vm.PinFolderTabs(targets),
             ShellContextMenuService.StockIconFolder);
+    }
+
+    /// <summary>
+    /// フォルダーを右クリックしたときだけ足す「ターミナルで開く」項目。
+    /// 設定「ターミナルを管理者として開く」を効かせるため Kiriha 側で用意し、同じ機能の
+    /// Windows Terminal のシェル拡張は ReplacesShellVerbs で落とす（自前描画のメニューと同じ扱い）。
+    /// </summary>
+    private static ShellMenuExtraItem? BuildOpenInTerminalItem(TabViewModel tab, IReadOnlyList<string> paths)
+    {
+        if (paths.Count == 0 || !paths.All(Directory.Exists))
+        {
+            return null;
+        }
+
+        var targets = paths.ToList();
+        return new ShellMenuExtraItem(
+            tab.OpenTerminalText,
+            () =>
+            {
+                foreach (var path in targets)
+                {
+                    tab.OpenTerminalAt(path);
+                }
+            },
+            ShellContextMenuService.StockIconFolder)
+        {
+            ReplacesShellVerbs = WindowsTerminalVerbs,
+        };
     }
 
     /// <summary>

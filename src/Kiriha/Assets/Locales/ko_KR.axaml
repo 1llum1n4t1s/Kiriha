@@ -13,8 +13,7 @@
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">여기로 폴더를 끌어다 놓으면 즐겨찾기에 추가됩니다</x:String>
   <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">연결 대상을 찾을 수 없음</x:String>
   <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">이 즐겨찾기의 대상 &quot;{0}&quot;이(가) 변경되었거나 이동 또는 삭제되었습니다. 이 즐겨찾기를 삭제할까요?</x:String>
-  <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">이름 바꾸기...</x:String>
-  <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">즐겨찾기 이름 바꾸기</x:String>
+  <x:String x:Key="Text.Bookmarks.Remove" xml:space="preserve">즐겨찾기에서 제거</x:String>
   <x:String x:Key="Text.Bookmarks.SortByName" xml:space="preserve">이름순 정렬</x:String>
   <x:String x:Key="Text.Bookmarks.SortByPath" xml:space="preserve">경로순 정렬</x:String>
   <x:String x:Key="Text.Caption.MaximizeRestore" xml:space="preserve">최대화 또는 이전 크기로</x:String>
@@ -63,6 +62,7 @@
   <x:String x:Key="Text.Common.OpenInExplorer" xml:space="preserve">파일 탐색기에서 열기</x:String>
   <x:String x:Key="Text.Common.OpenInNewTab" xml:space="preserve">새 탭에서 열기</x:String>
   <x:String x:Key="Text.Common.OpenInTerminal" xml:space="preserve">터미널에서 열기</x:String>
+  <x:String x:Key="Text.Common.OpenInTerminalAsAdmin" xml:space="preserve">관리자 권한으로 터미널에서 열기</x:String>
   <x:String x:Key="Text.Common.PinToQuickAccess" xml:space="preserve">즐겨찾기에 고정</x:String>
   <x:String x:Key="Text.Common.Properties" xml:space="preserve">속성</x:String>
   <x:String x:Key="Text.Common.UnpinFromQuickAccess" xml:space="preserve">즐겨찾기에서 고정 해제</x:String>
@@ -302,6 +302,9 @@
   <x:String x:Key="Text.Settings.Startup.PathCaption" xml:space="preserve">새 탭에서 열 폴더(비워 두면 사용자 폴더)</x:String>
   <x:String x:Key="Text.Settings.Startup.RestoreTabs" xml:space="preserve">종료할 때 열려 있던 탭을 다음에 복원</x:String>
   <x:String x:Key="Text.Settings.Startup.Subtitle" xml:space="preserve">시작 방법, Windows 통합, 알림 영역을 관리합니다</x:String>
+  <x:String x:Key="Text.Settings.Terminal" xml:space="preserve">터미널</x:String>
+  <x:String x:Key="Text.Settings.Terminal.AsAdmin" xml:space="preserve">터미널을 관리자 권한으로 열기</x:String>
+  <x:String x:Key="Text.Settings.Terminal.Note" xml:space="preserve">Kiriha 자체는 관리자 권한으로 실행되지 않습니다. 여는 터미널만 권한이 상승되므로 열 때마다 Windows의 사용자 계정 컨트롤 확인 창이 표시됩니다.</x:String>
   <x:String x:Key="Text.Settings.Theme" xml:space="preserve">테마</x:String>
   <x:String x:Key="Text.Settings.Theme.Dark" xml:space="preserve">어둡게</x:String>
   <x:String x:Key="Text.Settings.Theme.Light" xml:space="preserve">밝게</x:String>

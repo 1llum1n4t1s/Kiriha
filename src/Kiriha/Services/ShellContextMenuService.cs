@@ -10,7 +10,14 @@ namespace Kiriha.Services;
 /// <param name="Text">メニューに出す表示名（ローカライズ済みの文字列）。</param>
 /// <param name="Invoke">選択されたときに実行する処理。</param>
 /// <param name="StockIconId">項目の左に出すシェル標準アイコン（SIID_*）。</param>
-internal sealed record ShellMenuExtraItem(string Text, Action Invoke, uint StockIconId);
+internal sealed record ShellMenuExtraItem(string Text, Action Invoke, uint StockIconId)
+{
+    /// <summary>
+    /// この項目が肩代わりするシェル verb。同じ機能が 2 行並ばないよう、メニューから取り除く。
+    /// 判定は表示名ではなく正規 verb 名で行う（表示名は Windows の UI 言語で変わる）。
+    /// </summary>
+    public IReadOnlyCollection<string> ReplacesShellVerbs { get; init; } = [];
+}
 
 /// <summary>
 /// Windows 標準のシェルコンテキストメニュー（IContextMenu）を表示する。
@@ -440,8 +447,9 @@ internal static partial class ShellContextMenuService
                     LogLevel.Warning);
             }
 
-            // Kiriha 自身の中で「Kiriha で開く」は無意味なので取り除く（エクスプローラー側には残る）
-            RemoveOwnVerbItems(menu, hmenu);
+            // Kiriha 自身の中で「Kiriha で開く」は無意味なので取り除く（エクスプローラー側には残る）。
+            // 自前項目が肩代わりするシェル verb（ターミナルで開く 等）も同時に落とす。
+            RemoveOwnVerbItems(menu, hmenu, extraItems);
 
             // アプリ独自の項目（「新しいタブで開く」「エクスプローラーで開く」等）はシェル項目の後ろへ足す。
             // シェル拡張の項目を押しのけないよう、必ず QueryContextMenu の後に追加する。
@@ -535,12 +543,22 @@ internal static partial class ShellContextMenuService
     /// 自分の中で自分を開き直す項目は意味が無いため。判定は表示名ではなく正規 verb 名で行う
     /// （表示名は 17 言語で変わるが、verb 名はレジストリのキー名で固定）。
     /// </summary>
-    private static void RemoveOwnVerbItems(IContextMenu menu, nint hmenu)
+    private static void RemoveOwnVerbItems(
+        IContextMenu menu, nint hmenu, IReadOnlyList<ShellMenuExtraItem> extraItems)
     {
+        var removable = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            WindowsIntegrationService.ContextMenuVerb,
+        };
+        foreach (var item in extraItems)
+        {
+            removable.UnionWith(item.ReplacesShellVerbs);
+        }
+
         for (var i = GetMenuItemCount(hmenu) - 1; i >= 0; i--)
         {
             var id = GetMenuItemID(hmenu, i);
-            if (id > 0 && IsVerb(menu, id, WindowsIntegrationService.ContextMenuVerb))
+            if (id > 0 && TryGetVerb(menu, id) is { Length: > 0 } verb && removable.Contains(verb))
             {
                 DeleteMenu(hmenu, (uint)i, MfByPosition);
             }
@@ -628,6 +646,10 @@ internal static partial class ShellContextMenuService
 
     /// <summary>メニュー項目 cmd の正規 verb 名が指定の名前と一致するかを調べる。</summary>
     private static bool IsVerb(IContextMenu menu, int cmd, string verb)
+        => string.Equals(TryGetVerb(menu, cmd), verb, StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>メニュー項目 cmd の正規 verb 名。取得できなければ null（シェル拡張は大半が null）。</summary>
+    private static string? TryGetVerb(IContextMenu menu, int cmd)
     {
         unsafe
         {
@@ -635,10 +657,10 @@ internal static partial class ShellContextMenuService
             var buffer = stackalloc char[260];
             if (menu.GetCommandString((nuint)(cmd - 1), GcsVerbW, 0, (nint)buffer, 260) < 0)
             {
-                return false;
+                return null;
             }
 
-            return string.Equals(new string(buffer), verb, StringComparison.OrdinalIgnoreCase);
+            return new string(buffer);
         }
     }
 

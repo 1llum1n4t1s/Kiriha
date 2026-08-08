@@ -13,8 +13,7 @@
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">Перетащите сюда папку, чтобы добавить её в закладки</x:String>
   <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">Целевой объект не найден</x:String>
   <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">Объект этой закладки «{0}» был изменён, перемещён или удалён. Удалить эту закладку?</x:String>
-  <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">Переименовать...</x:String>
-  <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">Переименовать закладку</x:String>
+  <x:String x:Key="Text.Bookmarks.Remove" xml:space="preserve">Удалить из избранного</x:String>
   <x:String x:Key="Text.Bookmarks.SortByName" xml:space="preserve">Сортировать по имени</x:String>
   <x:String x:Key="Text.Bookmarks.SortByPath" xml:space="preserve">Сортировать по пути</x:String>
   <x:String x:Key="Text.Caption.MaximizeRestore" xml:space="preserve">Развернуть или восстановить</x:String>
@@ -63,6 +62,7 @@
   <x:String x:Key="Text.Common.OpenInExplorer" xml:space="preserve">Открыть в Проводнике</x:String>
   <x:String x:Key="Text.Common.OpenInNewTab" xml:space="preserve">Открыть в новой вкладке</x:String>
   <x:String x:Key="Text.Common.OpenInTerminal" xml:space="preserve">Открыть в Терминале</x:String>
+  <x:String x:Key="Text.Common.OpenInTerminalAsAdmin" xml:space="preserve">Открыть в Терминале от имени администратора</x:String>
   <x:String x:Key="Text.Common.PinToQuickAccess" xml:space="preserve">Закрепить в Быстром доступе</x:String>
   <x:String x:Key="Text.Common.Properties" xml:space="preserve">Свойства</x:String>
   <x:String x:Key="Text.Common.UnpinFromQuickAccess" xml:space="preserve">Открепить из Быстрого доступа</x:String>
@@ -302,6 +302,9 @@
   <x:String x:Key="Text.Settings.Startup.PathCaption" xml:space="preserve">Папка, открываемая в новых вкладках (оставьте пустым для папки пользователя)</x:String>
   <x:String x:Key="Text.Settings.Startup.RestoreTabs" xml:space="preserve">Восстанавливать вкладки, открытые при закрытии</x:String>
   <x:String x:Key="Text.Settings.Startup.Subtitle" xml:space="preserve">Управляйте запуском, интеграцией с Windows и областью уведомлений</x:String>
+  <x:String x:Key="Text.Settings.Terminal" xml:space="preserve">Терминал</x:String>
+  <x:String x:Key="Text.Settings.Terminal.AsAdmin" xml:space="preserve">Открывать Терминал от имени администратора</x:String>
+  <x:String x:Key="Text.Settings.Terminal.Note" xml:space="preserve">Сам Kiriha не запускается от имени администратора. Права повышаются только у открываемого терминала, поэтому Windows каждый раз показывает запрос контроля учётных записей.</x:String>
   <x:String x:Key="Text.Settings.Theme" xml:space="preserve">Тема</x:String>
   <x:String x:Key="Text.Settings.Theme.Dark" xml:space="preserve">Тёмная</x:String>
   <x:String x:Key="Text.Settings.Theme.Light" xml:space="preserve">Светлая</x:String>

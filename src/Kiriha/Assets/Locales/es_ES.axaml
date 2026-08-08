@@ -13,8 +13,7 @@
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">Arrastra aquí una carpeta para añadirla a marcadores</x:String>
   <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">No se encuentra el destino</x:String>
   <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">El destino de este marcador, «{0}», se ha cambiado, movido o eliminado. ¿Quieres eliminar este marcador?</x:String>
-  <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">Cambiar nombre...</x:String>
-  <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">Cambiar el nombre del marcador</x:String>
+  <x:String x:Key="Text.Bookmarks.Remove" xml:space="preserve">Quitar de favoritos</x:String>
   <x:String x:Key="Text.Bookmarks.SortByName" xml:space="preserve">Ordenar por nombre</x:String>
   <x:String x:Key="Text.Bookmarks.SortByPath" xml:space="preserve">Ordenar por ruta</x:String>
   <x:String x:Key="Text.Caption.MaximizeRestore" xml:space="preserve">Maximizar o restaurar</x:String>
@@ -63,6 +62,7 @@
   <x:String x:Key="Text.Common.OpenInExplorer" xml:space="preserve">Abrir en el Explorador</x:String>
   <x:String x:Key="Text.Common.OpenInNewTab" xml:space="preserve">Abrir en una pestaña nueva</x:String>
   <x:String x:Key="Text.Common.OpenInTerminal" xml:space="preserve">Abrir en el Terminal</x:String>
+  <x:String x:Key="Text.Common.OpenInTerminalAsAdmin" xml:space="preserve">Abrir en el Terminal como administrador</x:String>
   <x:String x:Key="Text.Common.PinToQuickAccess" xml:space="preserve">Anclar al Acceso rápido</x:String>
   <x:String x:Key="Text.Common.Properties" xml:space="preserve">Propiedades</x:String>
   <x:String x:Key="Text.Common.UnpinFromQuickAccess" xml:space="preserve">Desanclar del Acceso rápido</x:String>
@@ -302,6 +302,9 @@
   <x:String x:Key="Text.Settings.Startup.PathCaption" xml:space="preserve">Carpeta que se abre en las pestañas nuevas (déjalo vacío para tu carpeta de usuario)</x:String>
   <x:String x:Key="Text.Settings.Startup.RestoreTabs" xml:space="preserve">Restaurar las pestañas que estaban abiertas al cerrar</x:String>
   <x:String x:Key="Text.Settings.Startup.Subtitle" xml:space="preserve">Gestiona el inicio, la integración con Windows y el área de notificación</x:String>
+  <x:String x:Key="Text.Settings.Terminal" xml:space="preserve">Terminal</x:String>
+  <x:String x:Key="Text.Settings.Terminal.AsAdmin" xml:space="preserve">Abrir el Terminal como administrador</x:String>
+  <x:String x:Key="Text.Settings.Terminal.Note" xml:space="preserve">Kiriha no se ejecuta como administrador. Solo se eleva el terminal que se abre, por lo que Windows muestra el aviso de Control de cuentas de usuario cada vez.</x:String>
   <x:String x:Key="Text.Settings.Theme" xml:space="preserve">Tema</x:String>
   <x:String x:Key="Text.Settings.Theme.Dark" xml:space="preserve">Oscuro</x:String>
   <x:String x:Key="Text.Settings.Theme.Light" xml:space="preserve">Claro</x:String>

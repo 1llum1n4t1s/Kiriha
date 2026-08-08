@@ -191,6 +191,16 @@
                                             </StackPanel>
                                         </HeaderedContentControl>
 
+                                        <HeaderedContentControl Classes="settingscard" Header="{DynamicResource Text.Settings.Terminal}">
+                                            <StackPanel Classes="settingsfields">
+                                                <CheckBox Content="{DynamicResource Text.Settings.Terminal.AsAdmin}"
+                                                          IsChecked="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OptRunTerminalAsAdmin}" />
+                                                <TextBlock Classes="settingscaption" Margin="0,6,0,0"
+                                                           TextWrapping="Wrap"
+                                                           Text="{DynamicResource Text.Settings.Terminal.Note}" />
+                                            </StackPanel>
+                                        </HeaderedContentControl>
+
                                         <HeaderedContentControl Classes="settingscard" Header="{DynamicResource Text.Settings.Theme}">
                                             <StackPanel Spacing="12">
                                                 <!-- 表示はロケール文字列、内部値（settings.json / ApplyTheme の switch）は英語のまま。

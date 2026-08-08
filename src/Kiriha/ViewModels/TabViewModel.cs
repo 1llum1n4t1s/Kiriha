@@ -2609,12 +2609,15 @@ public partial class TabViewModel : ObservableObject
         _options.Changed += OnOptionsChanged;
         ClipboardFileService.CutStateChanged += OnCutStateChanged;
 
+        // 通常タブもタイトル以外に言語依存の表示名（OpenTerminalText）を持つので購読する。
+        // 解除は Detach が無条件に行う（ドロップ仮タブも含め、破棄時に必ず通る）。
+        LocalizationService.Changed += OnLocalizationChanged;
+
         if (isSettingsTab)
         {
             // 設定タブのタイトルだけは固定文言なので、言語切り替え時に付け直す
             // （通常タブのタイトルはフォルダー名で、言語に依存しない）。
             ApplySettingsTabTitle();
-            LocalizationService.Changed += OnLocalizationChanged;
         }
         else if (isDropPreview)
         {
@@ -2700,7 +2703,15 @@ public partial class TabViewModel : ObservableObject
         PathText = Title;
     }
 
-    private void OnLocalizationChanged(object? sender, EventArgs e) => ApplySettingsTabTitle();
+    private void OnLocalizationChanged(object? sender, EventArgs e)
+    {
+        if (IsSettingsTab)
+        {
+            ApplySettingsTabTitle();
+        }
+
+        OnPropertyChanged(nameof(OpenTerminalText));
+    }
 
     private void OnCutStateChanged(object? sender, EventArgs e)
     {
@@ -2878,6 +2889,7 @@ public partial class TabViewModel : ObservableObject
         GoBackCommand.NotifyCanExecuteChanged();
         GoForwardCommand.NotifyCanExecuteChanged();
         PasteCommand.NotifyCanExecuteChanged();
+        OpenTerminalCommand.NotifyCanExecuteChanged();
         OnPropertyChanged(nameof(CanCreateNew));
 
         if (preserveSelection is not null)
@@ -3984,7 +3996,11 @@ public partial class TabViewModel : ObservableObject
     }
 
     /// <summary>名前の変更を確定する（View のダイアログから呼ばれる）。バリデーション付き。</summary>
-    public async Task CommitRenameAsync(FileSystemEntry entry, string newName)
+    /// <returns>
+    /// 実際に改名できたときは新しいパス、そうでなければ null。
+    /// 呼び出し側はこれを見てお気に入りのパスを追従させる（お気に入りは名前を持たず実体名を出すため）。
+    /// </returns>
+    public async Task<string?> CommitRenameAsync(FileSystemEntry entry, string newName)
     {
         // OK でダイアログを閉じた時点で新規作成の保留状態は終了する。
         // 入力不備で改名できなかった場合も、後の通常リネームのキャンセルで削除されないようにする。
@@ -3993,19 +4009,19 @@ public partial class TabViewModel : ObservableObject
         newName = newName.Trim();
         if (newName.Length == 0 || newName == entry.Name)
         {
-            return;
+            return null;
         }
 
         if (newName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
         {
             StatusText = LocalizationService.Text("Text.Rename.InvalidChars");
-            return;
+            return null;
         }
 
         var dir = Path.GetDirectoryName(entry.FullPath);
         if (dir is null)
         {
-            return;
+            return null;
         }
 
         var newPath = Path.Combine(dir, newName);
@@ -4013,7 +4029,7 @@ public partial class TabViewModel : ObservableObject
         if (!isCaseOnlyRename && (File.Exists(newPath) || Directory.Exists(newPath)))
         {
             StatusText = LocalizationService.Text("Text.Rename.AlreadyExists", newName);
-            return;
+            return null;
         }
 
         if (isCaseOnlyRename)
@@ -4027,7 +4043,7 @@ public partial class TabViewModel : ObservableObject
             if (!first.IsSuccess)
             {
                 if (!first.IsCancelled) StatusText = LocalizationService.Text("Text.Op.RenameFailed", FormatOpError(first.NativeErrorCode));
-                return;
+                return null;
             }
 
             // 一時名への改名は既に成功しているため、ここで失敗したら一時名のまま残ってしまう。必ず元へ戻す。
@@ -4039,7 +4055,7 @@ public partial class TabViewModel : ObservableObject
                     ? LocalizationService.Text("Text.Rename.RevertedToOriginal")
                     : LocalizationService.Text("Text.Rename.StuckAsTemporary", Path.GetFileName(temporary));
                 await NavigateToAsync(CurrentPath, record: false);
-                return;
+                return null;
             }
         }
         else
@@ -4048,7 +4064,7 @@ public partial class TabViewModel : ObservableObject
             if (!result.IsSuccess)
             {
                 if (!result.IsCancelled) StatusText = LocalizationService.Text("Text.Op.RenameFailed", FormatOpError(result.NativeErrorCode));
-                return;
+                return null;
             }
         }
         await NavigateToAsync(CurrentPath, record: false);
@@ -4059,6 +4075,8 @@ public partial class TabViewModel : ObservableObject
         {
             SelectedEntry = renamed;
         }
+
+        return newPath;
     }
 
     [RelayCommand]
@@ -4206,29 +4224,30 @@ public partial class TabViewModel : ObservableObject
         }
     }
 
-    /// <summary>ターミナル（Windows Terminal、無ければ cmd）を現在のフォルダーで開く。</summary>
-    [RelayCommand]
-    private void OpenTerminal()
-    {
-        if (CurrentPath == FileSystemService.ComputerPath)
-        {
-            return;
-        }
+    /// <summary>「PC」と設定タブにはカレントディレクトリが無いのでターミナルを開けない。</summary>
+    public bool CanOpenTerminal => !IsSettingsTab && !IsComputerRoot && CurrentPath.Length > 0;
 
-        try
+    /// <summary>
+    /// ターミナルを開くコマンドの表示名。設定「ターミナルを管理者として開く」が ON なら
+    /// 昇格することが分かる文言に差し替える（UAC が出る操作なので、押す前に見えている必要がある）。
+    /// </summary>
+    public string OpenTerminalText => LocalizationService.Text(
+        TerminalLauncher.RunAsAdmin ? "Text.Common.OpenInTerminalAsAdmin" : "Text.Common.OpenInTerminal");
+
+    /// <summary>設定「ターミナルを管理者として開く」が切り替わったときに表示名を取り直す。</summary>
+    public void NotifyTerminalOptionChanged() => OnPropertyChanged(nameof(OpenTerminalText));
+
+    /// <summary>ターミナル（Windows Terminal、無ければ cmd）を現在のフォルダーで開く。</summary>
+    [RelayCommand(CanExecute = nameof(CanOpenTerminal))]
+    private void OpenTerminal() => OpenTerminalAt(CurrentPath);
+
+    /// <summary>指定フォルダーをターミナルで開く。
+    /// コンテキストメニューの「ターミナルで開く」も、選択したフォルダーを渡してここを通る。</summary>
+    public void OpenTerminalAt(string path)
+    {
+        if (TerminalLauncher.TryOpen(path) is { } error)
         {
-            TrustedProcessLauncher.Start("wt.exe", ["-d", CurrentPath], CurrentPath);
-        }
-        catch
-        {
-            try
-            {
-                TrustedProcessLauncher.Start("cmd.exe", [], CurrentPath);
-            }
-            catch (Exception ex)
-            {
-                StatusText = LocalizationService.Text("Text.Launch.TerminalFailed", ex.Message);
-            }
+            StatusText = LocalizationService.Text("Text.Launch.TerminalFailed", error);
         }
     }
 

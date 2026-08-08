@@ -13,8 +13,7 @@
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">चिह्नेषु योजयितुम् अत्र सञ्चिकाकोष्ठम् आकर्षय</x:String>
   <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">लक्ष्यं न प्राप्तम्</x:String>
   <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">अस्य रुचिचिह्नस्य लक्ष्यं &quot;{0}&quot; परिवर्तितं चालितं वा लोपितम् अस्ति। इदं रुचिचिह्नं लोपयितुम् इच्छसि वा?</x:String>
-  <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">नाम परिवर्तय...</x:String>
-  <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">चिह्नस्य नाम परिवर्तय</x:String>
+  <x:String x:Key="Text.Bookmarks.Remove" xml:space="preserve">प्रियेभ्यः अपसारय</x:String>
   <x:String x:Key="Text.Bookmarks.SortByName" xml:space="preserve">नाम्ना क्रमय</x:String>
   <x:String x:Key="Text.Bookmarks.SortByPath" xml:space="preserve">मार्गेण क्रमय</x:String>
   <x:String x:Key="Text.Caption.MaximizeRestore" xml:space="preserve">विस्तारय वा पुनःस्थापय</x:String>
@@ -63,6 +62,7 @@
   <x:String x:Key="Text.Common.OpenInExplorer" xml:space="preserve">सञ्चिकादर्शके उद्घाटय</x:String>
   <x:String x:Key="Text.Common.OpenInNewTab" xml:space="preserve">नवीने पत्रे उद्घाटय</x:String>
   <x:String x:Key="Text.Common.OpenInTerminal" xml:space="preserve">आदेशपटले उद्घाटय</x:String>
+  <x:String x:Key="Text.Common.OpenInTerminalAsAdmin" xml:space="preserve">प्रशासकरूपेण आदेशपटले उद्घाटय</x:String>
   <x:String x:Key="Text.Common.PinToQuickAccess" xml:space="preserve">शीघ्रप्रवेशे स्थापय</x:String>
   <x:String x:Key="Text.Common.Properties" xml:space="preserve">गुणधर्माः</x:String>
   <x:String x:Key="Text.Common.UnpinFromQuickAccess" xml:space="preserve">शीघ्रप्रवेशात् अपनय</x:String>
@@ -302,6 +302,9 @@
   <x:String x:Key="Text.Settings.Startup.PathCaption" xml:space="preserve">नवीनपत्रेषु उद्घाट्यमानं कोष्ठम् (रिक्ते सति प्रयोक्तुः कोष्ठम्)</x:String>
   <x:String x:Key="Text.Settings.Startup.RestoreTabs" xml:space="preserve">पिधाने उद्घाटितानि पत्राणि अग्रिमवारं पुनःस्थापय</x:String>
   <x:String x:Key="Text.Settings.Startup.Subtitle" xml:space="preserve">आरम्भविधिम्, Windows संयोगम्, सूचनाक्षेत्रं च परिपालय</x:String>
+  <x:String x:Key="Text.Settings.Terminal" xml:space="preserve">आदेशपटलम्</x:String>
+  <x:String x:Key="Text.Settings.Terminal.AsAdmin" xml:space="preserve">आदेशपटलं प्रशासकरूपेण उद्घाटय</x:String>
+  <x:String x:Key="Text.Settings.Terminal.Note" xml:space="preserve">Kiriha स्वयं प्रशासकरूपेण न चलति। केवलम् उद्घाट्यमानम् आदेशपटलम् एव अधिकारं प्राप्नोति, अतः प्रतिवारं Windows-तः पुष्टिपटलम् (UAC) प्रदर्श्यते।</x:String>
   <x:String x:Key="Text.Settings.Theme" xml:space="preserve">वर्णविन्यासः</x:String>
   <x:String x:Key="Text.Settings.Theme.Dark" xml:space="preserve">तमः</x:String>
   <x:String x:Key="Text.Settings.Theme.Light" xml:space="preserve">प्रकाशः</x:String>

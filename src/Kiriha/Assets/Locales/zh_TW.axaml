@@ -13,8 +13,7 @@
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">將資料夾拖曳到這裡即可加入書籤</x:String>
   <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">找不到連結目標</x:String>
   <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">此我的最愛的目標「{0}」已變更、移動或刪除。要刪除此我的最愛嗎？</x:String>
-  <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">重新命名...</x:String>
-  <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">重新命名書籤</x:String>
+  <x:String x:Key="Text.Bookmarks.Remove" xml:space="preserve">從我的最愛移除</x:String>
   <x:String x:Key="Text.Bookmarks.SortByName" xml:space="preserve">依名稱排序</x:String>
   <x:String x:Key="Text.Bookmarks.SortByPath" xml:space="preserve">依路徑排序</x:String>
   <x:String x:Key="Text.Caption.MaximizeRestore" xml:space="preserve">最大化或還原</x:String>
@@ -63,6 +62,7 @@
   <x:String x:Key="Text.Common.OpenInExplorer" xml:space="preserve">在檔案總管中開啟</x:String>
   <x:String x:Key="Text.Common.OpenInNewTab" xml:space="preserve">在新分頁中開啟</x:String>
   <x:String x:Key="Text.Common.OpenInTerminal" xml:space="preserve">在終端機中開啟</x:String>
+  <x:String x:Key="Text.Common.OpenInTerminalAsAdmin" xml:space="preserve">以系統管理員身分在終端機中開啟</x:String>
   <x:String x:Key="Text.Common.PinToQuickAccess" xml:space="preserve">釘選到快速存取</x:String>
   <x:String x:Key="Text.Common.Properties" xml:space="preserve">內容</x:String>
   <x:String x:Key="Text.Common.UnpinFromQuickAccess" xml:space="preserve">從快速存取取消釘選</x:String>
@@ -302,6 +302,9 @@
   <x:String x:Key="Text.Settings.Startup.PathCaption" xml:space="preserve">新分頁要開啟的資料夾（留白則使用您的使用者資料夾）</x:String>
   <x:String x:Key="Text.Settings.Startup.RestoreTabs" xml:space="preserve">下次啟動時還原關閉前開啟的分頁</x:String>
   <x:String x:Key="Text.Settings.Startup.Subtitle" xml:space="preserve">管理啟動方式、Windows 整合與通知區域</x:String>
+  <x:String x:Key="Text.Settings.Terminal" xml:space="preserve">終端機</x:String>
+  <x:String x:Key="Text.Settings.Terminal.AsAdmin" xml:space="preserve">以系統管理員身分開啟終端機</x:String>
+  <x:String x:Key="Text.Settings.Terminal.Note" xml:space="preserve">Kiriha 本身不會以系統管理員身分執行，只有開啟的終端機會提升權限，因此每次開啟時 Windows 都會顯示使用者帳戶控制（UAC）確認。</x:String>
   <x:String x:Key="Text.Settings.Theme" xml:space="preserve">佈景主題</x:String>
   <x:String x:Key="Text.Settings.Theme.Dark" xml:space="preserve">深色</x:String>
   <x:String x:Key="Text.Settings.Theme.Light" xml:space="preserve">淺色</x:String>

@@ -13,8 +13,7 @@
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">Plicam huc trahe ut inter notas addatur</x:String>
   <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">Meta nexus non inventa</x:String>
   <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">Meta huius delicii, &quot;{0}&quot;, mutata, mota aut deleta est. Visne hoc delicium delere?</x:String>
-  <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">Nomen mutare...</x:String>
-  <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">Nomen notae mutare</x:String>
+  <x:String x:Key="Text.Bookmarks.Remove" xml:space="preserve">E gratis removere</x:String>
   <x:String x:Key="Text.Bookmarks.SortByName" xml:space="preserve">Secundum nomen ordinare</x:String>
   <x:String x:Key="Text.Bookmarks.SortByPath" xml:space="preserve">Secundum semitam ordinare</x:String>
   <x:String x:Key="Text.Caption.MaximizeRestore" xml:space="preserve">Amplificare vel restituere</x:String>
@@ -63,6 +62,7 @@
   <x:String x:Key="Text.Common.OpenInExplorer" xml:space="preserve">In Explorer aperire</x:String>
   <x:String x:Key="Text.Common.OpenInNewTab" xml:space="preserve">In nova scheda aperire</x:String>
   <x:String x:Key="Text.Common.OpenInTerminal" xml:space="preserve">In terminali aperire</x:String>
+  <x:String x:Key="Text.Common.OpenInTerminalAsAdmin" xml:space="preserve">In terminali ut administrator aperire</x:String>
   <x:String x:Key="Text.Common.PinToQuickAccess" xml:space="preserve">Ad aditum celerem affigere</x:String>
   <x:String x:Key="Text.Common.Properties" xml:space="preserve">Proprietates</x:String>
   <x:String x:Key="Text.Common.UnpinFromQuickAccess" xml:space="preserve">Ab aditu celeri removere</x:String>
@@ -302,6 +302,9 @@
   <x:String x:Key="Text.Settings.Startup.PathCaption" xml:space="preserve">Plica in schedis novis aperienda (vacuum relinque pro plica usuarii)</x:String>
   <x:String x:Key="Text.Settings.Startup.RestoreTabs" xml:space="preserve">Schedas in clausura apertas proxime restituere</x:String>
   <x:String x:Key="Text.Settings.Startup.Subtitle" xml:space="preserve">Initium, integrationem Windows et aream nuntiorum administrare</x:String>
+  <x:String x:Key="Text.Settings.Terminal" xml:space="preserve">Terminale</x:String>
+  <x:String x:Key="Text.Settings.Terminal.AsAdmin" xml:space="preserve">Terminale ut administrator aperire</x:String>
+  <x:String x:Key="Text.Settings.Terminal.Note" xml:space="preserve">Kiriha ipsum ut administrator non agit. Solum terminale apertum potestatem accipit, ideo Windows singulis vicibus confirmationem (UAC) monstrat.</x:String>
   <x:String x:Key="Text.Settings.Theme" xml:space="preserve">Thema</x:String>
   <x:String x:Key="Text.Settings.Theme.Dark" xml:space="preserve">Obscurum</x:String>
   <x:String x:Key="Text.Settings.Theme.Light" xml:space="preserve">Clarum</x:String>

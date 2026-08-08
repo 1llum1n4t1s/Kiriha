@@ -13,8 +13,7 @@
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">புத்தகக்குறிகளில் சேர்க்க இங்கே ஒரு கோப்புறையை இழுத்து விடுங்கள்</x:String>
   <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">இணைப்பு இலக்கு கிடைக்கவில்லை</x:String>
   <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">இந்த புத்தகக்குறியின் இலக்கு &quot;{0}&quot; மாற்றப்பட்டது, நகர்த்தப்பட்டது அல்லது நீக்கப்பட்டது. இந்த புத்தகக்குறியை நீக்கவா?</x:String>
-  <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">பெயர் மாற்று...</x:String>
-  <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">புத்தகக்குறியின் பெயரை மாற்று</x:String>
+  <x:String x:Key="Text.Bookmarks.Remove" xml:space="preserve">பிடித்தவைகளிலிருந்து அகற்று</x:String>
   <x:String x:Key="Text.Bookmarks.SortByName" xml:space="preserve">பெயர் வரிசையில் அடுக்கு</x:String>
   <x:String x:Key="Text.Bookmarks.SortByPath" xml:space="preserve">பாதை வரிசையில் அடுக்கு</x:String>
   <x:String x:Key="Text.Caption.MaximizeRestore" xml:space="preserve">பெரிதாக்கு அல்லது மீட்டமை</x:String>
@@ -63,6 +62,7 @@
   <x:String x:Key="Text.Common.OpenInExplorer" xml:space="preserve">கோப்பு எக்ஸ்ப்ளோரரில் திற</x:String>
   <x:String x:Key="Text.Common.OpenInNewTab" xml:space="preserve">புதிய தாவலில் திற</x:String>
   <x:String x:Key="Text.Common.OpenInTerminal" xml:space="preserve">டெர்மினலில் திற</x:String>
+  <x:String x:Key="Text.Common.OpenInTerminalAsAdmin" xml:space="preserve">நிர்வாகியாக டெர்மினலில் திற</x:String>
   <x:String x:Key="Text.Common.PinToQuickAccess" xml:space="preserve">விரைவு அணுகலில் பொருத்து</x:String>
   <x:String x:Key="Text.Common.Properties" xml:space="preserve">பண்புகள்</x:String>
   <x:String x:Key="Text.Common.UnpinFromQuickAccess" xml:space="preserve">விரைவு அணுகலிலிருந்து அகற்று</x:String>
@@ -302,6 +302,9 @@
   <x:String x:Key="Text.Settings.Startup.PathCaption" xml:space="preserve">புதிய தாவல்களில் திறக்கும் கோப்புறை (காலியாக விட்டால் பயனர் கோப்புறை)</x:String>
   <x:String x:Key="Text.Settings.Startup.RestoreTabs" xml:space="preserve">மூடும்போது திறந்திருந்த தாவல்களை அடுத்த முறை மீட்டமை</x:String>
   <x:String x:Key="Text.Settings.Startup.Subtitle" xml:space="preserve">தொடக்க முறை, Windows ஒருங்கிணைப்பு, அறிவிப்புப் பகுதியை நிர்வகிக்கவும்</x:String>
+  <x:String x:Key="Text.Settings.Terminal" xml:space="preserve">டெர்மினல்</x:String>
+  <x:String x:Key="Text.Settings.Terminal.AsAdmin" xml:space="preserve">டெர்மினலை நிர்வாகியாகத் திற</x:String>
+  <x:String x:Key="Text.Settings.Terminal.Note" xml:space="preserve">Kiriha தானாக நிர்வாகி உரிமையில் இயங்குவதில்லை. திறக்கப்படும் டெர்மினலுக்கு மட்டுமே உரிமை உயர்த்தப்படுவதால், ஒவ்வொரு முறையும் Windows-இன் பயனர் கணக்குக் கட்டுப்பாடு (UAC) உறுதிப்படுத்தல் காட்டப்படும்.</x:String>
   <x:String x:Key="Text.Settings.Theme" xml:space="preserve">தீம்</x:String>
   <x:String x:Key="Text.Settings.Theme.Dark" xml:space="preserve">அடர்</x:String>
   <x:String x:Key="Text.Settings.Theme.Light" xml:space="preserve">ஒளி</x:String>

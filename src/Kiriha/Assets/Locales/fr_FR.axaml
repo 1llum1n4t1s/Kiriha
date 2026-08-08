@@ -13,8 +13,7 @@
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">Faites glisser un dossier ici pour l'ajouter aux favoris</x:String>
   <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">Cible du lien introuvable</x:String>
   <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">La cible de ce favori, « {0} », a été modifiée, déplacée ou supprimée. Voulez-vous supprimer ce favori ?</x:String>
-  <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">Renommer...</x:String>
-  <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">Renommer le favori</x:String>
+  <x:String x:Key="Text.Bookmarks.Remove" xml:space="preserve">Retirer des favoris</x:String>
   <x:String x:Key="Text.Bookmarks.SortByName" xml:space="preserve">Trier par nom</x:String>
   <x:String x:Key="Text.Bookmarks.SortByPath" xml:space="preserve">Trier par chemin</x:String>
   <x:String x:Key="Text.Caption.MaximizeRestore" xml:space="preserve">Agrandir ou restaurer</x:String>
@@ -63,6 +62,7 @@
   <x:String x:Key="Text.Common.OpenInExplorer" xml:space="preserve">Ouvrir dans l'Explorateur</x:String>
   <x:String x:Key="Text.Common.OpenInNewTab" xml:space="preserve">Ouvrir dans un nouvel onglet</x:String>
   <x:String x:Key="Text.Common.OpenInTerminal" xml:space="preserve">Ouvrir dans le Terminal</x:String>
+  <x:String x:Key="Text.Common.OpenInTerminalAsAdmin" xml:space="preserve">Ouvrir dans le Terminal en tant qu'administrateur</x:String>
   <x:String x:Key="Text.Common.PinToQuickAccess" xml:space="preserve">Épingler à l'Accès rapide</x:String>
   <x:String x:Key="Text.Common.Properties" xml:space="preserve">Propriétés</x:String>
   <x:String x:Key="Text.Common.UnpinFromQuickAccess" xml:space="preserve">Détacher de l'Accès rapide</x:String>
@@ -302,6 +302,9 @@
   <x:String x:Key="Text.Settings.Startup.PathCaption" xml:space="preserve">Dossier ouvert dans les nouveaux onglets (laissez vide pour votre dossier utilisateur)</x:String>
   <x:String x:Key="Text.Settings.Startup.RestoreTabs" xml:space="preserve">Restaurer les onglets ouverts lors de la fermeture</x:String>
   <x:String x:Key="Text.Settings.Startup.Subtitle" xml:space="preserve">Gérez le démarrage, l'intégration Windows et la zone de notification</x:String>
+  <x:String x:Key="Text.Settings.Terminal" xml:space="preserve">Terminal</x:String>
+  <x:String x:Key="Text.Settings.Terminal.AsAdmin" xml:space="preserve">Ouvrir le Terminal en tant qu'administrateur</x:String>
+  <x:String x:Key="Text.Settings.Terminal.Note" xml:space="preserve">Kiriha ne s'exécute pas en tant qu'administrateur. Seul le terminal ouvert est élevé, Windows affiche donc une invite de contrôle de compte d'utilisateur à chaque fois.</x:String>
   <x:String x:Key="Text.Settings.Theme" xml:space="preserve">Thème</x:String>
   <x:String x:Key="Text.Settings.Theme.Dark" xml:space="preserve">Sombre</x:String>
   <x:String x:Key="Text.Settings.Theme.Light" xml:space="preserve">Clair</x:String>

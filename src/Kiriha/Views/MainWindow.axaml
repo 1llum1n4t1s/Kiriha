@@ -118,40 +118,14 @@
                              PointerReleased="Tabs_PointerReleased">
                         <ListBox.ItemTemplate>
                             <DataTemplate x:DataType="vm:TabViewModel">
+                                <!-- 読み上げ名はここではなく ListBoxItem 側（MainWindowStyles.axaml）に付ける。
+                                     Grid は自動化ピアを持たないので、ここに書いても UI ツリーに出てこない。 -->
+                                <!-- 右クリックメニューはここには置かない。他の 5 か所と同じ組み立て
+                                     （MainWindow.UnifiedMenu.cs）を通すため Tabs_PointerReleased で作る。 -->
                                 <Grid Height="34" ColumnDefinitions="36,*,Auto"
-                                      AutomationProperties.Name="{Binding Title}"
                                       Opacity="{Binding TabRowOpacity}"
                                       DoubleTapped="TabRow_DoubleTapped"
                                       Background="Transparent" ToolTip.Tip="{Binding PathText}">
-                                    <Grid.ContextMenu>
-                                        <ContextMenu Opened="TabMenu_Opened">
-                                            <MenuItem Header="{DynamicResource Text.Tab.NewBelow}" Click="TabNewRight_Click" />
-                                            <MenuItem Header="{DynamicResource Text.Tab.Duplicate}" Click="TabDuplicate_Click"
-                                                      IsVisible="{Binding IsNormalTab}" />
-                                            <Separator />
-                                            <MenuItem Header="{DynamicResource Text.Tab.Pin}"
-                                                      IsVisible="{Binding !IsPinned}"
-                                                      Command="{Binding TogglePinCommand}" />
-                                            <MenuItem Header="{DynamicResource Text.Tab.Unpin}"
-                                                      IsVisible="{Binding IsPinned}"
-                                                      Command="{Binding TogglePinCommand}" />
-                                            <Separator />
-                                            <MenuItem Header="{DynamicResource Text.Tab.Close}"
-                                                      Command="{Binding CloseSelfCommand}" />
-                                            <MenuItem Header="{DynamicResource Text.Tab.CloseBelow}" Click="TabCloseRight_Click" />
-                                            <MenuItem Header="{DynamicResource Text.Tab.CloseOthers}" Click="TabCloseOthers_Click" />
-                                            <MenuItem Header="{DynamicResource Text.Tab.MoreActions}" Tag="tabActions" />
-                                            <Separator />
-                                            <MenuItem Header="{DynamicResource Text.Tab.Reopen}" Click="TabReopen_Click"
-                                                      InputGesture="Ctrl+Shift+T" />
-                                            <MenuItem Header="{DynamicResource Text.Tab.RecentlyClosed}" Tag="recent" />
-                                            <Separator />
-                                            <MenuItem Header="{DynamicResource Text.Common.CopyPath}" Click="TabCopyPath_Click" />
-                                            <MenuItem Header="{DynamicResource Text.Common.OpenInExplorer}"
-                                                      Command="{Binding OpenInExplorerCommand}" />
-                                        </ContextMenu>
-                                    </Grid.ContextMenu>
-
                                     <!-- 固定タブの目印。行全体へアクセント色を薄く敷き、左端に太めの
                                          アクセントバーを出す。選択中の印（ContentPresenter 側の左 2px 枠）
                                          とは色の面積が違うので、選択と固定は同時に出ても見分けがつく。 -->
@@ -488,6 +462,15 @@
                                     </StackPanel>
                                 </Button>
 
+                                <!-- 今見ているフォルダーをターミナルで開く（新しいフォルダーと同じ「現在のフォルダーに効く」グループ）。
+                                     E756 = CommandPrompt。Segoe Fluent Icons と Segoe MDL2 Assets の両方にあるので
+                                     Fluent を持たない Windows 10 でも豆腐にならない。
+                                     表示名は設定「ターミナルを管理者として開く」で変わるため DynamicResource ではなくバインドで取る。 -->
+                                <Button Classes="cmd cmdicon" Content="&#xE756;"
+                                        ToolTip.Tip="{Binding OpenTerminalText}"
+                                        AutomationProperties.Name="{Binding OpenTerminalText}"
+                                        VerticalAlignment="Center" Command="{Binding OpenTerminalCommand}" />
+
                                 <Border Width="1" Height="20" Background="{DynamicResource Divider}"
                                         VerticalAlignment="Center" Margin="4,0" />
 
@@ -626,7 +609,7 @@
                                             <MenuItem Header="{DynamicResource Text.Select.FoldersOnly}" Click="SelectFolders_Click" />
                                             <MenuItem Header="{DynamicResource Text.Select.FilesOnly}" Click="SelectFiles_Click" />
                                             <Separator />
-                                            <MenuItem Header="{DynamicResource Text.Common.OpenInTerminal}" Command="{Binding OpenTerminalCommand}" />
+                                            <MenuItem Header="{Binding OpenTerminalText}" Command="{Binding OpenTerminalCommand}" />
                                             <MenuItem Header="{DynamicResource Text.Common.OpenInExplorer}" Command="{Binding OpenInExplorerCommand}" />
                                             <MenuItem Header="{DynamicResource Text.Common.PinToQuickAccess}" Click="PinToQuickAccess_Click" />
                                             <MenuItem Header="{DynamicResource Text.Common.AddToBookmarks}" Click="AddBookmark_Click" InputGesture="Ctrl+D" />
@@ -927,7 +910,9 @@
                                                                 <TextBlock Grid.Column="0" Text="{Binding Icon}" FontSize="13"
                                                                            IsVisible="{Binding !HasIconImage}"
                                                                            VerticalAlignment="Center" />
-                                                                <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="13" Margin="8,0,0,0"
+                                                                <!-- 名前は実体のファイル名 / フォルダー名（BookmarkNode.DisplayName）。
+                                                                     お気に入り側で名前を持たないので、実体をリネームすれば表示も追従する。 -->
+                                                                <TextBlock Grid.Column="1" Text="{Binding DisplayName}" FontSize="13" Margin="8,0,0,0"
                                                                            Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center"
                                                                            TextTrimming="CharacterEllipsis" />
                                                             </Grid>

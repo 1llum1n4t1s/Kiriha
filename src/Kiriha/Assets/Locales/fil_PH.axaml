@@ -13,8 +13,7 @@
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">I-drag dito ang isang folder para idagdag sa mga bookmark</x:String>
   <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">Hindi mahanap ang target</x:String>
   <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">Ang target ng bookmark na ito, &quot;{0}&quot;, ay binago, inilipat, o tinanggal. Gusto mo bang tanggalin ang bookmark na ito?</x:String>
-  <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">Palitan ang pangalan...</x:String>
-  <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">Palitan ang pangalan ng bookmark</x:String>
+  <x:String x:Key="Text.Bookmarks.Remove" xml:space="preserve">Alisin sa mga paborito</x:String>
   <x:String x:Key="Text.Bookmarks.SortByName" xml:space="preserve">Ayusin ayon sa pangalan</x:String>
   <x:String x:Key="Text.Bookmarks.SortByPath" xml:space="preserve">Ayusin ayon sa path</x:String>
   <x:String x:Key="Text.Caption.MaximizeRestore" xml:space="preserve">I-maximize o ibalik</x:String>
@@ -63,6 +62,7 @@
   <x:String x:Key="Text.Common.OpenInExplorer" xml:space="preserve">Buksan sa File Explorer</x:String>
   <x:String x:Key="Text.Common.OpenInNewTab" xml:space="preserve">Buksan sa bagong tab</x:String>
   <x:String x:Key="Text.Common.OpenInTerminal" xml:space="preserve">Buksan sa Terminal</x:String>
+  <x:String x:Key="Text.Common.OpenInTerminalAsAdmin" xml:space="preserve">Buksan sa Terminal bilang administrator</x:String>
   <x:String x:Key="Text.Common.PinToQuickAccess" xml:space="preserve">I-pin sa Quick access</x:String>
   <x:String x:Key="Text.Common.Properties" xml:space="preserve">Mga katangian</x:String>
   <x:String x:Key="Text.Common.UnpinFromQuickAccess" xml:space="preserve">Alisin sa pagka-pin sa Quick access</x:String>
@@ -302,6 +302,9 @@
   <x:String x:Key="Text.Settings.Startup.PathCaption" xml:space="preserve">Folder na bubuksan sa mga bagong tab (iwanang blangko para sa iyong user folder)</x:String>
   <x:String x:Key="Text.Settings.Startup.RestoreTabs" xml:space="preserve">Ibalik ang mga tab na nakabukas noong isinara ang app</x:String>
   <x:String x:Key="Text.Settings.Startup.Subtitle" xml:space="preserve">Pamahalaan ang pagsisimula, integrasyon sa Windows at notification area</x:String>
+  <x:String x:Key="Text.Settings.Terminal" xml:space="preserve">Terminal</x:String>
+  <x:String x:Key="Text.Settings.Terminal.AsAdmin" xml:space="preserve">Buksan ang Terminal bilang administrator</x:String>
+  <x:String x:Key="Text.Settings.Terminal.Note" xml:space="preserve">Hindi tumatakbo ang Kiriha bilang administrator. Ang binubuksang terminal lang ang itinataas ang pribilehiyo, kaya nagpapakita ang Windows ng User Account Control tuwing bubuksan ito.</x:String>
   <x:String x:Key="Text.Settings.Theme" xml:space="preserve">Tema</x:String>
   <x:String x:Key="Text.Settings.Theme.Dark" xml:space="preserve">Madilim</x:String>
   <x:String x:Key="Text.Settings.Theme.Light" xml:space="preserve">Maliwanag</x:String>

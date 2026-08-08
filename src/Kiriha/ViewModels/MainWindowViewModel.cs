@@ -855,6 +855,28 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
+    /// <summary>
+    /// 設定タブ: ターミナルを管理者として開く。Kiriha 自身は昇格せず、起動するターミナルだけを
+    /// ShellExecuteEx の "runas" で昇格させる（詳細は <see cref="Services.TerminalLauncher.RunAsAdmin"/>）。
+    /// </summary>
+    public bool OptRunTerminalAsAdmin
+    {
+        get => _settings.RunTerminalAsAdmin;
+        set
+        {
+            _settings.RunTerminalAsAdmin = value;
+            SettingsService.Save(_settings);
+            Services.TerminalLauncher.RunAsAdmin = value;
+            // コマンドバーのボタンと「…」メニューの表示名が「管理者として〜」に変わるので取り直させる。
+            foreach (var tab in Tabs)
+            {
+                tab.NotifyTerminalOptionChanged();
+            }
+
+            OnPropertyChanged();
+        }
+    }
+
     /// <summary>設定タブ: ギャラリー表示の鮮鋭化（RCAS）。切り替えたら、見ている画像にも即座に反映する。</summary>
     public bool OptSharpenGallery
     {
@@ -1450,6 +1472,9 @@ public partial class MainWindowViewModel : ObservableObject
         _showPreviewPane = _settings.ShowPreviewPane;
         _previewWidth = _settings.PreviewWidth is >= 180 and <= 600 ? _settings.PreviewWidth : 280;
         _galleryStripHeight = _settings.GalleryStripHeight is >= 54 and <= 460 ? _settings.GalleryStripHeight : 116;
+
+        // ターミナルの昇格も全タブ共通なので、鮮鋭化と同じくサービス側へ反映しておく。
+        Services.TerminalLauncher.RunAsAdmin = _settings.RunTerminalAsAdmin;
 
         // 鮮鋭化も全タブ・動画で共通の状態なので、設定の値をサービス側へ反映しておく。
         Services.ContrastAdaptiveSharpenService.Enabled = _settings.SharpenGallery;
@@ -2156,18 +2181,24 @@ public partial class MainWindowViewModel : ObservableObject
     /// <summary>お気に入りへ追加（parent が null ならルート）。</summary>
     public void AddBookmark(string path, BookmarkNode? parent = null)
     {
-        var name = path == FileSystemService.ComputerPath
-            ? "PC"
-            : Path.GetFileName(path.TrimEnd(Path.DirectorySeparatorChar)) is { Length: > 0 } n ? n : path;
         var target = parent?.Children ?? _settings.Bookmarks;
         if (target.Any(b => b.Path is not null && WindowsPathIdentity.Instance.Equals(b.Path, path)))
         {
             return;
         }
 
-        target.Add(new BookmarkNode { Name = name, Path = path });
+        target.Add(NewBookmark(path));
         SaveBookmarks();
     }
+
+    /// <summary>お気に入りの新規リンク項目。名前は実体から導く（<see cref="BookmarkNode.DisplayName"/>）ので持たせない。
+    /// 実体を持たない「PC」（Path が空文字）だけは表示名が必要なので Name に入れる。</summary>
+    private static BookmarkNode NewBookmark(string path)
+        => new()
+        {
+            Name = path == FileSystemService.ComputerPath ? "PC" : "",
+            Path = path,
+        };
 
     /// <summary>
     /// ドラッグ＆ドロップで示された位置へお気に入りを挿入する。
@@ -2178,9 +2209,6 @@ public partial class MainWindowViewModel : ObservableObject
     public void InsertBookmark(string path, BookmarkNode? reference, BookmarkDropMark mark)
     {
         var (target, index) = ResolveBookmarkInsertion(reference, mark);
-        var name = path == FileSystemService.ComputerPath
-            ? "PC"
-            : Path.GetFileName(path.TrimEnd(Path.DirectorySeparatorChar)) is { Length: > 0 } n ? n : path;
 
         if (FindBookmarkByPath(_settings.Bookmarks, path) is { } existing)
         {
@@ -2197,7 +2225,7 @@ public partial class MainWindowViewModel : ObservableObject
             return;
         }
 
-        target.Insert(Math.Clamp(index, 0, target.Count), new BookmarkNode { Name = name, Path = path });
+        target.Insert(Math.Clamp(index, 0, target.Count), NewBookmark(path));
         SaveBookmarks();
     }
 
@@ -2366,13 +2394,63 @@ public partial class MainWindowViewModel : ObservableObject
         return list.Any(child => child.Children is not null && RemoveBookmarkRecursive(child.Children, node));
     }
 
-    public void RenameBookmark(BookmarkNode node, string newName)
+    /// <summary>
+    /// リネームでパスが変わったお気に入りを追従させる。<paramref name="oldPath"/> 自身と、
+    /// その配下を指す登録（親フォルダーをリネームしたとき）の両方を書き換える。
+    /// </summary>
+    /// <remarks>
+    /// お気に入りは名前を持たず実体名を表示する（<see cref="BookmarkNode.DisplayName"/>）ので、
+    /// パスを放置すると表示名が古いまま、しかもリンク切れになる。呼び出し元は
+    /// ファイル一覧のインライン編集（<c>TabViewModel.CommitRenameAsync</c>）と、
+    /// それ以外の場所のダイアログ変更（<c>MainWindow.RenamePathAsync</c>）の 2 か所。
+    /// </remarks>
+    public void UpdateBookmarkPaths(string oldPath, string newPath)
     {
-        if (!string.IsNullOrWhiteSpace(newName))
+        if (oldPath.Length == 0 || newPath.Length == 0)
         {
-            node.Name = newName;
+            return;
+        }
+
+        if (UpdateBookmarkPaths(_settings.Bookmarks, oldPath.TrimEnd(Path.DirectorySeparatorChar), newPath.TrimEnd(Path.DirectorySeparatorChar)))
+        {
             SaveBookmarks();
         }
+    }
+
+    /// <summary>付け替えの本体。テストから直接叩けるよう internal にしてある。</summary>
+    internal static bool UpdateBookmarkPaths(List<BookmarkNode> list, string oldPath, string newPath)
+    {
+        var changed = false;
+        foreach (var node in list)
+        {
+            if (node.Children is { } children)
+            {
+                changed |= UpdateBookmarkPaths(children, oldPath, newPath);
+                continue;
+            }
+
+            if (node.Path is not { Length: > 0 } path)
+            {
+                continue;
+            }
+
+            var trimmed = path.TrimEnd(Path.DirectorySeparatorChar);
+            if (WindowsPathIdentity.Instance.Equals(trimmed, oldPath))
+            {
+                node.Path = newPath;
+                changed = true;
+            }
+            else if (trimmed.Length > oldPath.Length
+                     && trimmed[oldPath.Length] == Path.DirectorySeparatorChar
+                     && WindowsPathIdentity.Instance.Equals(trimmed[..oldPath.Length], oldPath))
+            {
+                // 親フォルダーのリネーム。配下を指す登録も同じだけ付け替える
+                node.Path = newPath + trimmed[oldPath.Length..];
+                changed = true;
+            }
+        }
+
+        return changed;
     }
 
     /// <summary>Chrome の「名前順で並べ替え / パス名順で並べ替え」（フォルダー優先、ネスト内も再帰的に）。
@@ -2398,7 +2476,8 @@ public partial class MainWindowViewModel : ObservableObject
                 : ordered.ThenByDescending(Key, StringComparer.CurrentCultureIgnoreCase))
             .ToList();
 
-        string Key(BookmarkNode node) => byPath ? node.Path ?? "" : node.Name;
+        // 名前順は表示どおり（実体名）で並べる。node.Name は実体を持たないノードだけが持つ
+        string Key(BookmarkNode node) => byPath ? node.Path ?? "" : node.DisplayName;
     }
 
     /// <summary>ウィンドウの位置・サイズ・最大化状態・開いていたタブの保存（終了時に呼ばれる）。</summary>

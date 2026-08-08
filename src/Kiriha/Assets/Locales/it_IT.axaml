@@ -13,8 +13,7 @@
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">Trascina qui una cartella per aggiungerla ai preferiti</x:String>
   <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">Destinazione non trovata</x:String>
   <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">La destinazione di questo preferito, &quot;{0}&quot;, è stata modificata, spostata o eliminata. Vuoi eliminare questo preferito?</x:String>
-  <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">Rinomina...</x:String>
-  <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">Rinomina preferito</x:String>
+  <x:String x:Key="Text.Bookmarks.Remove" xml:space="preserve">Rimuovi dai preferiti</x:String>
   <x:String x:Key="Text.Bookmarks.SortByName" xml:space="preserve">Ordina per nome</x:String>
   <x:String x:Key="Text.Bookmarks.SortByPath" xml:space="preserve">Ordina per percorso</x:String>
   <x:String x:Key="Text.Caption.MaximizeRestore" xml:space="preserve">Ingrandisci o ripristina</x:String>
@@ -63,6 +62,7 @@
   <x:String x:Key="Text.Common.OpenInExplorer" xml:space="preserve">Apri in Esplora file</x:String>
   <x:String x:Key="Text.Common.OpenInNewTab" xml:space="preserve">Apri in una nuova scheda</x:String>
   <x:String x:Key="Text.Common.OpenInTerminal" xml:space="preserve">Apri nel Terminale</x:String>
+  <x:String x:Key="Text.Common.OpenInTerminalAsAdmin" xml:space="preserve">Apri nel Terminale come amministratore</x:String>
   <x:String x:Key="Text.Common.PinToQuickAccess" xml:space="preserve">Aggiungi ad Accesso rapido</x:String>
   <x:String x:Key="Text.Common.Properties" xml:space="preserve">Proprietà</x:String>
   <x:String x:Key="Text.Common.UnpinFromQuickAccess" xml:space="preserve">Rimuovi da Accesso rapido</x:String>
@@ -302,6 +302,9 @@
   <x:String x:Key="Text.Settings.Startup.PathCaption" xml:space="preserve">Cartella da aprire nelle nuove schede (lascia vuoto per la cartella utente)</x:String>
   <x:String x:Key="Text.Settings.Startup.RestoreTabs" xml:space="preserve">Ripristina le schede aperte alla chiusura</x:String>
   <x:String x:Key="Text.Settings.Startup.Subtitle" xml:space="preserve">Gestisci avvio, integrazione con Windows e area di notifica</x:String>
+  <x:String x:Key="Text.Settings.Terminal" xml:space="preserve">Terminale</x:String>
+  <x:String x:Key="Text.Settings.Terminal.AsAdmin" xml:space="preserve">Apri il Terminale come amministratore</x:String>
+  <x:String x:Key="Text.Settings.Terminal.Note" xml:space="preserve">Kiriha non viene eseguito come amministratore. Viene elevato solo il terminale aperto, quindi Windows mostra ogni volta la richiesta di Controllo dell'account utente.</x:String>
   <x:String x:Key="Text.Settings.Theme" xml:space="preserve">Tema</x:String>
   <x:String x:Key="Text.Settings.Theme.Dark" xml:space="preserve">Scuro</x:String>
   <x:String x:Key="Text.Settings.Theme.Light" xml:space="preserve">Chiaro</x:String>

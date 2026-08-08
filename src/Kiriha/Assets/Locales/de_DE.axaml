@@ -13,8 +13,7 @@
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">Ziehen Sie einen Ordner hierher, um ihn zu den Lesezeichen hinzuzufügen</x:String>
   <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">Verknüpfungsziel nicht gefunden</x:String>
   <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">Das Ziel dieses Lesezeichens „{0}“ wurde geändert, verschoben oder gelöscht. Möchten Sie dieses Lesezeichen entfernen?</x:String>
-  <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">Umbenennen ...</x:String>
-  <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">Lesezeichen umbenennen</x:String>
+  <x:String x:Key="Text.Bookmarks.Remove" xml:space="preserve">Aus Favoriten entfernen</x:String>
   <x:String x:Key="Text.Bookmarks.SortByName" xml:space="preserve">Nach Name sortieren</x:String>
   <x:String x:Key="Text.Bookmarks.SortByPath" xml:space="preserve">Nach Pfad sortieren</x:String>
   <x:String x:Key="Text.Caption.MaximizeRestore" xml:space="preserve">Maximieren oder wiederherstellen</x:String>
@@ -63,6 +62,7 @@
   <x:String x:Key="Text.Common.OpenInExplorer" xml:space="preserve">Im Explorer öffnen</x:String>
   <x:String x:Key="Text.Common.OpenInNewTab" xml:space="preserve">In neuem Tab öffnen</x:String>
   <x:String x:Key="Text.Common.OpenInTerminal" xml:space="preserve">Im Terminal öffnen</x:String>
+  <x:String x:Key="Text.Common.OpenInTerminalAsAdmin" xml:space="preserve">Als Administrator im Terminal öffnen</x:String>
   <x:String x:Key="Text.Common.PinToQuickAccess" xml:space="preserve">An Schnellzugriff anheften</x:String>
   <x:String x:Key="Text.Common.Properties" xml:space="preserve">Eigenschaften</x:String>
   <x:String x:Key="Text.Common.UnpinFromQuickAccess" xml:space="preserve">Vom Schnellzugriff lösen</x:String>
@@ -302,6 +302,9 @@
   <x:String x:Key="Text.Settings.Startup.PathCaption" xml:space="preserve">Ordner für neue Tabs (leer lassen für Ihren Benutzerordner)</x:String>
   <x:String x:Key="Text.Settings.Startup.RestoreTabs" xml:space="preserve">Beim Beenden geöffnete Tabs wiederherstellen</x:String>
   <x:String x:Key="Text.Settings.Startup.Subtitle" xml:space="preserve">Start, Windows-Integration und Infobereich verwalten</x:String>
+  <x:String x:Key="Text.Settings.Terminal" xml:space="preserve">Terminal</x:String>
+  <x:String x:Key="Text.Settings.Terminal.AsAdmin" xml:space="preserve">Terminal als Administrator öffnen</x:String>
+  <x:String x:Key="Text.Settings.Terminal.Note" xml:space="preserve">Kiriha selbst läuft nicht als Administrator. Nur das geöffnete Terminal wird erhöht, daher zeigt Windows jedes Mal eine Abfrage der Benutzerkontensteuerung an.</x:String>
   <x:String x:Key="Text.Settings.Theme" xml:space="preserve">Design</x:String>
   <x:String x:Key="Text.Settings.Theme.Dark" xml:space="preserve">Dunkel</x:String>
   <x:String x:Key="Text.Settings.Theme.Light" xml:space="preserve">Hell</x:String>

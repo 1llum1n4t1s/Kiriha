@@ -13,8 +13,7 @@
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">ここにフォルダーをドラッグするとお気に入りに追加されます</x:String>
   <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">リンク先が見つかりません</x:String>
   <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">このお気に入りのリンク先「{0}」は、変更されたか、移動または削除されています。このお気に入りを削除しますか？</x:String>
-  <x:String x:Key="Text.Bookmarks.RenameMenu" xml:space="preserve">名前を変更...</x:String>
-  <x:String x:Key="Text.Bookmarks.RenameTitle" xml:space="preserve">お気に入りの名前を変更</x:String>
+  <x:String x:Key="Text.Bookmarks.Remove" xml:space="preserve">お気に入りから削除</x:String>
   <x:String x:Key="Text.Bookmarks.SortByName" xml:space="preserve">名前順で並べ替え</x:String>
   <x:String x:Key="Text.Bookmarks.SortByPath" xml:space="preserve">パス名順で並べ替え</x:String>
   <x:String x:Key="Text.Caption.MaximizeRestore" xml:space="preserve">最大化または元に戻す</x:String>
@@ -63,6 +62,7 @@
   <x:String x:Key="Text.Common.OpenInExplorer" xml:space="preserve">エクスプローラーで開く</x:String>
   <x:String x:Key="Text.Common.OpenInNewTab" xml:space="preserve">新しいタブで開く</x:String>
   <x:String x:Key="Text.Common.OpenInTerminal" xml:space="preserve">ターミナルで開く</x:String>
+  <x:String x:Key="Text.Common.OpenInTerminalAsAdmin" xml:space="preserve">管理者としてターミナルで開く</x:String>
   <x:String x:Key="Text.Common.PinToQuickAccess" xml:space="preserve">クイックアクセスにピン留め</x:String>
   <x:String x:Key="Text.Common.Properties" xml:space="preserve">プロパティ</x:String>
   <x:String x:Key="Text.Common.UnpinFromQuickAccess" xml:space="preserve">クイックアクセスからピン留めを外す</x:String>
@@ -302,6 +302,9 @@
   <x:String x:Key="Text.Settings.Startup.PathCaption" xml:space="preserve">新しいタブで開くフォルダー（空欄でユーザーフォルダー）</x:String>
   <x:String x:Key="Text.Settings.Startup.RestoreTabs" xml:space="preserve">終了時に開いていたタブを次回復元する</x:String>
   <x:String x:Key="Text.Settings.Startup.Subtitle" xml:space="preserve">起動方法、Windows統合、タスクトレイを管理します</x:String>
+  <x:String x:Key="Text.Settings.Terminal" xml:space="preserve">ターミナル</x:String>
+  <x:String x:Key="Text.Settings.Terminal.AsAdmin" xml:space="preserve">ターミナルを管理者として開く</x:String>
+  <x:String x:Key="Text.Settings.Terminal.Note" xml:space="preserve">Kiriha 自体は管理者になりません。ここから開くターミナルだけを管理者に昇格するため、開くたびに Windows の確認画面（UAC）が表示されます。</x:String>
   <x:String x:Key="Text.Settings.Theme" xml:space="preserve">テーマ</x:String>
   <x:String x:Key="Text.Settings.Theme.Dark" xml:space="preserve">ダーク</x:String>
   <x:String x:Key="Text.Settings.Theme.Light" xml:space="preserve">ライト</x:String>
