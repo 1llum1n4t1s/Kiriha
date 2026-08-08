@@ -9,6 +9,7 @@
   <x:String x:Key="Text.Address.Copy" xml:space="preserve">Salin alamat</x:String>
   <x:String x:Key="Text.Address.Edit" xml:space="preserve">Edit alamat</x:String>
   <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">Tambahkan folder saat ini</x:String>
+  <x:String x:Key="Text.Bookmarks.DeleteSelectedMessage" xml:space="preserve">Hapus {0} markah yang dipilih?</x:String>
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">Seret folder ke sini untuk menambahkannya ke markah</x:String>
   <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">Target tautan tidak ditemukan</x:String>
   <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">Target markah ini, &quot;{0}&quot;, telah diubah, dipindahkan, atau dihapus. Apakah Anda ingin menghapus markah ini?</x:String>

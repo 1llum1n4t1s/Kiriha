@@ -9,6 +9,7 @@
   <x:String x:Key="Text.Address.Copy" xml:space="preserve">Копіювати адресу</x:String>
   <x:String x:Key="Text.Address.Edit" xml:space="preserve">Редагувати адресу</x:String>
   <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">Додати поточну папку</x:String>
+  <x:String x:Key="Text.Bookmarks.DeleteSelectedMessage" xml:space="preserve">Видалити вибрані закладки ({0})?</x:String>
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">Перетягніть сюди папку, щоб додати її до закладок</x:String>
   <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">Ціль посилання не знайдено</x:String>
   <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">Ціль цієї закладки «{0}» була змінена, переміщена або видалена. Видалити цю закладку?</x:String>

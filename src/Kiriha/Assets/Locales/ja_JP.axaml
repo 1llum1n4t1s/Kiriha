@@ -9,6 +9,7 @@
   <x:String x:Key="Text.Address.Copy" xml:space="preserve">アドレスのコピー</x:String>
   <x:String x:Key="Text.Address.Edit" xml:space="preserve">アドレスの編集</x:String>
   <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">現在のフォルダーを追加</x:String>
+  <x:String x:Key="Text.Bookmarks.DeleteSelectedMessage" xml:space="preserve">選択した {0} 件のお気に入りを削除しますか？</x:String>
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">ここにフォルダーをドラッグするとお気に入りに追加されます</x:String>
   <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">リンク先が見つかりません</x:String>
   <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">このお気に入りのリンク先「{0}」は、変更されたか、移動または削除されています。このお気に入りを削除しますか？</x:String>

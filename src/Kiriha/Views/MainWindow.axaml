@@ -845,10 +845,15 @@
                                         <!-- 下端に余白を開けて、項目でペインが埋まっても背景の右クリック
                                              （現在のフォルダーを追加 / 並べ替え）に届く場所を必ず残す。
                                              横スクロールバーは出さない（幅が足りない名前は末尾を省略する）。 -->
+                                        <!-- Ctrl / Shift クリックで複数選べる（まとめて削除するため）。
+                                             選んだだけで開く動きは単独選択のときだけに絞ってある
+                                             （MainWindow.axaml.cs の BookmarkTree_SelectionChanged）。 -->
                                         <TreeView Margin="0,0,0,28" Padding="0"
+                                                  SelectionMode="Multiple"
                                                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                                   ItemsSource="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).BookmarkItems}"
                                                   SelectionChanged="BookmarkTree_SelectionChanged"
+                                                  KeyDown="BookmarkTree_KeyDown"
                                                   PointerReleased="BookmarkTree_PointerReleased">
                                             <TreeView.Resources>
                                                 <!-- ツリー表示側と同じくインデントは半分にする -->

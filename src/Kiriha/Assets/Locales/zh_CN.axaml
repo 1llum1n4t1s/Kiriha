@@ -9,6 +9,7 @@
   <x:String x:Key="Text.Address.Copy" xml:space="preserve">复制地址</x:String>
   <x:String x:Key="Text.Address.Edit" xml:space="preserve">编辑地址</x:String>
   <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">添加当前文件夹</x:String>
+  <x:String x:Key="Text.Bookmarks.DeleteSelectedMessage" xml:space="preserve">要删除选中的 {0} 个收藏夹项吗？</x:String>
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">将文件夹拖到这里即可添加到书签</x:String>
   <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">找不到链接目标</x:String>
   <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">此收藏夹项的目标“{0}”已更改、移动或删除。要删除此收藏夹项吗？</x:String>

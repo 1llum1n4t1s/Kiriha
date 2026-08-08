@@ -9,6 +9,7 @@
   <x:String x:Key="Text.Address.Copy" xml:space="preserve">Copy address</x:String>
   <x:String x:Key="Text.Address.Edit" xml:space="preserve">Edit address</x:String>
   <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">Add current folder</x:String>
+  <x:String x:Key="Text.Bookmarks.DeleteSelectedMessage" xml:space="preserve">Delete the {0} selected bookmarks?</x:String>
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">Drag a folder here to add it to your bookmarks</x:String>
   <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">Link target not found</x:String>
   <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">The target of this bookmark, &quot;{0}&quot;, has been changed, moved, or removed. Do you want to delete this bookmark?</x:String>

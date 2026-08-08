@@ -1892,16 +1892,64 @@ public partial class MainWindow : Window
 
     /// <summary>お気に入りの項目を選んだときの動作。フォルダーはそのまま移動、ファイルは関連付けアプリで
     /// 起動する（お気に入りにはファイルも登録できるため）。グループ分けのフォルダーノードは開閉のみ。
-    /// アプリ側からこのツリーの選択を動かすことは無いので、ツリー表示側のような同期ガードは要らない。</summary>
+    /// アプリ側からこのツリーの選択を動かすことは無いので、ツリー表示側のような同期ガードは要らない。
+    /// ただしこのツリーは複数選択できるので、「1 項目だけを選び直した」ときに限って開く。Ctrl / Shift
+    /// クリックでの選択追加や、右クリックでメニューを出すための選択では開かない
+    /// （<see cref="DragEventArgs"/> と同じく <see cref="SelectionChangedEventArgs"/> にもボタン種別は
+    /// 載らないため、右ボタンは <see cref="MouseButtonState"/> で見る）。</summary>
     private void BookmarkTree_SelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        if (sender is not TreeView { SelectedItem: BookmarkNode { IsFolder: false, Path: { } path } node }
-            || ViewModel is not { } vm)
+        if (sender is not TreeView tree
+            || ViewModel is not { } vm
+            || MouseButtonState.IsRightButtonDown
+            || e.AddedItems.Count != 1
+            || SelectedBookmarkNodes(tree) is not [BookmarkNode { IsFolder: false, Path: { } path } node])
         {
             return;
         }
 
         _ = ActivateBookmarkAsync(node, path, vm);
+    }
+
+    /// <summary>お気に入りツリーで今選ばれている項目（複数選択対応）。</summary>
+    private static List<BookmarkNode> SelectedBookmarkNodes(TreeView tree)
+        => tree.SelectedItems?.OfType<BookmarkNode>().ToList() ?? [];
+
+    /// <summary>お気に入りツリーのキー操作。Delete で選択中の項目をまとめて削除する。</summary>
+    private void BookmarkTree_KeyDown(object? sender, KeyEventArgs e)
+    {
+        if (e.Key != Key.Delete
+            || e.KeyModifiers != KeyModifiers.None
+            || sender is not TreeView tree
+            || ViewModel is not { } vm)
+        {
+            return;
+        }
+
+        var nodes = SelectedBookmarkNodes(tree);
+        if (nodes.Count == 0)
+        {
+            return;
+        }
+
+        // ファイル一覧側の削除（Window.OnKeyDown）へ流さない
+        e.Handled = true;
+        _ = DeleteBookmarksAsync(nodes, vm);
+    }
+
+    /// <summary>選択中のお気に入りを削除する。複数まとめての削除は取り消せないので確認を挟む
+    /// （1 件だけのときは従来どおり確認なしで消す）。</summary>
+    private async Task DeleteBookmarksAsync(List<BookmarkNode> nodes, MainWindowViewModel vm)
+    {
+        if (nodes.Count > 1
+            && !await ConfirmAsync(
+                LocalizationService.Text("Text.Common.Delete"),
+                LocalizationService.Text("Text.Bookmarks.DeleteSelectedMessage", nodes.Count)))
+        {
+            return;
+        }
+
+        vm.RemoveBookmarks(nodes);
     }
 
     /// <summary>
@@ -2038,7 +2086,8 @@ public partial class MainWindow : Window
     /// <summary>お気に入り項目の中クリック / 右クリック（旧お気に入りバーと同じ操作）。</summary>
     private void BookmarkTree_PointerReleased(object? sender, PointerReleasedEventArgs e)
     {
-        if (ViewModel is not { } vm
+        if (sender is not TreeView tree
+            || ViewModel is not { } vm
             || (e.Source as Visual)?.FindAncestorOfType<TreeViewItem>() is not { DataContext: BookmarkNode node } item)
         {
             return;
@@ -2060,7 +2109,28 @@ public partial class MainWindow : Window
         }
 
         e.Handled = true;
+
+        // 複数選択した中の 1 つを右クリックしたときは、選択全体に効くメニューを出す
+        // （選択外の項目を右クリックした場合は、その押下で選択がその項目だけに戻っている）。
+        var selection = SelectedBookmarkNodes(tree);
+        if (selection.Count > 1 && selection.Contains(node))
+        {
+            ShowBookmarkSelectionMenu(item, selection, vm);
+            return;
+        }
+
         ShowBookmarkItemMenu(item, node, vm);
+    }
+
+    /// <summary>複数選択したお気に入りの右クリックメニュー。開く / 名前変更は 1 項目にしか
+    /// 意味が無いので、まとめて削除だけを出す。</summary>
+    private void ShowBookmarkSelectionMenu(Control anchor, List<BookmarkNode> nodes, MainWindowViewModel vm)
+    {
+        var flyout = new MenuFlyout();
+        var remove = new MenuItem { Header = LocalizationService.Text("Text.Common.Delete") };
+        remove.Click += (_, _) => _ = DeleteBookmarksAsync(nodes, vm);
+        flyout.Items.Add(remove);
+        flyout.ShowAt(anchor, showAtPointer: true);
     }
 
     /// <summary>お気に入り項目の右クリックメニュー（開き方 / 名前変更 / 削除）。</summary>

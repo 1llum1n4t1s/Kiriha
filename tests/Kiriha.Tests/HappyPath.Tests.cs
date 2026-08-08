@@ -1,5 +1,6 @@
 using Kiriha.Models;
 using Kiriha.Services;
+using Kiriha.ViewModels;
 using Xunit;
 
 namespace Kiriha.Tests;
@@ -528,5 +529,70 @@ public class EmojiIconHappyTests
         // 名前に拡張子があってもフォルダーならフォルダーのアイコンになる
         Assert.Equal("📁", FileSystemEntry.ResolveEmojiIcon("bundle.app", isDirectory: true));
         Assert.Equal("💾", FileSystemEntry.ResolveEmojiIcon("D:\\", isDirectory: true, isDrive: true));
+    }
+}
+
+/// <summary>お気に入りの一括削除（左ペインで複数選択して削除する経路の本体）。</summary>
+public class BookmarkBulkRemoveHappyTests
+{
+    private static BookmarkNode Link(string name) => new() { Name = name, Path = $@"C:\{name}" };
+
+    private static BookmarkNode Folder(string name, params BookmarkNode[] children)
+        => new() { Name = name, Children = [.. children] };
+
+    [Fact]
+    public void 選択した項目だけがまとめて消える()
+    {
+        var a = Link("a");
+        var b = Link("b");
+        var c = Link("c");
+        List<BookmarkNode> list = [a, b, c];
+
+        Assert.True(MainWindowViewModel.RemoveBookmarksRecursive(list, [a, c]));
+        Assert.Equal([b], list);
+    }
+
+    [Fact]
+    public void グループフォルダーの中の項目も消える()
+    {
+        var inner = Link("inner");
+        var outer = Link("outer");
+        var group = Folder("group", inner);
+        List<BookmarkNode> list = [group, outer];
+
+        Assert.True(MainWindowViewModel.RemoveBookmarksRecursive(list, [inner]));
+        Assert.Equal([group, outer], list);
+        Assert.Empty(group.Children!);
+    }
+
+    [Fact]
+    public void 親フォルダーと中の項目を同時に選んでも親ごと消える()
+    {
+        var inner = Link("inner");
+        var group = Folder("group", inner);
+        var keep = Link("keep");
+        List<BookmarkNode> list = [group, keep];
+
+        // 親が先に消えると子の削除は空振りするが、結果は「親ごと消える」で変わらない
+        Assert.True(MainWindowViewModel.RemoveBookmarksRecursive(list, [group, inner]));
+        Assert.Equal([keep], list);
+
+        // 逆順（子が先）でも同じ結果になること
+        var inner2 = Link("inner2");
+        var group2 = Folder("group2", inner2);
+        List<BookmarkNode> list2 = [group2];
+        Assert.True(MainWindowViewModel.RemoveBookmarksRecursive(list2, [inner2, group2]));
+        Assert.Empty(list2);
+    }
+
+    [Fact]
+    public void 登録されていない項目だけならfalseを返す()
+    {
+        var a = Link("a");
+        List<BookmarkNode> list = [a];
+
+        // 呼び出し側はこれを見て settings.json への保存を省く
+        Assert.False(MainWindowViewModel.RemoveBookmarksRecursive(list, [Link("stranger")]));
+        Assert.Equal([a], list);
     }
 }

@@ -9,6 +9,7 @@
   <x:String x:Key="Text.Address.Copy" xml:space="preserve">複製位址</x:String>
   <x:String x:Key="Text.Address.Edit" xml:space="preserve">編輯位址</x:String>
   <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">加入目前的資料夾</x:String>
+  <x:String x:Key="Text.Bookmarks.DeleteSelectedMessage" xml:space="preserve">要刪除選取的 {0} 個我的最愛嗎？</x:String>
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">將資料夾拖曳到這裡即可加入書籤</x:String>
   <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">找不到連結目標</x:String>
   <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">此我的最愛的目標「{0}」已變更、移動或刪除。要刪除此我的最愛嗎？</x:String>

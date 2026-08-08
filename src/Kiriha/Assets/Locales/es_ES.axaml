@@ -9,6 +9,7 @@
   <x:String x:Key="Text.Address.Copy" xml:space="preserve">Copiar dirección</x:String>
   <x:String x:Key="Text.Address.Edit" xml:space="preserve">Editar dirección</x:String>
   <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">Añadir la carpeta actual</x:String>
+  <x:String x:Key="Text.Bookmarks.DeleteSelectedMessage" xml:space="preserve">¿Eliminar los {0} marcadores seleccionados?</x:String>
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">Arrastra aquí una carpeta para añadirla a marcadores</x:String>
   <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">No se encuentra el destino</x:String>
   <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">El destino de este marcador, «{0}», se ha cambiado, movido o eliminado. ¿Quieres eliminar este marcador?</x:String>

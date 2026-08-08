@@ -9,6 +9,7 @@
   <x:String x:Key="Text.Address.Copy" xml:space="preserve">Kopyahin ang address</x:String>
   <x:String x:Key="Text.Address.Edit" xml:space="preserve">I-edit ang address</x:String>
   <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">Idagdag ang kasalukuyang folder</x:String>
+  <x:String x:Key="Text.Bookmarks.DeleteSelectedMessage" xml:space="preserve">Tanggalin ang {0} napiling bookmark?</x:String>
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">I-drag dito ang isang folder para idagdag sa mga bookmark</x:String>
   <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">Hindi mahanap ang target</x:String>
   <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">Ang target ng bookmark na ito, &quot;{0}&quot;, ay binago, inilipat, o tinanggal. Gusto mo bang tanggalin ang bookmark na ito?</x:String>

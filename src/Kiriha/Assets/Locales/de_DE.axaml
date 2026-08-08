@@ -9,6 +9,7 @@
   <x:String x:Key="Text.Address.Copy" xml:space="preserve">Adresse kopieren</x:String>
   <x:String x:Key="Text.Address.Edit" xml:space="preserve">Adresse bearbeiten</x:String>
   <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">Aktuellen Ordner hinzufügen</x:String>
+  <x:String x:Key="Text.Bookmarks.DeleteSelectedMessage" xml:space="preserve">Die {0} ausgewählten Lesezeichen löschen?</x:String>
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">Ziehen Sie einen Ordner hierher, um ihn zu den Lesezeichen hinzuzufügen</x:String>
   <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">Verknüpfungsziel nicht gefunden</x:String>
   <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">Das Ziel dieses Lesezeichens „{0}“ wurde geändert, verschoben oder gelöscht. Möchten Sie dieses Lesezeichen entfernen?</x:String>

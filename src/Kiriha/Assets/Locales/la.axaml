@@ -9,6 +9,7 @@
   <x:String x:Key="Text.Address.Copy" xml:space="preserve">Inscriptionem exscribere</x:String>
   <x:String x:Key="Text.Address.Edit" xml:space="preserve">Inscriptionem recensere</x:String>
   <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">Plicam praesentem addere</x:String>
+  <x:String x:Key="Text.Bookmarks.DeleteSelectedMessage" xml:space="preserve">Visne {0} delicia selecta delere?</x:String>
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">Plicam huc trahe ut inter notas addatur</x:String>
   <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">Meta nexus non inventa</x:String>
   <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">Meta huius delicii, &quot;{0}&quot;, mutata, mota aut deleta est. Visne hoc delicium delere?</x:String>

@@ -9,6 +9,7 @@
   <x:String x:Key="Text.Address.Copy" xml:space="preserve">Копировать адрес</x:String>
   <x:String x:Key="Text.Address.Edit" xml:space="preserve">Изменить адрес</x:String>
   <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">Добавить текущую папку</x:String>
+  <x:String x:Key="Text.Bookmarks.DeleteSelectedMessage" xml:space="preserve">Удалить выбранные закладки ({0})?</x:String>
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">Перетащите сюда папку, чтобы добавить её в закладки</x:String>
   <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">Целевой объект не найден</x:String>
   <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">Объект этой закладки «{0}» был изменён, перемещён или удалён. Удалить эту закладку?</x:String>

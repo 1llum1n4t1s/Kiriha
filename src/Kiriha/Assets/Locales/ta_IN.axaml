@@ -9,6 +9,7 @@
   <x:String x:Key="Text.Address.Copy" xml:space="preserve">முகவரியை நகலெடு</x:String>
   <x:String x:Key="Text.Address.Edit" xml:space="preserve">முகவரியைத் திருத்து</x:String>
   <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">தற்போதைய கோப்புறையைச் சேர்</x:String>
+  <x:String x:Key="Text.Bookmarks.DeleteSelectedMessage" xml:space="preserve">தேர்ந்தெடுத்த {0} புத்தகக்குறிகளை நீக்கவா?</x:String>
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">புத்தகக்குறிகளில் சேர்க்க இங்கே ஒரு கோப்புறையை இழுத்து விடுங்கள்</x:String>
   <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">இணைப்பு இலக்கு கிடைக்கவில்லை</x:String>
   <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">இந்த புத்தகக்குறியின் இலக்கு &quot;{0}&quot; மாற்றப்பட்டது, நகர்த்தப்பட்டது அல்லது நீக்கப்பட்டது. இந்த புத்தகக்குறியை நீக்கவா?</x:String>

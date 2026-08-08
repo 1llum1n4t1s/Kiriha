@@ -9,6 +9,7 @@
   <x:String x:Key="Text.Address.Copy" xml:space="preserve">Copiar endereço</x:String>
   <x:String x:Key="Text.Address.Edit" xml:space="preserve">Editar endereço</x:String>
   <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">Adicionar a pasta atual</x:String>
+  <x:String x:Key="Text.Bookmarks.DeleteSelectedMessage" xml:space="preserve">Excluir os {0} favoritos selecionados?</x:String>
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">Arraste uma pasta até aqui para adicioná-la aos favoritos</x:String>
   <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">Destino do link não encontrado</x:String>
   <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">O destino deste favorito, &quot;{0}&quot;, foi alterado, movido ou excluído. Deseja excluir este favorito?</x:String>

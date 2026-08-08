@@ -2296,6 +2296,29 @@ public partial class MainWindowViewModel : ObservableObject
         SaveBookmarks();
     }
 
+    /// <summary>選択した複数のお気に入りをまとめて削除する（保存と再構築は最後に 1 回だけ）。</summary>
+    public void RemoveBookmarks(IReadOnlyList<BookmarkNode> nodes)
+    {
+        if (RemoveBookmarksRecursive(_settings.Bookmarks, nodes))
+        {
+            SaveBookmarks();
+        }
+    }
+
+    /// <summary>複数ノードの削除本体。グループフォルダーとその子が同時に選ばれていても、
+    /// 先に親が消えた時点で子の削除は空振りするだけなので順序を気にしなくてよい。
+    /// 1 件でも消えたら true を返す（何も消えなければ保存しない）。</summary>
+    internal static bool RemoveBookmarksRecursive(List<BookmarkNode> list, IReadOnlyList<BookmarkNode> nodes)
+    {
+        var removed = false;
+        foreach (var node in nodes)
+        {
+            removed |= RemoveBookmarkRecursive(list, node);
+        }
+
+        return removed;
+    }
+
     private static bool RemoveBookmarkRecursive(List<BookmarkNode> list, BookmarkNode node)
     {
         if (list.Remove(node))

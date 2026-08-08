@@ -9,6 +9,7 @@
   <x:String x:Key="Text.Address.Copy" xml:space="preserve">पदवीं प्रतिलिख</x:String>
   <x:String x:Key="Text.Address.Edit" xml:space="preserve">पदवीं सम्पादय</x:String>
   <x:String x:Key="Text.Bookmarks.AddCurrent" xml:space="preserve">वर्तमानं सञ्चिकाकोष्ठं योजय</x:String>
+  <x:String x:Key="Text.Bookmarks.DeleteSelectedMessage" xml:space="preserve">चितानि {0} रुचिचिह्नानि लोपयितुम् इच्छसि वा?</x:String>
   <x:String x:Key="Text.Bookmarks.Empty" xml:space="preserve">चिह्नेषु योजयितुम् अत्र सञ्चिकाकोष्ठम् आकर्षय</x:String>
   <x:String x:Key="Text.Bookmarks.MissingTitle" xml:space="preserve">लक्ष्यं न प्राप्तम्</x:String>
   <x:String x:Key="Text.Bookmarks.MissingMessage" xml:space="preserve">अस्य रुचिचिह्नस्य लक्ष्यं &quot;{0}&quot; परिवर्तितं चालितं वा लोपितम् अस्ति। इदं रुचिचिह्नं लोपयितुम् इच्छसि वा?</x:String>
